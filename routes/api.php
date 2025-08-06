@@ -1,0 +1,408 @@
+<?php
+// routes/api.php
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+
+// Controllers
+use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\UserController;
+use App\Http\Controllers\API\ProductController;
+use App\Http\Controllers\API\CategoryController;
+use App\Http\Controllers\API\BrandController;
+use App\Http\Controllers\API\ConditionController;
+use App\Http\Controllers\API\LiveController;
+use App\Http\Controllers\API\StoryController;
+use App\Http\Controllers\API\OrderController;
+use App\Http\Controllers\API\ConversationController;
+use App\Http\Controllers\API\MessageController;
+use App\Http\Controllers\API\ReviewController;
+use App\Http\Controllers\API\NotificationController;
+use App\Http\Controllers\API\SearchController;
+use App\Http\Controllers\API\FeedController;
+use App\Http\Controllers\API\ReportController;
+use App\Http\Controllers\API\PaymentController;
+use App\Http\Controllers\API\AnalyticsController;
+
+/*
+|--------------------------------------------------------------------------
+| API Routes
+|--------------------------------------------------------------------------
+*/
+
+// Routes publiques
+Route::prefix('v1')->group(function () {
+
+    // Authentication Routes
+    Route::prefix('auth')->group(function () {
+        Route::post('register', [AuthController::class, 'register']);
+        Route::post('login', [AuthController::class, 'login']);
+        Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
+        Route::post('reset-password', [AuthController::class, 'resetPassword']);
+        Route::post('verify-email', [AuthController::class, 'verifyEmail']);
+        Route::post('resend-verification', [AuthController::class, 'resendVerification']);
+    });
+
+    // Public Routes (sans authentification)
+    Route::group([], function () {
+        // Categories
+        Route::get('categories', [CategoryController::class, 'index']);
+        Route::get('categories/{category}', [CategoryController::class, 'show']);
+
+        // Brands
+        Route::get('brands', [BrandController::class, 'index']);
+        Route::get('brands/{brand}', [BrandController::class, 'show']);
+
+        // Conditions
+        Route::get('conditions', [ConditionController::class, 'index']);
+
+        // Products (lecture seule)
+        Route::get('products', [ProductController::class, 'index']);
+        Route::get('products/{product}', [ProductController::class, 'show']);
+        Route::get('products/{product}/similar', [ProductController::class, 'similar']);
+
+        // Users (lecture seule)
+        Route::get('users/{user}', [UserController::class, 'show']);
+        Route::get('users/{user}/products', [UserController::class, 'userProducts']);
+        Route::get('users/{user}/followers', [UserController::class, 'followers']);
+        Route::get('users/{user}/following', [UserController::class, 'following']);
+
+        // Lives publics
+        Route::get('lives', [LiveController::class, 'index']);
+        Route::get('lives/{live}', [LiveController::class, 'show']);
+
+        // Search
+        Route::get('search', [SearchController::class, 'search']);
+        Route::get('search/suggestions', [SearchController::class, 'suggestions']);
+
+        // Explore
+        Route::get('explore', [FeedController::class, 'explore']);
+        Route::get('trending', [ProductController::class, 'trending']);
+    });
+
+    // Routes authentifiées
+    Route::middleware('auth:sanctum')->group(function () {
+
+        // Auth user routes
+        Route::prefix('auth')->group(function () {
+            Route::get('user', [AuthController::class, 'user']);
+            Route::post('logout', [AuthController::class, 'logout']);
+            Route::put('update-profile', [AuthController::class, 'updateProfile']);
+            Route::post('change-password', [AuthController::class, 'changePassword']);
+            Route::delete('delete-account', [AuthController::class, 'deleteAccount']);
+        });
+
+        // User Routes
+        Route::prefix('users')->group(function () {
+            Route::get('/', [UserController::class, 'index']);
+            Route::put('profile', [UserController::class, 'update']);
+            Route::post('{user}/follow', [UserController::class, 'follow']);
+            Route::delete('{user}/unfollow', [UserController::class, 'unfollow']);
+            Route::get('my-followers', [UserController::class, 'myFollowers']);
+            Route::get('my-following', [UserController::class, 'myFollowing']);
+            Route::put('settings', [UserController::class, 'updateSettings']);
+            Route::post('avatar', [UserController::class, 'updateAvatar']);
+            Route::post('cover', [UserController::class, 'updateCover']);
+        });
+
+        // Product Routes
+        Route::prefix('products')->group(function () {
+            Route::post('/', [ProductController::class, 'store']);
+            Route::put('{product}', [ProductController::class, 'update']);
+            Route::delete('{product}', [ProductController::class, 'destroy']);
+            Route::post('{product}/like', [ProductController::class, 'like']);
+            Route::post('{product}/favorite', [ProductController::class, 'favorite']);
+            Route::post('{product}/comment', [ProductController::class, 'addComment']);
+            Route::get('{product}/comments', [ProductController::class, 'getComments']);
+            Route::put('{product}/boost', [ProductController::class, 'boost']);
+            Route::post('{product}/share', [ProductController::class, 'share']);
+            Route::get('my-products', [ProductController::class, 'myProducts']);
+            Route::get('my-favorites', [ProductController::class, 'myFavorites']);
+            Route::get('my-likes', [ProductController::class, 'myLikes']);
+            Route::get('draft', [ProductController::class, 'draft']);
+            Route::get('sold', [ProductController::class, 'sold']);
+        });
+
+        // Live Routes
+        Route::prefix('lives')->group(function () {
+            Route::post('/', [LiveController::class, 'store']);
+            Route::put('{live}', [LiveController::class, 'update']);
+            Route::delete('{live}', [LiveController::class, 'destroy']);
+            Route::post('{live}/start', [LiveController::class, 'start']);
+            Route::post('{live}/end', [LiveController::class, 'end']);
+            Route::post('{live}/join', [LiveController::class, 'joinLive']);
+            Route::post('{live}/leave', [LiveController::class, 'leaveLive']);
+            Route::post('{live}/comment', [LiveController::class, 'addComment']);
+            Route::get('{live}/comments', [LiveController::class, 'getComments']);
+            Route::post('{live}/like', [LiveController::class, 'like']);
+            Route::get('my-lives', [LiveController::class, 'myLives']);
+            Route::get('following-lives', [LiveController::class, 'followingLives']);
+        });
+
+        // Story Routes
+        Route::prefix('stories')->group(function () {
+            Route::get('/', [StoryController::class, 'index']);
+            Route::post('/', [StoryController::class, 'store']);
+            Route::get('{story}', [StoryController::class, 'show']);
+            Route::delete('{story}', [StoryController::class, 'destroy']);
+            Route::post('{story}/view', [StoryController::class, 'view']);
+            Route::get('{story}/viewers', [StoryController::class, 'viewers']);
+            Route::get('my-stories', [StoryController::class, 'myStories']);
+            Route::get('following-stories', [StoryController::class, 'followingStories']);
+        });
+
+        // Order Routes
+        Route::prefix('orders')->group(function () {
+            Route::get('/', [OrderController::class, 'index']);
+            Route::post('/', [OrderController::class, 'store']);
+            Route::get('{order}', [OrderController::class, 'show']);
+            Route::put('{order}/status', [OrderController::class, 'updateStatus']);
+            Route::post('{order}/cancel', [OrderController::class, 'cancel']);
+            Route::post('{order}/dispute', [OrderController::class, 'dispute']);
+            Route::get('purchases', [OrderController::class, 'purchases']);
+            Route::get('sales', [OrderController::class, 'sales']);
+            Route::get('pending', [OrderController::class, 'pending']);
+        });
+
+        // Conversation & Messages Routes
+        Route::prefix('conversations')->group(function () {
+            Route::get('/', [ConversationController::class, 'index']);
+            Route::post('/', [ConversationController::class, 'store']);
+            Route::get('{conversation}', [ConversationController::class, 'show']);
+            Route::delete('{conversation}', [ConversationController::class, 'destroy']);
+            Route::post('{conversation}/messages', [MessageController::class, 'store']);
+            Route::get('{conversation}/messages', [MessageController::class, 'index']);
+            Route::put('messages/{message}/read', [MessageController::class, 'markAsRead']);
+            Route::delete('messages/{message}', [MessageController::class, 'destroy']);
+            Route::post('messages/{message}/report', [MessageController::class, 'report']);
+        });
+
+        // Review Routes
+        Route::prefix('reviews')->group(function () {
+            Route::post('/', [ReviewController::class, 'store']);
+            Route::put('{review}', [ReviewController::class, 'update']);
+            Route::delete('{review}', [ReviewController::class, 'destroy']);
+            Route::get('received', [ReviewController::class, 'received']);
+            Route::get('given', [ReviewController::class, 'given']);
+        });
+
+        // Notification Routes
+        Route::prefix('notifications')->group(function () {
+            Route::get('/', [NotificationController::class, 'index']);
+            Route::put('{notification}/read', [NotificationController::class, 'markAsRead']);
+            Route::post('mark-all-read', [NotificationController::class, 'markAllAsRead']);
+            Route::delete('{notification}', [NotificationController::class, 'destroy']);
+            Route::delete('clear-all', [NotificationController::class, 'clearAll']);
+            Route::get('unread-count', [NotificationController::class, 'unreadCount']);
+            Route::put('settings', [NotificationController::class, 'updateSettings']);
+        });
+
+        // Feed Routes
+        Route::prefix('feed')->group(function () {
+            Route::get('/', [FeedController::class, 'index']);
+            Route::get('following', [FeedController::class, 'following']);
+            Route::get('recommended', [FeedController::class, 'recommended']);
+            Route::post('refresh', [FeedController::class, 'refresh']);
+        });
+
+        // Report Routes
+        Route::prefix('reports')->group(function () {
+            Route::post('/', [ReportController::class, 'store']);
+            Route::get('my-reports', [ReportController::class, 'myReports']);
+        });
+
+        // Payment Routes
+        Route::prefix('payments')->group(function () {
+            Route::get('methods', [PaymentController::class, 'getMethods']);
+            Route::post('methods', [PaymentController::class, 'addMethod']);
+            Route::put('methods/{method}', [PaymentController::class, 'updateMethod']);
+            Route::delete('methods/{method}', [PaymentController::class, 'deleteMethod']);
+            Route::post('methods/{method}/default', [PaymentController::class, 'setDefault']);
+            Route::post('process', [PaymentController::class, 'process']);
+            Route::get('history', [PaymentController::class, 'history']);
+        });
+
+        // Shipping Address Routes
+        Route::prefix('addresses')->group(function () {
+            Route::get('/', [UserController::class, 'getAddresses']);
+            Route::post('/', [UserController::class, 'addAddress']);
+            Route::put('{address}', [UserController::class, 'updateAddress']);
+            Route::delete('{address}', [UserController::class, 'deleteAddress']);
+            Route::post('{address}/default', [UserController::class, 'setDefaultAddress']);
+        });
+
+        // Analytics Routes (for sellers)
+        Route::prefix('analytics')->group(function () {
+            Route::get('dashboard', [AnalyticsController::class, 'dashboard']);
+            Route::get('products', [AnalyticsController::class, 'productsAnalytics']);
+            Route::get('sales', [AnalyticsController::class, 'salesAnalytics']);
+            Route::get('followers', [AnalyticsController::class, 'followersAnalytics']);
+            Route::get('engagement', [AnalyticsController::class, 'engagementAnalytics']);
+        });
+
+        // Additional User Actions
+        Route::prefix('me')->group(function () {
+            Route::get('dashboard', [UserController::class, 'dashboard']);
+            Route::get('stats', [UserController::class, 'stats']);
+            Route::get('activity', [UserController::class, 'activity']);
+            Route::get('earnings', [UserController::class, 'earnings']);
+            Route::get('recent-views', [UserController::class, 'recentViews']);
+        });
+    });
+
+    // Admin Routes (protected by admin middleware)
+    Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
+
+        // User Management
+        Route::prefix('users')->group(function () {
+            Route::get('/', [Admin\UserController::class, 'index']);
+            Route::get('{user}', [Admin\UserController::class, 'show']);
+            Route::put('{user}/verify', [Admin\UserController::class, 'verify']);
+            Route::put('{user}/ban', [Admin\UserController::class, 'ban']);
+            Route::put('{user}/unban', [Admin\UserController::class, 'unban']);
+            Route::delete('{user}', [Admin\UserController::class, 'destroy']);
+        });
+
+        // Product Management
+        Route::prefix('products')->group(function () {
+            Route::get('/', [Admin\ProductController::class, 'index']);
+            Route::get('pending', [Admin\ProductController::class, 'pending']);
+            Route::put('{product}/approve', [Admin\ProductController::class, 'approve']);
+            Route::put('{product}/reject', [Admin\ProductController::class, 'reject']);
+            Route::put('{product}/feature', [Admin\ProductController::class, 'feature']);
+            Route::delete('{product}', [Admin\ProductController::class, 'destroy']);
+        });
+
+        // Report Management
+        Route::prefix('reports')->group(function () {
+            Route::get('/', [Admin\ReportController::class, 'index']);
+            Route::get('{report}', [Admin\ReportController::class, 'show']);
+            Route::put('{report}/resolve', [Admin\ReportController::class, 'resolve']);
+            Route::put('{report}/dismiss', [Admin\ReportController::class, 'dismiss']);
+        });
+
+        // Category Management
+        Route::prefix('categories')->group(function () {
+            Route::post('/', [Admin\CategoryController::class, 'store']);
+            Route::put('{category}', [Admin\CategoryController::class, 'update']);
+            Route::delete('{category}', [Admin\CategoryController::class, 'destroy']);
+        });
+
+        // Brand Management
+        Route::prefix('brands')->group(function () {
+            Route::post('/', [Admin\BrandController::class, 'store']);
+            Route::put('{brand}', [Admin\BrandController::class, 'update']);
+            Route::delete('{brand}', [Admin\BrandController::class, 'destroy']);
+        });
+
+        // Analytics & Statistics
+        Route::prefix('analytics')->group(function () {
+            Route::get('overview', [Admin\AnalyticsController::class, 'overview']);
+            Route::get('users', [Admin\AnalyticsController::class, 'users']);
+            Route::get('products', [Admin\AnalyticsController::class, 'products']);
+            Route::get('sales', [Admin\AnalyticsController::class, 'sales']);
+            Route::get('reports', [Admin\AnalyticsController::class, 'reports']);
+        });
+
+        // System Settings
+        Route::prefix('settings')->group(function () {
+            Route::get('/', [Admin\SettingsController::class, 'index']);
+            Route::put('/', [Admin\SettingsController::class, 'update']);
+        });
+    });
+});
+
+// Webhook Routes (for payment providers, etc.)
+Route::prefix('webhooks')->group(function () {
+    Route::post('stripe', [PaymentController::class, 'stripeWebhook']);
+    Route::post('paypal', [PaymentController::class, 'paypalWebhook']);
+});
+
+// Fallback route for API
+Route::fallback(function () {
+    return response()->json([
+        'success' => false,
+        'message' => 'API endpoint not found'
+    ], 404);
+});
+
+// Rate limiting for API routes
+Route::middleware(['throttle:api'])->group(function () {
+    // All API routes are automatically rate limited
+});
+
+// Special rate limiting for auth routes
+Route::middleware(['throttle:auth'])->prefix('v1/auth')->group(function () {
+    // Auth routes with stricter rate limiting are handled above
+});
+
+/*
+|--------------------------------------------------------------------------
+| Route Model Bindings
+|--------------------------------------------------------------------------
+*/
+
+// Custom route model bindings can be defined in RouteServiceProvider
+// Example: Route::model('user', User::class);
+
+/*
+|--------------------------------------------------------------------------
+| API Versioning
+|--------------------------------------------------------------------------
+*/
+
+// v2 API routes (for future versions)
+Route::prefix('v2')->group(function () {
+    // Future API versions can be added here
+    Route::get('status', function () {
+        return response()->json([
+            'version' => '2.0',
+            'status' => 'development'
+        ]);
+    });
+});
+
+/*
+|--------------------------------------------------------------------------
+| Health Check & Status Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('health')->group(function () {
+    Route::get('/', function () {
+        return response()->json([
+            'status' => 'OK',
+            'timestamp' => now(),
+            'version' => config('app.version', '1.0.0')
+        ]);
+    });
+
+    Route::get('database', function () {
+        try {
+            DB::connection()->getPdo();
+            return response()->json(['database' => 'connected']);
+        } catch (\Exception $e) {
+            return response()->json(['database' => 'disconnected'], 500);
+        }
+    });
+});
+
+/*
+|--------------------------------------------------------------------------
+| Documentation Route
+|--------------------------------------------------------------------------
+*/
+
+Route::get('docs', function () {
+    return response()->json([
+        'message' => 'API Documentation',
+        'version' => '1.0.0',
+        'endpoints' => [
+            'auth' => '/api/v1/auth',
+            'products' => '/api/v1/products',
+            'users' => '/api/v1/users',
+            'orders' => '/api/v1/orders',
+            'lives' => '/api/v1/lives',
+            'stories' => '/api/v1/stories',
+        ]
+    ]);
+});
