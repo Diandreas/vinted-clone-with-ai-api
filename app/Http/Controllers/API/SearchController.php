@@ -1,56 +1,88 @@
 <?php
+
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\User;
+use App\Models\Brand;
+use App\Models\Category;
 use Illuminate\Http\Request;
 
 class SearchController extends Controller
 {
     public function search(Request $request)
     {
-        $request->validate([
-            'query' => 'required|string|min:2',
-            'type' => 'in:products,users,all',
-        ]);
-
-        $query = $request->query;
-        $type = isset($request->type) ? $request->type : 'all';
-        $results = [];
-
-        if ($type === 'products' || $type === 'all') {
-            $products = Product::search($query)
-                ->take(20)
-                ->get()
-                ->load(['user', 'images', 'category']);
-
-            $results['products'] = $products;
+        $query = $request->get('q', '');
+        $type = $request->get('type', 'all'); // all, products, users, brands
+        
+        if (empty($query)) {
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'products' => [],
+                    'users' => [],
+                    'brands' => [],
+                    'categories' => [],
+                ]
+            ]);
         }
 
-        if ($type === 'users' || $type === 'all') {
-            $users = User::where('name', 'like', "%{$query}%")
-                ->orWhere('username', 'like', "%{$query}%")
+        $results = [];
+
+        if ($type === 'all' || $type === 'products') {
+            $results['products'] = Product::search($query)
+                ->with(['user', 'images', 'category', 'brand'])
                 ->active()
                 ->take(20)
                 ->get();
+        }
 
-            $results['users'] = $users;
+        if ($type === 'all' || $type === 'users') {
+            $results['users'] = User::search($query)
+                ->take(10)
+                ->get();
+        }
+
+        if ($type === 'all' || $type === 'brands') {
+            $results['brands'] = Brand::where('name', 'like', "%{$query}%")
+                ->active()
+                ->take(10)
+                ->get();
+        }
+
+        if ($type === 'all' || $type === 'categories') {
+            $results['categories'] = Category::where('name', 'like', "%{$query}%")
+                ->active()
+                ->take(10)
+                ->get();
         }
 
         return response()->json([
             'success' => true,
-            'data' => $results
+            'data' => $results,
+            'query' => $query,
+            'type' => $type
         ]);
     }
 
     public function suggestions(Request $request)
     {
-        $suggestions = [
-            'trending' => ['sneakers', 'vintage', 'designer'],
-            'categories' => ['clothing', 'shoes', 'accessories'],
-            'brands' => ['nike', 'adidas', 'zara'],
-        ];
+        $query = $request->get('q', '');
+        
+        if (strlen($query) < 2) {
+            return response()->json([
+                'success' => true,
+                'data' => []
+            ]);
+        }
+
+        // Get popular search terms and product titles
+        $suggestions = Product::where('title', 'like', "%{$query}%")
+            ->active()
+            ->groupBy('title')
+            ->pluck('title')
+            ->take(10);
 
         return response()->json([
             'success' => true,

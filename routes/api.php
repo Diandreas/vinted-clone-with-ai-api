@@ -23,6 +23,15 @@ use App\Http\Controllers\API\ReportController;
 use App\Http\Controllers\API\PaymentController;
 use App\Http\Controllers\API\AnalyticsController;
 
+// Admin Controllers - Specific imports
+use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Admin\ReportController as AdminReportController;
+use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Admin\BrandController as AdminBrandController;
+use App\Http\Controllers\Admin\AnalyticsController as AdminAnalyticsController;
+use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -57,8 +66,8 @@ Route::prefix('v1')->group(function () {
 
         // Products (lecture seule)
         Route::get('products', [ProductController::class, 'index']);
-        Route::get('products/{product}', [ProductController::class, 'show']);
-        Route::get('products/{product}/similar', [ProductController::class, 'similar']);
+        Route::get('products/{product}', [ProductController::class, 'show'])->where('product', '[0-9]+');
+        Route::get('products/{product}/similar', [ProductController::class, 'similar'])->where('product', '[0-9]+');
 
         // Users (lecture seule)
         Route::get('users/{user}', [UserController::class, 'show']);
@@ -107,6 +116,13 @@ Route::prefix('v1')->group(function () {
         // Product Routes
         Route::prefix('products')->group(function () {
             Route::post('/', [ProductController::class, 'store']);
+            // Static routes MUST come before parameterized routes
+            Route::get('my-products', [ProductController::class, 'myProducts']);
+            Route::get('my-favorites', [ProductController::class, 'myFavorites']);
+            Route::get('my-likes', [ProductController::class, 'myLikes']);
+            Route::get('draft', [ProductController::class, 'draft']);
+            Route::get('sold', [ProductController::class, 'sold']);
+            // Parameterized routes come after
             Route::put('{product}', [ProductController::class, 'update']);
             Route::delete('{product}', [ProductController::class, 'destroy']);
             Route::post('{product}/like', [ProductController::class, 'like']);
@@ -115,11 +131,6 @@ Route::prefix('v1')->group(function () {
             Route::get('{product}/comments', [ProductController::class, 'getComments']);
             Route::put('{product}/boost', [ProductController::class, 'boost']);
             Route::post('{product}/share', [ProductController::class, 'share']);
-            Route::get('my-products', [ProductController::class, 'myProducts']);
-            Route::get('my-favorites', [ProductController::class, 'myFavorites']);
-            Route::get('my-likes', [ProductController::class, 'myLikes']);
-            Route::get('draft', [ProductController::class, 'draft']);
-            Route::get('sold', [ProductController::class, 'sold']);
         });
 
         // Live Routes
@@ -254,59 +265,59 @@ Route::prefix('v1')->group(function () {
 
         // User Management
         Route::prefix('users')->group(function () {
-            Route::get('/', [Admin\UserController::class, 'index']);
-            Route::get('{user}', [Admin\UserController::class, 'show']);
-            Route::put('{user}/verify', [Admin\UserController::class, 'verify']);
-            Route::put('{user}/ban', [Admin\UserController::class, 'ban']);
-            Route::put('{user}/unban', [Admin\UserController::class, 'unban']);
-            Route::delete('{user}', [Admin\UserController::class, 'destroy']);
+            Route::get('/', [AdminUserController::class, 'index']);
+            Route::get('{user}', [AdminUserController::class, 'show']);
+            Route::put('{user}/verify', [AdminUserController::class, 'verify']);
+            Route::put('{user}/ban', [AdminUserController::class, 'ban']);
+            Route::put('{user}/unban', [AdminUserController::class, 'unban']);
+            Route::delete('{user}', [AdminUserController::class, 'destroy']);
         });
 
         // Product Management
         Route::prefix('products')->group(function () {
-            Route::get('/', [Admin\ProductController::class, 'index']);
-            Route::get('pending', [Admin\ProductController::class, 'pending']);
-            Route::put('{product}/approve', [Admin\ProductController::class, 'approve']);
-            Route::put('{product}/reject', [Admin\ProductController::class, 'reject']);
-            Route::put('{product}/feature', [Admin\ProductController::class, 'feature']);
-            Route::delete('{product}', [Admin\ProductController::class, 'destroy']);
+            Route::get('/', [AdminProductController::class, 'index']);
+            Route::get('pending', [AdminProductController::class, 'pending']);
+            Route::put('{product}/approve', [AdminProductController::class, 'approve']);
+            Route::put('{product}/reject', [AdminProductController::class, 'reject']);
+            Route::put('{product}/feature', [AdminProductController::class, 'feature']);
+            Route::delete('{product}', [AdminProductController::class, 'destroy']);
         });
 
         // Report Management
         Route::prefix('reports')->group(function () {
-            Route::get('/', [Admin\ReportController::class, 'index']);
-            Route::get('{report}', [Admin\ReportController::class, 'show']);
-            Route::put('{report}/resolve', [Admin\ReportController::class, 'resolve']);
-            Route::put('{report}/dismiss', [Admin\ReportController::class, 'dismiss']);
+            Route::get('/', [AdminReportController::class, 'index']);
+            Route::get('{report}', [AdminReportController::class, 'show']);
+            Route::put('{report}/resolve', [AdminReportController::class, 'resolve']);
+            Route::put('{report}/dismiss', [AdminReportController::class, 'dismiss']);
         });
 
         // Category Management
         Route::prefix('categories')->group(function () {
-            Route::post('/', [Admin\CategoryController::class, 'store']);
-            Route::put('{category}', [Admin\CategoryController::class, 'update']);
-            Route::delete('{category}', [Admin\CategoryController::class, 'destroy']);
+            Route::post('/', [AdminCategoryController::class, 'store']);
+            Route::put('{category}', [AdminCategoryController::class, 'update']);
+            Route::delete('{category}', [AdminCategoryController::class, 'destroy']);
         });
 
         // Brand Management
         Route::prefix('brands')->group(function () {
-            Route::post('/', [Admin\BrandController::class, 'store']);
-            Route::put('{brand}', [Admin\BrandController::class, 'update']);
-            Route::delete('{brand}', [Admin\BrandController::class, 'destroy']);
+            Route::post('/', [AdminBrandController::class, 'store']);
+            Route::put('{brand}', [AdminBrandController::class, 'update']);
+            Route::delete('{brand}', [AdminBrandController::class, 'destroy']);
         });
 
         // Analytics & Statistics
         Route::prefix('analytics')->group(function () {
-            Route::get('overview', [Admin\AnalyticsController::class, 'overview']);
-            Route::get('users', [Admin\AnalyticsController::class, 'users']);
-            Route::get('products', [Admin\AnalyticsController::class, 'products']);
-            Route::get('sales', [Admin\AnalyticsController::class, 'sales']);
-            Route::get('reports', [Admin\AnalyticsController::class, 'reports']);
+            Route::get('overview', [AdminAnalyticsController::class, 'overview']);
+            Route::get('users', [AdminAnalyticsController::class, 'users']);
+            Route::get('products', [AdminAnalyticsController::class, 'products']);
+            Route::get('sales', [AdminAnalyticsController::class, 'sales']);
+            Route::get('reports', [AdminAnalyticsController::class, 'reports']);
         });
 
         // System Settings
         Route::prefix('settings')->group(function () {
-            Route::get('/', [Admin\SettingsController::class, 'index']);
-            Route::put('/', [Admin\SettingsController::class, 'update']);
+            Route::get('/', [AdminSettingsController::class, 'index']);
+            Route::put('/', [AdminSettingsController::class, 'update']);
         });
     });
 });

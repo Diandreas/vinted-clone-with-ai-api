@@ -13,7 +13,14 @@ return new class extends Migration
     {
         Schema::create('product_views', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('product_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
+            $table->string('ip_address', 45)->nullable();
+            $table->timestamp('viewed_at');
             $table->timestamps();
+            
+            $table->index(['product_id', 'viewed_at']);
+            $table->index(['user_id', 'viewed_at']);
         });
     }
 

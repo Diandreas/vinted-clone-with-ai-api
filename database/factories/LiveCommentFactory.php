@@ -3,13 +3,13 @@
 namespace Database\Factories;
 
 use App\Models\User;
-use App\Models\Product;
+use App\Models\Live;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ProductComment>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\LiveComment>
  */
-class ProductCommentFactory extends Factory
+class LiveCommentFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -19,9 +19,9 @@ class ProductCommentFactory extends Factory
     public function definition(): array
     {
         return [
-            'product_id' => Product::factory(),
+            'live_id' => Live::factory(),
             'user_id' => User::factory(),
-            'content' => fake()->paragraph(),
+            'content' => fake()->sentence(),
         ];
     }
 }

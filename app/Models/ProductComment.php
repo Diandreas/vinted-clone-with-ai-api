@@ -7,6 +7,21 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProductComment extends Model
 {
-    /** @use HasFactory<\Database\Factories\ProductCommentFactory> */
     use HasFactory;
+
+    protected $fillable = [
+        'product_id',
+        'user_id',
+        'content',
+    ];
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

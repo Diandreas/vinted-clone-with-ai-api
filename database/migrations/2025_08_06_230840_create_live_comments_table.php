@@ -13,7 +13,12 @@ return new class extends Migration
     {
         Schema::create('live_comments', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('live_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->text('content');
             $table->timestamps();
+            
+            $table->index(['live_id', 'created_at']);
         });
     }
 

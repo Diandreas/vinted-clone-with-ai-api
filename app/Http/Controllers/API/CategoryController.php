@@ -9,7 +9,7 @@ class CategoryController extends Controller
     public function index()
     {
         $categories = Category::with(['children'])
-            ->parent()
+            ->whereNull('parent_id') // root categories
             ->active()
             ->orderBy('sort_order')
             ->get();
@@ -20,13 +20,22 @@ class CategoryController extends Controller
         ]);
     }
 
-    public function show(Category $category)
+        public function show(Category $category)
     {
-        $category->load(['children', 'parent']);
-
+        $category->load(['children', 'parent', 'products' => function($query) {
+            $query->active()->latest()->limit(20);
+        }]);
+        
         return response()->json([
             'success' => true,
-            'data' => $category
+            'data' => [
+                'category' => $category,
+                'products_count' => $category->products_count,
+                'stats' => [
+                    'total_products' => $category->products()->active()->count(),
+                    'subcategories_count' => $category->children()->count(),
+                ]
+            ]
         ]);
     }
 }

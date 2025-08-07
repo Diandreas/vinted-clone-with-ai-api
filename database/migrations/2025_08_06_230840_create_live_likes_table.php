@@ -13,7 +13,11 @@ return new class extends Migration
     {
         Schema::create('live_likes', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('live_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
+            
+            $table->unique(['live_id', 'user_id']);
         });
     }
 

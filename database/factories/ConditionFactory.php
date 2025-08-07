@@ -16,8 +16,16 @@ class ConditionFactory extends Factory
      */
     public function definition(): array
     {
+        $name = fake()->randomElement([
+            'Brand New', 'Like New', 'Very Good', 'Good', 'Fair', 'Poor'
+        ]);
+
         return [
-            //
+            'name' => $name,
+            'description' => fake()->sentence(),
+            'icon' => null,
+            'sort_order' => fake()->numberBetween(0, 10),
+            'is_active' => true,
         ];
     }
 }

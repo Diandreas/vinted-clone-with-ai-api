@@ -9,9 +9,11 @@ use App\Models\LiveComment;
 use App\Models\LiveLike;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class LiveController extends Controller
 {
+    use AuthorizesRequests;
     public function index(Request $request)
     {
         $lives = Live::with(['user'])
@@ -183,6 +185,129 @@ class LiveController extends Controller
         return response()->json([
             'success' => true,
             'viewers_count' => $live->viewers_count
+        ]);
+    }
+
+    public function destroy(Live $live)
+    {
+        if ($live->user_id !== auth()->id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+
+        $live->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Live deleted successfully'
+        ]);
+    }
+
+    public function start(Live $live)
+    {
+        if ($live->user_id !== auth()->id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+
+        if (!$live->canStart()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cannot start this live'
+            ], 400);
+        }
+
+        $live->start();
+
+        return response()->json([
+            'success' => true,
+            'data' => $live->fresh(),
+            'message' => 'Live started successfully'
+        ]);
+    }
+
+    public function end(Live $live)
+    {
+        if ($live->user_id !== auth()->id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+
+        if (!$live->canEnd()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cannot end this live'
+            ], 400);
+        }
+
+        $live->end();
+
+        return response()->json([
+            'success' => true,
+            'data' => $live->fresh(),
+            'message' => 'Live ended successfully'
+        ]);
+    }
+
+    public function getComments(Live $live)
+    {
+        $comments = $live->comments()
+            ->with('user:id,name,username,avatar')
+            ->latest()
+            ->paginate(50);
+
+        return response()->json([
+            'success' => true,
+            'data' => $comments
+        ]);
+    }
+
+    public function myLives()
+    {
+        $user = auth()->user();
+        
+        $lives = $user->lives()
+            ->with(['user'])
+            ->latest()
+            ->paginate(20);
+
+        return response()->json([
+            'success' => true,
+            'data' => $lives
+        ]);
+    }
+
+    public function followingLives()
+    {
+        $user = auth()->user();
+        $followingIds = $user->following()->pluck('following_id');
+        
+        if ($followingIds->isEmpty()) {
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'data' => [],
+                    'current_page' => 1,
+                    'total' => 0
+                ]
+            ]);
+        }
+
+        $lives = Live::with(['user'])
+            ->whereIn('user_id', $followingIds)
+            ->whereIn('status', ['scheduled', 'live'])
+            ->latest()
+            ->paginate(20);
+
+        return response()->json([
+            'success' => true,
+            'data' => $lives
         ]);
     }
 }

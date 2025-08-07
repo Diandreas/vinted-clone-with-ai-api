@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
@@ -10,24 +9,11 @@ use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $orders = Order::with(['product.images', 'buyer', 'seller'])
-            ->where(function ($query) use ($request) {
-                $query->where('buyer_id', $request->user()->id)
-                    ->orWhere('seller_id', $request->user()->id);
-            })
-            ->when($request->status, function ($query, $status) {
-                $query->where('status', $status);
-            })
-            ->when($request->type, function ($query, $type) use ($request) {
-                if ($type === 'purchases') {
-                    $query->where('buyer_id', $request->user()->id);
-                } elseif ($type === 'sales') {
-                    $query->where('seller_id', $request->user()->id);
-                }
-            })
-            ->orderBy('created_at', 'desc')
+        $orders = auth()->user()->orders_as_buyer()
+            ->with(['product', 'seller'])
+            ->latest()
             ->paginate(20);
 
         return response()->json([
@@ -41,56 +27,43 @@ class OrderController extends Controller
         $request->validate([
             'product_id' => 'required|exists:products,id',
             'shipping_address' => 'required|array',
-            'payment_method_id' => 'required|exists:payment_methods,id',
         ]);
 
         $product = Product::findOrFail($request->product_id);
-
-        if ($product->user_id === $request->user()->id) {
-            return response()->json([
-                'success' => false,
-                'message' => 'You cannot buy your own product'
-            ], 400);
-        }
-
-        if ($product->status !== 'active') {
+        
+        if ($product->status !== Product::STATUS_ACTIVE) {
             return response()->json([
                 'success' => false,
                 'message' => 'Product is not available'
             ], 400);
         }
 
-        $shippingCost = 5.99; // Calculer selon les règles
-        $serviceFee = $product->price * 0.05; // 5% de frais
-        $totalAmount = $product->price + $shippingCost + $serviceFee;
-
         $order = Order::create([
-            'buyer_id' => $request->user()->id,
+            'buyer_id' => auth()->id(),
             'seller_id' => $product->user_id,
             'product_id' => $product->id,
-            'amount' => $product->price,
-            'shipping_cost' => $shippingCost,
-            'service_fee' => $serviceFee,
-            'total_amount' => $totalAmount,
+            'total_amount' => $product->price,
+            'product_price' => $product->price,
             'shipping_address' => $request->shipping_address,
-            'status' => 'pending',
         ]);
-
-        // Marquer le produit comme réservé
-        $product->update(['status' => 'reserved']);
 
         return response()->json([
             'success' => true,
-            'data' => $order->load(['product.images', 'seller']),
+            'data' => $order,
             'message' => 'Order created successfully'
         ], 201);
     }
 
     public function show(Order $order)
     {
-        $this->authorize('view', $order);
+        if ($order->buyer_id !== auth()->id() && $order->seller_id !== auth()->id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
 
-        $order->load(['product.images', 'buyer', 'seller', 'reviews']);
+        $order->load(['product', 'buyer', 'seller']);
 
         return response()->json([
             'success' => true,
@@ -98,35 +71,102 @@ class OrderController extends Controller
         ]);
     }
 
-    public function updateStatus(Request $request, Order $order)
+    public function updateStatus(Order $order, Request $request)
     {
-        $this->authorize('update', $order);
+        if ($order->seller_id !== auth()->id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
 
         $request->validate([
-            'status' => 'required|in:paid,shipped,delivered,cancelled',
-            'tracking_number' => 'required_if:status,shipped|string',
+            'status' => 'required|in:confirmed,shipped,delivered,cancelled',
         ]);
 
-        $order->update([
-            'status' => $request->status,
-            'tracking_number' => $request->tracking_number,
-            'shipped_at' => $request->status === 'shipped' ? now() : $order->shipped_at,
-            'delivered_at' => $request->status === 'delivered' ? now() : $order->delivered_at,
-        ]);
-
-        // Mettre à jour le statut du produit
-        if ($request->status === 'delivered') {
-            $order->product->update(['status' => 'sold']);
-            $order->seller->increment('total_sales');
-        } elseif ($request->status === 'cancelled') {
-            $order->product->update(['status' => 'active']);
-        }
+        $order->update(['status' => $request->status]);
 
         return response()->json([
             'success' => true,
-            'data' => $order,
+            'data' => $order->fresh(),
             'message' => 'Order status updated successfully'
         ]);
     }
-}
 
+    public function cancel(Order $order)
+    {
+        if ($order->buyer_id !== auth()->id() && $order->seller_id !== auth()->id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+
+        $order->cancel();
+
+        return response()->json([
+            'success' => true,
+            'data' => $order->fresh(),
+            'message' => 'Order cancelled successfully'
+        ]);
+    }
+
+    public function dispute(Order $order)
+    {
+        if ($order->buyer_id !== auth()->id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+
+        // Handle dispute logic here
+        return response()->json([
+            'success' => true,
+            'message' => 'Dispute opened successfully'
+        ]);
+    }
+
+    public function purchases()
+    {
+        $orders = auth()->user()->orders_as_buyer()
+            ->with(['product', 'seller'])
+            ->latest()
+            ->paginate(20);
+
+        return response()->json([
+            'success' => true,
+            'data' => $orders
+        ]);
+    }
+
+    public function sales()
+    {
+        $orders = auth()->user()->orders_as_seller()
+            ->with(['product', 'buyer'])
+            ->latest()
+            ->paginate(20);
+
+        return response()->json([
+            'success' => true,
+            'data' => $orders
+        ]);
+    }
+
+    public function pending()
+    {
+        $orders = Order::where(function($query) {
+                $query->where('buyer_id', auth()->id())
+                      ->orWhere('seller_id', auth()->id());
+            })
+            ->pending()
+            ->with(['product', 'buyer', 'seller'])
+            ->latest()
+            ->paginate(20);
+
+        return response()->json([
+            'success' => true,
+            'data' => $orders
+        ]);
+    }
+}

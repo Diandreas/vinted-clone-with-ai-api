@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\Category;
 use App\Models\Brand;
 use App\Models\Condition;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -15,6 +16,7 @@ use App\Jobs\IndexProductForSearch;
 
 class ProductController extends Controller
 {
+    use AuthorizesRequests;
     /**
      * Display a listing of products.
      */
@@ -193,7 +195,12 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        $this->authorize('update', $product);
+        if ($product->user_id !== Auth::id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
 
         $request->validate([
             'title' => 'sometimes|string|max:255',
@@ -240,7 +247,12 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        $this->authorize('delete', $product);
+        if ($product->user_id !== Auth::id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
 
         $product->delete();
 
@@ -326,7 +338,12 @@ class ProductController extends Controller
      */
     public function boost(Request $request, Product $product)
     {
-        $this->authorize('update', $product);
+        if ($product->user_id !== Auth::id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
 
         $request->validate([
             'hours' => 'required|integer|min:1|max:168', // Max 1 week
@@ -358,14 +375,10 @@ class ProductController extends Controller
      */
     public function myProducts(Request $request)
     {
-        $query = Auth::user()->products()
-                     ->with(['category', 'brand', 'condition', 'mainImage']);
-
-        if ($request->status) {
-            $query->where('status', $request->status);
-        }
-
-        $products = $query->latest()->paginate($request->per_page ?? 20);
+        $products = Auth::user()->products()
+                        ->with(['user', 'category', 'brand', 'condition'])
+                        ->latest()
+                        ->paginate($request->per_page ?? 20);
 
         return response()->json([
             'success' => true,

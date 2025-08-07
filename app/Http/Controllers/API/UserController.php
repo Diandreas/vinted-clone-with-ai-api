@@ -1,44 +1,167 @@
 <?php
-// app/Http/Controllers/API/UserController.php
-use App\Models\ProductView;
+
+namespace App\Http\Controllers\API;
+
+use App\Http\Controllers\Controller;
+use App\Models\User;
+use App\Models\Follow;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
-class ProductController extends Controller
+class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $products = Product::with(['user', 'images', 'category', 'brand', 'condition'])
-            ->active()
-            ->published()
-            ->when($request->category_id, function($query, $categoryId) {
-                $query->where('category_id', $categoryId);
-            })
-            ->when($request->brand_id, function($query, $brandId) {
-                $query->where('brand_id', $brandId);
-            })
-            ->when($request->min_price, function($query, $minPrice) {
-                $query->where('price', '>=', $minPrice);
-            })
-            ->when($request->max_price, function($query, $maxPrice) {
-                $query->where('price', '<=', $maxPrice);
-            })
-            ->when($request->condition_id, function($query, $conditionId) {
-                $query->where('condition_id', $conditionId);
-            })
-            ->when($request->size, function($query, $size) {
-                $query->where('size', $size);
-            })
-            ->when($request->color, function($query, $color) {
-                $query->where('color', 'like', "%{$color}%");
-            })
+        $users = User::query()
             ->when($request->search, function($query, $search) {
-                $query->where(function($q) use ($search) {
-                    $q->where('title', 'like', "%{$search}%")
-                        ->orWhere('description', 'like', "%{$search}%");
-                });
+                $query->where('name', 'like', "%{$search}%")
+                      ->orWhere('username', 'like', "%{$search}%");
             })
-            ->orderBy(isset($request->sort_by) ? $request->sort_by : 'created_at', isset($request->sort_order) ? $request->sort_order : 'desc')
+            ->when($request->verified, function($query) {
+                $query->verified();
+            })
+            ->when($request->is_live, function($query) {
+                $query->live();
+            })
+            ->recentlyActive()
+            ->paginate(20);
+
+        return response()->json([
+            'success' => true,
+            'data' => $users
+        ]);
+    }
+
+    public function show(User $user)
+    {
+        $user->load(['products' => function($query) {
+            $query->active()->latest()->limit(6);
+        }]);
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'user' => $user,
+                'stats' => [
+                    'products_count' => $user->products()->active()->count(),
+                    'followers_count' => $user->followers_count,
+                    'following_count' => $user->following_count,
+                    'average_rating' => $user->average_rating,
+                ],
+                'is_following' => Auth::check() ? $user->isFollowing(Auth::user()) : false,
+            ]
+        ]);
+    }
+
+    public function update(Request $request)
+    {
+        $user = Auth::user();
+        
+        $request->validate([
+            'name' => 'string|max:255',
+            'bio' => 'nullable|string|max:500',
+            'website' => 'nullable|url|max:255',
+            'location' => 'nullable|string|max:255',
+            'phone' => 'nullable|string|max:20',
+        ]);
+
+        $user->update($request->only([
+            'name', 'bio', 'website', 'location', 'phone'
+        ]));
+
+        return response()->json([
+            'success' => true,
+            'data' => $user->fresh(),
+            'message' => 'Profile updated successfully'
+        ]);
+    }
+
+    public function follow(User $user)
+    {
+        $currentUser = Auth::user();
+        
+        if ($currentUser->id === $user->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You cannot follow yourself'
+            ], 400);
+        }
+
+        $result = $currentUser->follow($user);
+        
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'is_following' => $result,
+                'followers_count' => $user->fresh()->followers_count
+            ],
+            'message' => $result ? 'User followed successfully' : 'Already following this user'
+        ]);
+    }
+
+    public function unfollow(User $user)
+    {
+        $currentUser = Auth::user();
+        
+        $result = $currentUser->unfollow($user);
+        
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'is_following' => false,
+                'followers_count' => $user->fresh()->followers_count
+            ],
+            'message' => 'User unfollowed successfully'
+        ]);
+    }
+
+    public function followers(User $user)
+    {
+        $followers = $user->followers()
+            ->with('follower')
+            ->latest()
+            ->paginate(20);
+
+        return response()->json([
+            'success' => true,
+            'data' => $followers
+        ]);
+    }
+
+    public function following(User $user)
+    {
+        $following = $user->following()
+            ->with('following')
+            ->latest()
+            ->paginate(20);
+
+        return response()->json([
+            'success' => true,
+            'data' => $following
+        ]);
+    }
+
+    public function myFollowers()
+    {
+        $user = Auth::user();
+        
+        return $this->followers($user);
+    }
+
+    public function myFollowing()
+    {
+        $user = Auth::user();
+        
+        return $this->following($user);
+    }
+
+    public function userProducts(User $user)
+    {
+        $products = $user->products()
+            ->with(['images', 'category', 'brand', 'condition'])
+            ->active()
+            ->latest()
             ->paginate(20);
 
         return response()->json([
@@ -47,208 +170,228 @@ class ProductController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function updateAvatar(Request $request)
     {
         $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'price' => 'required|numeric|min:0',
-            'original_price' => 'nullable|numeric|min:0',
-            'category_id' => 'required|exists:categories,id',
-            'brand_id' => 'nullable|exists:brands,id',
-            'condition_id' => 'required|exists:conditions,id',
-            'size' => 'nullable|string',
-            'color' => 'nullable|string',
-            'material' => 'nullable|string',
-            'images' => 'required|array|min:1|max:10',
-            'images.*' => 'image|mimes:jpg,jpeg,png|max:5120',
-            'is_negotiable' => 'boolean',
-            'status' => 'in:draft,active',
+            'avatar' => 'required|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
-        $product = Product::create([
-            'title' => $request->title,
-            'description' => $request->description,
-            'price' => $request->price,
-            'original_price' => $request->original_price,
-            'category_id' => $request->category_id,
-            'brand_id' => $request->brand_id,
-            'condition_id' => $request->condition_id,
-            'size' => $request->size,
-            'color' => $request->color,
-            'material' => $request->material,
-            'user_id' => $request->user()->id,
-            'is_negotiable' => $request->boolean('is_negotiable', true),
-            'status' => isset($request->status) ? $request->status : 'active',
-            'published_at' => $request->status === 'active' ? now() : null,
-        ]);
-
-        // Gestion des images
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $index => $image) {
-                $path = $image->store('products', 'public');
-                $product->images()->create([
-                    'url' => $path,
-                    'sort_order' => $index,
-                    'is_primary' => $index === 0,
-                ]);
-            }
+        $user = Auth::user();
+        
+        // Delete old avatar if exists
+        if ($user->avatar && Storage::exists('public/avatars/' . $user->avatar)) {
+            Storage::delete('public/avatars/' . $user->avatar);
         }
+
+        // Store new avatar
+        $filename = time() . '_' . $request->file('avatar')->getClientOriginalName();
+        $request->file('avatar')->storeAs('public/avatars', $filename);
+
+        $user->update(['avatar' => $filename]);
 
         return response()->json([
             'success' => true,
-            'data' => $product->load(['images', 'category', 'brand', 'condition']),
-            'message' => 'Product created successfully'
+            'data' => [
+                'avatar_url' => $user->fresh()->avatar_url
+            ],
+            'message' => 'Avatar updated successfully'
+        ]);
+    }
+
+    public function updateCover(Request $request)
+    {
+        $request->validate([
+            'cover' => 'required|image|mimes:jpeg,png,jpg|max:5120'
+        ]);
+
+        $user = Auth::user();
+        
+        // Delete old cover if exists
+        if ($user->cover_image && Storage::exists('public/covers/' . $user->cover_image)) {
+            Storage::delete('public/covers/' . $user->cover_image);
+        }
+
+        // Store new cover
+        $filename = time() . '_' . $request->file('cover')->getClientOriginalName();
+        $request->file('cover')->storeAs('public/covers', $filename);
+
+        $user->update(['cover_image' => $filename]);
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'cover_image_url' => $user->fresh()->cover_image_url
+            ],
+            'message' => 'Cover image updated successfully'
+        ]);
+    }
+
+    public function updateSettings(Request $request)
+    {
+        $request->validate([
+            'settings' => 'array',
+            'notification_settings' => 'array',
+            'privacy_settings' => 'array',
+        ]);
+
+        $user = Auth::user();
+        
+        $user->update([
+            'settings' => array_merge($user->settings ?? [], $request->settings ?? []),
+            'notification_settings' => array_merge($user->notification_settings ?? [], $request->notification_settings ?? []),
+            'privacy_settings' => array_merge($user->privacy_settings ?? [], $request->privacy_settings ?? []),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'data' => $user->fresh(),
+            'message' => 'Settings updated successfully'
+        ]);
+    }
+
+    public function dashboard()
+    {
+        $user = Auth::user();
+        
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'user' => $user,
+                'stats' => [
+                    'total_products' => $user->products()->count(),
+                    'active_products' => $user->products()->active()->count(),
+                    'sold_products' => $user->products()->sold()->count(),
+                    'total_sales' => $user->orders_as_seller()->completed()->sum('seller_earnings'),
+                    'followers_count' => $user->followers_count,
+                    'following_count' => $user->following_count,
+                    'average_rating' => $user->average_rating,
+                ],
+                'recent_activity' => [
+                    'recent_products' => $user->products()->latest()->limit(5)->get(),
+                    'recent_orders' => $user->orders_as_buyer()->latest()->limit(5)->get(),
+                    'recent_sales' => $user->orders_as_seller()->latest()->limit(5)->get(),
+                ]
+            ]
+        ]);
+    }
+
+    public function stats()
+    {
+        $user = Auth::user();
+        
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'products' => [
+                    'total' => $user->products()->count(),
+                    'active' => $user->products()->active()->count(),
+                    'sold' => $user->products()->sold()->count(),
+                    'draft' => $user->products()->draft()->count(),
+                ],
+                'sales' => [
+                    'total_earnings' => $user->orders_as_seller()->completed()->sum('seller_earnings'),
+                    'total_orders' => $user->orders_as_seller()->count(),
+                    'completed_orders' => $user->orders_as_seller()->completed()->count(),
+                    'pending_orders' => $user->orders_as_seller()->pending()->count(),
+                ],
+                'social' => [
+                    'followers_count' => $user->followers_count,
+                    'following_count' => $user->following_count,
+                    'average_rating' => $user->average_rating,
+                    'total_reviews' => $user->reviews_received()->count(),
+                ]
+            ]
+        ]);
+    }
+
+    public function activity()
+    {
+        $user = Auth::user();
+        
+        // This would typically come from an activity log
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'recent_logins' => [],
+                'recent_actions' => [],
+                'recent_views' => [],
+            ]
+        ]);
+    }
+
+    public function earnings()
+    {
+        $user = Auth::user();
+        
+        $earnings = $user->orders_as_seller()
+            ->completed()
+            ->selectRaw('DATE(created_at) as date, SUM(seller_earnings) as earnings')
+            ->groupBy('date')
+            ->orderBy('date', 'desc')
+            ->limit(30)
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'total_earnings' => $user->orders_as_seller()->completed()->sum('seller_earnings'),
+                'this_month' => $user->orders_as_seller()->completed()
+                    ->whereMonth('created_at', now()->month)
+                    ->sum('seller_earnings'),
+                'daily_earnings' => $earnings,
+            ]
+        ]);
+    }
+
+    public function recentViews()
+    {
+        $user = Auth::user();
+        
+        // This would come from a views tracking system
+        return response()->json([
+            'success' => true,
+            'data' => []
+        ]);
+    }
+
+    // Address management methods
+    public function getAddresses()
+    {
+        return response()->json([
+            'success' => true,
+            'data' => []
+        ]);
+    }
+
+    public function addAddress(Request $request)
+    {
+        return response()->json([
+            'success' => true,
+            'data' => []
         ], 201);
     }
 
-    public function show(Request $request, Product $product)
+    public function updateAddress($address, Request $request)
     {
-        // Enregistrer la vue
-        ProductView::create([
-            'product_id' => $product->id,
-            'user_id' => $request->user()->id,
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-            'viewed_at' => now(),
-        ]);
-
-        $product->increment('views_count');
-
-        $product->load([
-            'user',
-            'images',
-            'category',
-            'brand',
-            'condition',
-            'comments' => function($query) {
-                $query->with('user')->latest();
-            }
-        ]);
-
         return response()->json([
             'success' => true,
-            'data' => $product
+            'data' => []
         ]);
     }
 
-    public function update(Request $request, Product $product)
+    public function deleteAddress($address)
     {
-        $this->authorize('update', $product);
-
-        $request->validate([
-            'title' => 'sometimes|string|max:255',
-            'description' => 'sometimes|string',
-            'price' => 'sometimes|numeric|min:0',
-            'original_price' => 'nullable|numeric|min:0',
-            'category_id' => 'sometimes|exists:categories,id',
-            'brand_id' => 'nullable|exists:brands,id',
-            'condition_id' => 'sometimes|exists:conditions,id',
-            'size' => 'nullable|string',
-            'color' => 'nullable|string',
-            'material' => 'nullable|string',
-            'is_negotiable' => 'boolean',
-            'status' => 'in:draft,active,inactive',
-        ]);
-
-        $product->update($request->all());
-
         return response()->json([
             'success' => true,
-            'data' => $product->load(['images', 'category', 'brand', 'condition']),
-            'message' => 'Product updated successfully'
+            'message' => 'Address deleted successfully'
         ]);
     }
 
-    public function destroy(Product $product)
+    public function setDefaultAddress($address)
     {
-        $this->authorize('delete', $product);
-
-        // Supprimer les images
-        foreach ($product->images as $image) {
-            Storage::delete($image->url);
-            $image->delete();
-        }
-
-        $product->delete();
-
         return response()->json([
             'success' => true,
-            'message' => 'Product deleted successfully'
-        ]);
-    }
-
-    public function like(Request $request, Product $product)
-    {
-        $user = $request->user();
-
-        if ($product->isLikedBy($user)) {
-            $product->likes()->detach($user->id);
-            $product->decrement('likes_count');
-            $message = 'Product unliked';
-        } else {
-            $product->likes()->attach($user->id);
-            $product->increment('likes_count');
-            $message = 'Product liked';
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => $message,
-            'is_liked' => $product->isLikedBy($user)
-        ]);
-    }
-
-    public function favorite(Request $request, Product $product)
-    {
-        $user = $request->user();
-
-        if ($product->isFavoritedBy($user)) {
-            $product->favorites()->detach($user->id);
-            $product->decrement('favorites_count');
-            $message = 'Product removed from favorites';
-        } else {
-            $product->favorites()->attach($user->id);
-            $product->increment('favorites_count');
-            $message = 'Product added to favorites';
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => $message,
-            'is_favorited' => $product->isFavoritedBy($user)
-        ]);
-    }
-
-    public function myProducts(Request $request)
-    {
-        $products = Product::with(['images', 'category', 'brand', 'condition'])
-            ->where('user_id', $request->user()->id)
-            ->when($request->status, function($query, $status) {
-                $query->where('status', $status);
-            })
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
-
-        return response()->json([
-            'success' => true,
-            'data' => $products
-        ]);
-    }
-
-    public function myFavorites(Request $request)
-    {
-        $products = $request->user()
-            ->favorites()
-            ->with(['user', 'images', 'category', 'brand', 'condition'])
-            ->active()
-            ->paginate(20);
-
-        return response()->json([
-            'success' => true,
-            'data' => $products
+            'message' => 'Default address set successfully'
         ]);
     }
 }
-
-

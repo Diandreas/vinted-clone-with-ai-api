@@ -13,7 +13,12 @@ return new class extends Migration
     {
         Schema::create('product_comments', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('product_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->text('content');
             $table->timestamps();
+            
+            $table->index(['product_id', 'created_at']);
         });
     }
 

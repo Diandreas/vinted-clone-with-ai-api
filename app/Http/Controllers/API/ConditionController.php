@@ -4,47 +4,36 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Condition;
-use Illuminate\Http\Request;
 
 class ConditionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $conditions = Condition::active()
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $conditions
+        ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
     public function show(Condition $condition)
     {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Condition $condition)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Condition $condition)
-    {
-        //
+        $condition->load(['products' => function($query) {
+            $query->active()->latest()->limit(20);
+        }]);
+        
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'condition' => $condition,
+                'stats' => [
+                    'total_products' => $condition->products()->active()->count(),
+                ]
+            ]
+        ]);
     }
 }
