@@ -13,7 +13,18 @@ return new class extends Migration
     {
         Schema::create('product_images', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('product_id')->constrained()->onDelete('cascade');
+            $table->string('filename');
+            $table->string('original_name')->nullable();
+            $table->string('alt_text')->nullable();
+            $table->integer('order')->default(0);
+            $table->integer('size')->nullable(); // file size in bytes
+            $table->integer('width')->nullable();
+            $table->integer('height')->nullable();
+            $table->string('mime_type')->nullable();
             $table->timestamps();
+            
+            $table->index(['product_id', 'order']);
         });
     }
 
