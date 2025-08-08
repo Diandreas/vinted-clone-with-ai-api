@@ -1,5 +1,4 @@
 <?php
-// app/Http/Controllers/API/AuthController.php
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
@@ -8,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Carbon;
 
 class AuthController extends Controller
 {
@@ -19,9 +19,14 @@ class AuthController extends Controller
             'email' => 'required|string|email|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'phone' => 'nullable|string',
+            // Front sends birth_date; DB column is date_of_birth
             'birth_date' => 'nullable|date',
             'gender' => 'nullable|in:male,female,other',
         ]);
+
+        $birthDate = $request->birth_date
+            ? Carbon::parse($request->birth_date)->toDateString()
+            : null;
 
         $user = User::create([
             'name' => $request->name,
@@ -29,7 +34,8 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'phone' => $request->phone,
-            'birth_date' => $request->birth_date,
+            // Map to correct DB column
+            'date_of_birth' => $birthDate,
             'gender' => $request->gender,
         ]);
 
@@ -58,7 +64,8 @@ class AuthController extends Controller
         }
 
         $token = $user->createToken('auth_token')->plainTextToken;
-        $user->update(['is_online' => true, 'last_seen' => now()]);
+        // Update supported column name
+        $user->update(['last_seen_at' => now()]);
 
         return response()->json([
             'success' => true,
@@ -70,7 +77,7 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         $request->user()->tokens()->delete();
-        $request->user()->update(['is_online' => false]);
+        $request->user()->update(['last_seen_at' => now()]);
 
         return response()->json([
             'success' => true,
