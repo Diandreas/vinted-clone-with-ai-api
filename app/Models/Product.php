@@ -9,7 +9,7 @@ use Laravel\Scout\Searchable;
 
 class Product extends Model
 {
-    use HasFactory, SoftDeletes, Searchable;
+    use HasFactory, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -358,7 +358,8 @@ class Product extends Model
      */
     public function getFormattedPriceAttribute()
     {
-        return '€' . number_format($this->price, 2);
+        $price = is_numeric($this->price) ? (float) $this->price : 0.0;
+        return '€' . number_format($price, 2);
     }
 
     /**
@@ -366,7 +367,11 @@ class Product extends Model
      */
     public function getFormattedOriginalPriceAttribute()
     {
-        return $this->original_price ? '€' . number_format($this->original_price, 2) : null;
+        if ($this->original_price === null) {
+            return null;
+        }
+        $original = is_numeric($this->original_price) ? (float) $this->original_price : 0.0;
+        return '€' . number_format($original, 2);
     }
 
     /**
