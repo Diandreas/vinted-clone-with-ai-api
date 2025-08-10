@@ -39,7 +39,12 @@ class SearchController extends Controller
         }
 
         if ($type === 'all' || $type === 'users') {
-            $results['users'] = User::search($query)
+            // Fallback to DB search when Scout/Algolia is disabled
+            $results['users'] = User::query()
+                ->where(function ($q) use ($query) {
+                    $q->where('name', 'like', "%{$query}%")
+                      ->orWhere('username', 'like', "%{$query}%");
+                })
                 ->take(10)
                 ->get();
         }

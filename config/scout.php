@@ -16,7 +16,8 @@ return [
     |
     */
 
-    'driver' => env('SCOUT_DRIVER', 'algolia'),
+    // Default to 'null' to disable external search engines in dev
+    'driver' => env('SCOUT_DRIVER', 'null'),
 
     /*
     |--------------------------------------------------------------------------
