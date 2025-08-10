@@ -51,7 +51,8 @@ return new class extends Migration
             $table->index(['is_boosted', 'boosted_until']);
             $table->index(['views_count', 'status']);
             $table->index(['likes_count', 'status']);
-            $table->fullText(['title', 'description']);
+            // $table->fullText(['title', 'description']); // Not supported by SQLite
+            $table->index(['title']);
         });
     }
 
@@ -63,3 +64,5 @@ return new class extends Migration
         Schema::dropIfExists('products');
     }
 };
+
+

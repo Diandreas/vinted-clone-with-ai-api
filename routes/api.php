@@ -43,12 +43,12 @@ Route::prefix('v1')->group(function () {
 
     // Authentication Routes
     Route::prefix('auth')->group(function () {
-        Route::post('register', [AuthController::class, 'register']);
-        Route::post('login', [AuthController::class, 'login']);
-        Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
-        Route::post('reset-password', [AuthController::class, 'resetPassword']);
-        Route::post('verify-email', [AuthController::class, 'verifyEmail']);
-        Route::post('resend-verification', [AuthController::class, 'resendVerification']);
+        Route::post('register', [AuthController::class, 'register'])->name('register');
+        Route::post('login', [AuthController::class, 'login'])->name('login');
+        Route::post('forgot-password', [AuthController::class, 'forgotPassword'])->name('password.email');
+        Route::post('reset-password', [AuthController::class, 'resetPassword'])->name('password.reset');
+        Route::post('verify-email', [AuthController::class, 'verifyEmail'])->name('verification.verify');
+        Route::post('resend-verification', [AuthController::class, 'resendVerification'])->name('verification.send');
     });
 
     // Public Routes (sans authentification)
@@ -122,6 +122,7 @@ Route::prefix('v1')->group(function () {
             Route::get('my-likes', [ProductController::class, 'myLikes']);
             Route::get('draft', [ProductController::class, 'draft']);
             Route::get('sold', [ProductController::class, 'sold']);
+            Route::get('stats', [ProductController::class, 'stats']);
             // Parameterized routes come after
             Route::put('{product}', [ProductController::class, 'update']);
             Route::delete('{product}', [ProductController::class, 'destroy']);
@@ -293,7 +294,9 @@ Route::prefix('v1')->group(function () {
 
         // Category Management
         Route::prefix('categories')->group(function () {
+            Route::get('/', [AdminCategoryController::class, 'index']);
             Route::post('/', [AdminCategoryController::class, 'store']);
+            Route::get('{category}', [AdminCategoryController::class, 'show']);
             Route::put('{category}', [AdminCategoryController::class, 'update']);
             Route::delete('{category}', [AdminCategoryController::class, 'destroy']);
         });

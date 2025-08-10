@@ -15,6 +15,23 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // Check if user is authenticated
+        if (!$request->user()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Authentication required'
+            ], 401);
+        }
+
+        // Check if user is admin (role_id = 1 or is_admin = true)
+        $user = $request->user();
+        if (!$user->is_admin && $user->role_id !== 1) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Admin access required'
+            ], 403);
+        }
+
         return $next($request);
     }
 }

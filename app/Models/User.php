@@ -9,7 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Scout\Searchable;
 
-class User extends Authenticatable implements MustVerifyEmail
+class  User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable, HasApiTokens, Searchable;
 
@@ -247,7 +247,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function getAvatarUrlAttribute()
     {
-        return $this->avatar 
+        return $this->avatar
             ? asset('storage/avatars/' . $this->avatar)
             : asset('images/default-avatar.png');
     }
@@ -257,7 +257,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function getCoverImageUrlAttribute()
     {
-        return $this->cover_image 
+        return $this->cover_image
             ? asset('storage/covers/' . $this->cover_image)
             : null;
     }

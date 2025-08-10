@@ -142,9 +142,10 @@ class ProductController extends Controller
             'status' => Product::STATUS_ACTIVE,
         ]);
 
-        // Process images
+        // Process images synchronously to avoid serialization of UploadedFile in queue
         if ($request->hasFile('images')) {
-            ProcessProductImages::dispatch($product, $request->file('images'));
+            $job = new ProcessProductImages($product, $request->file('images'));
+            $job->handle();
         }
 
         // Index for search
@@ -451,6 +452,32 @@ class ProductController extends Controller
         return response()->json([
             'success' => true,
             'data' => $products
+        ]);
+    }
+
+    /**
+     * Get user's product statistics.
+     */
+    public function stats()
+    {
+        $user = Auth::user();
+        
+        $stats = [
+            'total_products' => $user->products()->count(),
+            'active_products' => $user->products()->where('status', 'active')->count(),
+            'draft_products' => $user->products()->where('status', 'draft')->count(),
+            'sold_products' => $user->products()->where('status', 'sold')->count(),
+            'reserved_products' => $user->products()->where('status', 'reserved')->count(),
+            'total_views' => $user->products()->sum('views_count'),
+            'total_likes' => $user->products()->sum('likes_count'),
+            'total_favorites' => $user->products()->sum('favorites_count'),
+            'average_price' => $user->products()->where('status', 'active')->avg('price'),
+            'total_value' => $user->products()->where('status', 'active')->sum('price'),
+        ];
+
+        return response()->json([
+            'success' => true,
+            'data' => $stats
         ]);
     }
 
