@@ -242,7 +242,7 @@ const isAuthenticated = computed(() => authStore.isAuthenticated)
 const fetchTrendingProducts = async () => {
   loadingTrending.value = true
   try {
-    const response = await axios.get('/trending', { params: { limit: 8 } })
+    const response = await window.axios.get('/trending', { params: { limit: 8 } })
     trendingProducts.value = response.data.data || []
   } catch (error) {
     console.error('Error fetching trending products:', error)
@@ -254,7 +254,7 @@ const fetchTrendingProducts = async () => {
 const fetchLiveLives = async () => {
   loadingLives.value = true
   try {
-    const response = await axios.get('/lives', { 
+    const response = await window.axios.get('/lives', { 
       params: { status: 'live', limit: 6 } 
     })
     liveLives.value = response.data.data || []
@@ -268,7 +268,7 @@ const fetchLiveLives = async () => {
 const fetchCategories = async () => {
   loadingCategories.value = true
   try {
-    const response = await axios.get('/categories', { params: { limit: 12 } })
+    const response = await window.axios.get('/categories', { params: { limit: 12 } })
     categories.value = response.data.data || []
   } catch (error) {
     console.error('Error fetching categories:', error)

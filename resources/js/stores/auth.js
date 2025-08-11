@@ -13,6 +13,15 @@ export const useAuthStore = defineStore('auth', () => {
   // Getters
   const isAuthenticated = computed(() => !!token.value && !!user.value)
   const isVerified = computed(() => user.value?.is_verified || false)
+  const isAdmin = computed(() => !!(user.value?.is_admin) || user.value?.role === 'admin')
+
+  const hasPermission = (perm) => {
+    const perms = user.value?.permissions
+    if (!perms) return false
+    if (Array.isArray(perms)) return perms.includes(perm)
+    if (typeof perms === 'object') return !!perms[perm]
+    return false
+  }
   
   // Actions
   const initialize = async () => {
@@ -183,6 +192,7 @@ export const useAuthStore = defineStore('auth', () => {
     // Getters
     isAuthenticated,
     isVerified,
+    isAdmin,
     
     // Actions
     initialize,
@@ -194,7 +204,8 @@ export const useAuthStore = defineStore('auth', () => {
     updateProfile,
     changePassword,
     deleteAccount,
-    fetchUser
+    fetchUser,
+    hasPermission
   }
 })
 

@@ -9,6 +9,7 @@ const Register = () => import('@/views/auth/Register.vue')
 const ForgotPassword = () => import('@/views/auth/ForgotPassword.vue')
 const Profile = () => import('@/views/Profile.vue')
 const Products = () => import('@/views/Products.vue')
+const PublicProducts = () => import('@/views/PublicProducts.vue')
 const ProductDetail = () => import('@/views/ProductDetail.vue')
 const CreateProduct = () => import('@/views/CreateProduct.vue')
 const Lives = () => import('@/views/Lives.vue')
@@ -23,6 +24,24 @@ const UserProfile = () => import('@/views/UserProfile.vue')
 const CategoryManagement = () => import('@/views/admin/CategoryManagement.vue')
 
 const routes = [
+  {
+    path: '/admin/dashboard',
+    name: 'admin-dashboard',
+    component: () => import('@/views/admin/AdminDashboard.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: '/admin/users',
+    name: 'admin-users',
+    component: () => import('@/views/admin/UserManagement.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true, permission: 'users:manage' }
+  },
+  {
+    path: '/admin/products',
+    name: 'admin-products',
+    component: () => import('@/views/admin/ProductManagement.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true, permission: 'products:moderate' }
+  },
   {
     path: '/',
     name: 'home',
@@ -69,8 +88,14 @@ const routes = [
   {
     path: '/products',
     name: 'products',
-    component: Products,
+    component: PublicProducts,
     meta: { requiresAuth: false }
+  },
+  {
+    path: '/my-products',
+    name: 'my-products',
+    component: Products,
+    meta: { requiresAuth: true }
   },
   {
     path: '/products/:id',
@@ -184,6 +209,24 @@ router.beforeEach(async (to, from, next) => {
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     next({ name: 'login', query: { redirect: to.fullPath } })
     return
+  }
+
+  // Admin / permissions guard
+  if (to.meta.requiresAdmin) {
+    const canView = authStore.isAdmin || authStore.hasPermission('dashboard:view')
+    if (!canView) {
+      next({ name: 'dashboard' })
+      return
+    }
+    
+    // Check specific permission if required
+    if (to.meta.permission) {
+      const hasSpecificPermission = authStore.isAdmin || authStore.hasPermission(to.meta.permission)
+      if (!hasSpecificPermission) {
+        next({ name: 'admin-dashboard' })
+        return
+      }
+    }
   }
   
   // Redirect authenticated users away from guest-only pages

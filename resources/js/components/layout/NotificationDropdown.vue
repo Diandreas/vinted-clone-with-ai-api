@@ -133,7 +133,7 @@ const unreadCount = computed(() =>
 const fetchNotifications = async () => {
   loading.value = true
   try {
-    const response = await axios.get('/notifications', {
+            const response = await window.axios.get('/notifications', {
       params: { limit: 10 }
     })
     notifications.value = response.data.data || []
@@ -160,7 +160,7 @@ const handleNotificationClick = async (notification) => {
   // Mark as read if not already
   if (!notification.read_at) {
     try {
-      await axios.put(`/notifications/${notification.id}/read`)
+              await window.axios.put(`/notifications/${notification.id}/read`)
       notification.read_at = new Date().toISOString()
     } catch (error) {
       console.error('Error marking notification as read:', error)

@@ -23,9 +23,10 @@ class AdminMiddleware
             ], 401);
         }
 
-        // Check if user is admin (role_id = 1 or is_admin = true)
+        // Check if user is admin by flag or role string
         $user = $request->user();
-        if (!$user->is_admin && $user->role_id !== 1) {
+        $isAdmin = ($user->is_admin ?? false) || (($user->role ?? null) === 'admin');
+        if (!$isAdmin) {
             return response()->json([
                 'success' => false,
                 'message' => 'Admin access required'

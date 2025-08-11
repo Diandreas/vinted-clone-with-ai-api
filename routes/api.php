@@ -267,7 +267,9 @@ Route::prefix('v1')->group(function () {
         // User Management
         Route::prefix('users')->group(function () {
             Route::get('/', [AdminUserController::class, 'index']);
+            Route::post('/', [AdminUserController::class, 'store']);
             Route::get('{user}', [AdminUserController::class, 'show']);
+            Route::put('{user}', [AdminUserController::class, 'update']);
             Route::put('{user}/verify', [AdminUserController::class, 'verify']);
             Route::put('{user}/ban', [AdminUserController::class, 'ban']);
             Route::put('{user}/unban', [AdminUserController::class, 'unban']);
@@ -299,6 +301,14 @@ Route::prefix('v1')->group(function () {
             Route::get('{category}', [AdminCategoryController::class, 'show']);
             Route::put('{category}', [AdminCategoryController::class, 'update']);
             Route::delete('{category}', [AdminCategoryController::class, 'destroy']);
+        });
+
+        // Product Management
+        Route::prefix('products')->group(function () {
+            Route::get('/', [AdminProductController::class, 'index']);
+            Route::get('{product}', [AdminProductController::class, 'show']);
+            Route::put('{product}', [AdminProductController::class, 'update']);
+            Route::delete('{product}', [AdminProductController::class, 'destroy']);
         });
 
         // Brand Management

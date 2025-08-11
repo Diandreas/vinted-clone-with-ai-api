@@ -72,11 +72,11 @@
           <!-- Authenticated User Actions -->
           <template v-if="isAuthenticated">
             <!-- Admin Dropdown -->
-            <div class="relative hidden md:block">
+            <div v-if="authStore.isAdmin || authStore.hasPermission('dashboard:view')" class="relative hidden md:block">
               <button
                 @click="showAdminMenu = !showAdminMenu"
                 class="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
-                :class="{ 'text-indigo-600': $route.name?.includes('management') }"
+                :class="{ 'text-indigo-600': $route.name?.includes('admin') }"
               >
                 <PackageIcon class="w-4 h-4" />
                 <span>Admin</span>
@@ -97,27 +97,37 @@
                   class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
                 >
                   <RouterLink
-                    to="/admin/products"
+                    to="/admin/dashboard"
                     class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    :class="{ 'bg-gray-100': $route.name === 'product-management' }"
+                    :class="{ 'bg-gray-100': $route.name === 'admin-dashboard' }"
                   >
-                    <PackageIcon class="w-4 h-4 mr-3" />
-                    Gestion Produits
+                    <BarChart3Icon class="w-4 h-4 mr-3" />
+                    Dashboard
                   </RouterLink>
                   <RouterLink
+                    v-if="authStore.isAdmin || authStore.hasPermission('users:manage')"
                     to="/admin/users"
                     class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    :class="{ 'bg-gray-100': $route.name === 'user-management' }"
+                    :class="{ 'bg-gray-100': $route.name === 'admin-users' }"
                   >
                     <UsersIcon class="w-4 h-4 mr-3" />
                     Gestion Utilisateurs
                   </RouterLink>
                   <RouterLink
+                    v-if="authStore.isAdmin || authStore.hasPermission('products:moderate')"
+                    to="/admin/products"
+                    class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    :class="{ 'bg-gray-100': $route.name === 'admin-dashboard' }"
+                  >
+                    <PackageIcon class="w-4 h-4 mr-3" />
+                    Gestion Produits
+                  </RouterLink>
+                  <RouterLink
                     to="/admin/categories"
                     class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    :class="{ 'bg-gray-100': $route.name === 'category-management' }"
+                    :class="{ 'bg-gray-100': $route.name === 'admin-categories' }"
                   >
-                    <TagIcon class="w-4 h-4 mr-3" />
+                    <TagIcon class="w-4 h-2 mr-3" />
                     Gestion Catégories
                   </RouterLink>
                 </div>
@@ -300,7 +310,8 @@ import {
   RadioIcon,
   PackageIcon,
   UsersIcon,
-  TagIcon
+  TagIcon,
+  BarChart3Icon
 } from 'lucide-vue-next'
 
 // Components

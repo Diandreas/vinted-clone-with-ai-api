@@ -19,18 +19,18 @@ class AnalyticsController extends Controller
         $data = [
             'overview' => [
                 'total_products' => $user->products()->count(),
-                'active_products' => $user->products()->active()->count(),
+                'active_products' => $user->products()->where('status', 'active')->count(),
                 'sold_products' => $user->products()->where('status', 'sold')->count(),
-                'total_sales' => $user->salesAsSellerTotalAmount(),
-                'total_purchases' => $user->purchasesAsBuyerTotalAmount(),
+                'total_sales' => $user->sales()->where('status', 'completed')->sum('total_amount'),
+                'total_purchases' => $user->orders()->where('status', 'completed')->sum('total_amount'),
                 'followers_count' => $user->followers()->count(),
                 'following_count' => $user->following()->count(),
                 'avg_rating' => $user->averageRating(),
             ],
             'this_month' => [
                 'products_added' => $user->products()->where('created_at', '>=', $lastMonth)->count(),
-                'sales_count' => $user->salesAsSellerThisMonth(),
-                'sales_amount' => $user->salesAsSellerThisMonthAmount(),
+                'sales_count' => $user->sales()->where('status', 'completed')->where('created_at', '>=', $lastMonth)->count(),
+                'sales_amount' => $user->sales()->where('status', 'completed')->where('created_at', '>=', $lastMonth)->sum('total_amount'),
                 'new_followers' => $user->followers()->where('created_at', '>=', $lastMonth)->count(),
             ]
         ];
@@ -78,7 +78,7 @@ class AnalyticsController extends Controller
         $period = $request->get('period', '30');
         $startDate = Carbon::now()->subDays($period);
 
-        $sales = $user->salesAsSeller()
+        $sales = $user->sales()
             ->with(['product', 'buyer'])
             ->where('created_at', '>=', $startDate)
             ->get();
@@ -204,15 +204,18 @@ class AnalyticsController extends Controller
 
     private function getTopSellingProducts($user, $period)
     {
-        return $user->products()
-            ->join('orders', 'products.id', '=', 'orders.product_id')
-            ->where('orders.created_at', '>=', Carbon::now()->subDays($period))
-            ->where('orders.status', 'completed')
-            ->select('products.*', DB::raw('COUNT(orders.id) as sales_count'))
-            ->groupBy('products.id')
+        return $user->sales()
+            ->with('product')
+            ->where('created_at', '>=', Carbon::now()->subDays($period))
+            ->where('status', 'completed')
+            ->select('product_id', DB::raw('COUNT(*) as sales_count'))
+            ->groupBy('product_id')
             ->orderBy('sales_count', 'desc')
             ->limit(10)
-            ->get();
+            ->get()
+            ->map(function ($sale) {
+                return $sale->product;
+            });
     }
 
     private function getFollowerGrowthRate($user, $period)

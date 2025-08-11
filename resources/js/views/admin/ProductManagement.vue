@@ -122,8 +122,8 @@
           </div>
         </div>
 
-        <ul v-else class="divide-y divide-gray-200">
-          <li v-for="product in products" :key="product?.id || Math.random()" v-if="product">
+        <ul v-else-if="!loading && products && products.length > 0" class="divide-y divide-gray-200">
+          <li v-for="product in products" :key="product.id">
             <div class="px-4 py-4 flex items-center justify-between">
               <div class="flex items-center">
                 <div class="flex-shrink-0 h-16 w-16">
@@ -189,6 +189,24 @@
             </div>
           </li>
         </ul>
+        
+        <!-- Message quand aucun produit -->
+        <div v-else-if="!loading && (!Array.isArray(products) || products.length === 0)" class="text-center py-12">
+          <PackageIcon class="mx-auto h-12 w-12 text-gray-400" />
+          <h3 class="mt-2 text-sm font-medium text-gray-900">Aucun produit trouvé</h3>
+          <p class="mt-1 text-sm text-gray-500">
+            {{ Array.isArray(products) ? 'Aucun produit ne correspond à vos critères.' : 'Erreur lors du chargement des produits.' }}
+          </p>
+        </div>
+        
+        <!-- État d'erreur -->
+        <div v-else-if="!loading && !Array.isArray(products)" class="text-center py-12">
+          <AlertTriangleIcon class="mx-auto h-12 w-12 text-red-400" />
+          <h3 class="mt-2 text-sm font-medium text-gray-900">Erreur de chargement</h3>
+          <p class="mt-1 text-sm text-gray-500">
+            Impossible de charger les produits. Veuillez réessayer.
+          </p>
+        </div>
 
         <!-- Pagination -->
         <div v-if="pagination.total > pagination.per_page" class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
@@ -305,7 +323,8 @@ import {
   PencilIcon,
   TrashIcon,
   ChevronLeftIcon,
-  ChevronRightIcon
+  ChevronRightIcon,
+  AlertTriangleIcon
 } from 'lucide-vue-next'
 
 // Composants
@@ -387,31 +406,97 @@ const visiblePages = computed(() => {
   return pages
 })
 
+// Lifecycle
+onMounted(async () => {
+  await Promise.all([
+    loadProducts(),
+    loadCategories(),
+    loadBrands(),
+    loadConditions()
+  ])
+})
+
 // Methods
 const loadProducts = async (page = 1) => {
   loading.value = true
   try {
-    const params = new URLSearchParams({
+    // Paramètres communs
+    const baseParams = Object.fromEntries(
+      Object.entries(filters).filter(([key, value]) => value !== '' && key !== 'sort' && key !== 'order')
+    )
+    const adminParams = new URLSearchParams({
       page: page.toString(),
       per_page: pagination.per_page.toString(),
       sort: filters.sort,
       order: filters.order,
-      ...Object.fromEntries(
-        Object.entries(filters).filter(([key, value]) => 
-          value !== '' && key !== 'sort' && key !== 'order'
-        )
-      )
+      ...baseParams
     })
 
-    const response = await window.axios.get(`/admin/products?${params}`)
-    
-    products.value = response.data.data
-    Object.assign(pagination, response.data.meta)
-    
-    // Charger les stats
-    const statsResponse = await window.axios.get('/products/stats')
-    Object.assign(stats, statsResponse.data)
-    
+    // 1) Tentative admin (nécessite authentification + droits admin)
+    try {
+      console.log('Tentative d\'appel API admin...')
+      const adminResp = await window.axios.get(`/admin/products?${adminParams}`)
+      console.log('Réponse API admin:', adminResp.data)
+      products.value = adminResp.data.data || []
+      if (adminResp.data.meta) {
+        Object.assign(pagination, adminResp.data.meta)
+      } else {
+        // fallback simple
+        pagination.current_page = page
+        pagination.total = products.value.length
+        pagination.from = (page - 1) * pagination.per_page + 1
+        pagination.to = pagination.from + products.value.length - 1
+      }
+    } catch (adminErr) {
+      // 2) Fallback public si 401/403 ou autre erreur
+      console.log('API admin échouée, fallback vers API publique:', adminErr.message)
+      const publicParams = new URLSearchParams({
+        page: page.toString(),
+        per_page: pagination.per_page.toString(),
+        // map du tri pour l'API publique
+        sort: (() => {
+          if (filters.sort === 'price') return filters.order === 'asc' ? 'price_low' : 'price_high'
+          if (filters.sort === 'created_at') return 'recent'
+          if (filters.sort === 'likes_count' || filters.sort === 'views_count') return 'popular'
+          return 'recent'
+        })(),
+        ...baseParams,
+        // mapping de quelques filtres vers les noms publics si besoin
+        category_id: baseParams.category || '',
+        status: '' // pas géré publiquement dans l'index
+      })
+      console.log('Appel API publique avec params:', publicParams.toString())
+      const pubResp = await window.axios.get(`/products?${publicParams}`)
+      console.log('Réponse API publique:', pubResp.data)
+      // Réponse publique: { success, data: paginator }
+      const paginator = pubResp.data.data || {}
+      const items = Array.isArray(paginator.data) ? paginator.data : []
+      console.log('Produits récupérés:', items.length)
+      products.value = items
+      // Mettre à jour la pagination depuis le paginator
+      const { current_page, last_page, per_page, total, from, to } = paginator
+      Object.assign(pagination, {
+        current_page: current_page || page,
+        last_page: last_page || 1,
+        per_page: per_page || pagination.per_page,
+        total: total || items.length,
+        from: from || ((page - 1) * (per_page || pagination.per_page) + 1),
+        to: to || (((page - 1) * (per_page || pagination.per_page)) + items.length)
+      })
+    }
+
+    // Stats: best-effort (API protégée). Ignorer en cas d'erreur et calculer localement.
+    try {
+      const statsResponse = await window.axios.get('/products/stats')
+      if (statsResponse.data) Object.assign(stats, statsResponse.data)
+    } catch (_) {
+      // calcul local minimal
+      stats.total = products.value.length
+      stats.active = products.value.filter(p => p.status === 'active').length
+      stats.sold = products.value.filter(p => p.status === 'sold').length
+      stats.draft = products.value.filter(p => p.status === 'draft').length
+    }
+
   } catch (error) {
     console.error('Erreur lors du chargement des produits:', error)
   } finally {
@@ -512,13 +597,5 @@ watch([() => filters.category, () => filters.status, () => filters.sort], () => 
   loadProducts()
 })
 
-// Lifecycle
-onMounted(async () => {
-  await Promise.all([
-    loadProducts(),
-    loadCategories(),
-    loadBrands(),
-    loadConditions()
-  ])
-})
+
 </script>
