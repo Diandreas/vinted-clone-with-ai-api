@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { config } from './config/env.js';
 
 // Configure axios
 window.axios = axios;
@@ -18,8 +19,11 @@ if (apiToken) {
     window.axios.defaults.headers.common['Authorization'] = `Bearer ${apiToken}`;
 }
 
-// Configure base URL for API
-// Si on est en développement (Vite), pointer vers le serveur Laravel
-// Si on est en production, utiliser les URLs relatives
-const isDevelopment = window.location.port && window.location.port !== '8000'
-window.axios.defaults.baseURL = isDevelopment ? 'http://localhost:8000/api/v1' : '/api/v1';
+// Configure base URL for API using environment config
+window.axios.defaults.baseURL = config.baseURL;
+
+// Debug: Afficher l'URL de base en console (uniquement en développement)
+if (config.debug) {
+    console.log('API Base URL:', window.axios.defaults.baseURL);
+    console.log('Environment:', config.current);
+}
