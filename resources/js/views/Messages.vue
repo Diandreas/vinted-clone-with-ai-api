@@ -24,11 +24,11 @@
               @click="selectConversation(c)"
             >
               <div class="flex items-center justify-between">
-                <div class="text-sm font-medium text-gray-900">Conversation #{{ c.id }}</div>
-                <div class="text-xs text-gray-500">{{ new Date(c.updated_at).toLocaleString() }}</div>
+                <div class="text-sm font-medium text-gray-900">{{ otherParticipantName(c) }}</div>
+                <div class="text-xs text-gray-500">{{ formatDate(c.last_message_at || c.updated_at) }}</div>
               </div>
-              <div class="mt-1 text-sm text-gray-600 truncate" v-if="c.messages && c.messages.length > 0">
-                {{ c.messages[0].content }}
+              <div class="mt-1 text-sm text-gray-600 truncate">
+                {{ previewContent(c) }}
               </div>
             </li>
           </ul>
@@ -38,7 +38,7 @@
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 lg:col-span-2">
           <div class="p-4 border-b border-gray-100 flex items-center justify-between">
             <h2 class="text-lg font-semibold">
-              <span v-if="selectedConversation">Conversation #{{ selectedConversation.id }}</span>
+              <span v-if="selectedConversation">Avec {{ otherParticipantName(selectedConversation) }}</span>
               <span v-else>Nouvelle conversation</span>
             </h2>
           </div>
@@ -61,10 +61,10 @@
             <div v-if="loadingMessages" class="text-center text-gray-500">Chargement des messages…</div>
             <div v-else-if="messagesError" class="text-center text-red-600">{{ messagesError }}</div>
             <div v-else class="space-y-3">
-              <div v-for="m in messages" :key="m.id" class="max-w-xl" :class="m.user_id === meId ? 'ml-auto text-right' : ''">
-                <div class="inline-block px-3 py-2 rounded-lg" :class="m.user_id === meId ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-900'">
-                  <div class="text-sm">{{ m.content }}</div>
-                  <div class="text-[11px] mt-1 opacity-70">{{ new Date(m.created_at).toLocaleString() }}</div>
+              <div v-for="m in messages" :key="m.id" class="max-w-xl" :class="m.sender_id === meId ? 'ml-auto text-right' : ''">
+                <div class="inline-block px-3 py-2 rounded-lg" :class="m.sender_id === meId ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-900'">
+                  <div class="text-sm">{{ displayContent(m) }}</div>
+                  <div class="text-[11px] mt-1 opacity-70">{{ formatDate(m.created_at) }}</div>
                 </div>
               </div>
             </div>
@@ -111,6 +111,44 @@ const composeError = ref('')
 
 // Start target via query (?user=&product=)
 const startTarget = ref({ userId: null, productId: null })
+
+// Utils
+function formatDate(d) {
+  if (!d) return ''
+  return new Date(d).toLocaleString()
+}
+
+function safeParseMaybeJson(text) {
+  if (typeof text !== 'string') return String(text ?? '')
+  const trimmed = text.trim()
+  if (!(trimmed.startsWith('{') || trimmed.startsWith('['))) return text
+  try {
+    const obj = JSON.parse(trimmed)
+    // Heuristique: si c'est un message structuré {content, type}
+    if (obj && typeof obj === 'object' && 'content' in obj) return String(obj.content ?? '')
+    return typeof obj === 'string' ? obj : text
+  } catch (_) {
+    return text
+  }
+}
+
+function otherParticipantName(conv) {
+  if (!conv) return 'Conversation'
+  const me = meId.value
+  const other = conv.buyer_id === me ? conv.seller : conv.buyer
+  return other?.name || other?.username || 'Conversation'
+}
+
+function previewContent(conv) {
+  // lastMessage peut être chargé via relation ou via c.messages[0]
+  const last = conv.last_message || (conv.messages && conv.messages[0])
+  if (!last) return '—'
+  return safeParseMaybeJson(last.content)
+}
+
+function displayContent(m) {
+  return safeParseMaybeJson(m.content)
+}
 
 async function loadConversations() {
   loadingConversations.value = true
