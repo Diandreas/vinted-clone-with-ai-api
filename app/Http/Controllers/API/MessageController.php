@@ -12,8 +12,8 @@ class MessageController extends Controller
 {
     public function index(Conversation $conversation)
     {
-        // Check if user is participant
-        if (!$conversation->participants()->where('user_id', Auth::id())->exists()) {
+        // Check if user is participant (buyer or seller)
+        if (!($conversation->buyer_id === Auth::id() || $conversation->seller_id === Auth::id())) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized'
@@ -21,7 +21,7 @@ class MessageController extends Controller
         }
 
         $messages = $conversation->messages()
-            ->with('user')
+            ->with('sender')
             ->orderBy('created_at', 'desc')
             ->paginate(50);
 
@@ -33,8 +33,8 @@ class MessageController extends Controller
 
     public function store(Request $request, Conversation $conversation)
     {
-        // Check if user is participant
-        if (!$conversation->participants()->where('user_id', Auth::id())->exists()) {
+        // Check if user is participant (buyer or seller)
+        if (!($conversation->buyer_id === Auth::id() || $conversation->seller_id === Auth::id())) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized'
@@ -48,7 +48,7 @@ class MessageController extends Controller
         ]);
 
         $message = $conversation->messages()->create([
-            'user_id' => Auth::id(),
+            'sender_id' => Auth::id(),
             'content' => $request->content,
             'type' => $request->type ?? 'text',
             'product_id' => $request->product_id,
@@ -57,7 +57,7 @@ class MessageController extends Controller
         // Update conversation timestamp
         $conversation->touch();
 
-        $message->load('user', 'product');
+        $message->load('sender', 'product');
 
         // Here you would trigger real-time events with Pusher
         // broadcast(new MessageSent($message))->toOthers();
@@ -73,7 +73,7 @@ class MessageController extends Controller
     {
         // Check if user can read this message
         $conversation = $message->conversation;
-        if (!$conversation->participants()->where('user_id', Auth::id())->exists()) {
+        if (!($conversation->buyer_id === Auth::id() || $conversation->seller_id === Auth::id())) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized'
@@ -81,7 +81,7 @@ class MessageController extends Controller
         }
 
         // Can't mark own messages as read
-        if ($message->user_id === Auth::id()) {
+        if ($message->sender_id === Auth::id()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Cannot mark own message as read'
@@ -99,7 +99,7 @@ class MessageController extends Controller
     public function destroy(Message $message)
     {
         // Check if user owns the message
-        if ($message->user_id !== Auth::id()) {
+        if ($message->sender_id !== Auth::id()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized'

@@ -12,11 +12,10 @@ class ConversationController extends Controller
 {
     public function index()
     {
-        $conversations = Auth::user()->conversations()
-            ->with(['participants', 'messages' => function($query) {
-                $query->latest()->limit(1);
-            }])
-            ->latest('updated_at')
+        $user = Auth::user();
+        $conversations = Conversation::forUser($user)
+            ->with(['buyer', 'seller', 'lastMessage'])
+            ->latest('last_message_at')
             ->paginate(20);
 
         return response()->json([
@@ -30,45 +29,45 @@ class ConversationController extends Controller
         $request->validate([
             'participant_id' => 'required|exists:users,id|different:' . Auth::id(),
             'message' => 'required|string|max:1000',
+            'product_id' => 'nullable|exists:products,id'
         ]);
 
+        $current = Auth::user();
         $participant = User::findOrFail($request->participant_id);
 
-        // Check if conversation already exists
-        $existingConversation = Auth::user()->conversations()
-            ->whereHas('participants', function($query) use ($participant) {
-                $query->where('user_id', $participant->id);
-            })
-            ->first();
+        // Determine buyer/seller
+        $buyer = $current;
+        $seller = $participant;
 
-        if ($existingConversation) {
-            return response()->json([
-                'success' => true,
-                'data' => $existingConversation->load(['participants', 'messages' => function($query) {
-                    $query->latest()->limit(10);
-                }]),
-                'message' => 'Conversation already exists'
-            ]);
+        $product = null;
+        if ($request->product_id) {
+            $product = \App\Models\Product::findOrFail($request->product_id);
+            $seller = $product->user;
+            if ($seller->id === $current->id) {
+                $buyer = $participant;
+            }
         }
 
-        // Create new conversation
-        $conversation = Conversation::create([
-            'created_by' => Auth::id(),
+        // Find or create conversation
+        $lookup = [
+            'buyer_id' => $buyer->id,
+            'seller_id' => $seller->id,
+            'product_id' => $product?->id,
+        ];
+        $conversation = Conversation::firstOrCreate($lookup, [
+            'is_archived' => false,
+            'last_message_at' => now(),
         ]);
 
-        // Add participants
-        $conversation->participants()->attach([Auth::id(), $participant->id]);
-
-        // Create first message
+        // First message
         $conversation->messages()->create([
-            'user_id' => Auth::id(),
+            'sender_id' => $current->id,
             'content' => $request->message,
-            'type' => 'text'
+            'type' => 'text',
+            'product_id' => $product?->id,
         ]);
 
-        $conversation->load(['participants', 'messages' => function($query) {
-            $query->latest()->limit(10);
-        }]);
+        $conversation->load(['buyer', 'seller', 'lastMessage']);
 
         return response()->json([
             'success' => true,
@@ -79,21 +78,21 @@ class ConversationController extends Controller
 
     public function show(Conversation $conversation)
     {
-        // Check if user is participant
-        if (!$conversation->participants()->where('user_id', Auth::id())->exists()) {
+        // Check if user is participant (buyer or seller)
+        if (!($conversation->buyer_id === Auth::id() || $conversation->seller_id === Auth::id())) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized'
             ], 403);
         }
 
-        $conversation->load(['participants', 'messages' => function($query) {
-            $query->with('user')->latest()->limit(50);
+        $conversation->load(['buyer', 'seller', 'messages' => function($query) {
+            $query->with('sender')->latest()->limit(50);
         }]);
 
         // Mark messages as read
         $conversation->messages()
-            ->where('user_id', '!=', Auth::id())
+            ->where('sender_id', '!=', Auth::id())
             ->whereNull('read_at')
             ->update(['read_at' => now()]);
 
@@ -106,17 +105,15 @@ class ConversationController extends Controller
     public function destroy(Conversation $conversation)
     {
         // Check if user is participant
-        if (!$conversation->participants()->where('user_id', Auth::id())->exists()) {
+        if (!($conversation->buyer_id === Auth::id() || $conversation->seller_id === Auth::id())) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized'
             ], 403);
         }
 
-        // Soft delete for the current user only
-        $conversation->participants()
-            ->where('user_id', Auth::id())
-            ->update(['deleted_at' => now()]);
+        // Soft delete conversation
+        $conversation->delete();
 
         return response()->json([
             'success' => true,

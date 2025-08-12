@@ -50,6 +50,14 @@
             <div class="mt-4 sm:mt-0 flex items-center gap-3">
               <button
                 v-if="!isSelf"
+                @click="goToMessages()"
+                class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-gray-200 text-gray-700 bg-white hover:bg-gray-50"
+              >
+                <MessageCircleIcon class="h-4 w-4" />
+                <span>Message</span>
+              </button>
+              <button
+                v-if="!isSelf"
                 :disabled="followBusy"
                 @click="toggleFollow"
                 class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border transition disabled:opacity-60 disabled:cursor-not-allowed"
@@ -167,7 +175,8 @@ import {
   MapPinIcon,
   BadgeCheckIcon,
   Loader2Icon,
-  AlertTriangleIcon
+  AlertTriangleIcon,
+  MessageCircleIcon
 } from 'lucide-vue-next'
 
 const route = useRoute()
@@ -270,6 +279,16 @@ async function toggleFollow() {
 function goToPage(page) {
   if (page < 1 || page > pagination.value.last) return
   fetchProducts(page)
+}
+
+function goToMessages() {
+  if (!isAuthenticated.value) {
+    router.push({ name: 'login', query: { redirect: route.fullPath } })
+    return
+  }
+  const q = { user: user.value?.id }
+  if (route.query.product) q.product = route.query.product
+  router.push({ name: 'messages', query: q })
 }
 
 onMounted(async () => {
