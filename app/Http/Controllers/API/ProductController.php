@@ -269,7 +269,22 @@ class ProductController extends Controller
     public function like(Product $product)
     {
         $user = Auth::user();
+        
+        \Log::info('🔄 toggleLike appelé', [
+            'product_id' => $product->id,
+            'user_id' => $user->id,
+            'likes_count_before' => $product->likes_count
+        ]);
+        
         $liked = $product->toggleLike($user);
+        
+        $product->refresh(); // Rafraîchir le modèle
+        
+        \Log::info('✅ toggleLike terminé', [
+            'product_id' => $product->id,
+            'liked' => $liked,
+            'likes_count_after' => $product->likes_count
+        ]);
 
         return response()->json([
             'success' => true,
@@ -285,13 +300,56 @@ class ProductController extends Controller
     public function favorite(Product $product)
     {
         $user = Auth::user();
+        
+        \Log::info('🔄 toggleFavorite appelé', [
+            'product_id' => $product->id,
+            'user_id' => $user->id,
+            'favorites_count_before' => $product->favorites_count
+        ]);
+        
         $favorited = $product->toggleFavorite($user);
+        
+        $product->refresh(); // Rafraîchir le modèle
+        
+        \Log::info('✅ toggleFavorite terminé', [
+            'product_id' => $product->id,
+            'favorited' => $favorited,
+            'favorites_count_after' => $product->favorites_count
+        ]);
 
         return response()->json([
             'success' => true,
             'favorited' => $favorited,
             'favorites_count' => $product->favorites_count,
             'message' => $favorited ? 'Product added to favorites' : 'Product removed from favorites'
+        ]);
+    }
+
+    /**
+     * Get like status for the current user.
+     */
+    public function getLikeStatus(Product $product)
+    {
+        $user = Auth::user();
+        $liked = $product->isLikedByUser;
+
+        return response()->json([
+            'success' => true,
+            'liked' => $liked
+        ]);
+    }
+
+    /**
+     * Get favorite status for the current user.
+     */
+    public function getFavoriteStatus(Product $product)
+    {
+        $user = Auth::user();
+        $favorited = $product->isFavoritedByUser;
+
+        return response()->json([
+            'success' => true,
+            'favorited' => $favorited
         ]);
     }
 

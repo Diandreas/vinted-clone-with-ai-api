@@ -312,6 +312,8 @@ const product = ref(null)
 const similarProducts = ref([])
 const isLiked = ref(false)
 const isFavorited = ref(false)
+const likingProduct = ref(false)
+const favoritingProduct = ref(false)
 
 // Computed
 const isAuthenticated = computed(() => authStore.isAuthenticated)
@@ -374,17 +376,38 @@ const toggleLike = async () => {
     return
   }
   
+  // Protection contre les doubles clics
+  if (likingProduct.value) {
+    console.log('⚠️ toggleLike déjà en cours, ignoré')
+    return
+  }
+  
+  likingProduct.value = true
+  
+  console.log('🔄 toggleLike appelé - État avant:', {
+    isLiked: isLiked.value,
+    likes_count: product.value?.likes_count
+  })
+  
   try {
-    if (isLiked.value) {
-      await window.axios.delete(`/products/${route.params.id}/like`)
-      product.value.likes_count--
-    } else {
-      await window.axios.post(`/products/${route.params.id}/like`)
-      product.value.likes_count++
+    const response = await window.axios.post(`/products/${route.params.id}/like`)
+    
+    console.log('📡 Réponse API:', response.data)
+    
+    if (response.data.success) {
+      // Mettre à jour l'état local
+      isLiked.value = response.data.liked
+      product.value.likes_count = response.data.likes_count
+      
+      console.log('✅ État après mise à jour:', {
+        isLiked: isLiked.value,
+        likes_count: product.value.likes_count
+      })
     }
-    isLiked.value = !isLiked.value
   } catch (error) {
-    console.error('Erreur lors du like:', error)
+    console.error('❌ Erreur lors du like:', error)
+  } finally {
+    likingProduct.value = false
   }
 }
 
@@ -394,17 +417,38 @@ const toggleFavorite = async () => {
     return
   }
   
+  // Protection contre les doubles clics
+  if (favoritingProduct.value) {
+    console.log('⚠️ toggleFavorite déjà en cours, ignoré')
+    return
+  }
+  
+  favoritingProduct.value = true
+  
+  console.log('🔄 toggleFavorite appelé - État avant:', {
+    isFavorited: isFavorited.value,
+    favorites_count: product.value?.favorites_count
+  })
+  
   try {
-    if (isFavorited.value) {
-      await window.axios.delete(`/products/${route.params.id}/favorite`)
-      product.value.favorites_count--
-    } else {
-      await window.axios.post(`/products/${route.params.id}/favorite`)
-      product.value.favorites_count++
+    const response = await window.axios.post(`/products/${route.params.id}/favorite`)
+    
+    console.log('📡 Réponse API:', response.data)
+    
+    if (response.data.success) {
+      // Mettre à jour l'état local
+      isFavorited.value = response.data.favorited
+      product.value.favorites_count = response.data.favorites_count
+      
+      console.log('✅ État après mise à jour:', {
+        isFavorited: isFavorited.value,
+        favorites_count: product.value.favorites_count
+      })
     }
-    isFavorited.value = !isFavorited.value
   } catch (error) {
-    console.error('Erreur lors du favori:', error)
+    console.error('❌ Erreur lors du favori:', error)
+  } finally {
+    favoritingProduct.value = false
   }
 }
 

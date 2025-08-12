@@ -128,6 +128,8 @@ Route::prefix('v1')->group(function () {
             Route::delete('{product}', [ProductController::class, 'destroy']);
             Route::post('{product}/like', [ProductController::class, 'like']);
             Route::post('{product}/favorite', [ProductController::class, 'favorite']);
+            Route::get('{product}/like-status', [ProductController::class, 'getLikeStatus']);
+            Route::get('{product}/favorite-status', [ProductController::class, 'getFavoriteStatus']);
             Route::post('{product}/comment', [ProductController::class, 'addComment']);
             Route::get('{product}/comments', [ProductController::class, 'getComments']);
             Route::put('{product}/boost', [ProductController::class, 'boost']);

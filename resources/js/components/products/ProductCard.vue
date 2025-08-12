@@ -2,11 +2,10 @@
   <div class="bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow duration-200">
     <!-- Product Image -->
     <div class="relative aspect-square overflow-hidden rounded-t-lg">
-      <img
-        :src="product.main_image || '/placeholder-product.jpg'"
+      <ProductImage
+        :src="product.main_image_url || product.main_image"
         :alt="product.title"
-        class="w-full h-full object-cover"
-        @error="handleImageError"
+        fallback="/placeholder-product.jpg"
       />
       
       <!-- Status Badge -->
@@ -61,7 +60,7 @@
         </button>
         <button
           @click.stop="toggleFavorite"
-          :disabled="favoriteProduct"
+          :disabled="favoritingProduct"
           class="bg-white bg-opacity-90 hover:bg-opacity-100 p-2 rounded-full shadow-sm transition-all"
         >
           <BookmarkIcon
@@ -111,6 +110,7 @@
             :src="product.user?.avatar || '/default-avatar.png'"
             :alt="product.user?.name"
             class="w-6 h-6 rounded-full object-cover"
+            @error="handleAvatarError"
           />
           <span class="text-sm text-gray-600">{{ product.user?.name }}</span>
           <div v-if="product.user?.is_verified" class="text-blue-500">
@@ -154,6 +154,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import ProductImage from '@/components/ui/ProductImage.vue'
 import {
   HeartIcon,
   BookmarkIcon,
@@ -180,7 +181,7 @@ const authStore = useAuthStore()
 
 // Reactive state
 const likingProduct = ref(false)
-const favoriteProduct = ref(false)
+const favoritingProduct = ref(false)
 
 // Computed
 const isLiked = computed(() => props.product.is_liked_by_user)
@@ -198,6 +199,10 @@ const handleImageError = (event) => {
   event.target.src = '/placeholder-product.jpg'
 }
 
+const handleAvatarError = (event) => {
+  event.target.src = '/default-avatar.png'
+}
+
 const toggleLike = async () => {
   if (!authStore.isAuthenticated) {
     // Redirect to login or show modal
@@ -206,7 +211,19 @@ const toggleLike = async () => {
 
   likingProduct.value = true
   try {
-    emit('like', props.product)
+    const response = await window.axios.post(`/products/${props.product.id}/like`)
+    
+    if (response.data.success) {
+      // Mettre à jour l'état local du produit
+      props.product.is_liked_by_user = response.data.liked
+      props.product.likes_count = response.data.likes_count
+      
+      // Émettre l'événement pour notifier le parent
+      emit('like', props.product)
+    }
+  } catch (error) {
+    console.error('Erreur lors du like/unlike:', error)
+    // Optionnel : afficher un message d'erreur
   } finally {
     likingProduct.value = false
   }
@@ -218,11 +235,23 @@ const toggleFavorite = async () => {
     return
   }
 
-  favoriteProduct.value = true
+  favoritingProduct.value = true
   try {
-    emit('favorite', props.product)
+    const response = await window.axios.post(`/products/${props.product.id}/favorite`)
+    
+    if (response.data.success) {
+      // Mettre à jour l'état local du produit
+      props.product.is_favorited_by_user = response.data.favorited
+      props.product.favorites_count = response.data.favorites_count
+      
+      // Émettre l'événement pour notifier le parent
+      emit('favorite', props.product)
+    }
+  } catch (error) {
+    console.error('Erreur lors du favorite/unfavorite:', error)
+    // Optionnel : afficher un message d'erreur
   } finally {
-    favoriteProduct.value = false
+    favoritingProduct.value = false
   }
 }
 </script>

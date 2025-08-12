@@ -45,8 +45,16 @@ class ProductLike extends Model
         parent::boot();
         
         static::created(function ($like) {
+            // Increment product likes count
+            $like->product->increment('likes_count');
+            
             // Fire product liked event
             event(new \App\Events\ProductLiked($like));
+        });
+        
+        static::deleted(function ($like) {
+            // Decrement product likes count
+            $like->product->decrement('likes_count');
         });
     }
 }

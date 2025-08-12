@@ -409,11 +409,11 @@ class Product extends Model
         
         if ($like) {
             $like->delete();
-            $this->decrement('likes_count');
+            // Le compteur sera décrémenté automatiquement par l'event deleted du modèle ProductLike
             return false; // unliked
         } else {
             $this->likes()->create(['user_id' => $user->id]);
-            $this->increment('likes_count');
+            // Le compteur sera incrémenté automatiquement par l'event created du modèle ProductLike
             return true; // liked
         }
     }
@@ -427,11 +427,11 @@ class Product extends Model
         
         if ($favorite) {
             $favorite->delete();
-            $this->decrement('favorites_count');
+            // Le compteur sera décrémenté automatiquement par l'event deleted du modèle Favorite
             return false; // removed from favorites
         } else {
             $this->favorites()->create(['user_id' => $user->id]);
-            $this->increment('favorites_count');
+            // Le compteur sera incrémenté automatiquement par l'event created du modèle Favorite
             return true; // added to favorites
         }
     }
@@ -513,6 +513,30 @@ class Product extends Model
             ->active()
             ->limit($limit)
             ->get();
+    }
+
+    /**
+     * Check if the product is liked by the current authenticated user.
+     */
+    public function getIsLikedByUserAttribute()
+    {
+        if (!auth()->check()) {
+            return false;
+        }
+        
+        return $this->likes()->where('user_id', auth()->id())->exists();
+    }
+
+    /**
+     * Check if the product is favorited by the current authenticated user.
+     */
+    public function getIsFavoritedByUserAttribute()
+    {
+        if (!auth()->check()) {
+            return false;
+        }
+        
+        return $this->favorites()->where('user_id', auth()->id())->exists();
     }
 
     /**
