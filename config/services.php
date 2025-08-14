@@ -35,4 +35,34 @@ return [
         ],
     ],
 
+    'google_cloud' => [
+        'project_id' => env('GOOGLE_CLOUD_PROJECT_ID'),
+        'key_file' => env('GOOGLE_CLOUD_KEY_FILE'),
+        'storage_bucket' => env('GOOGLE_CLOUD_STORAGE_BUCKET'),
+    ],
+
+    'stripe' => [
+        'model' => App\Models\User::class,
+        'key' => env('STRIPE_KEY'),
+        'secret' => env('STRIPE_SECRET'),
+        'webhook' => [
+            'secret' => env('STRIPE_WEBHOOK_SECRET'),
+            'tolerance' => env('STRIPE_WEBHOOK_TOLERANCE', 300),
+        ],
+    ],
+
+    'pusher' => [
+        'app_id' => env('PUSHER_APP_ID'),
+        'app_key' => env('PUSHER_APP_KEY'),
+        'app_secret' => env('PUSHER_APP_SECRET'),
+        'app_cluster' => env('PUSHER_APP_CLUSTER', 'mt1'),
+        'useTLS' => true,
+    ],
+
+    'algolia' => [
+        'app_id' => env('ALGOLIA_APP_ID'),
+        'secret' => env('ALGOLIA_SECRET'),
+        'search_key' => env('ALGOLIA_SEARCH'),
+    ],
+
 ];
