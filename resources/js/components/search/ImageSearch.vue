@@ -154,12 +154,18 @@
 
 <script>
 import SearchResults from './SearchResults.vue';
-import { notificationStore } from '../../stores/notification';
+import { useNotificationStore } from '../../stores/notification';
 
 export default {
   name: 'ImageSearch',
   components: {
     SearchResults
+  },
+  setup() {
+    const notificationStore = useNotificationStore();
+    return {
+      notificationStore
+    };
   },
   data() {
     return {
@@ -242,11 +248,7 @@ export default {
     
     showError(message) {
       this.error = message;
-      notificationStore.add({
-        type: 'error',
-        message: message,
-        duration: 5000
-      });
+      this.notificationStore.error(message);
     },
     
     async searchByImage() {
@@ -276,11 +278,7 @@ export default {
           this.hasSearched = true;
           
           if (this.searchResults.length > 0) {
-            notificationStore.add({
-              type: 'success',
-              message: `${this.searchResults.length} produit(s) similaire(s) trouvé(s)`,
-              duration: 3000
-            });
+            this.notificationStore.success(`${this.searchResults.length} produit(s) similaire(s) trouvé(s)`);
             
             // Scroll vers les résultats
             this.$nextTick(() => {

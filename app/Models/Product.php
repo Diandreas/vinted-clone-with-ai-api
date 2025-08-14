@@ -27,6 +27,10 @@ class Product extends Model
         'color',
         'material',
         'status',
+        'followers_only',
+        'is_spot',
+        'spot_starts_at',
+        'spot_ends_at',
         'is_featured',
         'is_boosted',
         'boosted_until',
@@ -51,6 +55,10 @@ class Product extends Model
         return [
             'price' => 'decimal:2',
             'original_price' => 'decimal:2',
+            'followers_only' => 'boolean',
+            'is_spot' => 'boolean',
+            'spot_starts_at' => 'datetime',
+            'spot_ends_at' => 'datetime',
             'shipping_cost' => 'decimal:2',
             'minimum_offer' => 'decimal:2',
             'is_featured' => 'boolean',
@@ -145,6 +153,14 @@ class Product extends Model
     }
 
     /**
+     * Get the product's appointments.
+     */
+    public function appointments()
+    {
+        return $this->hasMany(ProductAppointment::class);
+    }
+
+    /**
      * Get the product's favorites.
      */
     public function favorites()
@@ -199,7 +215,18 @@ class Product extends Model
      */
     public function scopeActive($query)
     {
-        return $query->where('status', self::STATUS_ACTIVE);
+        return $query->where('status', self::STATUS_ACTIVE)
+                     ->where(function($q) {
+                         // Exclude expired spots
+                         $q->where('is_spot', false)
+                           ->orWhere(function($q2) {
+                               $q2->where('is_spot', true)
+                                  ->where(function($q3) {
+                                      $q3->whereNull('spot_ends_at')
+                                         ->orWhere('spot_ends_at', '>', now());
+                                  });
+                           });
+                     });
     }
 
     /**
@@ -279,6 +306,7 @@ class Product extends Model
     public function scopeTrending($query, $days = 7)
     {
         return $query->where('created_at', '>=', now()->subDays($days))
+                    ->orderBy('is_spot', 'desc')
                     ->orderBy('views_count', 'desc')
                     ->orderBy('likes_count', 'desc');
     }
@@ -311,8 +339,8 @@ class Product extends Model
     {
         $mainImage = $this->mainImage;
         return $mainImage 
-            ? asset('storage/products/' . $mainImage->filename)
-            : asset('images/product-placeholder.jpg');
+            ? url('api/v1/files/products/' . $mainImage->filename)
+            : asset('placeholder-product.jpg');
     }
 
     /**
@@ -321,7 +349,7 @@ class Product extends Model
     public function getImageUrlsAttribute()
     {
         return $this->images->map(function($image) {
-            return asset('storage/products/' . $image->filename);
+            return url('api/v1/files/products/' . $image->filename);
         });
     }
 
@@ -568,6 +596,8 @@ class Product extends Model
             'location' => $this->location,
             'views_count' => $this->views_count,
             'likes_count' => $this->likes_count,
+            'followers_only' => $this->followers_only,
+            'is_spot' => $this->is_spot,
             'is_featured' => $this->is_featured,
             'is_boosted' => $this->is_boosted_active,
             'created_at' => $this->created_at->timestamp,

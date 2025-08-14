@@ -199,7 +199,7 @@
 </template>
 
 <script>
-import { notificationStore } from '../../stores/notification';
+import { useNotificationStore } from '../../stores/notification';
 
 export default {
   name: 'SearchResults',
@@ -219,6 +219,12 @@ export default {
     }
   },
   emits: ['product-click', 'load-more'],
+  setup() {
+    const notificationStore = useNotificationStore();
+    return {
+      notificationStore
+    };
+  },
   data() {
     return {
       sortBy: 'similarity', // 'similarity' ou 'price'
@@ -259,11 +265,7 @@ export default {
       // Vérifier l'authentification
       const user = this.$store?.state?.auth?.user;
       if (!user) {
-        notificationStore.add({
-          type: 'warning',
-          message: 'Connectez-vous pour ajouter aux favoris',
-          duration: 3000
-        });
+        this.notificationStore.warning('Connectez-vous pour ajouter aux favoris');
         return;
       }
       
@@ -284,30 +286,18 @@ export default {
             'Produit ajouté aux favoris' : 
             'Produit retiré des favoris';
           
-          notificationStore.add({
-            type: 'success',
-            message,
-            duration: 2000
-          });
+          this.notificationStore.success(message);
         }
       } catch (error) {
         console.error('Favorite error:', error);
-        notificationStore.add({
-          type: 'error',
-          message: 'Erreur lors de la mise à jour des favoris',
-          duration: 3000
-        });
+        this.notificationStore.error('Erreur lors de la mise à jour des favoris');
       }
     },
     
     async toggleLike(product) {
       const user = this.$store?.state?.auth?.user;
       if (!user) {
-        notificationStore.add({
-          type: 'warning',
-          message: 'Connectez-vous pour liker',
-          duration: 3000
-        });
+        this.notificationStore.warning('Connectez-vous pour liker');
         return;
       }
       
@@ -328,11 +318,7 @@ export default {
         }
       } catch (error) {
         console.error('Like error:', error);
-        notificationStore.add({
-          type: 'error',
-          message: 'Erreur lors du like',
-          duration: 3000
-        });
+        this.notificationStore.error('Erreur lors du like');
       }
     }
   }

@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Jobs\ProcessProductImages;
 use App\Jobs\IndexProductForSearch;
+use App\Models\ProductAppointment;
+use App\Notifications\FollowerOnlyProductPosted;
 
 class ProductController extends Controller
 {
@@ -56,6 +58,37 @@ class ProductController extends Controller
 
         if ($request->location) {
             $query->where('location', 'like', '%' . $request->location . '%');
+        }
+
+        // Spots filter
+        if ($request->has('is_spot')) {
+            $isSpot = filter_var($request->get('is_spot'), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+            if (!is_null($isSpot)) {
+                $query->where('is_spot', $isSpot);
+            }
+        }
+
+        // Followers only filter (explicit)
+        if ($request->has('followers_only')) {
+            $followersOnly = filter_var($request->get('followers_only'), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+            if (!is_null($followersOnly)) {
+                $query->where('followers_only', $followersOnly);
+            }
+        }
+
+        // Followers-only filtering for non-followers
+        if (Auth::check()) {
+            $followingIds = Auth::user()->following()->pluck('following_id');
+            $query->where(function($q) use ($followingIds) {
+                $q->where('followers_only', false)
+                  ->orWhere(function($q2) use ($followingIds) {
+                      $q2->where('followers_only', true)
+                         ->whereIn('user_id', $followingIds);
+                  })
+                  ->orWhere('user_id', Auth::id());
+            });
+        } else {
+            $query->where('followers_only', false);
         }
 
         // Search
@@ -119,6 +152,10 @@ class ProductController extends Controller
             'measurements' => 'nullable|array',
             'images' => 'required|array|min:1|max:10',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:5120', // 5MB max
+            'followers_only' => 'nullable|boolean',
+            'is_spot' => 'nullable|boolean',
+            'spot_starts_at' => 'nullable|date',
+            'spot_ends_at' => 'nullable|date|after:spot_starts_at',
         ]);
 
         $product = Product::create([
@@ -140,6 +177,10 @@ class ProductController extends Controller
             'tags' => $request->tags,
             'measurements' => $request->measurements,
             'status' => Product::STATUS_ACTIVE,
+            'followers_only' => (bool) ($request->followers_only ?? false),
+            'is_spot' => (bool) ($request->is_spot ?? false),
+            'spot_starts_at' => $request->spot_starts_at,
+            'spot_ends_at' => $request->spot_ends_at,
         ]);
 
         // Process images synchronously to avoid serialization of UploadedFile in queue
@@ -148,12 +189,34 @@ class ProductController extends Controller
             $job->handle();
         }
 
+        // Notify followers if followers-only
+        if ($product->followers_only) {
+            $seller = $product->user()->first();
+            if ($seller) {
+                $followers = $seller->followers()->get();
+                foreach ($followers as $follower) {
+                    $follower->notify(new FollowerOnlyProductPosted($product));
+                }
+            }
+        }
+
         // Index for search
         IndexProductForSearch::dispatch($product);
 
+        $product->load(['user', 'category', 'brand', 'condition', 'images']);
+        $productData = $product->toArray();
+        $productData['main_image'] = $product->mainImage?->url;
+        $productData['images'] = $product->images->map(function($image) {
+            return [
+                'id' => $image->id,
+                'url' => $image->url,
+                'order' => $image->order,
+            ];
+        });
+
         return response()->json([
             'success' => true,
-            'data' => $product->load(['category', 'brand', 'condition']),
+            'data' => $productData,
             'message' => 'Product created successfully'
         ], 201);
     }
@@ -171,6 +234,17 @@ class ProductController extends Controller
             'images',
             'comments.user'
         ]);
+
+        // Visibility gate for followers-only show
+        if ($product->followers_only) {
+            $viewer = Auth::user();
+            if (!$viewer || ($viewer->id !== $product->user_id && !$viewer->isFollowing($product->user))) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'This product is only visible to followers'
+                ], 403);
+            }
+        }
 
         // Record view
         if ($user = Auth::user()) {
@@ -236,6 +310,10 @@ class ProductController extends Controller
             'tags' => 'nullable|array',
             'measurements' => 'nullable|array',
             'status' => 'sometimes|in:draft,active,removed',
+            'followers_only' => 'nullable|boolean',
+            'is_spot' => 'nullable|boolean',
+            'spot_starts_at' => 'nullable|date',
+            'spot_ends_at' => 'nullable|date|after:spot_starts_at',
         ]);
 
         $product->update($request->only([
@@ -243,7 +321,8 @@ class ProductController extends Controller
             'category_id', 'brand_id', 'condition_id',
             'size', 'color', 'material', 'shipping_cost',
             'location', 'is_negotiable', 'minimum_offer',
-            'tags', 'measurements', 'status'
+            'tags', 'measurements', 'status',
+            'followers_only', 'is_spot', 'spot_starts_at', 'spot_ends_at'
         ]));
 
         // Re-index for search if needed
@@ -441,6 +520,59 @@ class ProductController extends Controller
             'success' => true,
             'share_url' => route('products.show', $product),
             'message' => 'Share URL generated'
+        ]);
+    }
+
+    /**
+     * Request an appointment to view the product.
+     */
+    public function requestAppointment(Request $request, Product $product)
+    {
+        $request->validate([
+            'scheduled_at' => 'required|date|after:now',
+            'location' => 'nullable|string|max:255',
+            'notes' => 'nullable|string|max:1000',
+        ]);
+
+        $appointment = ProductAppointment::create([
+            'product_id' => $product->id,
+            'buyer_id' => Auth::id(),
+            'seller_id' => $product->user_id,
+            'scheduled_at' => $request->scheduled_at,
+            'location' => $request->location,
+            'status' => 'pending',
+            'notes' => $request->notes,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'data' => $appointment,
+            'message' => 'Appointment requested successfully'
+        ], 201);
+    }
+
+    /**
+     * Update appointment status by seller.
+     */
+    public function updateAppointmentStatus(Request $request, ProductAppointment $appointment)
+    {
+        if ($appointment->seller_id !== Auth::id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+
+        $request->validate([
+            'status' => 'required|in:accepted,declined,cancelled,completed',
+        ]);
+
+        $appointment->update(['status' => $request->status]);
+
+        return response()->json([
+            'success' => true,
+            'data' => $appointment,
+            'message' => 'Appointment status updated'
         ]);
     }
 

@@ -139,7 +139,11 @@ Route::prefix('v1')->group(function () {
             Route::get('{product}/comments', [ProductController::class, 'getComments']);
             Route::put('{product}/boost', [ProductController::class, 'boost']);
             Route::post('{product}/share', [ProductController::class, 'share']);
+            // Appointments
+            Route::post('{product}/appointments', [ProductController::class, 'requestAppointment']);
         });
+        // Appointment management
+        Route::put('appointments/{appointment}', [ProductController::class, 'updateAppointmentStatus']);
 
         // Live Routes
         Route::prefix('lives')->group(function () {
@@ -346,6 +350,15 @@ Route::prefix('v1')->group(function () {
             Route::get('stats', [ImageSearchController::class, 'getStats']);
         });
     });
+
+    // File serving route (temporary solution)
+    Route::get('files/{path}', function($path) {
+        $file = storage_path('app/public/' . $path);
+        if (!file_exists($file)) {
+            abort(404);
+        }
+        return response()->file($file);
+    })->where('path', '.*');
 });
 
 // Webhook Routes (for payment providers, etc.)
