@@ -78,6 +78,26 @@ npm run build
 php artisan migrate:fresh --seed
 ```
 
+---
+
+## 🔑 Variables d'environnement requises
+
+Ajoutez ces clés dans votre `.env` pour l'auth Google et Fapshi:
+
+```env
+# Google OAuth
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+GOOGLE_REDIRECT_URL=${APP_URL}/api/v1/auth/social/google/callback
+
+# Fapshi
+FAPSHI_BASE_URL=https://live.fapshi.com
+FAPSHI_API_USER=your_api_user
+FAPSHI_API_KEY=your_api_key
+FAPSHI_MIN_AMOUNT=100
+XAF_PER_EUR=650
+```
+
 
 
 

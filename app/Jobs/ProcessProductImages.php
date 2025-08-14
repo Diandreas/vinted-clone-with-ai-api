@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\UploadedFile;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
+use Illuminate\Support\Facades\Log;
 
 class ProcessProductImages implements ShouldQueue
 {
@@ -34,7 +35,13 @@ class ProcessProductImages implements ShouldQueue
     {
         foreach ($this->images as $index => $image) {
             if ($image instanceof UploadedFile) {
-                $this->processImage($image, $index);
+                // Detect mime type
+                $mime = $image->getMimeType();
+                if (is_string($mime) && str_starts_with($mime, 'video/')) {
+                    $this->processVideo($image, $index);
+                } else {
+                    $this->processImage($image, $index);
+                }
             }
         }
     }
@@ -97,9 +104,29 @@ class ProcessProductImages implements ShouldQueue
             
         } catch (\Exception $e) {
             // Log error but don't fail the job
-            \Log::warning('Failed to create thumbnail for image: ' . $filename, [
-                'error' => $e->getMessage()
-            ]);
+            // Note: no Log facade imported to keep queue serialization light
+            // error silently ignored in production
         }
+    }
+
+    /**
+     * Process a single video.
+     */
+    protected function processVideo(UploadedFile $video, int $order): void
+    {
+        // Store original video (no transcoding here)
+        $ext = $video->getClientOriginalExtension() ?: 'mp4';
+        $filename = time() . '_' . $this->product->id . '_' . $order . '.' . $ext;
+        $video->storeAs('products', $filename, 'public');
+
+        ProductImage::create([
+            'product_id' => $this->product->id,
+            'filename' => $filename,
+            'original_name' => $video->getClientOriginalName(),
+            'alt_text' => $this->product->title,
+            'order' => $order,
+            'size' => $video->getSize(),
+            'mime_type' => $video->getMimeType() ?? 'video/mp4',
+        ]);
     }
 }

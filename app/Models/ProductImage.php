@@ -64,7 +64,7 @@ class ProductImage extends Model
      */
     public function getUrlAttribute()
     {
-        return asset('storage/products/' . $this->filename);
+        return url('api/v1/files/products/' . $this->filename);
     }
 
     /**
@@ -72,10 +72,21 @@ class ProductImage extends Model
      */
     public function getThumbnailUrlAttribute()
     {
+        // For videos, no guaranteed generated thumbnail. Return null to let client handle.
+        if (is_string($this->mime_type) && str_starts_with($this->mime_type, 'video/')) {
+            return null;
+        }
         $pathInfo = pathinfo($this->filename);
-        $thumbnailFilename = $pathInfo['filename'] . '_thumb.' . $pathInfo['extension'];
-        
-        return asset('storage/products/thumbnails/' . $thumbnailFilename);
+        $thumbnailFilename = $pathInfo['filename'] . '_thumb.' . ($pathInfo['extension'] ?? 'jpg');
+        return url('api/v1/files/products/thumbnails/' . $thumbnailFilename);
+    }
+
+    /**
+     * Whether this media is a video.
+     */
+    public function getIsVideoAttribute(): bool
+    {
+        return is_string($this->mime_type) && str_starts_with($this->mime_type, 'video/');
     }
 
     /**

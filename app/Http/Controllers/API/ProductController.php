@@ -11,6 +11,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use App\Jobs\ProcessProductImages;
 use App\Jobs\IndexProductForSearch;
 use App\Models\ProductAppointment;
@@ -122,7 +123,7 @@ class ProductController extends Controller
                       ->latest();
         }
 
-        $products = $query->paginate($request->per_page ?? 20);
+        $products = $query->paginate($request->limit ?? $request->per_page ?? 20);
 
         return response()->json([
             'success' => true,
@@ -153,7 +154,8 @@ class ProductController extends Controller
             'tags' => 'nullable|array',
             'measurements' => 'nullable|array',
             'images' => 'required|array|min:1|max:10',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:5120', // 5MB max
+            // Accept images and videos; enforce reasonable sizes
+            'images.*' => 'file|mimetypes:image/jpeg,image/png,image/gif,video/mp4,video/quicktime,video/webm|max:51200', // 50MB
             'followers_only' => 'nullable|boolean',
             'is_spot' => 'nullable|boolean',
             'spot_starts_at' => 'nullable|date',

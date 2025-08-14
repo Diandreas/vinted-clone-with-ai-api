@@ -13,6 +13,7 @@ use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
+    private array $supportedProviders = ['google'];
     public function register(Request $request)
     {
         // Log incoming request (sanitized)
@@ -150,6 +151,12 @@ class AuthController extends Controller
      */
     public function redirectToProvider($provider)
     {
+        if (!in_array($provider, $this->supportedProviders, true)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unsupported provider'
+            ], 404);
+        }
         if (!class_exists(\Laravel\Socialite\Facades\Socialite::class)) {
             return response()->json([
                 'success' => false,
@@ -165,6 +172,12 @@ class AuthController extends Controller
      */
     public function handleProviderCallback(Request $request, $provider)
     {
+        if (!in_array($provider, $this->supportedProviders, true)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unsupported provider'
+            ], 404);
+        }
         if (!class_exists(\Laravel\Socialite\Facades\Socialite::class)) {
             return response()->json([
                 'success' => false,

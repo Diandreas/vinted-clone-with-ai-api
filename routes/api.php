@@ -51,9 +51,9 @@ Route::prefix('v1')->group(function () {
         Route::post('verify-email', [AuthController::class, 'verifyEmail'])->name('verification.verify');
         Route::post('resend-verification', [AuthController::class, 'resendVerification'])->name('verification.send');
 
-        // Social auth (web + mobile token exchange)
-        Route::get('social/{provider}/redirect', [AuthController::class, 'redirectToProvider']);
-        Route::match(['get', 'post'], 'social/{provider}/callback', [AuthController::class, 'handleProviderCallback']);
+        // Social auth (web + mobile token exchange) — Google only
+        Route::get('social/google/redirect', [AuthController::class, 'redirectToProvider']);
+        Route::match(['get', 'post'], 'social/google/callback', [AuthController::class, 'handleProviderCallback']);
     });
 
     // Public Routes (sans authentification)
@@ -243,46 +243,18 @@ Route::prefix('v1')->group(function () {
             Route::get('history', [PaymentController::class, 'history']);
         });
 
-        // Wallet Routes (top up via Fapshi)
+        // Wallet Routes
         Route::prefix('wallet')->group(function () {
-            Route::post('topup', function(\Illuminate\Http\Request $request) {
-                $request->validate([
-                    'amount_xaf' => 'required|integer|min:100',
-                    'email' => 'required|email',
-                    'user_id' => 'required',
-                    'message' => 'nullable|string'
-                ]);
+            Route::get('balance', [WalletController::class, 'balance']);
+            Route::get('transactions', [WalletController::class, 'transactions']);
+            Route::post('topup', [WalletController::class, 'topUp']);
+            Route::post('withdraw', [WalletController::class, 'withdraw']);
+        });
 
-                $payload = [
-                    'amount' => (int) $request->amount_xaf,
-                    'email' => $request->email,
-                    'externalId' => 'WALLET-' . \Str::upper(\Str::random(8)),
-                    'userId' => (string) $request->user_id,
-                    'message' => $request->message ?? 'Wallet top-up',
-                    'redirectUrl' => config('app.url') . '/wallet/return',
-                ];
-
-                $fapshi = app(\App\Services\Payment\FapshiService::class);
-                $resp = $fapshi->initiatePay($payload);
-
-                if (class_exists(\App\Models\WalletTransaction::class)) {
-                    \App\Models\WalletTransaction::create([
-                        'user_id' => Auth::id(),
-                        'type' => 'credit',
-                        'purpose' => 'topup',
-                        'amount_xaf' => (int) $request->amount_xaf,
-                        'status' => 'pending',
-                        'provider' => 'fapshi',
-                        'trans_id' => $resp['transId'] ?? null,
-                        'metadata' => $resp,
-                    ]);
-                }
-
-                return response()->json([
-                    'success' => true,
-                    'data' => $resp,
-                ]);
-            });
+        // Fapshi webhook routes (public)
+        Route::prefix('webhooks')->group(function () {
+            Route::post('fapshi', [WalletController::class, 'fapshiCallback']);
+            Route::get('fapshi/return', [WalletController::class, 'fapshiReturn']);
         });
 
         // Shipping Address Routes

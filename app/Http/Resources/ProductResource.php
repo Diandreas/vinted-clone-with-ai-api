@@ -46,7 +46,7 @@ class ProductResource extends JsonResource
             'location' => $this->location,
             'is_negotiable' => (bool) $this->is_negotiable,
             'minimum_offer' => $this->minimum_offer,
-            'main_image' => $this->mainImage?->filename ? asset('storage/products/' . $this->mainImage->filename) : null,
+            'main_image' => $this->main_image_url,
             'user' => $this->whenLoaded('user'),
             'category' => $this->whenLoaded('category'),
             'brand' => $this->whenLoaded('brand'),
@@ -55,7 +55,10 @@ class ProductResource extends JsonResource
                 return $this->images->map(function($image) {
                     return [
                         'id' => $image->id,
-                        'url' => asset('storage/products/' . $image->filename),
+                        'url' => $image->url,
+                        'thumbnail_url' => $image->thumbnail_url,
+                        'mime_type' => $image->mime_type,
+                        'is_video' => (bool) ($image->is_video ?? false),
                         'order' => $image->order,
                     ];
                 });

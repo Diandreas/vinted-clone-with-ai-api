@@ -75,13 +75,6 @@ return [
         'webhook_secret' => env('FAPSHI_WEBHOOK_SECRET'), // optional if provided
     ],
 
-    // Social authentication providers
-    'facebook' => [
-        'client_id' => env('FACEBOOK_CLIENT_ID'),
-        'client_secret' => env('FACEBOOK_CLIENT_SECRET'),
-        'redirect' => env('FACEBOOK_REDIRECT_URL', env('APP_URL') . '/api/v1/auth/social/facebook/callback'),
-    ],
-
     'google' => [
         'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
