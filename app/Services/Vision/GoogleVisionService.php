@@ -26,9 +26,27 @@ class GoogleVisionService
     private function initializeClient()
     {
         if ($this->client === null) {
-            $this->client = new ImageAnnotatorClient([
-                'credentials' => config('services.google_cloud.key_file'),
-            ]);
+            try {
+                Log::info('GoogleVision: Initializing client with credentials', [
+                    'credentials_path' => config('services.google_cloud.key_file'),
+                    'project_id' => config('services.google_cloud.project_id')
+                ]);
+                
+                $this->client = new ImageAnnotatorClient([
+                    'credentials' => config('services.google_cloud.key_file'),
+                ]);
+                
+                Log::info('GoogleVision: Client initialized successfully');
+            } catch (\Exception $e) {
+                Log::error('GoogleVision: Failed to initialize client', [
+                    'error' => $e->getMessage(),
+                    'code' => $e->getCode(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+                throw $e;
+            }
         }
         return $this->client;
     }
@@ -38,11 +56,29 @@ class GoogleVisionService
      */
     public function analyzeImage($imagePath, $productId = null)
     {
+        Log::info('GoogleVision: Starting image analysis', [
+            'image_path' => $imagePath,
+            'product_id' => $productId,
+            'file_exists' => file_exists($imagePath),
+            'file_size' => file_exists($imagePath) ? filesize($imagePath) : null
+        ]);
+        
         try {
             $client = $this->initializeClient();
+            Log::info('GoogleVision: Client ready, reading image file');
 
             // Lire l'image
+            if (!file_exists($imagePath)) {
+                throw new \Exception("Image file not found: {$imagePath}");
+            }
+            
             $imageContent = file_get_contents($imagePath);
+            if ($imageContent === false) {
+                throw new \Exception("Failed to read image file: {$imagePath}");
+            }
+            
+            Log::info('GoogleVision: Image content read', ['content_length' => strlen($imageContent)]);
+            
             $image = new Image();
             $image->setContent($imageContent);
 
@@ -64,13 +100,23 @@ class GoogleVisionService
             $batchRequest = new BatchAnnotateImagesRequest();
             $batchRequest->setRequests([$request]);
             
+            Log::info('GoogleVision: Sending request to Google Vision API');
             $response = $client->batchAnnotateImages($batchRequest);
+            Log::info('GoogleVision: Received response from Google Vision API');
+            
             $annotations = $response->getResponses()[0];
 
             if ($annotations->hasError()) {
-                Log::error('Google Vision API Error: ' . $annotations->getError()->getMessage());
+                $error = $annotations->getError();
+                Log::error('GoogleVision: API returned error', [
+                    'error_message' => $error->getMessage(),
+                    'error_code' => $error->getCode(),
+                    'error_details' => $error->getDetails()
+                ]);
                 return null;
             }
+            
+            Log::info('GoogleVision: Successfully processed image annotations');
 
             // Extraire les données
             $visionData = [
@@ -88,6 +134,8 @@ class GoogleVisionService
 
             // Sauvegarder en base de données si un product_id est fourni
             if ($productId) {
+                Log::info('GoogleVision: Saving vision data to database', ['product_id' => $productId]);
+                
                 ProductVisionData::create([
                     'product_id' => $productId,
                     'image_path' => $imagePath,
@@ -102,6 +150,8 @@ class GoogleVisionService
                     'processed' => true,
                     'processed_at' => now(),
                 ]);
+                
+                Log::info('GoogleVision: Vision data saved successfully');
             }
 
             return [
@@ -110,7 +160,15 @@ class GoogleVisionService
             ];
 
         } catch (\Exception $e) {
-            Log::error('Google Vision Analysis Error: ' . $e->getMessage());
+            Log::error('GoogleVision: Analysis failed', [
+                'error_message' => $e->getMessage(),
+                'error_code' => $e->getCode(),
+                'error_file' => $e->getFile(),
+                'error_line' => $e->getLine(),
+                'image_path' => $imagePath,
+                'product_id' => $productId,
+                'stack_trace' => $e->getTraceAsString()
+            ]);
             return null;
         }
     }
@@ -120,12 +178,20 @@ class GoogleVisionService
      */
     public function searchSimilarProducts($imagePath, $limit = 10)
     {
+        Log::info('GoogleVision: Starting similarity search', [
+            'image_path' => $imagePath,
+            'limit' => $limit
+        ]);
+        
         // Analyser l'image de recherche
         $analysisResult = $this->analyzeImage($imagePath);
         
         if (!$analysisResult) {
+            Log::warning('GoogleVision: Failed to analyze search image, returning empty results');
             return [];
         }
+        
+        Log::info('GoogleVision: Search image analyzed successfully, computing similarities');
 
         $searchVector = $analysisResult['feature_vector'];
         $visionData = $analysisResult['vision_data'];
@@ -134,6 +200,8 @@ class GoogleVisionService
         $productVisionData = ProductVisionData::with('product')
             ->where('processed', true)
             ->get();
+            
+        Log::info('GoogleVision: Found products for comparison', ['count' => $productVisionData->count()]);
 
         $similarities = [];
 
@@ -168,8 +236,16 @@ class GoogleVisionService
         usort($similarities, function ($a, $b) {
             return $b['similarity'] <=> $a['similarity'];
         });
-
-        return array_slice($similarities, 0, $limit);
+        
+        $results = array_slice($similarities, 0, $limit);
+        
+        Log::info('GoogleVision: Similarity search completed', [
+            'total_matches' => count($similarities),
+            'returned_results' => count($results),
+            'top_similarity' => !empty($results) ? $results[0]['similarity'] : null
+        ]);
+        
+        return $results;
     }
 
     /**
