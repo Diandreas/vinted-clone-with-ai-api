@@ -184,6 +184,14 @@ class Product extends Model
         return $this->morphMany(Report::class, 'reportable');
     }
 
+    /**
+     * Get the product's vision data.
+     */
+    public function visionData()
+    {
+        return $this->hasMany(ProductVisionData::class);
+    }
+
     // Scopes
 
     /**

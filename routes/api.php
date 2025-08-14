@@ -18,6 +18,7 @@ use App\Http\Controllers\API\MessageController;
 use App\Http\Controllers\API\ReviewController;
 use App\Http\Controllers\API\NotificationController;
 use App\Http\Controllers\API\SearchController;
+use App\Http\Controllers\API\ImageSearchController;
 use App\Http\Controllers\API\FeedController;
 use App\Http\Controllers\API\ReportController;
 use App\Http\Controllers\API\PaymentController;
@@ -82,6 +83,10 @@ Route::prefix('v1')->group(function () {
         // Search
         Route::get('search', [SearchController::class, 'search']);
         Route::get('search/suggestions', [SearchController::class, 'suggestions']);
+        
+        // Image Search (public endpoint for testing)
+        Route::post('search/image', [ImageSearchController::class, 'searchByImage']);
+        Route::post('search/analyze', [ImageSearchController::class, 'analyzeImage']);
 
         // Explore
         Route::get('explore', [FeedController::class, 'explore']);
@@ -333,6 +338,12 @@ Route::prefix('v1')->group(function () {
         Route::prefix('settings')->group(function () {
             Route::get('/', [AdminSettingsController::class, 'index']);
             Route::put('/', [AdminSettingsController::class, 'update']);
+        });
+
+        // Image Search Admin Routes
+        Route::prefix('image-search')->group(function () {
+            Route::post('process-products', [ImageSearchController::class, 'processExistingProducts']);
+            Route::get('stats', [ImageSearchController::class, 'getStats']);
         });
     });
 });

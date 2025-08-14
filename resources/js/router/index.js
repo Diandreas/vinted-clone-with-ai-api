@@ -22,6 +22,7 @@ const Messages = () => import('@/views/Messages.vue')
 const Orders = () => import('@/views/Orders.vue')
 const Notifications = () => import('@/views/Notifications.vue')
 const Search = () => import('@/views/Search.vue')
+const ImageSearch = () => import('@/views/ImageSearch.vue')
 const UserProfile = () => import('@/views/UserProfile.vue')
 const CategoryManagement = () => import('@/views/admin/CategoryManagement.vue')
 
@@ -184,6 +185,12 @@ const routes = [
     path: '/search',
     name: 'search',
     component: Search,
+    meta: { requiresAuth: false }
+  },
+  {
+    path: '/search/image',
+    name: 'image-search',
+    component: ImageSearch,
     meta: { requiresAuth: false }
   },
   {
