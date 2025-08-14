@@ -38,31 +38,62 @@
         <div class="space-y-4">
           <!-- Main Image -->
           <div class="aspect-square bg-gray-100 rounded-xl overflow-hidden">
+            <!-- Debug info -->
+            <div v-if="product" class="absolute top-2 left-2 bg-black bg-opacity-50 text-white text-xs p-1 rounded z-10">
+              Debug: main_image_url = {{ product.main_image_url || 'null' }}
+            </div>
+            
             <img 
-              v-if="product.main_image"
-              :src="product.main_image" 
+              v-if="product.main_image_url"
+              :src="product.main_image_url" 
               :alt="product.title"
               class="w-full h-full object-cover"
+              @load="console.log('✅ Image principale chargée:', product.main_image_url)"
+              @error="console.error('❌ Erreur chargement image principale:', product.main_image_url)"
             />
             <div v-else class="flex items-center justify-center h-full">
               <ImageIcon class="w-24 h-24 text-gray-400" />
+              <div class="text-center text-gray-500 mt-2">
+                <p>Aucune image principale</p>
+                <p class="text-xs">main_image_url: {{ product?.main_image_url || 'null' }}</p>
+              </div>
             </div>
           </div>
 
           <!-- Image Gallery (if multiple images) -->
           <div v-if="product.images && product.images.length > 1" class="grid grid-cols-4 gap-2">
+            <!-- Debug info -->
+            <div class="col-span-4 bg-yellow-100 text-yellow-800 text-xs p-2 rounded mb-2">
+              Galerie: {{ product.images.length }} images trouvées
+            </div>
+            
             <div 
               v-for="image in product.images" 
               :key="image.id"
-              class="aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover:opacity-80 transition-opacity"
+              class="aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover:opacity-80 transition-opacity relative"
               @click="selectMainImage(image)"
             >
               <img 
-                :src="image.filename" 
+                :src="image.url" 
                 :alt="image.alt_text || product.title"
                 class="w-full h-full object-cover"
+                @load="console.log('✅ Image galerie chargée:', image.url)"
+                @error="console.error('❌ Erreur chargement image galerie:', image.url)"
               />
+              <!-- Debug info sur chaque image -->
+              <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1">
+                {{ image.filename }}
+              </div>
             </div>
+          </div>
+          
+          <!-- Debug: Aucune image -->
+          <div v-else-if="product.images && product.images.length === 1" class="bg-blue-100 text-blue-800 text-xs p-2 rounded">
+            Une seule image trouvée (pas de galerie)
+          </div>
+          
+          <div v-else class="bg-red-100 text-red-800 text-xs p-2 rounded">
+            Aucune image trouvée dans product.images
           </div>
         </div>
 
@@ -326,6 +357,21 @@ const loadProduct = async () => {
     const response = await window.axios.get(`/products/${route.params.id}`)
     if (response.data.success) {
       product.value = response.data.data
+      
+      // Debug des données du produit
+      console.log('🖼️ Données du produit chargées:', {
+        id: product.value.id,
+        title: product.value.title,
+        main_image_url: product.value.main_image_url,
+        images_count: product.value.images?.length || 0,
+        images: product.value.images?.map(img => ({
+          id: img.id,
+          filename: img.filename,
+          url: img.url,
+          alt_text: img.alt_text
+        }))
+      })
+      
       await loadSimilarProducts()
       await checkUserInteractions()
     }
@@ -475,8 +521,8 @@ const viewProduct = (product) => {
 }
 
 const selectMainImage = (image) => {
-  // Update main image display
-  product.value.main_image = image.filename
+  // Update main image display with full URL
+  product.value.main_image_url = image.url
 }
 
 const formatPrice = (price) => {

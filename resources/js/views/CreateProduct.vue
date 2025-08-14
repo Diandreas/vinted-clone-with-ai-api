@@ -22,6 +22,49 @@
         </div>
       </div>
 
+
+
+      <!-- Error Display -->
+      <div v-if="showErrors && Object.keys(errors).length > 0" class="mb-6">
+        <div class="bg-red-50 border border-red-200 rounded-xl p-4">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-red-800">
+                Erreurs de validation
+              </h3>
+              <div class="mt-2 text-sm text-red-700">
+                <ul class="list-disc pl-5 space-y-1">
+                  <li v-for="(fieldErrors, field) in errors" :key="field">
+                    <span v-if="field === 'general'">
+                      <span v-for="error in fieldErrors" :key="error">{{ error }}</span>
+                    </span>
+                    <span v-else>
+                      <strong>{{ field }}:</strong>
+                      <span v-for="error in fieldErrors" :key="error" class="ml-1">{{ error }}</span>
+                    </span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div class="ml-auto pl-3">
+              <button
+                @click="showErrors = false"
+                class="inline-flex bg-red-50 rounded-md p-1.5 text-red-500 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              >
+                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <form @submit.prevent="submitProduct" class="space-y-6 lg:space-y-8">
         <!-- Images Section modernisée -->
         <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 p-6 lg:p-8 hover:shadow-2xl transition-all duration-300">
@@ -300,8 +343,20 @@
                       </div>
                     </div>
 
-        <!-- Submit Button -->
-        <div class="flex justify-center">
+        <!-- Submit Buttons -->
+        <div class="flex justify-center space-x-4">
+          <button
+            type="button"
+            @click="resetForm"
+            :disabled="loading"
+            class="inline-flex items-center px-6 py-4 bg-gray-500 text-white font-semibold rounded-xl hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+          >
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            Réinitialiser
+          </button>
+          
             <button
               type="submit"
               :disabled="loading"
@@ -335,6 +390,8 @@ const router = useRouter()
 
 // Loading state
 const loading = ref(false)
+const errors = ref({})
+const showErrors = ref(false)
 
 // Form data
 const form = reactive({
@@ -402,6 +459,20 @@ const handleImageUpload = (event, index) => {
   const file = event.target.files[0]
   if (!file) return
 
+  // Validation du fichier côté client
+  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif']
+  const maxSize = 5 * 1024 * 1024 // 5MB
+  
+  if (!allowedTypes.includes(file.type)) {
+    alert('Type de fichier non supporté. Utilisez JPEG, PNG ou GIF.')
+    return
+  }
+  
+  if (file.size > maxSize) {
+    alert('Fichier trop volumineux. Taille maximum : 5MB.')
+    return
+  }
+
   // Create preview
   const reader = new FileReader()
   reader.onload = (e) => {
@@ -417,8 +488,23 @@ const handleImageUpload = (event, index) => {
 const handleMultipleImageUpload = (event) => {
   const files = Array.from(event.target.files)
   let currentIndex = 0
+  let validFiles = 0
   
   files.forEach((file, fileIndex) => {
+    // Validation du fichier
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif']
+    const maxSize = 5 * 1024 * 1024 // 5MB
+    
+    if (!allowedTypes.includes(file.type)) {
+      alert(`Fichier "${file.name}" : Type non supporté. Utilisez JPEG, PNG ou GIF.`)
+      return
+    }
+    
+    if (file.size > maxSize) {
+      alert(`Fichier "${file.name}" : Trop volumineux. Taille maximum : 5MB.`)
+      return
+    }
+    
     // Find next empty slot
     while (currentIndex < form.images.length && form.images[currentIndex]) {
       currentIndex++
@@ -434,8 +520,13 @@ const handleMultipleImageUpload = (event) => {
       }
       reader.readAsDataURL(file)
       currentIndex++
+      validFiles++
     }
   })
+  
+  if (validFiles > 0) {
+    console.log(`${validFiles} images ajoutées avec succès`)
+  }
 }
 
 // Move image to main position
@@ -467,34 +558,131 @@ const removeImage = (index) => {
   form.images = compactedImages
 }
 
+// Reset form
+const resetForm = () => {
+  form.title = ''
+  form.description = ''
+  form.price = ''
+  form.original_price = ''
+  form.category_id = ''
+  form.brand_id = ''
+  form.condition_id = ''
+  form.size = ''
+  form.is_negotiable = false
+  form.status = 'active'
+  form.images = Array(8).fill(null)
+  errors.value = {}
+  showErrors.value = false
+}
+
+// Display errors
+const displayErrors = (errorData) => {
+  errors.value = errorData
+  showErrors.value = true
+  
+  // Auto-hide errors after 10 seconds
+  setTimeout(() => {
+    showErrors.value = false
+  }, 10000)
+}
+
+
+
+
+
+
+
 // Submit product
 const submitProduct = async () => {
   loading.value = true
   
   try {
+    // Validation côté client
+    if (!form.title.trim()) {
+      alert('Le titre est requis')
+      loading.value = false
+      return
+    }
+    
+    if (!form.description.trim()) {
+      alert('La description est requise')
+      loading.value = false
+      return
+    }
+    
+    if (!form.price || parseFloat(form.price) <= 0) {
+      alert('Le prix est requis et doit être supérieur à 0')
+      loading.value = false
+      return
+    }
+    
+    if (!form.category_id) {
+      alert('La catégorie est requise')
+      loading.value = false
+      return
+    }
+    
+    if (!form.condition_id) {
+      alert('L\'état du produit est requis')
+      loading.value = false
+      return
+    }
+    
+    // Vérifier qu'au moins une image est sélectionnée et pas plus de 10
+    const validImages = form.images.filter(img => img && img.file)
+    if (validImages.length === 0) {
+      alert('Au moins une image est requise')
+      loading.value = false
+      return
+    }
+    
+    if (validImages.length > 10) {
+      alert('Maximum 10 images autorisées')
+      loading.value = false
+      return
+    }
+    
     // Create FormData for file upload
     const formData = new FormData()
     
     // Add text fields
-    formData.append('title', form.title)
-    formData.append('description', form.description)
+    formData.append('title', form.title.trim())
+    formData.append('description', form.description.trim())
     formData.append('price', form.price)
     formData.append('category_id', form.category_id)
     formData.append('status', form.status)
     
     // Add optional fields
-    if (form.original_price) formData.append('original_price', form.original_price)
+    if (form.original_price && parseFloat(form.original_price) > 0) {
+      formData.append('original_price', form.original_price)
+    }
     if (form.brand_id) formData.append('brand_id', form.brand_id)
     if (form.condition_id) formData.append('condition_id', form.condition_id)
-    if (form.size) formData.append('size', form.size)
+    if (form.size && form.size.trim()) formData.append('size', form.size.trim())
     if (form.is_negotiable) formData.append('is_negotiable', '1')
     
-    // Add images
-    form.images.forEach((image) => {
-      if (image && image.file) {
-        formData.append('images[]', image.file)
+    // Add images - Utiliser 'images[]' comme dans le test qui fonctionne
+    validImages.forEach((image, index) => {
+      if (image && image.file && image.file instanceof File) {
+        // Vérification supplémentaire que c'est bien un fichier valide
+        if (image.file.size > 0 && image.file.type.startsWith('image/')) {
+          formData.append('images[]', image.file) // Utiliser 'images[]' comme dans le test
+        } else {
+          console.warn('Fichier invalide ignoré:', image.file.name)
+        }
       }
     })
+    
+    console.log('FormData contenu:')
+    for (let [key, value] of formData.entries()) {
+      console.log(key, value)
+    }
+    
+    console.log('Images à envoyer:', validImages.map(img => ({
+      name: img.file.name,
+      type: img.file.type,
+      size: img.file.size
+    })))
     
     const response = await window.axios.post('/products', formData, {
       headers: {
@@ -515,12 +703,14 @@ const submitProduct = async () => {
     
     // Handle validation errors
     if (error.response?.status === 422) {
-      const errors = error.response.data.errors
-      console.log('Erreurs de validation:', errors)
-      // You could show these errors in the UI
+      const errorData = error.response.data.errors
+      console.log('Erreurs de validation:', errorData)
+      displayErrors(errorData)
+    } else if (error.response?.status === 500) {
+      displayErrors({ general: ['Erreur serveur. Veuillez réessayer plus tard.'] })
+    } else {
+      displayErrors({ general: ['Erreur lors de la création du produit. Veuillez réessayer.'] })
     }
-    
-    alert('Erreur lors de la création du produit. Veuillez réessayer.')
   } finally {
     loading.value = false
   }

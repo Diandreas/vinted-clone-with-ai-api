@@ -9,9 +9,11 @@ const Register = () => import('@/views/auth/Register.vue')
 const ForgotPassword = () => import('@/views/auth/ForgotPassword.vue')
 const Profile = () => import('@/views/Profile.vue')
 const Products = () => import('@/views/Products.vue')
+const MyProducts = () => import('@/views/MyProducts.vue')
 const PublicProducts = () => import('@/views/PublicProducts.vue')
 const ProductDetail = () => import('@/views/ProductDetail.vue')
 const CreateProduct = () => import('@/views/CreateProduct.vue')
+const EditProduct = () => import('@/views/EditProduct.vue')
 const Lives = () => import('@/views/Lives.vue')
 const LiveDetail = () => import('@/views/LiveDetail.vue')
 const CreateLive = () => import('@/views/CreateLive.vue')
@@ -94,7 +96,7 @@ const routes = [
   {
     path: '/my-products',
     name: 'my-products',
-    component: Products,
+    component: MyProducts,
     meta: { requiresAuth: true }
   },
   {
@@ -108,6 +110,13 @@ const routes = [
     path: '/products/create',
     name: 'create-product',
     component: CreateProduct,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/products/:id/edit',
+    name: 'edit-product',
+    component: EditProduct,
+    props: true,
     meta: { requiresAuth: true }
   },
   {

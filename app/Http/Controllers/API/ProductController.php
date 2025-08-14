@@ -185,9 +185,24 @@ class ProductController extends Controller
             $product->is_favorited = $product->isFavoritedBy($user);
         }
 
+        // Ajouter les accesseurs manuellement
+        $productData = $product->toArray();
+        $productData['main_image_url'] = $product->main_image_url;
+        $productData['image_urls'] = $product->image_urls;
+        
+        // Ajouter les URLs des images individuelles
+        if ($product->images) {
+            $productData['images'] = $product->images->map(function($image) {
+                $imageData = $image->toArray();
+                $imageData['url'] = $image->url;
+                $imageData['thumbnail_url'] = $image->thumbnail_url;
+                return $imageData;
+            });
+        }
+        
         return response()->json([
             'success' => true,
-            'data' => $product
+            'data' => $productData
         ]);
     }
 

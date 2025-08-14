@@ -8,9 +8,9 @@
             <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
               <span class="text-white font-bold text-lg">V</span>
             </div>
-            <span class="text-xl font-bold text-gray-900">sellam</span>
+            <span class="text-xl font-bold text-gray-900">Linkea</span>
           </RouterLink>
-          
+
           <!-- Main Navigation -->
           <div class="hidden md:flex items-center space-x-6">
             <RouterLink
@@ -82,7 +82,7 @@
                 <span>Admin</span>
                 <ChevronDownIcon class="w-3 h-3" />
               </button>
-              
+
               <Transition
                 enter-active-class="transition ease-out duration-100"
                 enter-from-class="transform opacity-0 scale-95"
@@ -257,7 +257,7 @@
           >
             Stories
           </RouterLink>
-          
+
           <template v-if="isAuthenticated">
             <div class="border-t border-gray-200 pt-2 mt-2">
               <RouterLink
@@ -280,6 +280,13 @@
                 @click="showMobileMenu = false"
               >
                 Mes Commandes
+              </RouterLink>
+              <RouterLink
+                to="/my-products"
+                class="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg"
+                @click="showMobileMenu = false"
+              >
+                Mes Produits
               </RouterLink>
               <button
                 @click="logout"
@@ -370,7 +377,7 @@ const handleClickOutside = (event) => {
 // Lifecycle
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
-  
+
   // Load notification counts if authenticated
   if (isAuthenticated.value) {
     dashboardStore.fetchStats()
