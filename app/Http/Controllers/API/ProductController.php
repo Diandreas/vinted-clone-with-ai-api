@@ -15,6 +15,8 @@ use App\Jobs\ProcessProductImages;
 use App\Jobs\IndexProductForSearch;
 use App\Models\ProductAppointment;
 use App\Notifications\FollowerOnlyProductPosted;
+use App\Models\PlatformFee;
+use App\Models\ProductFeeCharge;
 
 class ProductController extends Controller
 {
@@ -187,6 +189,25 @@ class ProductController extends Controller
         if ($request->hasFile('images')) {
             $job = new ProcessProductImages($product, $request->file('images'));
             $job->handle();
+        }
+
+        // Charge listing fee (if configured)
+        $listingFee = PlatformFee::where('code', 'listing_fee')->where('active', true)->first();
+        if ($listingFee) {
+            $amount = $listingFee->type === 'percentage'
+                ? round(($listingFee->percentage / 100) * (float) $product->price, 2)
+                : (float) $listingFee->amount;
+            ProductFeeCharge::create([
+                'product_id' => $product->id,
+                'user_id' => Auth::id(),
+                'platform_fee_id' => $listingFee->id,
+                'amount' => $amount,
+                'currency' => 'EUR',
+                'status' => 'pending',
+                'meta' => [
+                    'reason' => 'product_listing',
+                ],
+            ]);
         }
 
         // Notify followers if followers-only

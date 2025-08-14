@@ -65,4 +65,46 @@ return [
         'search_key' => env('ALGOLIA_SEARCH'),
     ],
 
+    'fapshi' => [
+        'base_url' => env('FAPSHI_BASE_URL', 'https://live.fapshi.com'),
+        'api_user' => env('FAPSHI_API_USER'),
+        'api_key' => env('FAPSHI_API_KEY'),
+        'currency' => env('FAPSHI_CURRENCY', 'XAF'),
+        'min_amount' => env('FAPSHI_MIN_AMOUNT', 100),
+        'xaf_per_eur' => env('XAF_PER_EUR', 650),
+        'webhook_secret' => env('FAPSHI_WEBHOOK_SECRET'), // optional if provided
+    ],
+
+    // Social authentication providers
+    'facebook' => [
+        'client_id' => env('FACEBOOK_CLIENT_ID'),
+        'client_secret' => env('FACEBOOK_CLIENT_SECRET'),
+        'redirect' => env('FACEBOOK_REDIRECT_URL', env('APP_URL') . '/api/v1/auth/social/facebook/callback'),
+    ],
+
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URL', env('APP_URL') . '/api/v1/auth/social/google/callback'),
+    ],
+
+    // Mobile Money providers (placeholders for environment configuration)
+    'mobile_money' => [
+        'mtn_momo' => [
+            'base_url' => env('MTN_MOMO_BASE_URL'),
+            'api_key' => env('MTN_MOMO_API_KEY'),
+            'api_user' => env('MTN_MOMO_API_USER'),
+            'api_secret' => env('MTN_MOMO_API_SECRET'),
+            'currency' => env('MTN_MOMO_CURRENCY', 'XAF'),
+            'callback_url' => env('MTN_MOMO_CALLBACK_URL', env('APP_URL') . '/api/webhooks/mobile-money/mtn_momo'),
+        ],
+        'orange_money' => [
+            'base_url' => env('ORANGE_MONEY_BASE_URL'),
+            'api_key' => env('ORANGE_MONEY_API_KEY'),
+            'merchant_code' => env('ORANGE_MONEY_MERCHANT_CODE'),
+            'currency' => env('ORANGE_MONEY_CURRENCY', 'XOF'),
+            'callback_url' => env('ORANGE_MONEY_CALLBACK_URL', env('APP_URL') . '/api/webhooks/mobile-money/orange_money'),
+        ],
+    ],
+
 ];

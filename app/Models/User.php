@@ -31,10 +31,12 @@ class  User extends Authenticatable implements MustVerifyEmail
         'gender',
         'is_verified',
         'is_live',
+        'stripe_customer_id',
         'last_seen_at',
         'settings',
         'notification_settings',
         'privacy_settings',
+        'wallet_balance_xaf',
     ];
 
     /**
@@ -63,6 +65,7 @@ class  User extends Authenticatable implements MustVerifyEmail
             'settings' => 'array',
             'notification_settings' => 'array',
             'privacy_settings' => 'array',
+            'wallet_balance_xaf' => 'integer',
         ];
     }
 

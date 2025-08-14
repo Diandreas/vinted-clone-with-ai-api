@@ -4,21 +4,16 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\PaymentMethod;
-use App\Models\Payment;
+// use App\Models\Payment;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Stripe\Stripe;
-use Stripe\Customer;
-use Stripe\PaymentMethod as StripePaymentMethod;
-use Stripe\PaymentIntent;
+// Stripe removed for Cameroon market
+use Illuminate\Support\Facades\Log;
 
 class PaymentController extends Controller
 {
-    public function __construct()
-    {
-        Stripe::setApiKey(config('services.stripe.secret'));
-    }
+    public function __construct() {}
 
     public function getMethods()
     {
@@ -36,55 +31,11 @@ class PaymentController extends Controller
     public function addMethod(Request $request)
     {
         $request->validate([
-            'payment_method_id' => 'required|string', // Stripe Payment Method ID
+            'payment_method_id' => 'nullable|string',
             'is_default' => 'boolean'
         ]);
 
-        try {
-            $user = Auth::user();
-            
-            // Create or get Stripe customer
-            if (!$user->stripe_customer_id) {
-                $customer = Customer::create([
-                    'email' => $user->email,
-                    'name' => $user->name,
-                ]);
-                $user->update(['stripe_customer_id' => $customer->id]);
-            }
-
-            // Attach payment method to customer
-            $stripePaymentMethod = StripePaymentMethod::retrieve($request->payment_method_id);
-            $stripePaymentMethod->attach(['customer' => $user->stripe_customer_id]);
-
-            // Store in database
-            $paymentMethod = $user->paymentMethods()->create([
-                'stripe_payment_method_id' => $request->payment_method_id,
-                'type' => $stripePaymentMethod->type,
-                'last_four' => $stripePaymentMethod->card->last4 ?? null,
-                'brand' => $stripePaymentMethod->card->brand ?? null,
-                'expires_month' => $stripePaymentMethod->card->exp_month ?? null,
-                'expires_year' => $stripePaymentMethod->card->exp_year ?? null,
-                'is_default' => $request->is_default ?? false
-            ]);
-
-            // Set as default if requested
-            if ($request->is_default) {
-                $user->paymentMethods()->where('id', '!=', $paymentMethod->id)
-                    ->update(['is_default' => false]);
-            }
-
-            return response()->json([
-                'success' => true,
-                'data' => $paymentMethod,
-                'message' => 'Payment method added successfully'
-            ], 201);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to add payment method: ' . $e->getMessage()
-            ], 400);
-        }
+        return response()->json(['success' => false, 'message' => 'Card payment disabled'], 410);
     }
 
     public function updateMethod($method, Request $request)
@@ -113,25 +64,8 @@ class PaymentController extends Controller
     {
         $paymentMethod = Auth::user()->paymentMethods()->findOrFail($method);
         
-        try {
-            // Detach from Stripe
-            $stripePaymentMethod = StripePaymentMethod::retrieve($paymentMethod->stripe_payment_method_id);
-            $stripePaymentMethod->detach();
-
-            // Soft delete
-            $paymentMethod->delete();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Payment method deleted'
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to delete payment method: ' . $e->getMessage()
-            ], 400);
-        }
+        $paymentMethod->delete();
+        return response()->json(['success' => true, 'message' => 'Payment method deleted']);
     }
 
     public function setDefault($method)
@@ -154,7 +88,8 @@ class PaymentController extends Controller
     {
         $request->validate([
             'order_id' => 'required|exists:orders,id',
-            'payment_method_id' => 'nullable|exists:payment_methods,id'
+            'provider' => 'nullable|in:fapshi',
+            'phone' => 'nullable|string',
         ]);
 
         $order = Order::findOrFail($request->order_id);
@@ -167,64 +102,67 @@ class PaymentController extends Controller
             ], 403);
         }
 
-        // Get payment method
-        $paymentMethodId = $request->payment_method_id;
-        if (!$paymentMethodId) {
-            $paymentMethod = Auth::user()->paymentMethods()->where('is_default', true)->first();
-            if (!$paymentMethod) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'No payment method available'
-                ], 400);
-            }
-            $paymentMethodId = $paymentMethod->id;
+        // Cameroon-specific: use Fapshi (direct debit on buyer balance/phone)
+        $provider = $request->provider ?? 'fapshi';
+        if ($provider !== 'fapshi') {
+            return response()->json(['success' => false, 'message' => 'Unsupported provider'], 400);
         }
 
-        $paymentMethod = Auth::user()->paymentMethods()->findOrFail($paymentMethodId);
+        $buyer = Auth::user();
+        $rate = (float) config('services.fapshi.xaf_per_eur', 650);
+        $amountXaf = (int) round(((float) $order->total_amount) * $rate);
 
-        try {
-            // Create payment intent
-            $paymentIntent = PaymentIntent::create([
-                'amount' => $order->total_amount * 100, // Convert to cents
-                'currency' => 'eur',
-                'customer' => Auth::user()->stripe_customer_id,
-                'payment_method' => $paymentMethod->stripe_payment_method_id,
-                'confirmation_method' => 'manual',
-                'confirm' => true,
-                'return_url' => config('app.url') . '/payment/return',
-            ]);
+        $payload = [
+            'amount' => $amountXaf,
+            'email' => $buyer->email,
+            'externalId' => (string) $order->order_number,
+            'userId' => (string) $buyer->id,
+            'message' => 'Order payment #' . $order->order_number,
+        ];
+        if ($request->filled('phone')) {
+            $payload['phone'] = $request->string('phone')->toString();
+        }
 
-            // Create payment record
-            $payment = Payment::create([
+        $fapshi = app(\App\Services\Payment\FapshiService::class);
+        $response = $request->filled('phone')
+            ? $fapshi->directPay($payload)
+            : $fapshi->initiatePay($payload);
+
+        // Record wallet transaction for transparency
+        $transId = $response['transId'] ?? null;
+        if (class_exists(\App\Models\WalletTransaction::class)) {
+            \App\Models\WalletTransaction::create([
+                'user_id' => $buyer->id,
+                'type' => 'debit',
+                'purpose' => 'order_payment',
+                'amount_xaf' => $amountXaf,
+                'status' => 'pending',
+                'provider' => 'fapshi',
+                'trans_id' => $transId,
                 'order_id' => $order->id,
-                'user_id' => Auth::id(),
-                'payment_method_id' => $paymentMethod->id,
-                'stripe_payment_intent_id' => $paymentIntent->id,
-                'amount' => $order->total_amount,
-                'currency' => 'EUR',
-                'status' => $paymentIntent->status,
+                'metadata' => $response,
             ]);
-
-            if ($paymentIntent->status === 'succeeded') {
-                $order->update(['payment_status' => 'paid', 'status' => 'confirmed']);
-            }
-
-            return response()->json([
-                'success' => true,
-                'data' => [
-                    'payment' => $payment,
-                    'client_secret' => $paymentIntent->client_secret,
-                    'status' => $paymentIntent->status
-                ],
-                'message' => 'Payment processed'
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Payment failed: ' . $e->getMessage()
-            ], 400);
         }
+
+        // Set order as pending payment and return fapshi transaction info
+        $order->update([
+            'payment_status' => \App\Models\Order::PAYMENT_STATUS_PENDING,
+            'status' => \App\Models\Order::STATUS_PENDING,
+            'payment_method' => 'fapshi',
+            'payment_intent_id' => $transId,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'provider' => 'fapshi',
+                'status' => $response['status'] ?? 'PENDING',
+                'transaction' => $response,
+            ],
+            'message' => 'Payment initiated with Fapshi'
+        ]);
+
+        return response()->json(['success' => false, 'message' => 'Unsupported flow'], 400);
     }
 
     public function history()
@@ -242,43 +180,60 @@ class PaymentController extends Controller
 
     public function stripeWebhook(Request $request)
     {
-        $payload = $request->getContent();
-        $sig_header = $request->header('Stripe-Signature');
-        $endpoint_secret = config('services.stripe.webhook_secret');
-
-        try {
-            $event = \Stripe\Webhook::constructEvent($payload, $sig_header, $endpoint_secret);
-        } catch (\Exception $e) {
-            return response('Webhook signature verification failed.', 400);
-        }
-
-        // Handle the event
-        switch ($event['type']) {
-            case 'payment_intent.succeeded':
-                $paymentIntent = $event['data']['object'];
-                $payment = Payment::where('stripe_payment_intent_id', $paymentIntent['id'])->first();
-                if ($payment) {
-                    $payment->update(['status' => 'succeeded']);
-                    $payment->order->update(['payment_status' => 'paid', 'status' => 'confirmed']);
-                }
-                break;
-            
-            case 'payment_intent.payment_failed':
-                $paymentIntent = $event['data']['object'];
-                $payment = Payment::where('stripe_payment_intent_id', $paymentIntent['id'])->first();
-                if ($payment) {
-                    $payment->update(['status' => 'failed']);
-                    $payment->order->update(['payment_status' => 'failed']);
-                }
-                break;
-        }
-
-        return response()->json(['success' => true]);
+        return response()->json(['success' => false, 'message' => 'Stripe disabled'], 410);
     }
 
     public function paypalWebhook(Request $request)
     {
-        // PayPal webhook implementation would go here
+        return response()->json(['success' => false, 'message' => 'PayPal disabled'], 410);
+    }
+
+    public function fapshiWebhook(Request $request)
+    {
+        $payload = json_decode($request->getContent() ?: '{}', true);
+        if (!isset($payload['transId'])) {
+            return response()->json(['success' => false], 400);
+        }
+
+        $fapshi = app(\App\Services\Payment\FapshiService::class);
+        $event = $fapshi->paymentStatus($payload['transId']);
+
+        $order = \App\Models\Order::where('payment_intent_id', $payload['transId'])->first();
+        if (!$order) {
+            return response()->json(['success' => false], 404);
+        }
+
+        switch ($event['status'] ?? null) {
+            case 'SUCCESSFUL':
+                $order->update([
+                    'payment_status' => \App\Models\Order::PAYMENT_STATUS_PAID,
+                    'status' => \App\Models\Order::STATUS_CONFIRMED,
+                ]);
+                if (class_exists(\App\Models\WalletTransaction::class)) {
+                    \App\Models\WalletTransaction::where('trans_id', $payload['transId'])
+                        ->update(['status' => 'completed']);
+                }
+                break;
+            case 'FAILED':
+                $order->update([
+                    'payment_status' => \App\Models\Order::PAYMENT_STATUS_FAILED,
+                ]);
+                if (class_exists(\App\Models\WalletTransaction::class)) {
+                    \App\Models\WalletTransaction::where('trans_id', $payload['transId'])
+                        ->update(['status' => 'failed']);
+                }
+                break;
+            case 'EXPIRED':
+                $order->update([
+                    'payment_status' => \App\Models\Order::PAYMENT_STATUS_FAILED,
+                ]);
+                if (class_exists(\App\Models\WalletTransaction::class)) {
+                    \App\Models\WalletTransaction::where('trans_id', $payload['transId'])
+                        ->update(['status' => 'failed']);
+                }
+                break;
+        }
+
         return response()->json(['success' => true]);
     }
 }

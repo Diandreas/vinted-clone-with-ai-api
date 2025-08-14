@@ -28,6 +28,7 @@ return new class extends Migration
             $table->enum('gender', ['male', 'female', 'other'])->nullable();
             $table->boolean('is_verified')->default(false);
             $table->boolean('is_live')->default(false);
+            $table->string('stripe_customer_id')->nullable()->index();
             $table->timestamp('last_seen_at')->nullable();
             $table->json('settings')->nullable();
             $table->json('notification_settings')->nullable();

@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
+use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
@@ -142,5 +143,77 @@ class AuthController extends Controller
             'success' => true,
             'user' => $request->user()->load(['followers', 'following'])
         ]);
+    }
+
+    /**
+     * Redirect to provider (for web flows; mobile will use token exchange)
+     */
+    public function redirectToProvider($provider)
+    {
+        if (!class_exists(\Laravel\Socialite\Facades\Socialite::class)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Social authentication is not enabled on this server.'
+            ], 501);
+        }
+
+        return Socialite::driver($provider)->stateless()->redirect();
+    }
+
+    /**
+     * Handle provider callback (web) or token login (mobile)
+     */
+    public function handleProviderCallback(Request $request, $provider)
+    {
+        if (!class_exists(\Laravel\Socialite\Facades\Socialite::class)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Social authentication is not enabled on this server.'
+            ], 501);
+        }
+
+        try {
+            // Mobile: if access_token is provided, use it
+            if ($request->has('access_token')) {
+                $socialUser = Socialite::driver($provider)
+                    ->stateless()
+                    ->userFromToken($request->input('access_token'));
+            } else {
+                // Web: use OAuth callback
+                $socialUser = Socialite::driver($provider)->stateless()->user();
+            }
+
+            $email = $socialUser->getEmail();
+            $name = $socialUser->getName() ?: ($socialUser->getNickname() ?: 'User');
+            $username = $socialUser->getNickname() ?: (explode('@', (string) $email)[0] ?? 'user_' . substr(md5($socialUser->getId()), 0, 6));
+
+            $user = User::firstOrCreate(
+                ['email' => $email ?: $provider.'_'.$socialUser->getId().'@example.com'],
+                [
+                    'name' => $name,
+                    'username' => $username,
+                    'password' => \Hash::make(str()->random(32)),
+                    'email_verified_at' => now(),
+                ]
+            );
+
+            $token = $user->createToken('auth_token')->plainTextToken;
+
+            return response()->json([
+                'success' => true,
+                'user' => $user,
+                'token' => $token,
+                'provider' => $provider,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Social login failed', [
+                'provider' => $provider,
+                'message' => $e->getMessage(),
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Social authentication failed'
+            ], 400);
+        }
     }
 }
