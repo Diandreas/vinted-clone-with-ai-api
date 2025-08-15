@@ -18,6 +18,7 @@ use App\Models\ProductAppointment;
 use App\Notifications\FollowerOnlyProductPosted;
 use App\Models\PlatformFee;
 use App\Models\ProductFeeCharge;
+use App\Http\Resources\ProductResource;
 
 class ProductController extends Controller
 {
@@ -127,7 +128,7 @@ class ProductController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $products
+            'data' => ProductResource::collection($products)
         ]);
     }
 
