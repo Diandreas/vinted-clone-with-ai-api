@@ -222,17 +222,17 @@ const loadProducts = async (page = 1) => {
     
     const response = await window.axios.get(`/products?${params}`)
     
-    if (response.data.success) {
-      const paginator = response.data.data
-      products.value = paginator.data || []
-      
-      // Update pagination
-      pagination.current_page = paginator.current_page || 1
-      pagination.last_page = paginator.last_page || 1
-      pagination.total = paginator.total || 0
-      pagination.from = paginator.from || 0
-      pagination.to = paginator.to || 0
-    }
+    // L'API retourne {success: true, data: Array(10)}
+    const productsData = response.data.data
+    products.value = productsData || []
+    
+    // Pour la pagination, on utilise les données de base
+    // car l'API retourne directement le tableau de produits
+    pagination.current_page = 1
+    pagination.last_page = 1
+    pagination.total = productsData.length || 0
+    pagination.from = 1
+    pagination.to = productsData.length || 0
   } catch (error) {
     console.error('Erreur lors du chargement des produits:', error)
   } finally {

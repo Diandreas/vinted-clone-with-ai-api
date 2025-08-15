@@ -11,6 +11,7 @@ const Profile = () => import('@/views/Profile.vue')
 const Products = () => import('@/views/Products.vue')
 const MyProducts = () => import('@/views/MyProducts.vue')
 const PublicProducts = () => import('@/views/PublicProducts.vue')
+const TestProducts = () => import('@/views/TestProducts.vue')
 const ProductDetail = () => import('@/views/ProductDetail.vue')
 const CreateProduct = () => import('@/views/CreateProduct.vue')
 const EditProduct = () => import('@/views/EditProduct.vue')
@@ -92,6 +93,12 @@ const routes = [
     path: '/products',
     name: 'products',
     component: PublicProducts,
+    meta: { requiresAuth: false }
+  },
+  {
+    path: '/test-products',
+    name: 'test-products',
+    component: TestProducts,
     meta: { requiresAuth: false }
   },
   {

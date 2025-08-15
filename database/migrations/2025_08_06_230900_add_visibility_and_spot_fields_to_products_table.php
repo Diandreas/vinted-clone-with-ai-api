@@ -6,32 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up(): void
-    {
-        Schema::table('products', function (Blueprint $table) {
-            $table->boolean('followers_only')->default(false)->index();
-            $table->boolean('is_spot')->default(false)->index();
-            $table->timestamp('spot_starts_at')->nullable()->index();
-            $table->timestamp('spot_ends_at')->nullable()->index();
-        });
-    }
-
-    public function down(): void
-    {
-        Schema::table('products', function (Blueprint $table) {
-            $table->dropColumn(['followers_only', 'is_spot', 'spot_starts_at', 'spot_ends_at']);
-        });
-    }
-};
-
-<?php
-
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
-
-return new class extends Migration
-{
     /**
      * Run the migrations.
      */

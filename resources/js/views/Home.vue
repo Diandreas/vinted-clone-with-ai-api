@@ -25,6 +25,15 @@
             >
               Voir les Lives
             </RouterLink>
+            <button
+              @click="downloadAPK"
+              :disabled="downloadingAPK"
+              class="bg-green-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <DownloadIcon v-if="!downloadingAPK" class="w-6 h-6" />
+              <div v-else class="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              {{ downloadingAPK ? 'Téléchargement...' : 'Télécharger l\'App' }}
+            </button>
           </div>
         </div>
       </div>
@@ -214,7 +223,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import { TrendingUpIcon, RadioIcon } from 'lucide-vue-next'
+import { TrendingUpIcon, RadioIcon, DownloadIcon } from 'lucide-vue-next'
 
 // Components
 import FeatureCard from '@/components/home/FeatureCard.vue'
@@ -234,11 +243,53 @@ const categories = ref([])
 const loadingTrending = ref(true)
 const loadingLives = ref(true)
 const loadingCategories = ref(true)
+const downloadingAPK = ref(false)
 
 // Computed
 const isAuthenticated = computed(() => authStore.isAuthenticated)
 
 // Methods
+const downloadAPK = async () => {
+  if (downloadingAPK.value) return
+  
+  downloadingAPK.value = true
+  try {
+    // Utiliser la route API pour le téléchargement
+    const response = await window.axios.get('/download/app', {
+      responseType: 'blob'
+    })
+    
+    // Créer un blob et déclencher le téléchargement
+    const blob = new Blob([response.data], { 
+      type: 'application/vnd.android.package-archive' 
+    })
+    const url = window.URL.createObjectURL(blob)
+    
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'sellam-app.apk'
+    link.style.display = 'none'
+    
+    document.body.appendChild(link)
+    link.click()
+    
+    // Nettoyer
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
+    
+    console.log('Téléchargement de l\'APK démarré')
+  } catch (error) {
+    console.error('Erreur lors du téléchargement:', error)
+    if (error.response?.status === 404) {
+      alert('L\'APK n\'est pas encore disponible. Veuillez réessayer plus tard.')
+    } else {
+      alert('Erreur lors du téléchargement. Veuillez réessayer.')
+    }
+  } finally {
+    downloadingAPK.value = false
+  }
+}
+
 const fetchTrendingProducts = async () => {
   loadingTrending.value = true
   try {

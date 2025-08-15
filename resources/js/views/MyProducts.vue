@@ -275,7 +275,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { debounce } from 'lodash-es'
+import { debounce } from 'lodash'
 
 const router = useRouter()
 

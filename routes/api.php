@@ -22,6 +22,7 @@ use App\Http\Controllers\API\ImageSearchController;
 use App\Http\Controllers\API\FeedController;
 use App\Http\Controllers\API\ReportController;
 use App\Http\Controllers\API\PaymentController;
+use App\Http\Controllers\API\WalletController;
 use App\Http\Controllers\API\AnalyticsController;
 
 // Admin Controllers - Specific imports
@@ -95,6 +96,23 @@ Route::prefix('v1')->group(function () {
         // Explore
         Route::get('explore', [FeedController::class, 'explore']);
         Route::get('trending', [ProductController::class, 'trending']);
+        
+        // App Download
+        Route::get('download/app', function() {
+            $apkPath = public_path('app-debug.apk');
+            
+            if (!file_exists($apkPath)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'APK non disponible'
+                ], 404);
+            }
+            
+            return response()->download($apkPath, 'sellam-app.apk', [
+                'Content-Type' => 'application/vnd.android.package-archive',
+                'Content-Disposition' => 'attachment; filename="sellam-app.apk"'
+            ]);
+        });
     });
 
     // Routes authentifiées
