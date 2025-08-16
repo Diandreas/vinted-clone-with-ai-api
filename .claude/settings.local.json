@@ -7,9 +7,12 @@
       "Bash(composer require:*)",
       "Bash(composer show:*)",
       "Bash(curl:*)",
-      "Bash(composer remove:*)"
+      "Bash(composer remove:*)",
+      "Bash(npm run dev:*)",
+      "Bash(grep:*)"
     ],
     "deny": [],
-    "ask": []
+    "ask": [],
+    "defaultMode": "acceptEdits"
   }
 }

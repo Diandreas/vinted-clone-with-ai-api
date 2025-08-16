@@ -48,13 +48,12 @@ class WalletController extends Controller
     }
 
     /**
-     * Top up wallet using Fapshi.
+     * Top up wallet using NotchPay.
      */
     public function topUp(Request $request)
     {
         $request->validate([
             'amount_xaf' => 'required|integer|min:100|max:1000000', // 100 FCFA to 1M FCFA
-            'phone' => 'nullable|string|max:20',
             'message' => 'nullable|string|max:255',
         ]);
 
@@ -62,28 +61,32 @@ class WalletController extends Controller
         $amount = $request->amount_xaf;
 
         try {
-            // Initialize Fapshi payment
-            $fapshi = app(\App\Services\Payment\FapshiService::class);
+            // Initialize NotchPay payment
+            $notchpay = app(\App\Services\Payment\NotchPayService::class);
             
-            $response = $fapshi->initiatePay([
-                'amount' => $amount,
+            $reference = 'wallet_' . uniqid();
+            $response = $notchpay->initializePayment([
+                'amount' => (string)$amount,
                 'currency' => 'XAF',
                 'email' => $user->email,
-                'phone' => $request->phone ?? $user->phone,
                 'description' => $request->message ?? "Recharge wallet {$user->name}",
-                'callback_url' => route('api.wallet.fapshi-callback'),
-                'return_url' => route('api.wallet.fapshi-return'),
+                'reference' => $reference,
+                'callback' => url('/api/v1/webhooks/notchpay'),
             ]);
 
-            if ($response['success']) {
+            // Log the response for debugging
+            Log::info('NotchPay initialize payment response:', $response);
+
+            // Check if the response is successful
+            if (($response['statusCode'] ?? 500) === 200 || ($response['statusCode'] ?? 500) === 201) {
                 // Create pending wallet transaction
                 $transaction = WalletTransaction::create([
                     'user_id' => $user->id,
-                    'type' => 'topup',
+                    'purpose' => 'topup',
                     'amount_xaf' => $amount,
                     'status' => 'pending',
-                    'provider' => 'fapshi',
-                    'trans_id' => $response['data']['transId'] ?? null,
+                    'provider' => 'notchpay',
+                    'trans_id' => $reference,
                     'metadata' => $response,
                 ]);
 
@@ -91,8 +94,8 @@ class WalletController extends Controller
                     'success' => true,
                     'data' => [
                         'transaction_id' => $transaction->id,
-                        'fapshi_data' => $response['data'],
-                        'redirect_url' => $response['data']['redirectUrl'] ?? null,
+                        'notchpay_data' => $response,
+                        'authorization_url' => $response['authorization_url'] ?? null,
                     ],
                     'message' => 'Recharge initiée avec succès'
                 ]);
@@ -113,123 +116,81 @@ class WalletController extends Controller
         }
     }
 
-    /**
-     * Withdraw funds from wallet.
-     */
-    public function withdraw(Request $request)
-    {
-        $request->validate([
-            'amount_xaf' => 'required|integer|min:100',
-            'phone' => 'required|string|max:20',
-            'provider' => 'required|in:om,momo',
-        ]);
-
-        $user = Auth::user();
-        $amount = $request->amount_xaf;
-
-        // Check if user has sufficient balance
-        if (($user->wallet_balance_xaf ?? 0) < $amount) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Solde insuffisant'
-            ], 400);
-        }
-
-        try {
-            // Create withdrawal transaction
-            $transaction = WalletTransaction::create([
-                'user_id' => $user->id,
-                'type' => 'withdrawal',
-                'amount_xaf' => $amount,
-                'status' => 'pending',
-                'provider' => $request->provider,
-                'metadata' => [
-                    'phone' => $request->phone,
-                    'provider' => $request->provider,
-                ],
-            ]);
-
-            // Deduct from wallet balance
-            $user->decrement('wallet_balance_xaf', $amount);
-
-            // Here you would integrate with OM/MoMo API for actual withdrawal
-            // For now, we'll simulate success
-            $transaction->update(['status' => 'completed']);
-
-            return response()->json([
-                'success' => true,
-                'data' => $transaction,
-                'message' => 'Retrait initié avec succès'
-            ]);
-
-        } catch (\Exception $e) {
-            Log::error('Wallet withdrawal error: ' . $e->getMessage());
-            
-            return response()->json([
-                'success' => false,
-                'message' => 'Erreur lors du retrait'
-            ], 500);
-        }
-    }
 
     /**
-     * Fapshi webhook callback.
+     * NotchPay webhook callback.
      */
-    public function fapshiCallback(Request $request)
+    public function notchpayCallback(Request $request)
     {
-        $payload = json_decode($request->getContent() ?: '{}', true);
+        $payload = $request->all();
         
-        if (!isset($payload['transId'])) {
+        Log::info('NotchPay callback received:', $payload);
+        
+        if (!isset($payload['reference'])) {
             return response()->json(['success' => false], 400);
         }
 
         try {
-            $fapshi = app(\App\Services\Payment\FapshiService::class);
-            $event = $fapshi->paymentStatus($payload['transId']);
+            $notchpay = app(\App\Services\Payment\NotchPayService::class);
+            $statusResponse = $notchpay->verifyPayment($payload['reference']);
 
-            $transaction = WalletTransaction::where('trans_id', $payload['transId'])
-                ->where('type', 'topup')
+            Log::info('NotchPay status check response:', $statusResponse);
+
+            $transaction = WalletTransaction::where('trans_id', $payload['reference'])
+                ->where('purpose', 'topup')
                 ->first();
 
             if (!$transaction) {
+                Log::warning('Transaction not found for reference: ' . $payload['reference']);
                 return response()->json(['success' => false], 404);
             }
 
             $user = $transaction->user;
 
-            switch ($event['status'] ?? null) {
-                case 'SUCCESSFUL':
-                    // Add funds to wallet
-                    $user->increment('wallet_balance_xaf', $transaction->amount_xaf);
-                    $transaction->update(['status' => 'completed']);
-                    
-                    // Send notification to user
-                    $user->notify(new \App\Notifications\WalletRecharged($transaction));
+            // NotchPay status can be: complete, pending, failed
+            switch ($payload['status'] ?? $statusResponse['status'] ?? null) {
+                case 'complete':
+                case 'completed':
+                case 'successful':
+                    if ($transaction->status !== 'completed') {
+                        // Add funds to wallet
+                        $user->increment('wallet_balance_xaf', $transaction->amount_xaf);
+                        $transaction->update(['status' => 'completed']);
+                        
+                        Log::info('Wallet recharged successfully', [
+                            'user_id' => $user->id,
+                            'amount' => $transaction->amount_xaf,
+                            'transaction_id' => $transaction->id
+                        ]);
+                    }
                     break;
 
-                case 'FAILED':
-                case 'EXPIRED':
+                case 'failed':
+                case 'cancelled':
+                case 'expired':
                     $transaction->update(['status' => 'failed']);
+                    break;
+
+                case 'pending':
+                    // Transaction still in progress, no action needed
                     break;
             }
 
             return response()->json(['success' => true]);
 
         } catch (\Exception $e) {
-            Log::error('Fapshi callback error: ' . $e->getMessage());
+            Log::error('NotchPay callback error: ' . $e->getMessage());
             return response()->json(['success' => false], 500);
         }
     }
 
     /**
-     * Fapshi return URL (user redirected back).
+     * NotchPay return URL (user redirected back).
      */
-    public function fapshiReturn(Request $request)
+    public function notchpayReturn(Request $request)
     {
-        // This would typically redirect to the mobile app or show a success page
-        return response()->json([
-            'success' => true,
-            'message' => 'Retour de Fapshi'
-        ]);
+        // This would typically redirect to the wallet page or show a success page
+        return redirect()->route('wallet')
+            ->with('success', 'Paiement traité. Vérifiez votre solde.');
     }
 }

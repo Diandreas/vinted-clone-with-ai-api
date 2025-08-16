@@ -82,6 +82,15 @@
 
           <!-- Authenticated User Actions -->
           <template v-if="isAuthenticated">
+            <!-- Wallet Balance -->
+            <RouterLink
+              to="/wallet"
+              class="hidden md:flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-indigo-600 hover:bg-gray-50 rounded-lg transition-colors"
+            >
+              <WalletIcon class="w-4 h-4" />
+              <span class="font-semibold">{{ walletBalance }}</span>
+            </RouterLink>
+
             <!-- Admin Dropdown -->
             <div v-if="authStore.isAdmin || authStore.hasPermission('dashboard:view')" class="relative hidden md:block">
               <button
@@ -272,6 +281,17 @@
           <template v-if="isAuthenticated">
             <div class="border-t border-gray-200 pt-2 mt-2">
               <RouterLink
+                to="/wallet"
+                class="flex items-center justify-between px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg"
+                @click="showMobileMenu = false"
+              >
+                <div class="flex items-center space-x-2">
+                  <WalletIcon class="w-4 h-4" />
+                  <span>Mon Portefeuille</span>
+                </div>
+                <span class="font-semibold text-indigo-600">{{ walletBalance }}</span>
+              </RouterLink>
+              <RouterLink
                 to="/dashboard"
                 class="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg"
                 @click="showMobileMenu = false"
@@ -318,6 +338,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useDashboardStore } from '@/stores/dashboard'
+import { useWalletStore } from '@/stores/wallet'
 import {
   SearchIcon,
   BellIcon,
@@ -329,7 +350,8 @@ import {
   PackageIcon,
   UsersIcon,
   TagIcon,
-  BarChart3Icon
+  BarChart3Icon,
+  WalletIcon
 } from 'lucide-vue-next'
 
 // Components
@@ -339,6 +361,7 @@ import UserDropdown from '@/components/layout/UserDropdown.vue'
 // Stores
 const authStore = useAuthStore()
 const dashboardStore = useDashboardStore()
+const walletStore = useWalletStore()
 const router = useRouter()
 
 // Reactive data
@@ -354,6 +377,7 @@ const isAuthenticated = computed(() => authStore.isAuthenticated)
 const user = computed(() => authStore.user)
 const unreadMessages = computed(() => dashboardStore.unreadMessages)
 const unreadNotifications = computed(() => dashboardStore.unreadNotifications)
+const walletBalance = computed(() => walletStore.balanceFormatted)
 
 // Methods
 const performSearch = () => {
@@ -389,9 +413,10 @@ const handleClickOutside = (event) => {
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
 
-  // Load notification counts if authenticated
+  // Load notification counts and wallet balance if authenticated
   if (isAuthenticated.value) {
     dashboardStore.fetchStats()
+    walletStore.fetchBalance()
   }
 })
 

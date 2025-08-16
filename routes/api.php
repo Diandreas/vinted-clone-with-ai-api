@@ -266,13 +266,12 @@ Route::prefix('v1')->group(function () {
             Route::get('balance', [WalletController::class, 'balance']);
             Route::get('transactions', [WalletController::class, 'transactions']);
             Route::post('topup', [WalletController::class, 'topUp']);
-            Route::post('withdraw', [WalletController::class, 'withdraw']);
         });
 
-        // Fapshi webhook routes (public)
+        // NotchPay webhook routes (public)
         Route::prefix('webhooks')->group(function () {
-            Route::post('fapshi', [WalletController::class, 'fapshiCallback']);
-            Route::get('fapshi/return', [WalletController::class, 'fapshiReturn']);
+            Route::post('notchpay', [WalletController::class, 'notchpayCallback']);
+            Route::get('notchpay/return', [WalletController::class, 'notchpayReturn']);
         });
 
         // Shipping Address Routes

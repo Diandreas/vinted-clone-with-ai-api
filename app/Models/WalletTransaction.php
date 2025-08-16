@@ -11,15 +11,13 @@ class WalletTransaction extends Model
 
     protected $fillable = [
         'user_id',
-        'type', // 'topup', 'withdrawal', 'purchase', 'refund', 'fee'
+        'purpose', // 'topup', 'payout', 'order_payment', 'refund'
         'amount_xaf',
         'status', // 'pending', 'completed', 'failed', 'cancelled'
         'provider', // 'fapshi', 'om', 'momo', 'internal'
         'trans_id', // External transaction ID
         'order_id', // Related order if applicable
-        'product_id', // Related product if applicable
         'metadata', // Additional data
-        'description',
     ];
 
     protected $casts = [
@@ -33,12 +31,11 @@ class WalletTransaction extends Model
     const STATUS_FAILED = 'failed';
     const STATUS_CANCELLED = 'cancelled';
 
-    // Type constants
-    const TYPE_TOPUP = 'topup';
-    const TYPE_WITHDRAWAL = 'withdrawal';
-    const TYPE_PURCHASE = 'purchase';
-    const TYPE_REFUND = 'refund';
-    const TYPE_FEE = 'fee';
+    // Purpose constants
+    const PURPOSE_TOPUP = 'topup';
+    const PURPOSE_PAYOUT = 'payout';
+    const PURPOSE_ORDER_PAYMENT = 'order_payment';
+    const PURPOSE_REFUND = 'refund';
 
     // Provider constants
     const PROVIDER_FAPSHI = 'fapshi';
@@ -103,15 +100,15 @@ class WalletTransaction extends Model
      */
     public function scopeTopup($query)
     {
-        return $query->where('type', self::TYPE_TOPUP);
+        return $query->where('purpose', self::PURPOSE_TOPUP);
     }
 
     /**
-     * Scope withdrawal transactions.
+     * Scope payout transactions.
      */
-    public function scopeWithdrawal($query)
+    public function scopePayout($query)
     {
-        return $query->where('type', self::TYPE_WITHDRAWAL);
+        return $query->where('purpose', self::PURPOSE_PAYOUT);
     }
 
     /**
@@ -152,23 +149,21 @@ class WalletTransaction extends Model
     }
 
     /**
-     * Get type label.
+     * Get purpose label.
      */
-    public function getTypeLabelAttribute()
+    public function getPurposeLabelAttribute()
     {
-        switch ($this->type) {
-            case self::TYPE_TOPUP:
+        switch ($this->purpose) {
+            case self::PURPOSE_TOPUP:
                 return 'Recharge';
-            case self::TYPE_WITHDRAWAL:
+            case self::PURPOSE_PAYOUT:
                 return 'Retrait';
-            case self::TYPE_PURCHASE:
+            case self::PURPOSE_ORDER_PAYMENT:
                 return 'Achat';
-            case self::TYPE_REFUND:
+            case self::PURPOSE_REFUND:
                 return 'Remboursement';
-            case self::TYPE_FEE:
-                return 'Frais';
             default:
-                return ucfirst($this->type);
+                return ucfirst($this->purpose);
         }
     }
 

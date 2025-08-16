@@ -25,6 +25,7 @@ const Notifications = () => import('@/views/Notifications.vue')
 const Search = () => import('@/views/Search.vue')
 const ImageSearch = () => import('@/views/ImageSearch.vue')
 const UserProfile = () => import('@/views/UserProfile.vue')
+const Wallet = () => import('@/views/Wallet.vue')
 const CategoryManagement = () => import('@/views/admin/CategoryManagement.vue')
 
 const routes = [
@@ -186,6 +187,12 @@ const routes = [
     path: '/notifications',
     name: 'notifications',
     component: Notifications,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/wallet',
+    name: 'wallet',
+    component: Wallet,
     meta: { requiresAuth: true }
   },
   {

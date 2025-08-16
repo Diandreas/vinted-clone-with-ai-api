@@ -65,14 +65,13 @@ return [
         'search_key' => env('ALGOLIA_SEARCH'),
     ],
 
-    'fapshi' => [
-        'base_url' => env('FAPSHI_BASE_URL', 'https://live.fapshi.com'),
-        'api_user' => env('FAPSHI_API_USER'),
-        'api_key' => env('FAPSHI_API_KEY'),
-        'currency' => env('FAPSHI_CURRENCY', 'XAF'),
-        'min_amount' => env('FAPSHI_MIN_AMOUNT', 100),
-        'xaf_per_eur' => env('XAF_PER_EUR', 650),
-        'webhook_secret' => env('FAPSHI_WEBHOOK_SECRET'), // optional if provided
+    'notchpay' => [
+        'base_url' => env('NOTCHPAY_BASE_URL', 'https://api.notchpay.co'),
+        'public_key' => env('NOTCHPAY_PUBLIC_KEY'),
+        'secret_key' => env('NOTCHPAY_SECRET_KEY'),
+        'currency' => env('NOTCHPAY_CURRENCY', 'XAF'),
+        'sandbox' => env('NOTCHPAY_SANDBOX', true),
+        'webhook_secret' => env('NOTCHPAY_WEBHOOK_SECRET'),
     ],
 
     'google' => [

@@ -32,6 +32,12 @@ class FapshiService
     public function initiatePay(array $payload): array
     {
         $this->validateAmount($payload['amount'] ?? null);
+        
+        // Ensure required fields are present
+        if (!isset($payload['email'])) {
+            throw new \InvalidArgumentException('email required');
+        }
+        
         $response = Http::withHeaders($this->headers())
             ->post(rtrim($this->baseUrl, '/') . '/initiate-pay', $payload);
         return $this->responseToArray($response);
@@ -66,6 +72,17 @@ class FapshiService
     {
         $response = Http::withHeaders($this->headers())
             ->get(rtrim($this->baseUrl, '/') . '/search', $params);
+        return $this->responseToArray($response);
+    }
+
+    public function getUserTrans(string $userId): array
+    {
+        if (empty($userId)) {
+            throw new \InvalidArgumentException('userId required');
+        }
+        
+        $response = Http::withHeaders($this->headers())
+            ->get(rtrim($this->baseUrl, '/') . '/transaction/' . $userId);
         return $this->responseToArray($response);
     }
 
