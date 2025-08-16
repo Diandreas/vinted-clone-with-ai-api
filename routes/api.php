@@ -268,10 +268,9 @@ Route::prefix('v1')->group(function () {
             Route::post('topup', [WalletController::class, 'topUp']);
         });
 
-        // NotchPay webhook routes (public)
-        Route::prefix('webhooks')->group(function () {
-            Route::post('notchpay', [WalletController::class, 'notchpayCallback']);
-            Route::get('notchpay/return', [WalletController::class, 'notchpayReturn']);
+        // NotchPay payment initialization routes
+        Route::prefix('notchpay')->group(function () {
+            Route::post('initialize', [\App\Http\Controllers\NotchPayController::class, 'initializePayment']);
         });
 
         // Shipping Address Routes
@@ -391,13 +390,40 @@ Route::prefix('v1')->group(function () {
     })->where('path', '.*');
 });
 
-// Webhook Routes (for payment providers, etc.)
+// Webhook Routes (for payment providers, etc.) - PUBLIC
 Route::prefix('webhooks')->group(function () {
     Route::post('stripe', [PaymentController::class, 'stripeWebhook']);
     Route::post('paypal', [PaymentController::class, 'paypalWebhook']);
     Route::post('fapshi', [PaymentController::class, 'fapshiWebhook']);
+    Route::post('notchpay', [\App\Http\Controllers\NotchPayController::class, 'handleWebhook']);
+    // NotchPay callback handler (GET request from browser redirect)
+    Route::get('notchpay', [\App\Http\Controllers\NotchPayController::class, 'handleCallback']);
     Route::post('mobile-money/mtn_momo', function() { return response()->json(['ok' => true]); });
     Route::post('mobile-money/orange_money', function() { return response()->json(['ok' => true]); });
+});
+
+// V1 Webhook Routes (for backward compatibility and specific providers)
+Route::prefix('v1/webhooks')->group(function () {
+    Route::post('notchpay', [\App\Http\Controllers\NotchPayController::class, 'handleWebhook']);
+    // NotchPay callback handler (GET request from browser redirect) - V1 path
+    Route::get('notchpay', [\App\Http\Controllers\NotchPayController::class, 'handleCallback']);
+});
+
+// NotchPay callback routes (PUBLIC)
+Route::prefix('payment')->group(function () {
+    Route::get('callback', [\App\Http\Controllers\NotchPayController::class, 'handleCallback'])->name('payment.callback');
+    Route::get('/', function() {
+        return redirect('/payment');
+    });
+});
+
+// Additional legacy routes for NotchPay
+Route::get('/payment/callback', [\App\Http\Controllers\NotchPayController::class, 'handleCallback'])->name('payment.callback.legacy');
+Route::post('/api/notchpay/webhook', [\App\Http\Controllers\NotchPayController::class, 'handleWebhook']);
+
+// Authenticated legacy route
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/api/notchpay/initialize', [\App\Http\Controllers\NotchPayController::class, 'initializePayment']);
 });
 
 // Fallback route for API

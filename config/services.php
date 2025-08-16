@@ -72,6 +72,7 @@ return [
         'currency' => env('NOTCHPAY_CURRENCY', 'XAF'),
         'sandbox' => env('NOTCHPAY_SANDBOX', true),
         'webhook_secret' => env('NOTCHPAY_WEBHOOK_SECRET'),
+        'callback_url' => env('NOTCHPAY_CALLBACK_URL', env('APP_URL') . '/payment/callback'),
     ],
 
     'google' => [
