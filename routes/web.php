@@ -16,7 +16,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
 // NotchPay callback route (PUBLIC - must be before catch-all)
 Route::get('payment/callback', [\App\Http\Controllers\NotchPayController::class, 'handleCallback'])->name('payment.callback.web');
 
-// All other routes are handled by Vue Router
+// All other routes are handled by Vue Router (EXCEPT API routes)
 Route::get('{any}', function () {
+    // Skip API routes
+    if (str_starts_with(request()->path(), 'api/')) {
+        abort(404);
+    }
+    
     return view('app');
 })->where('any', '.*');

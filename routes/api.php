@@ -43,6 +43,9 @@ use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 // Routes publiques
 Route::prefix('v1')->group(function () {
 
+    // File serving routes (must be before other routes)
+    Route::get('files/{path}', [\App\Http\Controllers\FileController::class, 'serve'])->where('path', '.*');
+
     // Authentication Routes
     Route::prefix('auth')->group(function () {
         Route::post('register', [AuthController::class, 'register'])->name('register');

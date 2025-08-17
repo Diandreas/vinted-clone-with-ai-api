@@ -13,9 +13,17 @@ class FileController extends Controller
         // Construct the full path
         $filePath = 'public/' . $path;
         
+        // Log for debugging
+        \Log::info('File request', [
+            'requested_path' => $path,
+            'full_path' => $filePath,
+            'storage_exists' => Storage::exists($filePath)
+        ]);
+        
         // Check if file exists
         if (!Storage::exists($filePath)) {
-            abort(404, 'File not found');
+            \Log::warning('File not found', ['path' => $filePath]);
+            abort(404, 'File not found: ' . $path);
         }
         
         // Get file content and type
@@ -25,6 +33,7 @@ class FileController extends Controller
         // Return file response
         return response($file, 200)
             ->header('Content-Type', $mimeType)
-            ->header('Cache-Control', 'public, max-age=3600');
+            ->header('Cache-Control', 'public, max-age=3600')
+            ->header('Access-Control-Allow-Origin', '*');
     }
 }

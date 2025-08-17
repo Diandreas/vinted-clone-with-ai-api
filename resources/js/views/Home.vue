@@ -77,8 +77,18 @@
               <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
                 <div class="flex items-center justify-center sm:justify-start space-x-6">
                   <!-- Like Button -->
-                  <button class="flex flex-col items-center space-y-1 text-white sm:text-gray-600 hover:text-red-500 transition-colors">
-                    <HeartIcon class="w-6 h-6 sm:w-8 sm:h-8" />
+                  <button 
+                    @click="toggleLike(product)"
+                    :disabled="!isAuthenticated"
+                    class="flex flex-col items-center space-y-1 text-white sm:text-gray-600 hover:text-red-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed group"
+                    :title="isAuthenticated ? 'Cliquer pour liker' : 'Connectez-vous pour liker'"
+                  >
+                    <HeartIcon 
+                      :class="[
+                        'w-6 h-6 sm:w-8 sm:h-8 transition-all duration-200',
+                        product.is_liked ? 'fill-red-500 text-red-500 scale-110' : 'group-hover:scale-110'
+                      ]"
+                    />
                     <span class="text-xs">{{ product.likes_count || 0 }}</span>
                   </button>
 
@@ -396,6 +406,52 @@ const loadCategories = async () => {
     console.error('Error fetching categories:', error)
   } finally {
     loadingCategories.value = false
+  }
+}
+
+const toggleLike = async (product) => {
+  if (!isAuthenticated.value) {
+    // Rediriger vers la page de connexion si non connecté
+    router.push('/login')
+    return
+  }
+
+  try {
+    // Optimistic update - mettre à jour l'interface immédiatement
+    const wasLiked = product.is_liked
+    product.is_liked = !wasLiked
+    product.likes_count = wasLiked ? (product.likes_count || 1) - 1 : (product.likes_count || 0) + 1
+
+    // Appel API pour sauvegarder le like/dislike
+    const response = await window.axios.post(`/products/${product.id}/like`)
+    
+    if (response.data.success) {
+      // Mettre à jour avec les données de l'API
+      product.is_liked = response.data.liked
+      product.likes_count = response.data.likes_count
+      
+      // Notification de succès
+      if (product.is_liked) {
+        console.log('Produit liké avec succès')
+      } else {
+        console.log('Like supprimé avec succès')
+      }
+    } else {
+      // En cas d'erreur, remettre l'état précédent
+      product.is_liked = wasLiked
+      product.likes_count = wasLiked ? (product.likes_count || 0) + 1 : (product.likes_count || 1) - 1
+      console.error('Erreur lors du like:', response.data.message)
+    }
+  } catch (error) {
+    console.error('Erreur lors du like:', error)
+    
+    // En cas d'erreur, remettre l'état précédent
+    const wasLiked = !product.is_liked
+    product.is_liked = wasLiked
+    product.likes_count = wasLiked ? (product.likes_count || 0) + 1 : (product.likes_count || 1) - 1
+    
+    // Notification d'erreur
+    alert('Erreur lors du like. Veuillez réessayer.')
   }
 }
 
