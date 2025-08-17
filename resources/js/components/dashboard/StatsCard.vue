@@ -1,21 +1,21 @@
 <template>
-  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-    <div class="flex items-center justify-between">
-      <div>
-        <p class="text-sm font-medium text-gray-600">{{ title }}</p>
-        <p class="text-2xl font-bold text-gray-900 mt-2">{{ formattedValue }}</p>
-        <div v-if="trend !== undefined" class="flex items-center mt-2">
+  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 hover:shadow-md transition-shadow">
+    <div class="flex items-start justify-between">
+      <div class="flex-1">
+        <p class="text-sm sm:text-base font-medium text-gray-600 mb-2">{{ title }}</p>
+        <p class="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">{{ formattedValue }}</p>
+        <div v-if="trend !== undefined" class="flex items-center">
           <TrendingUpIcon
             v-if="trend > 0"
-            class="w-4 h-4 text-green-500 mr-1"
+            class="w-4 h-4 text-green-500 mr-2"
           />
           <TrendingDownIcon
             v-else-if="trend < 0"
-            class="w-4 h-4 text-red-500 mr-1"
+            class="w-4 h-4 text-red-500 mr-2"
           />
           <MinusIcon
             v-else
-            class="w-4 h-4 text-gray-400 mr-1"
+            class="w-4 h-4 text-gray-400 mr-2"
           />
           <span
             :class="{
@@ -27,14 +27,14 @@
           >
             {{ Math.abs(trend) }}%
           </span>
-          <span class="text-gray-500 text-sm ml-1">vs mois dernier</span>
+          <span class="text-gray-500 text-sm ml-2">vs mois dernier</span>
         </div>
       </div>
       <div
         :class="iconColorClasses"
-        class="p-3 rounded-lg"
+        class="p-3 sm:p-4 rounded-lg flex-shrink-0"
       >
-        <component :is="iconComponent" class="w-6 h-6" />
+        <component :is="iconComponent" class="w-6 h-6 sm:w-7 sm:h-7" />
       </div>
     </div>
   </div>

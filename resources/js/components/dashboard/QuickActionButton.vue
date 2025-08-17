@@ -1,24 +1,27 @@
 <template>
   <RouterLink
     :to="to"
-    class="flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-colors group"
+    class="flex items-center justify-between p-4 sm:p-5 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 group hover:shadow-sm"
   >
-    <div class="flex items-center space-x-3">
+    <div class="flex items-center space-x-4">
       <div :class="iconClasses">
-        <component :is="iconComponent" class="w-5 h-5" />
+        <component :is="iconComponent" class="w-5 h-5 sm:w-6 sm:h-6" />
       </div>
-      <span class="font-medium text-gray-900">{{ title }}</span>
+      <div class="flex flex-col">
+        <span class="font-semibold text-gray-900 text-sm sm:text-base">{{ title }}</span>
+        <span v-if="description" class="text-gray-500 text-xs sm:text-sm">{{ description }}</span>
+      </div>
     </div>
     
-    <div class="flex items-center space-x-2">
+    <div class="flex items-center space-x-3">
       <span
         v-if="badge && badge > 0"
         :class="badgeClasses"
-        class="px-2 py-1 text-xs font-medium rounded-full"
+        class="px-3 py-1 text-xs font-medium rounded-full"
       >
         {{ badge > 99 ? '99+' : badge }}
       </span>
-      <ChevronRightIcon class="w-4 h-4 text-gray-400 group-hover:text-gray-600" />
+      <ChevronRightIcon class="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
     </div>
   </RouterLink>
 </template>
@@ -30,7 +33,11 @@ import {
   ShoppingBagIcon,
   BellIcon,
   CameraIcon,
-  ChevronRightIcon
+  ChevronRightIcon,
+  PlusIcon,
+  VideoIcon,
+  UsersIcon,
+  UserIcon
 } from 'lucide-vue-next'
 
 const props = defineProps({
@@ -46,6 +53,10 @@ const props = defineProps({
     type: String,
     required: true
   },
+  description: {
+    type: String,
+    default: ''
+  },
   badge: {
     type: Number,
     default: 0
@@ -60,7 +71,11 @@ const iconMapping = {
   'message-circle': MessageCircleIcon,
   'shopping-bag': ShoppingBagIcon,
   'bell': BellIcon,
-  'camera': CameraIcon
+  'camera': CameraIcon,
+  'plus': PlusIcon,
+  'video': VideoIcon,
+  'users': UsersIcon,
+  'user': UserIcon
 }
 
 const colorMapping = {
