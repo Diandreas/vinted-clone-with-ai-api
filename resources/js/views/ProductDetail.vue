@@ -160,11 +160,10 @@
           <div class="bg-white rounded-xl border border-gray-200 p-6">
             <h3 class="text-lg font-semibold text-gray-900 mb-4">Contacter le vendeur</h3>
             <div class="flex items-center space-x-4 mb-4">
-              <img
-                :src="product.user?.avatar || '/default-avatar.png'"
-                :alt="product.user?.name"
-                class="w-12 h-12 rounded-full object-cover"
-              />
+              <!-- Avatar avec initiales -->
+              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-semibold text-lg">
+                {{ getUserInitials(product.user?.name) }}
+              </div>
               <div>
                 <p class="font-medium text-gray-900">{{ product.user?.name }}</p>
                 <p class="text-sm text-gray-500">Membre depuis {{ formatDate(product.user?.created_at) }}</p>
@@ -543,6 +542,20 @@ const formatDate = (dateString) => {
 const calculateDiscount = (originalPrice, currentPrice) => {
   const discount = ((parseFloat(originalPrice) - parseFloat(currentPrice)) / parseFloat(originalPrice)) * 100
   return Math.round(discount)
+}
+
+const getUserInitials = (fullName) => {
+  if (!fullName) return '?'
+  
+  // Diviser le nom en mots et prendre la première lettre de chaque mot
+  const names = fullName.trim().split(' ')
+  if (names.length === 1) {
+    // Si un seul mot, prendre les 2 premières lettres
+    return names[0].substring(0, 2).toUpperCase()
+  } else {
+    // Si plusieurs mots, prendre la première lettre de chaque mot (max 2)
+    return names.slice(0, 2).map(name => name.charAt(0).toUpperCase()).join('')
+  }
 }
 
 const getStatusBadgeClass = (status) => {
