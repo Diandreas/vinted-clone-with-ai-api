@@ -222,6 +222,14 @@ Route::prefix('v1')->group(function () {
             Route::put('messages/{message}/read', [MessageController::class, 'markAsRead']);
             Route::delete('messages/{message}', [MessageController::class, 'destroy']);
             Route::post('messages/{message}/report', [MessageController::class, 'report']);
+            
+            // Nouvelles routes pour conversations centrées produit
+            Route::get('my-product-discussions', [ConversationController::class, 'myProductDiscussions']);
+            Route::get('my-products-with-buyers', [ConversationController::class, 'myProductsWithBuyers']);
+            Route::get('my-product-interests', [ConversationController::class, 'myProductInterests']);
+            Route::put('{conversation}/status', [ConversationController::class, 'updateStatus']);
+            Route::post('start/{product}', [ConversationController::class, 'startProductConversation']);
+            Route::get('product/{product}/conversations', [ConversationController::class, 'getProductConversations']);
         });
 
         // Review Routes

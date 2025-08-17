@@ -4,6 +4,8 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Conversation;
+use App\Models\Product;
+use App\Models\ProductInterest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -118,6 +120,189 @@ class ConversationController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Conversation deleted successfully'
+        ]);
+    }
+
+    /**
+     * Get product discussions for buyer (products they are interested in).
+     */
+    public function myProductDiscussions()
+    {
+        $user = Auth::user();
+        $conversations = Conversation::getProductConversationsForBuyer($user);
+
+        return response()->json([
+            'success' => true,
+            'data' => $conversations,
+            'message' => 'Product discussions retrieved successfully'
+        ]);
+    }
+
+    /**
+     * Get products with buyers for seller (grouped by product).
+     */
+    public function myProductsWithBuyers()
+    {
+        $user = Auth::user();
+        $conversationsByProduct = Conversation::getProductConversationsForSeller($user);
+        
+        // Transform to include product info and conversation count
+        $productsWithConversations = [];
+        foreach ($conversationsByProduct as $productId => $conversations) {
+            $firstConversation = $conversations->first();
+            if ($firstConversation && $firstConversation->product) {
+                $productsWithConversations[] = [
+                    'product' => $firstConversation->product,
+                    'conversations' => $conversations,
+                    'conversation_count' => $conversations->count(),
+                    'unread_count' => $conversations->sum(function($conv) use ($user) {
+                        return $conv->getUnreadCount($user);
+                    }),
+                    'last_activity' => $conversations->max('last_message_at')
+                ];
+            }
+        }
+
+        // Sort by last activity
+        usort($productsWithConversations, function($a, $b) {
+            return $b['last_activity'] <=> $a['last_activity'];
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => $productsWithConversations,
+            'message' => 'Products with conversations retrieved successfully'
+        ]);
+    }
+
+    /**
+     * Start a conversation for a specific product.
+     */
+    public function startProductConversation(Request $request, Product $product)
+    {
+        $request->validate([
+            'message' => 'required|string|max:1000'
+        ]);
+
+        $buyer = Auth::user();
+
+        // Check if user is not the owner
+        if ($product->user_id === $buyer->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cannot start conversation with your own product'
+            ], 403);
+        }
+
+        $seller = $product->user;
+
+        // Create or get conversation
+        $conversation = Conversation::findOrCreateForProduct($buyer, $seller, $product);
+
+        // Create first message
+        $conversation->messages()->create([
+            'sender_id' => $buyer->id,
+            'content' => $request->message,
+            'type' => 'text',
+            'product_id' => $product->id,
+        ]);
+
+        $conversation->load(['product', 'seller', 'lastMessage']);
+
+        return response()->json([
+            'success' => true,
+            'data' => $conversation,
+            'message' => 'Conversation started successfully'
+        ], 201);
+    }
+
+    /**
+     * Get conversations for a specific product (seller view).
+     */
+    public function getProductConversations(Product $product)
+    {
+        $user = Auth::user();
+
+        // Check if user is the product owner
+        if ($product->user_id !== $user->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+
+        $conversations = Conversation::where('product_id', $product->id)
+            ->with(['buyer', 'lastMessage'])
+            ->orderBy('last_message_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'product' => $product,
+                'conversations' => $conversations,
+                'total_conversations' => $conversations->count(),
+                'unread_count' => $conversations->sum(function($conv) use ($user) {
+                    return $conv->getUnreadCount($user);
+                })
+            ]
+        ]);
+    }
+
+    /**
+     * Get user's product interests with conversation status.
+     */
+    public function myProductInterests()
+    {
+        $user = Auth::user();
+        
+        $interests = ProductInterest::where('user_id', $user->id)
+            ->with(['product', 'conversation.lastMessage'])
+            ->active()
+            ->orderBy('last_interaction_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $interests,
+            'message' => 'Product interests retrieved successfully'
+        ]);
+    }
+
+    /**
+     * Update conversation/interest status.
+     */
+    public function updateStatus(Request $request, Conversation $conversation)
+    {
+        $request->validate([
+            'status' => 'required|in:interested,negotiating,cancelled,purchased'
+        ]);
+
+        $user = Auth::user();
+
+        // Check if user is participant
+        if (!($conversation->buyer_id === $user->id || $conversation->seller_id === $user->id)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+
+        // Update product interest status
+        if ($conversation->product_id) {
+            $interest = ProductInterest::where('product_id', $conversation->product_id)
+                ->where('user_id', $conversation->buyer_id)
+                ->first();
+
+            if ($interest) {
+                $interest->update(['status' => $request->status]);
+                $interest->updateInteraction();
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Status updated successfully'
         ]);
     }
 }

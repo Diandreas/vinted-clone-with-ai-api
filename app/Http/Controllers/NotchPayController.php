@@ -30,7 +30,7 @@ class NotchPayController extends Controller
                     'reference' => $request->reference,
                     'status' => $request->status
                 ]);
-                return redirect('/payment')
+                return redirect('/wallet')
                     ->with('warning', 'Paiement annulé. Vous pouvez réessayer à tout moment.');
             }
 
@@ -39,13 +39,13 @@ class NotchPayController extends Controller
                     'reference' => $request->reference,
                     'status' => $request->status
                 ]);
-                return redirect('/payment')
+                return redirect('/wallet')
                     ->with('error', 'Le paiement a échoué. Veuillez réessayer.');
             }
 
             if ($request->status !== 'complete') {
                 Log::warning('Unknown payment status', ['status' => $request->status]);
-                return redirect('/payment')
+                return redirect('/wallet')
                     ->with('error', 'Statut de paiement inconnu: ' . $request->status);
             }
 
@@ -77,7 +77,7 @@ class NotchPayController extends Controller
                         'trxref' => $request->trxref
                     ]
                 ]);
-                return redirect('/payment')
+                return redirect('/wallet')
                     ->with('error', 'Paiement introuvable ou déjà traité.');
             }
 
@@ -107,8 +107,8 @@ class NotchPayController extends Controller
 
             DB::commit();
 
-            // Redirect to success page with success message
-            return redirect('/payment')
+            // Redirect to wallet page with success message
+            return redirect('/wallet')
                 ->with('success', 'Paiement réussi ! ' . $tokens . ' jetons ont été ajoutés à votre compte.');
 
         } catch (Exception $e) {
@@ -119,8 +119,8 @@ class NotchPayController extends Controller
                 'request_data' => $request->all()
             ]);
 
-            // Redirect to payment page with error message
-            return redirect()->route('payment.index')
+            // Redirect to wallet page with error message
+            return redirect('/wallet')
                 ->with('error', 'Erreur lors du traitement du paiement : ' . $e->getMessage());
         }
     }

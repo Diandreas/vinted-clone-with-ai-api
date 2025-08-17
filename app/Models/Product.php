@@ -208,6 +208,30 @@ class Product extends Model
         return $this->hasMany(ProductVisionData::class);
     }
 
+    /**
+     * Get the conversations for this product.
+     */
+    public function conversations()
+    {
+        return $this->hasMany(Conversation::class);
+    }
+
+    /**
+     * Get the product interests for this product.
+     */
+    public function interests()
+    {
+        return $this->hasMany(ProductInterest::class);
+    }
+
+    /**
+     * Get active interests for this product.
+     */
+    public function activeInterests()
+    {
+        return $this->hasMany(ProductInterest::class)->active();
+    }
+
     // Scopes
 
     /**

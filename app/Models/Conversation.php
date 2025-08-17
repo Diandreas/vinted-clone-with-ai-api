@@ -67,6 +67,17 @@ class Conversation extends Model
     }
 
     /**
+     * Get the product interest associated with this conversation.
+     */
+    public function productInterest()
+    {
+        return $this->hasOne(ProductInterest::class, function($query) {
+            $query->where('product_id', $this->product_id)
+                  ->where('user_id', $this->buyer_id);
+        });
+    }
+
+    /**
      * Get the messages in this conversation.
      */
     public function messages()
@@ -206,10 +217,53 @@ class Conversation extends Model
      */
     public static function findOrCreateForProduct(User $buyer, User $seller, Product $product)
     {
-        return static::firstOrCreate([
+        $conversation = static::firstOrCreate([
             'product_id' => $product->id,
             'buyer_id' => $buyer->id,
             'seller_id' => $seller->id,
         ]);
+
+        // Create or update product interest
+        ProductInterest::createOrUpdate($product->id, $buyer->id);
+
+        return $conversation;
+    }
+
+    /**
+     * Get conversations grouped by product for a seller.
+     */
+    public static function getProductConversationsForSeller(User $seller)
+    {
+        return static::with(['product', 'buyer', 'lastMessage'])
+            ->where('seller_id', $seller->id)
+            ->whereHas('product', function($q) {
+                $q->whereNotNull('id');
+            })
+            ->orderBy('last_message_at', 'desc')
+            ->get()
+            ->groupBy('product_id');
+    }
+
+    /**
+     * Get product-based conversations for a buyer.
+     */
+    public static function getProductConversationsForBuyer(User $buyer)
+    {
+        return static::with(['product', 'seller', 'lastMessage'])
+            ->where('buyer_id', $buyer->id)
+            ->whereHas('product', function($q) {
+                $q->whereNotNull('id');
+            })
+            ->orderBy('last_message_at', 'desc')
+            ->get();
+    }
+
+    /**
+     * Archive conversations when product is deleted/sold.
+     */
+    public static function archiveForProduct(Product $product)
+    {
+        static::where('product_id', $product->id)
+            ->update(['is_archived' => true]);
     }
 }
