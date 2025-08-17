@@ -3,36 +3,37 @@
     <!-- Hero Section -->
     <div class="relative bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 overflow-hidden">
       <div class="absolute inset-0 bg-black opacity-10"></div>
-      <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+      <div class="relative max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-16 sm:py-24">
         <div class="text-center">
-          <h1 class="text-4xl md:text-6xl font-bold text-white mb-6">
+          <h1 class="text-3xl sm:text-4xl md:text-6xl font-bold text-white mb-4 sm:mb-6">
             Vendez, Achetez, Streamez
           </h1>
-          <p class="text-xl md:text-2xl text-white opacity-90 mb-8 max-w-3xl mx-auto">
+          <p class="text-lg sm:text-xl md:text-2xl text-white opacity-90 mb-6 sm:mb-8 max-w-3xl mx-auto px-2">
             La nouvelle façon de faire du shopping. Découvrez des produits uniques, 
             participez à des lives shopping et rejoignez notre communauté.
           </p>
-          <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4">
             <RouterLink
               to="/products"
-              class="bg-white text-indigo-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-50 transition-colors"
+              class="bg-white text-indigo-600 px-6 sm:px-8 py-3 sm:py-4 rounded-lg text-base sm:text-lg font-semibold hover:bg-gray-50 transition-colors"
             >
               Explorer les Produits
             </RouterLink>
             <RouterLink
               to="/lives"
-              class="bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-white hover:text-indigo-600 transition-colors"
+              class="bg-transparent border-2 border-white text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg text-base sm:text-lg font-semibold hover:bg-white hover:text-indigo-600 transition-colors"
             >
               Voir les Lives
             </RouterLink>
             <button
               @click="downloadAPK"
               :disabled="downloadingAPK"
-              class="bg-green-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              class="bg-green-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg text-base sm:text-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <DownloadIcon v-if="!downloadingAPK" class="w-6 h-6" />
-              <div v-else class="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              {{ downloadingAPK ? 'Téléchargement...' : 'Télécharger l\'App' }}
+              <DownloadIcon v-if="!downloadingAPK" class="w-5 h-5 sm:w-6 sm:h-6" />
+              <div v-else class="w-5 h-5 sm:w-6 sm:h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              <span class="hidden sm:inline">{{ downloadingAPK ? 'Téléchargement...' : 'Télécharger l\'App' }}</span>
+              <span class="sm:hidden">{{ downloadingAPK ? '...' : 'App' }}</span>
             </button>
           </div>
         </div>
@@ -40,27 +41,27 @@
     </div>
 
     <!-- Products Section - Main Content -->
-    <div class="py-20 bg-gray-50">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="py-12 sm:py-20 bg-gray-50">
+      <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <!-- Header -->
-        <div class="flex items-center justify-between mb-12">
-          <div>
-            <h2 class="text-3xl font-bold text-gray-900 mb-2">Tous les Produits</h2>
-            <p class="text-lg text-gray-600">Découvrez des articles uniques à vendre</p>
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 sm:mb-12">
+          <div class="mb-4 sm:mb-0">
+            <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Tous les Produits</h2>
+            <p class="text-base sm:text-lg text-gray-600">Découvrez des articles uniques à vendre</p>
           </div>
         </div>
 
         <!-- Filters -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-          <div class="flex flex-wrap gap-4">
-            <div class="flex-1 min-w-64">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 mb-6 sm:mb-8">
+          <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
+            <div class="flex-1 min-w-0">
               <div class="relative">
-                <SearchIcon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <SearchIcon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
                 <input
                   v-model="filters.search"
                   type="text"
                   placeholder="Rechercher des produits..."
-                  class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  class="w-full pl-9 sm:pl-10 pr-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm sm:text-base"
                   @input="debouncedSearch"
                 />
               </div>
@@ -69,7 +70,7 @@
             <select 
               v-model="filters.category"
               @change="loadProducts"
-              class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              class="px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm sm:text-base"
             >
               <option value="">Toutes les catégories</option>
               <option v-for="category in categories" :key="category.id" :value="category.id">
@@ -80,7 +81,7 @@
             <select 
               v-model="filters.sort"
               @change="loadProducts"
-              class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              class="px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm sm:text-base"
             >
               <option value="created_at">Plus récents</option>
               <option value="price">Prix croissant</option>
@@ -91,7 +92,7 @@
 
             <button
               @click="resetFilters"
-              class="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              class="px-3 sm:px-4 py-2 sm:py-3 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm sm:text-base"
             >
               Réinitialiser
             </button>
@@ -99,12 +100,12 @@
         </div>
 
         <!-- Loading State -->
-        <div v-if="loadingProducts" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div v-if="loadingProducts" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
           <ProductSkeleton v-for="i in 12" :key="i" />
         </div>
         
         <!-- Products Grid -->
-        <div v-else-if="products.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div v-else-if="products.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
           <div 
             v-for="product in products" 
             :key="product.id"
@@ -120,11 +121,11 @@
                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               />
               <div v-else class="flex items-center justify-center h-full">
-                <ImageIcon class="w-12 h-12 text-gray-400" />
+                <ImageIcon class="w-8 h-8 sm:w-12 sm:h-12 text-gray-400" />
               </div>
               
               <!-- Status Badge -->
-              <div class="absolute top-3 left-3">
+              <div class="absolute top-2 sm:top-3 left-2 sm:left-3">
                 <span 
                   :class="getStatusBadgeClass(product.status)"
                   class="px-2 py-1 text-xs font-medium rounded-full"
@@ -134,36 +135,36 @@
               </div>
 
               <!-- Price -->
-              <div class="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm rounded-lg px-2 py-1">
-                <span class="text-lg font-bold text-indigo-600">{{ formatPrice(product.price) }}</span>
-                <span v-if="product.original_price && product.original_price !== product.price" class="text-sm text-gray-500 line-through ml-2">
+              <div class="absolute bottom-2 sm:bottom-3 right-2 sm:right-3 bg-white/90 backdrop-blur-sm rounded-lg px-2 py-1">
+                <span class="text-base sm:text-lg font-bold text-indigo-600">{{ formatPrice(product.price) }}</span>
+                <span v-if="product.original_price && product.original_price !== product.price" class="text-xs sm:text-sm text-gray-500 line-through ml-1 sm:ml-2">
                   {{ formatPrice(product.original_price) }}
                 </span>
               </div>
             </div>
             
             <!-- Product Info -->
-            <div class="p-4">
-              <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2">{{ product.title }}</h3>
-              <p v-if="product.description" class="text-sm text-gray-600 mb-3 line-clamp-2">{{ product.description }}</p>
+            <div class="p-3 sm:p-4">
+              <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2 text-sm sm:text-base">{{ product.title }}</h3>
+              <p v-if="product.description" class="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3 line-clamp-2">{{ product.description }}</p>
               
-              <div class="flex items-center justify-between text-sm text-gray-500 mb-3">
-                <span>{{ product.category?.name }}</span>
-                <span>{{ product.condition?.name }}</span>
+              <div class="flex items-center justify-between text-xs sm:text-sm text-gray-500 mb-2 sm:mb-3">
+                <span class="truncate">{{ product.category?.name }}</span>
+                <span class="truncate ml-2">{{ product.condition?.name }}</span>
               </div>
               
               <div class="flex items-center justify-between">
-                <div class="flex items-center text-sm text-gray-500">
-                  <span class="flex items-center mr-3">
-                    <EyeIcon class="w-4 h-4 mr-1" />
+                <div class="flex items-center text-xs sm:text-sm text-gray-500">
+                  <span class="flex items-center mr-2 sm:mr-3">
+                    <EyeIcon class="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                     {{ product.views_count || 0 }}
                   </span>
                   <span class="flex items-center">
-                    <HeartIcon class="w-4 h-4 mr-1" />
+                    <HeartIcon class="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                     {{ product.likes_count || 0 }}
                   </span>
                 </div>
-                <div class="text-sm text-gray-500">
+                <div class="text-xs sm:text-sm text-gray-500 truncate ml-2">
                   Par {{ product.user?.name }}
                 </div>
               </div>
@@ -172,16 +173,16 @@
         </div>
 
         <!-- No Products -->
-        <div v-else class="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
-          <PackageIcon class="mx-auto h-12 w-12 text-gray-400" />
+        <div v-else class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 sm:p-12 text-center">
+          <PackageIcon class="mx-auto h-8 w-8 sm:h-12 sm:w-12 text-gray-400" />
           <h3 class="mt-2 text-sm font-medium text-gray-900">Aucun produit trouvé</h3>
           <p class="mt-1 text-sm text-gray-500">Aucun produit ne correspond à vos critères de recherche.</p>
         </div>
 
         <!-- Pagination -->
-        <div v-if="pagination.total > pagination.per_page" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mt-8">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-2">
+        <div v-if="pagination.total > pagination.per_page" class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 mt-6 sm:mt-8">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0">
+            <div class="flex items-center justify-center sm:justify-start space-x-2">
               <button
                 @click="loadProducts(pagination.current_page - 1)"
                 :disabled="pagination.current_page === 1"
@@ -190,7 +191,7 @@
                 Précédent
               </button>
               
-              <span class="text-sm text-gray-700">
+              <span class="text-sm text-gray-700 px-2">
                 Page {{ pagination.current_page }} sur {{ pagination.last_page }}
               </span>
               

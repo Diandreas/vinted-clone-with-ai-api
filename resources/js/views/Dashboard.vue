@@ -2,28 +2,98 @@
   <div class="min-h-screen bg-gray-50">
     <!-- Header -->
     <div class="bg-white shadow-sm border-b border-gray-200">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center py-6">
+      <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center py-4 sm:py-6 space-y-4 sm:space-y-0">
           <div>
-            <h1 class="text-3xl font-bold text-gray-900">
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">
               Bonjour, {{ user?.name || 'Utilisateur' }} 👋
             </h1>
-            <p class="text-gray-600 mt-1">Voici un aperçu de votre activité</p>
+            <p class="text-sm sm:text-base text-gray-600 mt-1">Voici un aperçu de votre activité</p>
           </div>
-          <div class="flex space-x-3">
+          <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
             <RouterLink
               to="/products/create"
-              class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors flex items-center space-x-2"
+              class="bg-indigo-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors flex items-center justify-center space-x-2 text-sm sm:text-base"
             >
-              <PlusIcon class="w-5 h-5" />
-              <span>Vendre un article</span>
+              <PlusIcon class="w-4 h-4 sm:w-5 sm:h-5" />
+              <span class="hidden sm:inline">Vendre un article</span>
+              <span class="sm:hidden">Vendre</span>
             </RouterLink>
             <RouterLink
               to="/lives/create"
-              class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors flex items-center space-x-2"
+              class="bg-red-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center space-x-2 text-sm sm:text-base"
             >
-              <VideoIcon class="w-5 h-5" />
-              <span>Créer un Live</span>
+              <VideoIcon class="w-4 h-4 sm:w-5 sm:h-5" />
+              <span class="hidden sm:inline">Créer un Live</span>
+              <span class="sm:hidden">Live</span>
+            </RouterLink>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Section - Style TikTok -->
+    <div class="bg-white border-b border-gray-200">
+      <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-6">
+          <!-- Profile Avatar -->
+          <div class="relative mx-auto sm:mx-0">
+            <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-2xl sm:text-3xl font-bold border-4 border-white shadow-lg">
+              {{ user?.name?.charAt(0)?.toUpperCase() || 'U' }}
+            </div>
+            <div class="absolute -bottom-1 -right-1 w-6 h-6 sm:w-7 sm:h-7 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+              <div class="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-white rounded-full"></div>
+            </div>
+          </div>
+
+          <!-- Profile Info -->
+          <div class="flex-1 text-center sm:text-left">
+            <div class="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 mb-3">
+              <h2 class="text-xl sm:text-2xl font-bold text-gray-900">{{ user?.name || 'Utilisateur' }}</h2>
+              <span v-if="user?.username" class="text-gray-500 text-sm sm:text-base">@{{ user.username }}</span>
+              <span v-if="user?.is_verified" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                Vérifié
+              </span>
+            </div>
+            <p v-if="user?.bio" class="text-gray-600 text-sm sm:text-base mb-4 max-w-2xl">{{ user.bio }}</p>
+            
+            <!-- Profile Stats -->
+            <div class="grid grid-cols-3 gap-4 sm:gap-6 max-w-md mx-auto sm:mx-0">
+              <div class="text-center cursor-pointer hover:bg-gray-50 rounded-lg p-3 transition-colors" @click="goToProfile('products')">
+                <div class="text-xl sm:text-2xl font-bold text-gray-900">{{ stats.products_count || 0 }}</div>
+                <div class="text-xs sm:text-sm text-gray-500">Produits</div>
+              </div>
+              <div class="text-center cursor-pointer hover:bg-gray-50 rounded-lg p-3 transition-colors" @click="goToProfile('followers')">
+                <div class="text-xl sm:text-2xl font-bold text-gray-900">{{ stats.followers_count || 0 }}</div>
+                <div class="text-xs sm:text-sm text-gray-500">Followers</div>
+              </div>
+              <div class="text-center cursor-pointer hover:bg-gray-50 rounded-lg p-3 transition-colors" @click="goToProfile('following')">
+                <div class="text-xl sm:text-2xl font-bold text-gray-900">{{ stats.following_count || 0 }}</div>
+                <div class="text-xs sm:text-sm text-gray-500">Following</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Profile Actions -->
+          <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
+            <RouterLink
+              :to="`/profile/${user?.id}`"
+              class="bg-gray-900 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full hover:bg-gray-800 transition-colors flex items-center justify-center space-x-2 text-sm sm:text-base font-medium"
+            >
+              <UserIcon class="w-4 h-4 sm:w-5 sm:h-5" />
+              <span class="hidden sm:inline">Voir mon profil</span>
+              <span class="sm:hidden">Profil</span>
+            </RouterLink>
+            <RouterLink
+              to="/profile/edit"
+              class="bg-white text-gray-700 border border-gray-300 px-4 sm:px-6 py-2 sm:py-3 rounded-full hover:bg-gray-50 transition-colors flex items-center justify-center space-x-2 text-sm sm:text-base font-medium"
+            >
+              <EditIcon class="w-4 h-4 sm:w-5 sm:h-5" />
+              <span class="hidden sm:inline">Modifier</span>
+              <span class="sm:hidden">Modifier</span>
             </RouterLink>
           </div>
         </div>
@@ -31,8 +101,8 @@
     </div>
 
     <!-- Stats Cards -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
         <StatsCard
           title="Mes Produits"
           :value="stats.products_count"
@@ -64,13 +134,13 @@
       </div>
 
       <!-- Main Content Grid -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
         <!-- Left Column -->
-        <div class="lg:col-span-2 space-y-8">
+        <div class="lg:col-span-2 space-y-6 sm:space-y-8">
           <!-- Sales Chart -->
-          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div class="flex items-center justify-between mb-6">
-              <h2 class="text-xl font-semibold text-gray-900">Ventes des 30 derniers jours</h2>
+          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-3 sm:space-y-0">
+              <h2 class="text-lg sm:text-xl font-semibold text-gray-900">Ventes des 30 derniers jours</h2>
               <select v-model="chartPeriod" class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
                 <option value="7">7 jours</option>
                 <option value="30">30 jours</option>
@@ -81,9 +151,9 @@
           </div>
 
           <!-- Recent Products -->
-          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div class="flex items-center justify-between mb-6">
-              <h2 class="text-xl font-semibold text-gray-900">Mes Produits Récents</h2>
+          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-3 sm:space-y-0">
+              <h2 class="text-lg sm:text-xl font-semibold text-gray-900">Mes Produits Récents</h2>
               <RouterLink
                 to="/products?filter=my-products"
                 class="text-indigo-600 hover:text-indigo-700 text-sm font-medium"
@@ -99,66 +169,59 @@
                 v-for="product in recentProducts"
                 :key="product.id"
                 :product="product"
-                :show-actions="true"
-                @edit="editProduct"
-                @delete="deleteProduct"
+                class="border border-gray-200 rounded-lg p-4"
               />
             </div>
-            <div v-else class="text-center py-12">
-              <PackageIcon class="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 class="text-lg font-medium text-gray-900 mb-2">Aucun produit</h3>
-              <p class="text-gray-600 mb-4">Commencez par créer votre premier produit</p>
-              <RouterLink
-                to="/products/create"
-                class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
-              >
-                Créer un produit
-              </RouterLink>
+            <div v-else class="text-center py-8">
+              <PackageIcon class="mx-auto h-8 w-8 sm:h-12 sm:w-12 text-gray-400" />
+              <h3 class="mt-2 text-sm font-medium text-gray-900">Aucun produit</h3>
+              <p class="mt-1 text-sm text-gray-500">Commencez par créer votre premier produit</p>
             </div>
           </div>
         </div>
 
         <!-- Right Column -->
-        <div class="space-y-8">
+        <div class="space-y-6 sm:space-y-8">
           <!-- Quick Actions -->
-          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-6">Actions Rapides</h2>
+          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+            <h2 class="text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6">Actions Rapides</h2>
             <div class="space-y-3">
               <QuickActionButton
-                to="/messages"
-                icon="message-circle"
-                title="Messages"
-                :badge="unreadMessages"
-                color="blue"
+                icon="plus"
+                label="Ajouter un produit"
+                description="Vendez vos articles"
+                action="create-product"
+                @click="router.push('/products/create')"
               />
               <QuickActionButton
-                to="/orders"
-                icon="shopping-bag"
-                title="Commandes"
-                :badge="pendingOrders"
-                color="green"
+                icon="video"
+                label="Créer un live"
+                description="Vendez en direct"
+                action="create-live"
+                @click="router.push('/lives/create')"
               />
               <QuickActionButton
-                to="/notifications"
-                icon="bell"
-                title="Notifications"
-                :badge="unreadNotifications"
-                color="yellow"
+                icon="users"
+                label="Gérer mes followers"
+                description="Voir mes abonnés"
+                action="manage-followers"
+                @click="goToProfile('followers')"
               />
               <QuickActionButton
-                to="/stories"
-                icon="camera"
-                title="Stories"
-                color="purple"
+                icon="user"
+                label="Mon profil complet"
+                description="Voir tous mes détails"
+                action="view-profile"
+                @click="goToProfile()"
               />
             </div>
           </div>
 
           <!-- Recent Activity -->
-          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-6">Activité Récente</h2>
+          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+            <h2 class="text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6">Activité Récente</h2>
             <div v-if="loadingActivity" class="space-y-4">
-              <ActivitySkeleton v-for="i in 5" :key="i" />
+              <ActivitySkeleton v-for="i in 3" :key="i" />
             </div>
             <div v-else-if="recentActivity.length > 0" class="space-y-4">
               <ActivityItem
@@ -168,27 +231,9 @@
               />
             </div>
             <div v-else class="text-center py-8">
-              <ClockIcon class="w-12 h-12 text-gray-300 mx-auto mb-3" />
-              <p class="text-gray-600">Aucune activité récente</p>
-            </div>
-          </div>
-
-          <!-- Trending Products -->
-          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-6">Produits Tendance</h2>
-            <div v-if="loadingTrending" class="space-y-4">
-              <TrendingProductSkeleton v-for="i in 3" :key="i" />
-            </div>
-            <div v-else-if="trendingProducts.length > 0" class="space-y-4">
-              <TrendingProductCard
-                v-for="product in trendingProducts"
-                :key="product.id"
-                :product="product"
-              />
-            </div>
-            <div v-else class="text-center py-8">
-              <TrendingUpIcon class="w-12 h-12 text-gray-300 mx-auto mb-3" />
-              <p class="text-gray-600">Aucun produit tendance</p>
+              <ActivityIcon class="mx-auto h-8 w-8 sm:h-12 sm:w-12 text-gray-400" />
+              <h3 class="mt-2 text-sm font-medium text-gray-900">Aucune activité</h3>
+              <p class="mt-1 text-sm text-gray-500">Vos actions apparaîtront ici</p>
             </div>
           </div>
         </div>
@@ -198,75 +243,53 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useDashboardStore } from '@/stores/dashboard'
-import { 
-  PlusIcon, 
-  VideoIcon, 
-  PackageIcon, 
-  ClockIcon, 
-  TrendingUpIcon 
-} from 'lucide-vue-next'
-
-// Components
 import StatsCard from '@/components/dashboard/StatsCard.vue'
 import SalesChart from '@/components/dashboard/SalesChart.vue'
 import ProductCard from '@/components/products/ProductCard.vue'
 import ProductSkeleton from '@/components/skeletons/ProductSkeleton.vue'
+import QuickActionButton from '@/components/dashboard/QuickActionButton.vue'
 import ActivityItem from '@/components/dashboard/ActivityItem.vue'
 import ActivitySkeleton from '@/components/skeletons/ActivitySkeleton.vue'
-import QuickActionButton from '@/components/dashboard/QuickActionButton.vue'
-import TrendingProductCard from '@/components/products/TrendingProductCard.vue'
-import TrendingProductSkeleton from '@/components/skeletons/TrendingProductSkeleton.vue'
+import {
+  PlusIcon,
+  VideoIcon,
+  PackageIcon, 
+  ClockIcon, 
+  TrendingUpIcon,
+  ActivityIcon,
+  UserIcon,
+  EditIcon
+} from 'lucide-vue-next'
 
-// Stores
+const router = useRouter()
 const authStore = useAuthStore()
 const dashboardStore = useDashboardStore()
-const router = useRouter()
 
 // Reactive data
 const chartPeriod = ref('30')
 const loadingStats = ref(true)
 const loadingProducts = ref(true)
 const loadingActivity = ref(true)
-const loadingTrending = ref(true)
 
 // Computed
 const user = computed(() => authStore.user)
 const stats = computed(() => dashboardStore.stats)
 const recentProducts = computed(() => dashboardStore.recentProducts)
 const recentActivity = computed(() => dashboardStore.recentActivity)
-const trendingProducts = computed(() => dashboardStore.trendingProducts)
 const salesChartData = computed(() => dashboardStore.salesChartData)
-const unreadMessages = computed(() => dashboardStore.unreadMessages)
-const pendingOrders = computed(() => dashboardStore.pendingOrders)
-const unreadNotifications = computed(() => dashboardStore.unreadNotifications)
 
 // Methods
 const formatCurrency = (amount) => {
+  if (!amount) return '0 FCFA'
   return new Intl.NumberFormat('fr-FR', {
     style: 'currency',
-    currency: 'EUR'
+    currency: 'XOF',
+    minimumFractionDigits: 0
   }).format(amount)
-}
-
-const editProduct = (product) => {
-  // Navigate to edit product page
-  router.push(`/products/${product.id}/edit`)
-}
-
-const deleteProduct = async (product) => {
-  if (confirm('Êtes-vous sûr de vouloir supprimer ce produit ?')) {
-    try {
-      await dashboardStore.deleteProduct(product.id)
-      // Refresh products list
-      await loadRecentProducts()
-    } catch (error) {
-      console.error('Error deleting product:', error)
-    }
-  }
 }
 
 const loadStats = async () => {
@@ -302,37 +325,27 @@ const loadRecentActivity = async () => {
   }
 }
 
-const loadTrendingProducts = async () => {
-  loadingTrending.value = true
-  try {
-    await dashboardStore.fetchTrendingProducts()
-  } catch (error) {
-    console.error('Error loading trending products:', error)
-  } finally {
-    loadingTrending.value = false
+const goToProfile = (tab = null) => {
+  if (tab) {
+    router.push(`/profile/${user.value?.id}?tab=${tab}`)
+  } else {
+    router.push(`/profile/${user.value?.id}`)
   }
 }
 
-// Watch chart period changes
+// Watchers
 watch(chartPeriod, async (newPeriod) => {
-  loadingStats.value = true
-  try {
-    await dashboardStore.fetchSalesChart(newPeriod)
-  } catch (error) {
-    console.error('Error loading sales chart:', error)
-  } finally {
-    loadingStats.value = false
+  if (newPeriod) {
+    await dashboardStore.fetchSalesChartData(newPeriod)
   }
 })
 
 // Lifecycle
 onMounted(async () => {
-  // Load all dashboard data
   await Promise.all([
     loadStats(),
     loadRecentProducts(),
-    loadRecentActivity(),
-    loadTrendingProducts()
+    loadRecentActivity()
   ])
 })
 </script>

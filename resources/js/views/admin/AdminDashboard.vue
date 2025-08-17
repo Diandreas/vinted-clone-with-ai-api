@@ -1,47 +1,47 @@
 <template>
-  <div class="min-h-screen bg-gray-50 p-6">
+  <div class="min-h-screen bg-gray-50 p-3 sm:p-6">
     <div class="max-w-7xl mx-auto">
-      <h1 class="text-2xl font-bold text-gray-900 mb-6">Dashboard Admin</h1>
+      <h1 class="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Dashboard Admin</h1>
 
       <!-- KPI Cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div class="bg-white rounded-xl border border-gray-200 p-4">
-          <div class="text-sm text-gray-500">Utilisateurs</div>
-          <div class="text-2xl font-semibold text-gray-900">{{ kpis.users_total }}</div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
+        <div class="bg-white rounded-xl border border-gray-200 p-3 sm:p-4">
+          <div class="text-xs sm:text-sm text-gray-500">Utilisateurs</div>
+          <div class="text-xl sm:text-2xl font-semibold text-gray-900">{{ kpis.users_total }}</div>
           <div class="text-xs text-green-600">Vérifiés: {{ kpis.users_verified }}</div>
         </div>
-        <div class="bg-white rounded-xl border border-gray-200 p-4">
-          <div class="text-sm text-gray-500">Produits</div>
-          <div class="text-2xl font-semibold text-gray-900">{{ kpis.products_total }}</div>
+        <div class="bg-white rounded-xl border border-gray-200 p-3 sm:p-4">
+          <div class="text-xs sm:text-sm text-gray-500">Produits</div>
+          <div class="text-xl sm:text-2xl font-semibold text-gray-900">{{ kpis.products_total }}</div>
           <div class="text-xs text-green-600">Actifs: {{ kpis.products_active }}</div>
         </div>
-        <div class="bg-white rounded-xl border border-gray-200 p-4">
-          <div class="text-sm text-gray-500">Lives</div>
-          <div class="text-2xl font-semibold text-gray-900">{{ kpis.lives_total }}</div>
+        <div class="bg-white rounded-xl border border-gray-200 p-3 sm:p-4">
+          <div class="text-xs sm:text-sm text-gray-500">Lives</div>
+          <div class="text-xl sm:text-2xl font-semibold text-gray-900">{{ kpis.lives_total }}</div>
           <div class="text-xs text-red-600">En direct: {{ kpis.lives_active }}</div>
         </div>
-        <div class="bg-white rounded-xl border border-gray-200 p-4">
-          <div class="text-sm text-gray-500">Commandes</div>
-          <div class="text-2xl font-semibold text-gray-900">{{ kpis.orders_total }}</div>
+        <div class="bg-white rounded-xl border border-gray-200 p-3 sm:p-4">
+          <div class="text-xs sm:text-sm text-gray-500">Commandes</div>
+          <div class="text-xl sm:text-2xl font-semibold text-gray-900">{{ kpis.orders_total }}</div>
         </div>
       </div>
 
       <!-- Charts Grid -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="bg-white rounded-xl border border-gray-200 p-4">
-          <div class="text-sm font-medium text-gray-900 mb-2">Inscriptions utilisateurs</div>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        <div class="bg-white rounded-xl border border-gray-200 p-3 sm:p-4">
+          <div class="text-xs sm:text-sm font-medium text-gray-900 mb-2">Inscriptions utilisateurs</div>
           <canvas ref="usersByDayChart" height="160"></canvas>
         </div>
-        <div class="bg-white rounded-xl border border-gray-200 p-4">
-          <div class="text-sm font-medium text-gray-900 mb-2">Créations produits</div>
+        <div class="bg-white rounded-xl border border-gray-200 p-3 sm:p-4">
+          <div class="text-xs sm:text-sm font-medium text-gray-900 mb-2">Créations produits</div>
           <canvas ref="productsByDayChart" height="160"></canvas>
         </div>
-        <div class="bg-white rounded-xl border border-gray-200 p-4">
-          <div class="text-sm font-medium text-gray-900 mb-2">Commandes par jour</div>
+        <div class="bg-white rounded-xl border border-gray-200 p-3 sm:p-4">
+          <div class="text-xs sm:text-sm font-medium text-gray-900 mb-2">Commandes par jour</div>
           <canvas ref="ordersByDayChart" height="160"></canvas>
         </div>
-        <div class="bg-white rounded-xl border border-gray-200 p-4">
-          <div class="text-sm font-medium text-gray-900 mb-2">Produits par statut</div>
+        <div class="bg-white rounded-xl border border-gray-200 p-3 sm:p-4">
+          <div class="text-xs sm:text-sm font-medium text-gray-900 mb-2">Produits par statut</div>
           <canvas ref="productsByStatusChart" height="160"></canvas>
         </div>
       </div>

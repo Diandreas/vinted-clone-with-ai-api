@@ -1,44 +1,43 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-12">
+    <div class="max-w-5xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-12">
       <!-- Header modernisé -->
-      <div class="mb-8 lg:mb-12">
-        <nav class="flex mb-6">
+      <div class="mb-6 sm:mb-8 lg:mb-12">
+        <nav class="flex mb-4 sm:mb-6">
           <RouterLink 
             to="/products" 
-            class="group inline-flex items-center text-slate-600 hover:text-indigo-600 transition-all duration-200 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-full border border-white/50 hover:border-indigo-200 hover:bg-white/80"
+            class="group inline-flex items-center text-slate-600 hover:text-indigo-600 transition-all duration-200 bg-white/60 backdrop-blur-sm px-3 sm:px-4 py-2 rounded-full border border-white/50 hover:border-indigo-200 hover:bg-white/80 text-sm sm:text-base"
           >
-            <ArrowLeftIcon class="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform duration-200" />
-            Retour aux produits
+            <ArrowLeftIcon class="w-3 h-3 sm:w-4 sm:h-4 mr-2 group-hover:-translate-x-1 transition-transform duration-200" />
+            <span class="hidden sm:inline">Retour aux produits</span>
+            <span class="sm:hidden">Retour</span>
           </RouterLink>
         </nav>
         <div class="text-center lg:text-left">
-          <h1 class="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-slate-900 via-indigo-900 to-slate-900 bg-clip-text text-transparent">
+          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-slate-900 via-indigo-900 to-slate-900 bg-clip-text text-transparent">
             Créer un nouveau produit
           </h1>
-          <p class="text-slate-600 mt-3 text-lg max-w-2xl mx-auto lg:mx-0">
+          <p class="text-slate-600 mt-2 sm:mt-3 text-base sm:text-lg max-w-2xl mx-auto lg:mx-0">
             Partagez vos articles avec notre communauté et donnez-leur une seconde vie
           </p>
         </div>
       </div>
 
-
-
       <!-- Error Display -->
-      <div v-if="showErrors && Object.keys(errors).length > 0" class="mb-6">
-        <div class="bg-red-50 border border-red-200 rounded-xl p-4">
+      <div v-if="showErrors && Object.keys(errors).length > 0" class="mb-4 sm:mb-6">
+        <div class="bg-red-50 border border-red-200 rounded-xl p-3 sm:p-4">
           <div class="flex">
             <div class="flex-shrink-0">
-              <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+              <svg class="h-4 w-4 sm:h-5 sm:w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
               </svg>
             </div>
             <div class="ml-3">
-              <h3 class="text-sm font-medium text-red-800">
+              <h3 class="text-xs sm:text-sm font-medium text-red-800">
                 Erreurs de validation
               </h3>
-              <div class="mt-2 text-sm text-red-700">
-                <ul class="list-disc pl-5 space-y-1">
+              <div class="mt-2 text-xs sm:text-sm text-red-700">
+                <ul class="list-disc pl-4 sm:pl-5 space-y-1">
                   <li v-for="(fieldErrors, field) in errors" :key="field">
                     <span v-if="field === 'general'">
                       <span v-for="error in fieldErrors" :key="error">{{ error }}</span>
@@ -54,9 +53,9 @@
             <div class="ml-auto pl-3">
               <button
                 @click="showErrors = false"
-                class="inline-flex bg-red-50 rounded-md p-1.5 text-red-500 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                class="inline-flex bg-red-50 rounded-md p-1 sm:p-1.5 text-red-500 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
               >
-                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <svg class="h-4 w-4 sm:h-5 sm:w-5" viewBox="0 0 20 20" fill="currentColor">
                   <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
                 </svg>
               </button>
@@ -65,28 +64,29 @@
         </div>
       </div>
 
-      <form @submit.prevent="submitProduct" class="space-y-6 lg:space-y-8">
+      <form @submit.prevent="submitProduct" class="space-y-4 sm:space-y-6 lg:space-y-8">
         <!-- Images Section modernisée -->
-        <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 p-6 lg:p-8 hover:shadow-2xl transition-all duration-300">
-          <div class="flex items-center mb-6">
-            <div class="bg-gradient-to-r from-indigo-500 to-purple-500 w-8 h-8 rounded-lg flex items-center justify-center mr-3">
-              <CameraIcon class="w-5 h-5 text-white" />
+        <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 p-4 sm:p-6 lg:p-8 hover:shadow-2xl transition-all duration-300">
+          <div class="flex items-center mb-4 sm:mb-6">
+            <div class="bg-gradient-to-r from-indigo-500 to-purple-500 w-6 h-6 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center mr-2 sm:mr-3">
+              <CameraIcon class="w-3 h-3 sm:w-5 sm:h-5 text-white" />
             </div>
             <div>
-              <h2 class="text-xl lg:text-2xl font-bold text-slate-900">Photos du produit</h2>
-              <p class="text-slate-600 text-sm mt-1">Ajoutez jusqu'à 8 photos de qualité</p>
+              <h2 class="text-lg sm:text-xl lg:text-2xl font-bold text-slate-900">Photos du produit</h2>
+              <p class="text-slate-600 text-xs sm:text-sm mt-1">Ajoutez jusqu'à 8 photos de qualité</p>
             </div>
           </div>
           
           <!-- Upload Multiple Images Button -->
-          <div class="mb-6">
-            <div class="flex items-center justify-between">
-              <div class="text-sm text-slate-600">
+          <div class="mb-4 sm:mb-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
+              <div class="text-xs sm:text-sm text-slate-600">
                 {{ form.images.filter(img => img).length }}/8 images ajoutées
               </div>
-              <label class="cursor-pointer inline-flex items-center px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors font-medium">
-                <PlusIcon class="w-5 h-5 mr-2" />
-                Ajouter plusieurs images
+              <label class="cursor-pointer inline-flex items-center px-3 sm:px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors font-medium text-sm sm:text-base">
+                <PlusIcon class="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                <span class="hidden sm:inline">Ajouter plusieurs images</span>
+                <span class="sm:hidden">Ajouter images</span>
                 <input 
                   ref="multipleImageInput"
                   type="file"

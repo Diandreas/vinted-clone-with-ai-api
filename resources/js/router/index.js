@@ -8,6 +8,7 @@ const Login = () => import('@/views/auth/Login.vue')
 const Register = () => import('@/views/auth/Register.vue')
 const ForgotPassword = () => import('@/views/auth/ForgotPassword.vue')
 const Profile = () => import('@/views/Profile.vue')
+const EditProfile = () => import('@/views/EditProfile.vue')
 const Products = () => import('@/views/Products.vue')
 const MyProducts = () => import('@/views/MyProducts.vue')
 const PublicProducts = () => import('@/views/PublicProducts.vue')
@@ -81,6 +82,12 @@ const routes = [
     path: '/profile',
     name: 'profile',
     component: Profile,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/profile/edit',
+    name: 'edit-profile',
+    component: EditProfile,
     meta: { requiresAuth: true }
   },
   {

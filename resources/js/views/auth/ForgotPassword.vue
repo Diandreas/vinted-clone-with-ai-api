@@ -1,30 +1,30 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full space-y-8">
+  <div class="min-h-screen flex items-center justify-center bg-gray-50 py-6 sm:py-12 px-3 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-6 sm:space-y-8">
       <div>
-        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+        <h2 class="mt-4 sm:mt-6 text-center text-2xl sm:text-3xl font-extrabold text-gray-900">
           Mot de passe oublié
         </h2>
-        <p class="mt-2 text-center text-sm text-gray-600">
+        <p class="mt-2 text-center text-xs sm:text-sm text-gray-600">
           Entrez votre email pour recevoir un lien de réinitialisation
         </p>
       </div>
       
-      <form class="mt-8 space-y-6" @submit.prevent="submitForm">
-        <div v-if="message" class="rounded-md bg-green-50 p-4">
+      <form class="mt-6 sm:mt-8 space-y-4 sm:space-y-6" @submit.prevent="submitForm">
+        <div v-if="message" class="rounded-md bg-green-50 p-3 sm:p-4">
           <div class="flex">
             <div class="ml-3">
-              <h3 class="text-sm font-medium text-green-800">
+              <h3 class="text-xs sm:text-sm font-medium text-green-800">
                 {{ message }}
               </h3>
             </div>
           </div>
         </div>
 
-        <div v-if="error" class="rounded-md bg-red-50 p-4">
+        <div v-if="error" class="rounded-md bg-red-50 p-3 sm:p-4">
           <div class="flex">
             <div class="ml-3">
-              <h3 class="text-sm font-medium text-red-800">
+              <h3 class="text-xs sm:text-sm font-medium text-red-800">
                 {{ error }}
               </h3>
             </div>
@@ -41,7 +41,7 @@
               type="email"
               autocomplete="email"
               required
-              class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+              class="appearance-none rounded-md relative block w-full px-3 py-2 sm:py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 text-sm sm:text-base"
               placeholder="Adresse email"
             />
           </div>
@@ -51,7 +51,7 @@
           <button
             type="submit"
             :disabled="loading"
-            class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+            class="group relative w-full flex justify-center py-2 sm:py-3 px-4 border border-transparent text-sm sm:text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 transition-colors"
           >
             <span v-if="loading">Envoi en cours...</span>
             <span v-else>Envoyer le lien de réinitialisation</span>
@@ -61,7 +61,7 @@
         <div class="text-center">
           <RouterLink
             to="/login"
-            class="font-medium text-indigo-600 hover:text-indigo-500"
+            class="font-medium text-indigo-600 hover:text-indigo-500 text-xs sm:text-sm"
           >
             Retour à la connexion
           </RouterLink>
