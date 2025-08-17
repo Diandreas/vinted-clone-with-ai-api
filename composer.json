@@ -9,6 +9,7 @@
         "php": "^8.2",
         "algolia/algoliasearch-client-php": "^4.26",
         "darkaonline/l5-swagger": "^9.0",
+        "doctrine/dbal": "^4.3",
         "google/cloud-vision": "^2.0",
         "intervention/image": "^3.11",
         "laravel/framework": "^12.0",

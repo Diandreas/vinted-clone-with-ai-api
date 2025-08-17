@@ -1,172 +1,107 @@
 <template>
   <div class="min-h-screen bg-gray-50">
-    <!-- Hero Section -->
-    <div class="relative bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 overflow-hidden">
-      <div class="absolute inset-0 bg-black opacity-10"></div>
-      <div class="relative max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-16 sm:py-24">
-        <div class="text-center">
-          <h1 class="text-3xl sm:text-4xl md:text-6xl font-bold text-white mb-4 sm:mb-6">
-            Vendez, Achetez, Streamez
-          </h1>
-          <p class="text-lg sm:text-xl md:text-2xl text-white opacity-90 mb-6 sm:mb-8 max-w-3xl mx-auto px-2">
-            La nouvelle façon de faire du shopping. Découvrez des produits uniques, 
-            participez à des lives shopping et rejoignez notre communauté.
-          </p>
-          <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4">
-            <RouterLink
-              to="/products"
-              class="bg-white text-indigo-600 px-6 sm:px-8 py-3 sm:py-4 rounded-lg text-base sm:text-lg font-semibold hover:bg-gray-50 transition-colors"
-            >
-              Explorer les Produits
-            </RouterLink>
-            <RouterLink
-              to="/lives"
-              class="bg-transparent border-2 border-white text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg text-base sm:text-lg font-semibold hover:bg-white hover:text-indigo-600 transition-colors"
-            >
-              Voir les Lives
-            </RouterLink>
-            <button
-              @click="downloadAPK"
-              :disabled="downloadingAPK"
-              class="bg-green-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg text-base sm:text-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <DownloadIcon v-if="!downloadingAPK" class="w-5 h-5 sm:w-6 sm:h-6" />
-              <div v-else class="w-5 h-5 sm:w-6 sm:h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              <span class="hidden sm:inline">{{ downloadingAPK ? 'Téléchargement...' : 'Télécharger l\'App' }}</span>
-              <span class="sm:hidden">{{ downloadingAPK ? '...' : 'App' }}</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- Products Section - Main Content -->
-    <div class="py-12 sm:py-20 bg-gray-50">
+    <div class="py-8 sm:py-12 bg-gray-50">
       <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <!-- Header -->
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 sm:mb-12">
-          <div class="mb-4 sm:mb-0">
-            <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Tous les Produits</h2>
-            <p class="text-base sm:text-lg text-gray-600">Découvrez des articles uniques à vendre</p>
-          </div>
+        <div class="text-center sm:text-left mb-8 sm:mb-12">
+          <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-3">Tous les Produits</h2>
+          <p class="text-lg sm:text-xl text-gray-600">Découvrez des articles uniques à vendre</p>
         </div>
 
-        <!-- Filters -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 mb-6 sm:mb-8">
-          <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
-            <div class="flex-1 min-w-0">
-              <div class="relative">
-                <SearchIcon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
-                <input
-                  v-model="filters.search"
-                  type="text"
-                  placeholder="Rechercher des produits..."
-                  class="w-full pl-9 sm:pl-10 pr-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm sm:text-base"
-                  @input="debouncedSearch"
-                />
-              </div>
-            </div>
-            
-            <select 
-              v-model="filters.category"
-              @change="loadProducts"
-              class="px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm sm:text-base"
-            >
-              <option value="">Toutes les catégories</option>
-              <option v-for="category in categories" :key="category.id" :value="category.id">
-                {{ category.name }}
-              </option>
-            </select>
 
-            <select 
-              v-model="filters.sort"
-              @change="loadProducts"
-              class="px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm sm:text-base"
-            >
-              <option value="created_at">Plus récents</option>
-              <option value="price">Prix croissant</option>
-              <option value="-price">Prix décroissant</option>
-              <option value="views_count">Plus vus</option>
-              <option value="likes_count">Plus aimés</option>
-            </select>
-
-            <button
-              @click="resetFilters"
-              class="px-3 sm:px-4 py-2 sm:py-3 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm sm:text-base"
-            >
-              Réinitialiser
-            </button>
-          </div>
-        </div>
 
         <!-- Loading State -->
-        <div v-if="loadingProducts" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-          <ProductSkeleton v-for="i in 12" :key="i" />
+        <div v-if="loadingProducts" class="space-y-4">
+          <ProductSkeleton v-for="i in 5" :key="i" />
         </div>
         
-        <!-- Products Grid -->
-        <div v-else-if="products.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+        <!-- Products Feed - Responsive TikTok Style -->
+        <div v-else-if="products.length > 0" class="space-y-0 sm:space-y-6">
           <div 
             v-for="product in products" 
             :key="product.id"
-            class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow group cursor-pointer"
-            @click="viewProduct(product)"
+            class="relative bg-black text-white h-screen sm:h-auto sm:min-h-[400px] flex flex-col mb-0 sm:mb-0 sm:rounded-xl sm:overflow-hidden sm:shadow-lg"
           >
-            <!-- Product Image -->
-            <div class="relative aspect-square bg-gray-100">
+            <!-- Product Image Container -->
+            <div class="relative flex-1 bg-gray-900">
               <img 
                 v-if="product.main_image"
                 :src="product.main_image" 
                 :alt="product.title"
-                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                class="w-full h-full object-cover"
               />
               <div v-else class="flex items-center justify-center h-full">
-                <ImageIcon class="w-8 h-8 sm:w-12 sm:h-12 text-gray-400" />
+                <ImageIcon class="w-24 h-24 text-gray-600" />
               </div>
               
               <!-- Status Badge -->
-              <div class="absolute top-2 sm:top-3 left-2 sm:left-3">
+              <div class="absolute top-4 left-4">
                 <span 
                   :class="getStatusBadgeClass(product.status)"
-                  class="px-2 py-1 text-xs font-medium rounded-full"
+                  class="px-3 py-1 text-sm font-medium rounded-full"
                 >
                   {{ getStatusText(product.status) }}
                 </span>
               </div>
 
-              <!-- Price -->
-              <div class="absolute bottom-2 sm:bottom-3 right-2 sm:right-3 bg-white/90 backdrop-blur-sm rounded-lg px-2 py-1">
-                <span class="text-base sm:text-lg font-bold text-indigo-600">{{ formatPrice(product.price) }}</span>
-                <span v-if="product.original_price && product.original_price !== product.price" class="text-xs sm:text-sm text-gray-500 line-through ml-1 sm:ml-2">
+              <!-- Price Badge -->
+              <div class="absolute top-4 right-4 bg-black bg-opacity-70 backdrop-blur-sm rounded-lg px-3 py-2">
+                <span class="text-lg font-bold text-white">{{ formatPrice(product.price) }}</span>
+                <span v-if="product.original_price && product.original_price !== product.price" class="text-sm text-gray-300 line-through ml-2">
                   {{ formatPrice(product.original_price) }}
                 </span>
               </div>
             </div>
             
-            <!-- Product Info -->
-            <div class="p-3 sm:p-4">
-              <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2 text-sm sm:text-base">{{ product.title }}</h3>
-              <p v-if="product.description" class="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3 line-clamp-2">{{ product.description }}</p>
-              
-              <div class="flex items-center justify-between text-xs sm:text-sm text-gray-500 mb-2 sm:mb-3">
-                <span class="truncate">{{ product.category?.name }}</span>
-                <span class="truncate ml-2">{{ product.condition?.name }}</span>
+            <!-- Product Info & Actions - Responsive -->
+            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/80 to-transparent p-4 sm:relative sm:bg-white sm:text-gray-900 sm:p-4 sm:border-t sm:border-gray-200">
+              <!-- Product Title & Description -->
+              <div class="mb-4">
+                <h3 class="text-lg font-semibold mb-2">{{ product.title }}</h3>
+                <p v-if="product.description" class="text-sm text-gray-300 sm:text-gray-600 line-clamp-2">{{ product.description }}</p>
               </div>
-              
-              <div class="flex items-center justify-between">
-                <div class="flex items-center text-xs sm:text-sm text-gray-500">
-                  <span class="flex items-center mr-2 sm:mr-3">
-                    <EyeIcon class="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
-                    {{ product.views_count || 0 }}
-                  </span>
-                  <span class="flex items-center">
-                    <HeartIcon class="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
-                    {{ product.likes_count || 0 }}
-                  </span>
+
+              <!-- User Info -->
+              <div class="flex items-center space-x-3 mb-4">
+                <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
+                  <span class="text-white font-bold text-sm">{{ product.user?.name?.charAt(0)?.toUpperCase() || 'U' }}</span>
                 </div>
-                <div class="text-xs sm:text-sm text-gray-500 truncate ml-2">
-                  Par {{ product.user?.name }}
+                <div>
+                  <div class="font-medium text-white sm:text-gray-900">{{ product.user?.name || 'Utilisateur' }}</div>
+                  <div class="text-xs text-gray-400 sm:text-gray-500">{{ product.category?.name }}</div>
                 </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+                <div class="flex items-center justify-center sm:justify-start space-x-6">
+                  <!-- Like Button -->
+                  <button class="flex flex-col items-center space-y-1 text-white sm:text-gray-600 hover:text-red-500 transition-colors">
+                    <HeartIcon class="w-6 h-6 sm:w-8 sm:h-8" />
+                    <span class="text-xs">{{ product.likes_count || 0 }}</span>
+                  </button>
+
+                  <!-- Comment Button -->
+                  <button class="flex flex-col items-center space-y-1 text-white sm:text-gray-600 hover:text-blue-400 transition-colors">
+                    <MessageCircleIcon class="w-6 h-6 sm:w-8 sm:h-8" />
+                    <span class="text-xs">{{ product.comments_count || 0 }}</span>
+                  </button>
+
+                  <!-- Share Button -->
+                  <button class="flex flex-col items-center space-y-1 text-white sm:text-gray-600 hover:text-green-400 transition-colors">
+                    <ShareIcon class="w-6 h-6 sm:w-8 sm:h-8" />
+                    <span class="text-xs">Partager</span>
+                  </button>
+                </div>
+
+                <!-- View Product Button -->
+                <button 
+                  @click="viewProduct(product)"
+                  class="w-full sm:w-auto bg-white text-black px-6 py-3 sm:py-2 rounded-full font-semibold hover:bg-gray-100 transition-colors"
+                >
+                  Voir le produit
+                </button>
               </div>
             </div>
           </div>
@@ -324,7 +259,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
 import { debounce } from 'lodash'
-import { TrendingUpIcon, RadioIcon, DownloadIcon, SearchIcon, EyeIcon, HeartIcon, ImageIcon, PackageIcon } from 'lucide-vue-next'
+import { TrendingUpIcon, RadioIcon, DownloadIcon, SearchIcon, EyeIcon, HeartIcon, ImageIcon, PackageIcon, MessageCircleIcon, ShareIcon } from 'lucide-vue-next'
 
 // Components
 import ProductSkeleton from '@/components/skeletons/ProductSkeleton.vue'
@@ -482,25 +417,26 @@ const viewProduct = (product) => {
 }
 
 const formatPrice = (price) => {
+  if (!price) return '0 XOF'
   return new Intl.NumberFormat('fr-FR', {
     style: 'currency',
-    currency: 'EUR'
+    currency: 'XOF'
   }).format(price)
 }
 
 const getStatusBadgeClass = (status) => {
   const classes = {
-    active: 'bg-green-100 text-green-800',
-    draft: 'bg-gray-100 text-gray-800',
-    sold: 'bg-blue-100 text-blue-800',
-    reserved: 'bg-yellow-100 text-yellow-800'
+    active: 'bg-green-500 text-white',
+    draft: 'bg-gray-500 text-white',
+    sold: 'bg-red-500 text-white',
+    reserved: 'bg-yellow-500 text-white'
   }
   return classes[status] || classes.draft
 }
 
 const getStatusText = (status) => {
   const texts = {
-    active: 'Actif',
+    active: 'Disponible',
     draft: 'Brouillon',
     sold: 'Vendu',
     reserved: 'Réservé'
@@ -517,4 +453,13 @@ onMounted(async () => {
   ])
 })
 </script>
+
+<style scoped>
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+</style>
 
