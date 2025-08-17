@@ -25,7 +25,7 @@ class AnalyticsController extends Controller
                 'total_purchases' => $user->orders()->where('status', 'completed')->sum('total_amount'),
                 'followers_count' => $user->followers()->count(),
                 'following_count' => $user->following()->count(),
-                'avg_rating' => $user->averageRating(),
+                'avg_rating' => $user->average_rating ?? 0,
             ],
             'this_month' => [
                 'products_added' => $user->products()->where('created_at', '>=', $lastMonth)->count(),
@@ -238,7 +238,7 @@ class AnalyticsController extends Controller
     {
         // This would need more complex logic based on likes, comments, etc.
         return $user->followers()
-            ->latest('user_follows.created_at')
+            ->latest('follows.created_at')
             ->limit(10)
             ->get(['users.id', 'users.name', 'users.username', 'users.avatar']);
     }

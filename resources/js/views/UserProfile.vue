@@ -1,9 +1,9 @@
 <template>
-  <div class="min-h-screen bg-black text-white">
+  <div class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
     <!-- Header avec image de couverture -->
     <div class="relative">
       <!-- Cover Image -->
-      <div class="h-64 bg-gradient-to-br from-purple-600 via-pink-600 to-red-600 relative overflow-hidden">
+      <div class="h-48 sm:h-64 lg:h-80 bg-gradient-to-br from-purple-600 via-pink-600 to-red-600 relative overflow-hidden">
         <img
           v-if="user?.cover_image"
           :src="user.cover_image"
@@ -15,7 +15,7 @@
         <!-- Back Button -->
         <button
           @click="router.back()"
-          class="absolute top-4 left-4 p-2 bg-black bg-opacity-50 rounded-full hover:bg-opacity-70 transition-all"
+          class="absolute top-4 left-4 p-2 bg-black bg-opacity-50 rounded-full hover:bg-opacity-70 transition-all backdrop-blur-sm"
         >
           <ArrowLeftIcon class="w-5 h-5 text-white" />
         </button>
@@ -24,7 +24,7 @@
         <button
           v-if="!isSelf"
           @click="showMoreOptions = !showMoreOptions"
-          class="absolute top-4 right-4 p-2 bg-black bg-opacity-50 rounded-full hover:bg-opacity-70 transition-all"
+          class="absolute top-4 right-4 p-2 bg-black bg-opacity-50 rounded-full hover:bg-opacity-70 transition-all backdrop-blur-sm"
         >
           <MoreVerticalIcon class="w-5 h-5 text-white" />
         </button>
@@ -32,18 +32,18 @@
         <!-- More Options Dropdown -->
         <div
           v-if="showMoreOptions"
-          class="absolute top-16 right-4 bg-gray-900 rounded-lg shadow-xl border border-gray-800 py-2 z-50 min-w-[200px]"
+          class="absolute top-16 right-4 bg-gray-900/95 backdrop-blur-sm rounded-xl shadow-xl border border-gray-700 py-2 z-50 min-w-[200px]"
         >
           <button
             @click="reportUser"
-            class="w-full px-4 py-2 text-left text-red-400 hover:bg-gray-800 transition-colors flex items-center"
+            class="w-full px-4 py-3 text-left text-red-400 hover:bg-gray-800 transition-colors flex items-center rounded-lg mx-2"
           >
             <FlagIcon class="w-4 h-4 mr-3" />
             Signaler
           </button>
           <button
             @click="blockUser"
-            class="w-full px-4 py-2 text-left text-red-400 hover:bg-gray-800 transition-colors flex items-center"
+            class="w-full px-4 py-3 text-left text-red-400 hover:bg-gray-800 transition-colors flex items-center rounded-lg mx-2"
           >
             <BanIcon class="w-4 h-4 mr-3" />
             Bloquer
@@ -52,324 +52,358 @@
       </div>
       
       <!-- Profile Info Overlay -->
-      <div class="absolute bottom-0 left-0 right-0 p-6">
-        <div class="flex items-end justify-between">
-          <div class="flex items-end space-x-4">
-            <!-- Avatar -->
-            <div class="relative">
-              <img
-                :src="userAvatar"
-                :alt="user?.name || 'Utilisateur'"
-                class="w-24 h-24 rounded-full border-4 border-white object-cover"
-                @error="onAvatarError"
-              />
-              <div
-                v-if="user?.is_verified"
-                class="absolute -bottom-1 -right-1 bg-blue-500 rounded-full p-1"
-              >
-                <CheckIcon class="w-4 h-4 text-white" />
+      <div class="absolute -bottom-16 sm:-bottom-20 left-0 right-0 px-4 sm:px-6">
+        <div class="max-w-4xl mx-auto">
+          <div class="flex flex-col sm:flex-row sm:items-end justify-between">
+            <div class="flex flex-col sm:flex-row sm:items-end space-y-4 sm:space-y-0 sm:space-x-6">
+              <!-- Avatar -->
+              <div class="relative mx-auto sm:mx-0">
+                <ProfileIcon
+                  :src="user?.avatar"
+                  :alt="user?.name || 'Utilisateur'"
+                  :user-id="user?.id"
+                  size="2xl"
+                  :verified="user?.is_verified"
+                  :fallback-to-initials="true"
+                  class="border-4 border-white shadow-lg"
+                />
+              </div>
+              
+              <!-- User Info -->
+              <div class="text-center sm:text-left mb-4 sm:mb-2">
+                <div class="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 mb-2">
+                  <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold">{{ user?.name || 'Utilisateur' }}</h1>
+                  <span v-if="user?.username" class="text-gray-300 text-lg">@{{ user.username }}</span>
+                </div>
+                <p v-if="user?.bio" class="text-gray-300 text-sm sm:text-base max-w-md mb-3">{{ user.bio }}</p>
+                <div class="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-6 text-sm text-gray-400">
+                  <span v-if="user?.location" class="flex items-center justify-center sm:justify-start">
+                    <MapPinIcon class="w-4 h-4 mr-2" />
+                    {{ user.location }}
+                  </span>
+                  <span v-if="user?.website" class="flex items-center justify-center sm:justify-start">
+                    <LinkIcon class="w-4 h-4 mr-2" />
+                    <a :href="user.website" target="_blank" class="hover:text-white transition-colors">
+                      Site web
+                    </a>
+                  </span>
+                </div>
               </div>
             </div>
             
-            <!-- User Info -->
-            <div class="mb-2">
-              <div class="flex items-center space-x-2 mb-1">
-                <h1 class="text-2xl font-bold">{{ user?.name || 'Utilisateur' }}</h1>
-                <span v-if="user?.username" class="text-gray-300">@{{ user.username }}</span>
-              </div>
-              <p v-if="user?.bio" class="text-gray-300 text-sm max-w-md">{{ user.bio }}</p>
-              <div class="flex items-center space-x-4 mt-2 text-sm text-gray-400">
-                <span v-if="user?.location" class="flex items-center">
-                  <MapPinIcon class="w-4 h-4 mr-1" />
-                  {{ user.location }}
-                </span>
-                <span v-if="user?.website" class="flex items-center">
-                  <LinkIcon class="w-4 h-4 mr-1" />
-                  <a :href="user.website" target="_blank" class="hover:text-white transition-colors">
-                    Site web
-                  </a>
-                </span>
-              </div>
+            <!-- Action Buttons -->
+            <div v-if="!isSelf" class="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-3 mt-4 sm:mt-0">
+              <button
+                @click="goToMessages"
+                class="w-full sm:w-auto px-6 py-3 bg-indigo-600 hover:bg-indigo-700 rounded-full transition-colors flex items-center justify-center space-x-2 shadow-lg"
+              >
+                <MessageCircleIcon class="w-4 h-4" />
+                <span>Message</span>
+              </button>
+              <button
+                :disabled="followBusy"
+                @click="toggleFollow"
+                class="w-full sm:w-auto px-6 py-3 rounded-full transition-all flex items-center justify-center space-x-2 shadow-lg"
+                :class="isFollowing 
+                  ? 'bg-gray-700 hover:bg-gray-600 text-white' 
+                  : 'bg-red-500 hover:bg-red-600 text-white'"
+              >
+                <template v-if="followBusy">
+                  <Loader2Icon class="w-4 h-4 animate-spin" />
+                  <span>...</span>
+                </template>
+                <template v-else>
+                  <UsersIcon v-if="!isFollowing" class="w-4 h-4" />
+                  <CheckIcon v-else class="w-4 h-4" />
+                  <span>{{ isFollowing ? 'Abonné' : 'Suivre' }}</span>
+                </template>
+              </button>
             </div>
           </div>
-          
-          <!-- Action Buttons -->
-          <div v-if="!isSelf" class="flex items-center space-x-3">
-            <button
-              @click="goToMessages"
-              class="px-6 py-2 bg-gray-800 hover:bg-gray-700 rounded-full transition-colors flex items-center space-x-2"
-            >
-              <MessageCircleIcon class="w-4 h-4" />
-              <span>Message</span>
-            </button>
-            <button
-              :disabled="followBusy"
-              @click="toggleFollow"
-              class="px-6 py-2 rounded-full transition-all flex items-center space-x-2"
-              :class="isFollowing 
-                ? 'bg-gray-800 hover:bg-gray-700 text-white' 
-                : 'bg-red-500 hover:bg-red-600 text-white'"
-            >
-              <template v-if="followBusy">
-                <Loader2Icon class="w-4 h-4 animate-spin" />
-                <span>...</span>
-              </template>
-              <template v-else>
-                <UsersIcon v-if="!isFollowing" class="w-4 h-4" />
-                <CheckIcon v-else class="w-4 h-4" />
-                <span>{{ isFollowing ? 'Abonné' : 'Suivre' }}</span>
-              </template>
-            </button>
-          </div>
         </div>
       </div>
     </div>
 
-    <!-- Stats Bar -->
-    <div class="bg-gray-900 border-b border-gray-800">
-      <div class="max-w-4xl mx-auto px-6 py-4">
-        <div class="grid grid-cols-4 gap-4 text-center">
-          <div class="cursor-pointer hover:bg-gray-800 rounded-lg p-3 transition-colors" @click="activeTab = 'products'">
-            <div class="text-xl font-bold text-white">{{ stats?.products_count ?? 0 }}</div>
-            <div class="text-sm text-gray-400">Produits</div>
-          </div>
-          <div class="cursor-pointer hover:bg-gray-800 rounded-lg p-3 transition-colors" @click="activeTab = 'followers'">
-            <div class="text-xl font-bold text-white">{{ stats?.followers_count ?? 0 }}</div>
-            <div class="text-sm text-gray-400">Abonnés</div>
-          </div>
-          <div class="cursor-pointer hover:bg-gray-800 rounded-lg p-3 transition-colors" @click="activeTab = 'following'">
-            <div class="text-xl font-bold text-white">{{ stats?.following_count ?? 0 }}</div>
-            <div class="text-sm text-gray-400">Abonnements</div>
-          </div>
-          <div class="cursor-pointer hover:bg-gray-800 rounded-lg p-3 transition-colors" @click="activeTab = 'reviews'">
-            <div class="text-xl font-bold text-white">{{ (stats?.average_rating ?? 0).toFixed(1) }}</div>
-            <div class="text-sm text-gray-400">Note</div>
+    <!-- Main Content -->
+    <div class="pt-20 sm:pt-24 lg:pt-28">
+      <!-- Stats Bar -->
+      <div class="bg-gray-800/50 backdrop-blur-sm border-b border-gray-700">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 py-6">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+            <div 
+              class="cursor-pointer hover:bg-gray-700/50 rounded-xl p-4 transition-all duration-200 hover:scale-105" 
+              @click="activeTab = 'products'"
+            >
+              <div class="text-2xl sm:text-3xl font-bold text-white mb-1">{{ stats?.products_count ?? 0 }}</div>
+              <div class="text-sm text-gray-400">Produits</div>
+            </div>
+            <div 
+              class="cursor-pointer hover:bg-gray-700/50 rounded-xl p-4 transition-all duration-200 hover:scale-105" 
+              @click="activeTab = 'followers'"
+            >
+              <div class="text-2xl sm:text-3xl font-bold text-white mb-1">{{ stats?.followers_count ?? 0 }}</div>
+              <div class="text-sm text-gray-400">Abonnés</div>
+            </div>
+            <div 
+              class="cursor-pointer hover:bg-gray-700/50 rounded-xl p-4 transition-all duration-200 hover:scale-105" 
+              @click="activeTab = 'following'"
+            >
+              <div class="text-2xl sm:text-3xl font-bold text-white mb-1">{{ stats?.following_count ?? 0 }}</div>
+              <div class="text-sm text-gray-400">Abonnements</div>
+            </div>
+            <div 
+              class="cursor-pointer hover:bg-gray-700/50 rounded-xl p-4 transition-all duration-200 hover:scale-105" 
+              @click="activeTab = 'reviews'"
+            >
+              <div class="text-2xl sm:text-3xl font-bold text-white mb-1">{{ (stats?.average_rating ?? 0).toFixed(1) }}</div>
+              <div class="text-sm text-gray-400">Note</div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Stories Section -->
-    <div class="max-w-4xl mx-auto px-6 py-6">
-      <StoriesGrid :stories="stories" :user-id="route.params.id" />
-    </div>
-
-    <!-- Content Tabs -->
-    <div class="max-w-4xl mx-auto px-6 py-6">
-      <!-- Tab Navigation -->
-      <div class="flex space-x-8 border-b border-gray-800 mb-6">
-        <button
-          v-for="tab in tabs"
-          :key="tab.id"
-          @click="activeTab = tab.id"
-          class="pb-4 px-2 relative transition-colors"
-          :class="activeTab === tab.id ? 'text-white' : 'text-gray-400 hover:text-gray-300'"
-        >
-          {{ tab.label }}
-          <div
-            v-if="activeTab === tab.id"
-            class="absolute bottom-0 left-0 right-0 h-0.5 bg-red-500"
-          ></div>
-        </button>
+      <!-- Stories Section -->
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 py-6">
+        <StoriesGrid :stories="stories" :user-id="route.params.id" />
       </div>
 
-      <!-- Loading State -->
-      <div v-if="loading" class="flex items-center justify-center py-16">
-        <Loader2Icon class="h-8 w-8 animate-spin text-red-500" />
-        <span class="ml-3 text-gray-400">Chargement...</span>
-      </div>
+      <!-- Content Tabs -->
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 py-6">
+        <!-- Tab Navigation -->
+        <div class="flex overflow-x-auto space-x-1 sm:space-x-8 border-b border-gray-700 mb-6 pb-2">
+          <button
+            v-for="tab in tabs"
+            :key="tab.id"
+            @click="activeTab = tab.id"
+            class="flex-shrink-0 pb-4 px-3 sm:px-4 relative transition-colors whitespace-nowrap"
+            :class="activeTab === tab.id ? 'text-white' : 'text-gray-400 hover:text-gray-300'"
+          >
+            {{ tab.label }}
+            <div
+              v-if="activeTab === tab.id"
+              class="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full"
+            ></div>
+          </button>
+        </div>
 
-      <!-- Error State -->
-      <div v-else-if="error" class="text-center py-16">
-        <AlertTriangleIcon class="h-12 w-12 text-red-500 mx-auto mb-4" />
-        <p class="text-red-400">{{ error }}</p>
-        <button
-          @click="retryLoad"
-          class="mt-4 px-6 py-2 bg-red-500 hover:bg-red-600 rounded-full transition-colors"
-        >
-          Réessayer
-        </button>
-      </div>
-
-      <!-- Tab Content -->
-      <div v-else>
-        <!-- Products Tab -->
-        <div v-if="activeTab === 'products'" class="space-y-6">
-          <div v-if="products.length === 0" class="text-center py-16">
-            <PackageIcon class="h-16 w-16 text-gray-600 mx-auto mb-4" />
-            <h3 class="text-xl font-semibold text-gray-300 mb-2">Aucun produit</h3>
-            <p class="text-gray-500">Cet utilisateur n'a pas encore publié de produits.</p>
+        <!-- Loading State -->
+        <div v-if="loading" class="flex items-center justify-center py-16">
+          <div class="text-center">
+            <Loader2Icon class="h-12 w-12 animate-spin text-indigo-500 mx-auto mb-4" />
+            <span class="text-gray-400">Chargement...</span>
           </div>
-          
-          <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <TikTokProductCard
+        </div>
+
+        <!-- Error State -->
+        <div v-else-if="error" class="text-center py-16">
+          <AlertTriangleIcon class="h-16 w-16 text-red-500 mx-auto mb-4" />
+          <p class="text-red-400 mb-4">{{ error }}</p>
+          <button
+            @click="retryLoad"
+            class="px-6 py-3 bg-red-500 hover:bg-red-600 rounded-full transition-colors shadow-lg"
+          >
+            Réessayer
+          </button>
+        </div>
+
+        <!-- Tab Content -->
+        <div v-else class="space-y-6">
+          <!-- Products Tab -->
+          <div v-if="activeTab === 'products'" class="space-y-6">
+            <div v-if="products.length === 0" class="text-center py-16">
+              <div class="w-20 h-20 bg-gray-700 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <PackageIcon class="h-10 w-10 text-gray-500" />
+              </div>
+              <h3 class="text-xl font-semibold text-gray-300 mb-2">Aucun produit</h3>
+              <p class="text-gray-500">Cet utilisateur n'a pas encore publié de produits.</p>
+            </div>
+            
+            <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                          <TikTokProductCard
               v-for="product in products"
-              :key="product.id"
+              :key="`product-${product.id}-${activeTab}`"
               :product="product"
             />
-          </div>
-          
-          <!-- Pagination -->
-          <div v-if="pagination.last > 1" class="flex items-center justify-center space-x-4 mt-8">
-            <button
-              @click="goToPage(pagination.current - 1)"
-              :disabled="pagination.current === 1"
-              class="px-4 py-2 rounded-full transition-colors"
-              :class="pagination.current === 1 
-                ? 'bg-gray-800 text-gray-600 cursor-not-allowed' 
-                : 'bg-gray-800 hover:bg-gray-700 text-white'"
-            >
-              Précédent
-            </button>
-            <span class="text-gray-400">Page {{ pagination.current }} / {{ pagination.last }}</span>
-            <button
-              @click="goToPage(pagination.current + 1)"
-              :disabled="pagination.current === pagination.last"
-              class="px-4 py-2 rounded-full transition-colors"
-              :class="pagination.current === pagination.last 
-                ? 'bg-gray-800 text-gray-600 cursor-not-allowed' 
-                : 'bg-gray-800 hover:bg-gray-700 text-white'"
-            >
-              Suivant
-            </button>
-          </div>
-        </div>
-
-        <!-- Lives Tab -->
-        <div v-if="activeTab === 'lives'" class="space-y-6">
-          <div v-if="lives.length === 0" class="text-center py-16">
-            <div class="w-16 h-16 bg-gray-800 rounded-full mx-auto mb-4 flex items-center justify-center">
-              <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-              </svg>
             </div>
-            <h3 class="text-xl font-semibold text-gray-300 mb-2">Aucun live</h3>
-            <p class="text-gray-500">Cet utilisateur n'a pas encore créé de lives.</p>
+            
+            <!-- Pagination -->
+            <div v-if="pagination.last > 1" class="flex items-center justify-center space-x-4 mt-8">
+              <button
+                @click="goToPage(pagination.current - 1)"
+                :disabled="pagination.current === 1"
+                class="px-4 py-2 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                :class="pagination.current === 1 
+                  ? 'bg-gray-700 text-gray-500 cursor-not-allowed' 
+                  : 'bg-gray-700 hover:bg-gray-600 text-white'"
+              >
+                Précédent
+              </button>
+              <span class="text-gray-400 px-4 py-2 bg-gray-800 rounded-full">Page {{ pagination.current }} / {{ pagination.last }}</span>
+              <button
+                @click="goToPage(pagination.current + 1)"
+                :disabled="pagination.current === pagination.last"
+                class="px-4 py-2 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                :class="pagination.current === pagination.last 
+                  ? 'bg-gray-700 text-gray-500 cursor-not-allowed' 
+                  : 'bg-gray-700 hover:bg-gray-600 text-white'"
+              >
+                Suivant
+              </button>
+            </div>
           </div>
-          
-          <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <TikTokLiveCard
+
+          <!-- Lives Tab -->
+          <div v-if="activeTab === 'lives'" class="space-y-6">
+            <div v-if="lives.length === 0" class="text-center py-16">
+              <div class="w-20 h-20 bg-gray-700 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <svg class="w-10 h-10 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                </svg>
+              </div>
+              <h3 class="text-xl font-semibold text-gray-300 mb-2">Aucun live</h3>
+              <p class="text-gray-500">Cet utilisateur n'a pas encore créé de lives.</p>
+            </div>
+            
+            <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                          <TikTokLiveCard
               v-for="live in lives"
-              :key="live.id"
+              :key="`live-${live.id}-${activeTab}`"
               :live="live"
             />
-          </div>
-        </div>
-
-        <!-- Followers Tab -->
-        <div v-if="activeTab === 'followers'" class="space-y-4">
-          <div v-if="followers.length === 0" class="text-center py-16">
-            <UsersIcon class="h-16 w-16 text-gray-600 mx-auto mb-4" />
-            <h3 class="text-xl font-semibold text-gray-300 mb-2">Aucun abonné</h3>
-            <p class="text-gray-500">Cet utilisateur n'a pas encore d'abonnés.</p>
-          </div>
-          
-          <div v-else class="space-y-3">
-            <div
-              v-for="follower in followers"
-              :key="follower.id"
-              class="flex items-center justify-between p-4 bg-gray-900 rounded-xl hover:bg-gray-800 transition-colors"
-            >
-              <div class="flex items-center space-x-3">
-                <img
-                  :src="follower.avatar || '/default-avatar.png'"
-                  :alt="follower.name"
-                  class="w-12 h-12 rounded-full object-cover"
-                />
-                <div>
-                  <h4 class="font-semibold text-white">{{ follower.name }}</h4>
-                  <p class="text-sm text-gray-400">@{{ follower.username }}</p>
-                </div>
-              </div>
-              <button
-                v-if="!isSelf"
-                @click="toggleFollowUser(follower.id)"
-                class="px-4 py-2 rounded-full transition-colors"
-                :class="follower.is_following 
-                  ? 'bg-gray-700 hover:bg-gray-600 text-white' 
-                  : 'bg-red-500 hover:bg-red-600 text-white'"
-              >
-                {{ follower.is_following ? 'Abonné' : 'Suivre' }}
-              </button>
             </div>
           </div>
-        </div>
 
-        <!-- Following Tab -->
-        <div v-if="activeTab === 'following'" class="space-y-4">
-          <div v-if="following.length === 0" class="text-center py-16">
-            <UsersIcon class="h-16 w-16 text-gray-600 mx-auto mb-4" />
-            <h3 class="text-xl font-semibold text-gray-300 mb-2">Aucun abonnement</h3>
-            <p class="text-gray-500">Cet utilisateur ne suit personne pour le moment.</p>
-          </div>
-          
-          <div v-else class="space-y-3">
-            <div
-              v-for="followed in following"
-              :key="followed.id"
-              class="flex items-center justify-between p-4 bg-gray-900 rounded-xl hover:bg-gray-800 transition-colors"
-            >
-              <div class="flex items-center space-x-3">
-                <img
-                  :src="followed.avatar || '/default-avatar.png'"
-                  :alt="followed.name"
-                  class="w-12 h-12 rounded-full object-cover"
-                />
-                <div>
-                  <h4 class="font-semibold text-white">{{ followed.name }}</h4>
-                  <p class="text-sm text-gray-400">@{{ followed.username }}</p>
+          <!-- Followers Tab -->
+          <div v-if="activeTab === 'followers'" class="space-y-4">
+            <div v-if="followers.length === 0" class="text-center py-16">
+              <div class="w-20 h-20 bg-gray-700 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <UsersIcon class="h-10 w-10 text-gray-500" />
+              </div>
+              <h3 class="text-xl font-semibold text-gray-300 mb-2">Aucun abonné</h3>
+              <p class="text-gray-500">Cet utilisateur n'a pas encore d'abonnés.</p>
+            </div>
+            
+            <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div
+                v-for="follower in followers"
+                :key="follower.id"
+                class="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 hover:bg-gray-700/50 transition-colors border border-gray-700"
+              >
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center space-x-3">
+                    <ProfileIcon
+                      :src="follower.avatar"
+                      :alt="follower.name"
+                      :user-id="follower.id"
+                      size="lg"
+                      :fallback-to-initials="true"
+                    />
+                    <div>
+                      <h4 class="font-semibold text-white">{{ follower.name }}</h4>
+                      <p class="text-sm text-gray-400">@{{ follower.username }}</p>
+                    </div>
+                  </div>
+                  <button
+                    v-if="!isSelf"
+                    @click="toggleFollowUser(follower.id)"
+                    class="px-4 py-2 rounded-full transition-colors text-sm"
+                    :class="follower.is_following 
+                      ? 'bg-gray-600 hover:bg-gray-500 text-white' 
+                      : 'bg-indigo-600 hover:bg-indigo-500 text-white'"
+                  >
+                    {{ follower.is_following ? 'Abonné' : 'Suivre' }}
+                  </button>
                 </div>
               </div>
-              <button
-                v-if="!isSelf"
-                @click="toggleFollowUser(followed.id)"
-                class="px-4 py-2 rounded-full transition-colors"
-                :class="followed.is_following 
-                  ? 'bg-gray-700 hover:bg-gray-600 text-white' 
-                  : 'bg-red-500 hover:bg-red-600 text-white'"
-              >
-                {{ followed.is_following ? 'Abonné' : 'Suivre' }}
-              </button>
             </div>
           </div>
-        </div>
 
-        <!-- Reviews Tab -->
-        <div v-if="activeTab === 'reviews'" class="space-y-4">
-          <div v-if="reviews.length === 0" class="text-center py-16">
-            <StarIcon class="h-16 w-16 text-gray-600 mx-auto mb-4" />
-            <h3 class="text-xl font-semibold text-gray-300 mb-2">Aucune évaluation</h3>
-            <p class="text-gray-500">Cet utilisateur n'a pas encore reçu d'évaluations.</p>
+          <!-- Following Tab -->
+          <div v-if="activeTab === 'following'" class="space-y-4">
+            <div v-if="following.length === 0" class="text-center py-16">
+              <div class="w-20 h-20 bg-gray-700 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <UsersIcon class="h-10 w-10 text-gray-500" />
+              </div>
+              <h3 class="text-xl font-semibold text-gray-300 mb-2">Aucun abonnement</h3>
+              <p class="text-gray-500">Cet utilisateur ne suit personne pour le moment.</p>
+            </div>
+            
+            <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div
+                v-for="followed in following"
+                :key="followed.id"
+                class="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 hover:bg-gray-700/50 transition-colors border border-gray-700"
+              >
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center space-x-3">
+                    <ProfileIcon
+                      :src="followed.avatar"
+                      :alt="followed.name"
+                      :user-id="followed.id"
+                      size="lg"
+                      :fallback-to-initials="true"
+                    />
+                    <div>
+                      <h4 class="font-semibold text-white">{{ followed.name }}</h4>
+                      <p class="text-sm text-gray-400">@{{ followed.username }}</p>
+                    </div>
+                  </div>
+                  <button
+                    v-if="!isSelf"
+                    @click="toggleFollowUser(followed.id)"
+                    class="px-4 py-2 rounded-full transition-colors text-sm"
+                    :class="followed.is_following 
+                      ? 'bg-gray-600 hover:bg-gray-500 text-white' 
+                      : 'bg-indigo-600 hover:bg-indigo-500 text-white'"
+                  >
+                    {{ followed.is_following ? 'Abonné' : 'Suivre' }}
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
-          
-          <div v-else class="space-y-4">
-            <div
-              v-for="review in reviews"
-              :key="review.id"
-              class="p-4 bg-gray-900 rounded-xl"
-            >
-              <div class="flex items-center justify-between mb-3">
-                <div class="flex items-center space-x-3">
-                  <img
-                    :src="review.user.avatar || '/default-avatar.png'"
-                    :alt="review.user.name"
-                    class="w-10 h-10 rounded-full object-cover"
-                  />
-                  <div>
-                    <h4 class="font-semibold text-white">{{ review.user.name }}</h4>
-                    <p class="text-sm text-gray-400">{{ formatDate(review.created_at) }}</p>
+
+          <!-- Reviews Tab -->
+          <div v-if="activeTab === 'reviews'" class="space-y-4">
+            <div v-if="reviews.length === 0" class="text-center py-16">
+              <div class="w-20 h-20 bg-gray-700 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <StarIcon class="h-10 w-10 text-gray-500" />
+              </div>
+              <h3 class="text-xl font-semibold text-gray-300 mb-2">Aucune évaluation</h3>
+              <p class="text-gray-500">Cet utilisateur n'a pas encore reçu d'évaluations.</p>
+            </div>
+            
+            <div v-else class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div
+                v-for="review in reviews"
+                :key="review.id"
+                class="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700"
+              >
+                <div class="flex items-center justify-between mb-4">
+                  <div class="flex items-center space-x-3">
+                    <ProfileIcon
+                      :src="review.user.avatar"
+                      :alt="review.user.name"
+                      :user-id="review.user.id"
+                      size="md"
+                      :fallback-to-initials="true"
+                    />
+                    <div>
+                      <h4 class="font-semibold text-white">{{ review.user.name }}</h4>
+                      <p class="text-sm text-gray-400">{{ formatDate(review.created_at) }}</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center space-x-1">
+                    <StarIcon
+                      v-for="star in 5"
+                      :key="star"
+                      class="w-4 h-4"
+                      :class="star <= review.rating ? 'text-yellow-400 fill-current' : 'text-gray-600'"
+                    />
                   </div>
                 </div>
-                <div class="flex items-center space-x-1">
-                  <StarIcon
-                    v-for="star in 5"
-                    :key="star"
-                    class="w-4 h-4"
-                    :class="star <= review.rating ? 'text-yellow-400 fill-current' : 'text-gray-600'"
-                  />
-                </div>
+                <p class="text-gray-300">{{ review.comment }}</p>
               </div>
-              <p class="text-gray-300">{{ review.comment }}</p>
             </div>
           </div>
         </div>
@@ -385,6 +419,7 @@ import { useAuthStore } from '@/stores/auth'
 import TikTokProductCard from '@/components/products/TikTokProductCard.vue'
 import TikTokLiveCard from '@/components/lives/TikTokLiveCard.vue'
 import StoriesGrid from '@/components/stories/StoriesGrid.vue'
+import ProfileIcon from '@/components/ui/ProfileIcon.vue'
 import {
   ArrowLeftIcon,
   MoreVerticalIcon,
@@ -441,14 +476,9 @@ const isSelf = computed(() => {
   return authStore.user && authStore.user.id === id
 })
 
-const userAvatar = computed(() => {
-  return user.value?.avatar || '/default-avatar.png'
-})
+
 
 // Methods
-function onAvatarError(event) {
-  event.target.src = '/default-avatar.png'
-}
 
 async function fetchUser() {
   try {
@@ -623,6 +653,8 @@ function formatDate(dateString) {
     day: 'numeric'
   })
 }
+
+
 
 async function loadInitialData() {
   try {

@@ -1,15 +1,18 @@
 <template>
   <div 
+    :key="`product-${product.id}`"
     class="group relative bg-gray-900 rounded-xl overflow-hidden cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-2xl"
     @click="goToProduct"
   >
     <!-- Product Image -->
     <div class="relative aspect-square overflow-hidden">
       <img
-        :src="product.main_image_url || product.main_image || '/placeholder-product.jpg'"
+        :key="`img-${product.id}`"
+        :src="imageSrc"
         :alt="product.title"
         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
         @error="onImageError"
+        loading="lazy"
       />
       
       <!-- Gradient Overlay -->
@@ -46,7 +49,7 @@
       <!-- Price Badge -->
       <div class="absolute bottom-3 right-3">
         <div class="bg-black/80 backdrop-blur-sm rounded-full px-3 py-2 text-white font-bold text-sm">
-          {{ formatPrice(product.price) }}
+          {{ formattedPrice }}
         </div>
       </div>
 
@@ -86,7 +89,7 @@
       <div class="absolute bottom-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         <div class="bg-black/80 backdrop-blur-sm rounded-full px-3 py-1 text-white text-xs font-medium flex items-center space-x-1">
           <EyeIcon class="w-3 h-3" />
-          <span>{{ formatNumber(product.views_count || 0) }}</span>
+          <span>{{ formattedViews }}</span>
         </div>
       </div>
     </div>
@@ -99,58 +102,29 @@
       
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-2">
-          <!-- Category -->
-          <span v-if="product.category" class="text-xs text-gray-400 bg-gray-800 px-2 py-1 rounded-full">
-            {{ product.category.name }}
-          </span>
-          
-          <!-- Brand -->
-          <span v-if="product.brand" class="text-xs text-gray-400 bg-gray-800 px-2 py-1 rounded-full">
-            {{ product.brand.name }}
-          </span>
+          <div class="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold">
+            {{ getUserInitials(product.user?.name) }}
+          </div>
+          <span class="text-gray-400 text-xs">{{ product.user?.name }}</span>
         </div>
         
-        <!-- Original Price -->
-        <div v-if="product.original_price && product.original_price > product.price" class="text-xs text-gray-500 line-through">
-          {{ formatPrice(product.original_price) }}
+        <div class="flex items-center space-x-2">
+          <span class="text-gray-400 text-xs">{{ formattedDate }}</span>
         </div>
-      </div>
-      
-      <!-- Product Meta -->
-      <div class="mt-3 flex items-center justify-between text-xs text-gray-400">
-        <div class="flex items-center space-x-3">
-          <span v-if="product.location" class="flex items-center">
-            <MapPinIcon class="w-3 h-3 mr-1" />
-            {{ product.location }}
-          </span>
-          <span v-if="product.size" class="flex items-center">
-            <RulerIcon class="w-3 h-3 mr-1" />
-            {{ product.size }}
-          </span>
-        </div>
-        
-        <span class="text-gray-500">
-          {{ formatDate(product.created_at) }}
-        </span>
       </div>
     </div>
-
-    <!-- Hover Effect Border -->
-    <div class="absolute inset-0 border-2 border-transparent group-hover:border-red-500 rounded-xl transition-all duration-300 opacity-0 group-hover:opacity-100"></div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import {
   HeartIcon,
   BookmarkIcon,
   ShareIcon,
-  EyeIcon,
-  MapPinIcon,
-  RulerIcon
+  EyeIcon
 } from 'lucide-vue-next'
 
 const props = defineProps({
@@ -167,17 +141,67 @@ const authStore = useAuthStore()
 const likingProduct = ref(false)
 const favoritingProduct = ref(false)
 
-// Computed
+// Computed properties mémorisées
+const imageSrc = computed(() => {
+  return props.product.main_image_url || props.product.main_image || '/placeholder-product.jpg'
+})
+
+const formattedPrice = computed(() => {
+  if (!props.product.price) return '€0.00'
+  return new Intl.NumberFormat('fr-FR', {
+    style: 'currency',
+    currency: 'EUR'
+  }).format(props.product.price)
+})
+
+const formattedViews = computed(() => {
+  const num = props.product.views_count || 0
+  if (num >= 1000000) {
+    return (num / 1000000).toFixed(1) + 'M'
+  } else if (num >= 1000) {
+    return (num / 1000).toFixed(1) + 'K'
+  }
+  return num.toString()
+})
+
+const formattedDate = computed(() => {
+  if (!props.product.created_at) return ''
+  const date = new Date(props.product.created_at)
+  const now = new Date()
+  const diffTime = Math.abs(now - date)
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+  
+  if (diffDays === 1) return 'Aujourd\'hui'
+  if (diffDays === 2) return 'Hier'
+  if (diffDays <= 7) return `Il y a ${diffDays - 1} jours`
+  if (diffDays <= 30) return `Il y a ${Math.floor(diffDays / 7)} semaines`
+  if (diffDays <= 365) return `Il y a ${Math.floor(diffDays / 30)} mois`
+  return `Il y a ${Math.floor(diffDays / 365)} ans`
+})
+
 const isLiked = computed(() => props.product.is_liked || false)
 const isFavorite = computed(() => props.product.is_favorited || false)
 
 // Methods
-function onImageError(event) {
-  event.target.src = '/placeholder-product.jpg'
+function getUserInitials(fullName) {
+  if (!fullName) return '?'
+  const names = fullName.trim().split(' ')
+  if (names.length === 1) {
+    return names[0].substring(0, 2).toUpperCase()
+  } else {
+    return names.slice(0, 2).map(name => name.charAt(0).toUpperCase()).join('')
+  }
 }
 
 function goToProduct() {
   router.push(`/products/${props.product.id}`)
+}
+
+function onImageError(event) {
+  // Éviter les rechargements en boucle
+  if (event.target.src !== '/placeholder-product.jpg') {
+    event.target.src = '/placeholder-product.jpg'
+  }
 }
 
 async function toggleLike() {
@@ -186,6 +210,8 @@ async function toggleLike() {
     return
   }
 
+  if (likingProduct.value) return
+  
   likingProduct.value = true
   try {
     const response = await window.axios.post(`/products/${props.product.id}/like`)
@@ -204,6 +230,8 @@ async function toggleFavorite() {
     return
   }
 
+  if (favoritingProduct.value) return
+  
   favoritingProduct.value = true
   try {
     const response = await window.axios.post(`/products/${props.product.id}/favorite`)
@@ -231,38 +259,6 @@ function shareProduct() {
       alert('Lien copié dans le presse-papiers !')
     })
   }
-}
-
-function formatPrice(price) {
-  if (!price) return '€0.00'
-  return new Intl.NumberFormat('fr-FR', {
-    style: 'currency',
-    currency: 'EUR'
-  }).format(price)
-}
-
-function formatNumber(num) {
-  if (num >= 1000000) {
-    return (num / 1000000).toFixed(1) + 'M'
-  } else if (num >= 1000) {
-    return (num / 1000).toFixed(1) + 'K'
-  }
-  return num.toString()
-}
-
-function formatDate(dateString) {
-  if (!dateString) return ''
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffTime = Math.abs(now - date)
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-  
-  if (diffDays === 1) return 'Aujourd\'hui'
-  if (diffDays === 2) return 'Hier'
-  if (diffDays <= 7) return `Il y a ${diffDays - 1} jours`
-  if (diffDays <= 30) return `Il y a ${Math.floor(diffDays / 7)} semaines`
-  if (diffDays <= 365) return `Il y a ${Math.floor(diffDays / 30)} mois`
-  return `Il y a ${Math.floor(diffDays / 365)} ans`
 }
 </script>
 
