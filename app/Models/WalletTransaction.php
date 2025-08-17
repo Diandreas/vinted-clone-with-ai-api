@@ -126,7 +126,7 @@ class WalletTransaction extends Model
      */
     public function getFormattedAmountAttribute()
     {
-        return number_format($this->amount_xaf) . ' FCFA';
+        return number_format($this->amount_xaf) . ' Fcfa';
     }
 
     /**

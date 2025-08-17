@@ -15,14 +15,17 @@ class ConversationController extends Controller
     public function index()
     {
         $user = Auth::user();
+        
+        // For backward compatibility, we can return both product-based and legacy conversations
         $conversations = Conversation::forUser($user)
-            ->with(['buyer', 'seller', 'lastMessage'])
+            ->with(['product', 'buyer', 'seller', 'lastMessage'])
             ->latest('last_message_at')
             ->paginate(20);
 
         return response()->json([
             'success' => true,
-            'data' => $conversations
+            'data' => $conversations,
+            'message' => 'Use /conversations/my-product-discussions for product-centered view'
         ]);
     }
 
@@ -48,18 +51,21 @@ class ConversationController extends Controller
             if ($seller->id === $current->id) {
                 $buyer = $participant;
             }
+            
+            // Use the new product-centered conversation system
+            $conversation = Conversation::findOrCreateForProduct($buyer, $seller, $product);
+        } else {
+            // Legacy system: find or create conversation without product
+            $lookup = [
+                'buyer_id' => $buyer->id,
+                'seller_id' => $seller->id,
+                'product_id' => null,
+            ];
+            $conversation = Conversation::firstOrCreate($lookup, [
+                'is_archived' => false,
+                'last_message_at' => now(),
+            ]);
         }
-
-        // Find or create conversation
-        $lookup = [
-            'buyer_id' => $buyer->id,
-            'seller_id' => $seller->id,
-            'product_id' => $product?->id,
-        ];
-        $conversation = Conversation::firstOrCreate($lookup, [
-            'is_archived' => false,
-            'last_message_at' => now(),
-        ]);
 
         // First message
         $conversation->messages()->create([
@@ -180,14 +186,33 @@ class ConversationController extends Controller
      */
     public function startProductConversation(Request $request, Product $product)
     {
+        \Log::info('🔵 startProductConversation appelé', [
+            'product_id' => $product->id,
+            'product_title' => $product->title,
+            'request_data' => $request->all(),
+            'user_id' => Auth::id(),
+            'user_email' => Auth::user()?->email
+        ]);
+
         $request->validate([
             'message' => 'required|string|max:1000'
         ]);
 
         $buyer = Auth::user();
 
+        \Log::info('👤 Utilisateur authentifié', [
+            'buyer_id' => $buyer->id,
+            'buyer_name' => $buyer->name,
+            'product_owner_id' => $product->user_id
+        ]);
+
         // Check if user is not the owner
         if ($product->user_id === $buyer->id) {
+            \Log::warning('❌ Utilisateur essaie de contacter son propre produit', [
+                'user_id' => $buyer->id,
+                'product_id' => $product->id
+            ]);
+            
             return response()->json([
                 'success' => false,
                 'message' => 'Cannot start conversation with your own product'
@@ -196,18 +221,42 @@ class ConversationController extends Controller
 
         $seller = $product->user;
 
+        \Log::info('🏪 Vendeur trouvé', [
+            'seller_id' => $seller->id,
+            'seller_name' => $seller->name
+        ]);
+
         // Create or get conversation
+        \Log::info('🔧 Création/récupération de la conversation...');
         $conversation = Conversation::findOrCreateForProduct($buyer, $seller, $product);
+        
+        \Log::info('💬 Conversation trouvée/créée', [
+            'conversation_id' => $conversation->id,
+            'is_new' => $conversation->wasRecentlyCreated
+        ]);
 
         // Create first message
-        $conversation->messages()->create([
+        \Log::info('📝 Création du message...');
+        $message = $conversation->messages()->create([
             'sender_id' => $buyer->id,
             'content' => $request->message,
             'type' => 'text',
             'product_id' => $product->id,
         ]);
 
+        \Log::info('✅ Message créé', [
+            'message_id' => $message->id,
+            'content' => $message->content
+        ]);
+
         $conversation->load(['product', 'seller', 'lastMessage']);
+
+        \Log::info('🎉 Conversation démarrée avec succès', [
+            'conversation_id' => $conversation->id,
+            'buyer_id' => $buyer->id,
+            'seller_id' => $seller->id,
+            'product_id' => $product->id
+        ]);
 
         return response()->json([
             'success' => true,

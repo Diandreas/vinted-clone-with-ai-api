@@ -379,7 +379,6 @@ const availablePermissions = [
   { value: 'dashboard:view', label: 'Voir le dashboard' },
   { value: 'users:manage', label: 'Gérer les utilisateurs' },
   { value: 'products:moderate', label: 'Modérer les produits' },
-  { value: 'lives:moderate', label: 'Modérer les lives' },
   { value: 'orders:view', label: 'Voir les commandes' },
   { value: 'analytics:view', label: 'Voir les analytics' }
 ]

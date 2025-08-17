@@ -16,11 +16,10 @@ const TestProducts = () => import('@/views/TestProducts.vue')
 const ProductDetail = () => import('@/views/ProductDetail.vue')
 const CreateProduct = () => import('@/views/CreateProduct.vue')
 const EditProduct = () => import('@/views/EditProduct.vue')
-const Lives = () => import('@/views/Lives.vue')
-const LiveDetail = () => import('@/views/LiveDetail.vue')
-const CreateLive = () => import('@/views/CreateLive.vue')
-const Stories = () => import('@/views/Stories.vue')
+
 const Messages = () => import('@/views/Messages.vue')
+const ProductDiscussions = () => import('@/views/ProductDiscussions.vue')
+const SellerProductConversations = () => import('@/views/SellerProductConversations.vue')
 const Orders = () => import('@/views/Orders.vue')
 const Notifications = () => import('@/views/Notifications.vue')
 const Search = () => import('@/views/Search.vue')
@@ -153,35 +152,23 @@ const routes = [
     component: CategoryManagement,
     meta: { requiresAuth: true }
   },
-  {
-    path: '/lives',
-    name: 'lives',
-    component: Lives,
-    meta: { requiresAuth: false }
-  },
-  {
-    path: '/lives/:id',
-    name: 'live-detail',
-    component: LiveDetail,
-    props: true,
-    meta: { requiresAuth: false }
-  },
-  {
-    path: '/lives/create',
-    name: 'create-live',
-    component: CreateLive,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/stories',
-    name: 'stories',
-    component: Stories,
-    meta: { requiresAuth: true }
-  },
+
   {
     path: '/messages',
     name: 'messages',
     component: Messages,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/discussions',
+    name: 'product-discussions',
+    component: ProductDiscussions,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/my-sales-conversations',
+    name: 'seller-conversations',
+    component: SellerProductConversations,
     meta: { requiresAuth: true }
   },
   {

@@ -37,7 +37,7 @@ class WalletRecharged extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $amount = number_format($this->transaction->amount_xaf) . ' FCFA';
+        $amount = number_format($this->transaction->amount_xaf) . ' Fcfa';
         
         return (new MailMessage)
             ->subject('Wallet rechargé avec succès')
@@ -60,7 +60,7 @@ class WalletRecharged extends Notification implements ShouldQueue
         return [
             'type' => 'wallet_recharged',
             'title' => 'Wallet rechargé',
-            'message' => 'Votre wallet a été rechargé de ' . number_format($this->transaction->amount_xaf) . ' FCFA',
+            'message' => 'Votre wallet a été rechargé de ' . number_format($this->transaction->amount_xaf) . ' Fcfa',
             'transaction_id' => $this->transaction->id,
             'amount' => $this->transaction->amount_xaf,
             'provider' => $this->transaction->provider,

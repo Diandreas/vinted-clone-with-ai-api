@@ -19,14 +19,7 @@
               <span class="hidden sm:inline">Vendre un article</span>
               <span class="sm:hidden">Vendre</span>
             </RouterLink>
-            <RouterLink
-              to="/lives/create"
-              class="bg-red-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center space-x-3 text-base sm:text-lg font-medium shadow-lg"
-            >
-              <VideoIcon class="w-5 h-5 sm:w-6 sm:h-6" />
-              <span class="hidden sm:inline">Créer un Live</span>
-              <span class="sm:hidden">Live</span>
-            </RouterLink>
+
           </div>
         </div>
       </div>
@@ -190,13 +183,7 @@
                 description="Vendez vos articles"
                 color="blue"
               />
-              <QuickActionButton
-                to="/lives/create"
-                icon="video"
-                title="Créer un live"
-                description="Vendez en direct"
-                color="red"
-              />
+
               <QuickActionButton
                 :to="`/profile/${user?.id}?tab=followers`"
                 icon="users"
@@ -253,7 +240,6 @@ import ActivityItem from '@/components/dashboard/ActivityItem.vue'
 import ActivitySkeleton from '@/components/skeletons/ActivitySkeleton.vue'
 import {
   PlusIcon,
-  VideoIcon,
   PackageIcon, 
   ClockIcon, 
   TrendingUpIcon,
@@ -281,7 +267,7 @@ const salesChartData = computed(() => dashboardStore.salesChartData)
 
 // Methods
 const formatCurrency = (amount) => {
-  if (!amount) return '0 FCFA'
+  if (!amount) return '0 Fcfa'
   return new Intl.NumberFormat('fr-FR', {
     style: 'currency',
     currency: 'XOF',

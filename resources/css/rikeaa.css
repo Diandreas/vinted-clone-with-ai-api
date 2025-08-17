@@ -1,0 +1,184 @@
+/* RIKEAA Global Styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* Couleurs RIKEAA */
+  --rikeaa-primary-50: #f0fdf4;
+  --rikeaa-primary-100: #dcfce7;
+  --rikeaa-primary-200: #bbf7d0;
+  --rikeaa-primary-300: #86efac;
+  --rikeaa-primary-400: #4ade80;
+  --rikeaa-primary-500: #22c55e;
+  --rikeaa-primary-600: #16a34a;
+  --rikeaa-primary-700: #15803d;
+  --rikeaa-primary-800: #166534;
+  --rikeaa-primary-900: #14532d;
+  
+  /* Spacing responsive */
+  --rikeaa-space-xs: 0.75rem;
+  --rikeaa-space-sm: 1rem;
+  --rikeaa-space-md: 1.5rem;
+  --rikeaa-space-lg: 2rem;
+  --rikeaa-space-xl: 3rem;
+  
+  /* Shadows */
+  --rikeaa-shadow-soft: 0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04);
+  --rikeaa-shadow-medium: 0 4px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --rikeaa-shadow-strong: 0 10px 40px -10px rgba(0, 0, 0, 0.15);
+  
+  /* Border radius */
+  --rikeaa-radius-sm: 0.5rem;
+  --rikeaa-radius-md: 0.75rem;
+  --rikeaa-radius-lg: 1rem;
+  --rikeaa-radius-xl: 1.5rem;
+}
+
+/* Responsive spacing pour desktop */
+@media (min-width: 1024px) {
+  :root {
+    --rikeaa-space-xs: 1rem;
+    --rikeaa-space-sm: 1.5rem;
+    --rikeaa-space-md: 2rem;
+    --rikeaa-space-lg: 3rem;
+    --rikeaa-space-xl: 4rem;
+  }
+}
+
+/* Base styles */
+* {
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+html {
+  font-family: 'Inter', 'Instrument Sans', system-ui, sans-serif;
+  scroll-behavior: smooth;
+}
+
+/* Classes utilitaires RIKEAA */
+.rikeaa-btn-primary {
+  @apply bg-primary-500 hover:bg-primary-600 text-white font-medium px-4 py-2.5 rounded-xl transition-all duration-200 shadow-soft hover:shadow-medium focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+}
+
+.rikeaa-btn-secondary {
+  @apply bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 font-medium px-4 py-2.5 rounded-xl transition-all duration-200 shadow-soft hover:shadow-medium focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
+}
+
+.rikeaa-btn-outline {
+  @apply border-2 border-primary-500 text-primary-600 hover:bg-primary-50 font-medium px-4 py-2.5 rounded-xl transition-all duration-200 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+}
+
+.rikeaa-card {
+  @apply bg-white rounded-xl shadow-soft hover:shadow-medium transition-all duration-200 border border-gray-100;
+}
+
+.rikeaa-card-elevated {
+  @apply bg-white rounded-xl shadow-medium hover:shadow-strong transition-all duration-200 border border-gray-100;
+}
+
+.rikeaa-input {
+  @apply w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 bg-white text-gray-900 placeholder-gray-500;
+}
+
+.rikeaa-input-error {
+  @apply w-full px-4 py-3 border border-red-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 bg-red-50 text-gray-900 placeholder-red-400;
+}
+
+.rikeaa-text-heading {
+  @apply font-bold text-gray-900;
+}
+
+.rikeaa-text-subheading {
+  @apply font-semibold text-gray-800;
+}
+
+.rikeaa-text-body {
+  @apply text-gray-600;
+}
+
+.rikeaa-text-caption {
+  @apply text-sm text-gray-500;
+}
+
+.rikeaa-text-link {
+  @apply text-primary-600 hover:text-primary-700 transition-colors duration-200;
+}
+
+/* Animations personnalisées RIKEAA */
+@keyframes rikeaa-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.rikeaa-animate-pulse {
+  animation: rikeaa-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes rikeaa-bounce {
+  0%, 100% {
+    transform: translateY(-25%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+.rikeaa-animate-bounce {
+  animation: rikeaa-bounce 1s infinite;
+}
+
+/* Gradient backgrounds RIKEAA */
+.rikeaa-gradient-primary {
+  background: linear-gradient(135deg, var(--rikeaa-primary-500) 0%, var(--rikeaa-primary-600) 100%);
+}
+
+.rikeaa-gradient-soft {
+  background: linear-gradient(135deg, #f8fafc 0%, rgba(240, 253, 244, 0.3) 50%, rgba(187, 247, 208, 0.2) 100%);
+}
+
+/* Scrollbar personnalisée RIKEAA */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--rikeaa-primary-50);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--rikeaa-primary-300);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--rikeaa-primary-400);
+}
+
+/* Focus visible pour accessibilité */
+.focus-visible:focus {
+  outline: 2px solid var(--rikeaa-primary-500);
+  outline-offset: 2px;
+}
+
+/* Classes responsive utilitaires */
+.mobile-compact {
+  @apply px-3 py-2 text-sm;
+}
+
+@media (min-width: 768px) {
+  .mobile-compact {
+    @apply px-4 py-3 text-base;
+  }
+}
+
+@media (min-width: 1024px) {
+  .mobile-compact {
+    @apply px-6 py-4 text-lg;
+  }
+}

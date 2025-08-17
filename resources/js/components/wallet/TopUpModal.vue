@@ -29,11 +29,11 @@
               required
             />
             <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
-              FCFA
+              Fcfa
             </span>
           </div>
           <p class="text-xs text-gray-500 mt-1">
-            Minimum: 100 FCFA - Maximum: 1,000,000 FCFA
+            Minimum: 100 Fcfa - Maximum: 1,000,000 Fcfa
           </p>
         </div>
 
@@ -141,13 +141,13 @@ const quickAmounts = [1000, 5000, 10000, 25000, 50000, 100000]
 
 // Methods
 const formatAmount = (amount) => {
-  if (!amount) return '0 FCFA'
-  return `${amount.toLocaleString()} FCFA`
+  if (!amount) return '0 Fcfa'
+  return `${amount.toLocaleString()} Fcfa`
 }
 
 const submitTopUp = async () => {
   if (!form.amount || form.amount < 100) {
-    error.value = 'Le montant minimum est de 100 FCFA'
+    error.value = 'Le montant minimum est de 100 Fcfa'
     return
   }
 

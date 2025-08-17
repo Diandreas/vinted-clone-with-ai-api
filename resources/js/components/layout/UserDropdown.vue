@@ -75,14 +75,7 @@
         Vendre un article
       </RouterLink>
       
-      <RouterLink
-        to="/lives/create"
-        class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-        @click="$emit('close')"
-      >
-        <VideoIcon class="w-4 h-4 mr-3" />
-        Créer un Live
-      </RouterLink>
+
       
       <div class="border-t border-gray-100 my-2"></div>
       
@@ -116,7 +109,6 @@ import {
   ShoppingBagIcon,
   HeartIcon,
   PlusIcon,
-  VideoIcon,
   SettingsIcon,
   LogOutIcon
 } from 'lucide-vue-next'

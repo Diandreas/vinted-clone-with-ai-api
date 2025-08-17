@@ -1,26 +1,23 @@
+import { CURRENCY_CONFIG, formatCurrency } from '../config/currency.js'
+
 /**
- * Format a price value to French Euro currency format
+ * Format a price value to Fcfa currency format
  * @param {number} price - The price value to format
  * @returns {string} Formatted price string
  */
 export const formatPrice = (price) => {
-    if (price === null || price === undefined) return '0,00 €'
-
-    return new Intl.NumberFormat('fr-FR', {
-        style: 'currency',
-        currency: 'EUR'
-    }).format(price)
+    return formatCurrency(price)
 }
 
 /**
  * Format a price value to a specific currency format
  * @param {number} price - The price value to format
- * @param {string} currency - The currency code (default: 'EUR')
+ * @param {string} currency - The currency code (default: 'XAF')
  * @param {string} locale - The locale (default: 'fr-FR')
  * @returns {string} Formatted price string
  */
-export const formatPriceCustom = (price, currency = 'EUR', locale = 'fr-FR') => {
-    if (price === null || price === undefined) return '0,00'
+export const formatPriceCustom = (price, currency = CURRENCY_CONFIG.code, locale = CURRENCY_CONFIG.locale) => {
+    if (price === null || price === undefined) return '0 ' + CURRENCY_CONFIG.symbol
 
     return new Intl.NumberFormat(locale, {
         style: 'currency',

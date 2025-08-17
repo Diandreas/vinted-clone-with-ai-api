@@ -1,82 +1,141 @@
 <template>
   <div class="min-h-screen bg-gray-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 class="text-3xl font-bold text-gray-900 mb-8">Messages</h1>
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <!-- Header -->
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-4">Messages & Conversations</h1>
+        <p class="text-lg text-gray-600">Gérez vos discussions centrées sur les produits</p>
+      </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Conversations list -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 lg:col-span-1">
-          <div class="p-4 border-b border-gray-100 flex items-center justify-between">
-            <h2 class="text-lg font-semibold">Conversations</h2>
-            <button
-              class="text-sm text-gray-600 hover:text-gray-900"
-              @click="loadConversations()"
-            >Rafraîchir</button>
+      <!-- Navigation Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <!-- Buyer View - My Product Discussions -->
+        <div 
+          class="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow cursor-pointer"
+          @click="goToProductDiscussions"
+        >
+          <div class="p-6">
+            <div class="flex items-center mb-4">
+              <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-xl font-semibold text-gray-900">Mes Discussions</h3>
+                <p class="text-sm text-gray-500">Mode Acheteur</p>
+              </div>
+            </div>
+            <p class="text-gray-600 mb-4">
+              Consultez vos conversations sur les produits qui vous intéressent. 
+              Suivez vos négociations et l'état de vos achats potentiels.
+            </p>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-4 text-sm text-gray-500">
+                <span v-if="buyerStats.loading">Chargement...</span>
+                <template v-else>
+                  <span>{{ buyerStats.totalDiscussions }} discussions</span>
+                  <span v-if="buyerStats.unreadCount > 0" class="text-red-600 font-medium">
+                    {{ buyerStats.unreadCount }} non lus
+                  </span>
+                </template>
+              </div>
+              <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </div>
           </div>
-          <div v-if="loadingConversations" class="p-6 text-center text-gray-500">Chargement…</div>
-          <div v-else-if="conversationsError" class="p-6 text-center text-red-600">{{ conversationsError }}</div>
-          <ul v-else class="divide-y divide-gray-100 max-h-[60vh] overflow-auto">
-            <li
-              v-for="c in conversations"
-              :key="c.id"
-              class="p-4 cursor-pointer hover:bg-gray-50"
-              :class="selectedConversation && selectedConversation.id === c.id ? 'bg-gray-50' : ''"
-              @click="selectConversation(c)"
-            >
-              <div class="flex items-center justify-between">
-                <div class="text-sm font-medium text-gray-900">{{ otherParticipantName(c) }}</div>
-                <div class="text-xs text-gray-500">{{ formatDate(c.last_message_at || c.updated_at) }}</div>
-              </div>
-              <div class="mt-1 text-sm text-gray-600 truncate">
-                {{ previewContent(c) }}
-              </div>
-            </li>
-          </ul>
         </div>
 
-        <!-- Conversation pane -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 lg:col-span-2">
-          <div class="p-4 border-b border-gray-100 flex items-center justify-between">
-            <h2 class="text-lg font-semibold">
-              <span v-if="selectedConversation">Avec {{ otherParticipantName(selectedConversation) }}</span>
-              <span v-else>Nouvelle conversation</span>
-            </h2>
-          </div>
-
-          <!-- Start new conversation shortcut from query -->
-          <div v-if="!selectedConversation && startTarget.userId" class="p-6 border-b border-gray-100">
-            <div class="text-sm text-gray-700">
-              Envoi d’un message à l’utilisateur #{{ startTarget.userId }}
-              <span v-if="startTarget.productId">à propos du produit #{{ startTarget.productId }}</span>
-            </div>
-            <div class="mt-3 flex items-center gap-2">
-              <input v-model="compose" type="text" class="flex-1 rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Votre message…" />
-              <button class="px-4 py-2 text-sm rounded-md bg-indigo-600 text-white hover:bg-indigo-700" :disabled="composeBusy || !compose.trim()" @click="startConversation()">Envoyer</button>
-            </div>
-            <div v-if="composeError" class="mt-2 text-sm text-red-600">{{ composeError }}</div>
-          </div>
-
-          <!-- Messages -->
-          <div class="p-4 h-[50vh] overflow-auto" v-if="selectedConversation">
-            <div v-if="loadingMessages" class="text-center text-gray-500">Chargement des messages…</div>
-            <div v-else-if="messagesError" class="text-center text-red-600">{{ messagesError }}</div>
-            <div v-else class="space-y-3">
-              <div v-for="m in messages" :key="m.id" class="max-w-xl" :class="m.sender_id === meId ? 'ml-auto text-right' : ''">
-                <div class="inline-block px-3 py-2 rounded-lg" :class="m.sender_id === meId ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-900'">
-                  <div class="text-sm">{{ displayContent(m) }}</div>
-                  <div class="text-[11px] mt-1 opacity-70">{{ formatDate(m.created_at) }}</div>
-                </div>
+        <!-- Seller View - My Products with Buyers -->
+        <div 
+          class="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow cursor-pointer"
+          @click="goToSellerConversations"
+        >
+          <div class="p-6">
+            <div class="flex items-center mb-4">
+              <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
+                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-xl font-semibold text-gray-900">Mes Ventes</h3>
+                <p class="text-sm text-gray-500">Mode Vendeur</p>
               </div>
             </div>
-          </div>
-
-          <!-- Composer -->
-          <div class="p-4 border-t border-gray-100" v-if="selectedConversation">
-            <div class="flex items-center gap-2">
-              <input v-model="compose" type="text" class="flex-1 rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Votre message…" @keyup.enter="sendMessage()" />
-              <button class="px-4 py-2 text-sm rounded-md bg-indigo-600 text-white hover:bg-indigo-700" :disabled="composeBusy || !compose.trim()" @click="sendMessage()">Envoyer</button>
+            <p class="text-gray-600 mb-4">
+              Gérez les conversations sur vos produits. Voyez qui s'intéresse à quoi 
+              et répondez aux acheteurs potentiels.
+            </p>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-4 text-sm text-gray-500">
+                <span v-if="sellerStats.loading">Chargement...</span>
+                <template v-else>
+                  <span>{{ sellerStats.activeProducts }} produits</span>
+                  <span v-if="sellerStats.unreadCount > 0" class="text-red-600 font-medium">
+                    {{ sellerStats.unreadCount }} non lus
+                  </span>
+                </template>
+              </div>
+              <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
             </div>
-            <div v-if="composeError" class="mt-2 text-sm text-red-600">{{ composeError }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Transition vers nouveau système -->
+      <div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-6 mb-6">
+        <div class="flex items-start">
+          <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3 mt-0.5">
+            <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+          </div>
+          <div>
+            <h4 class="text-sm font-medium text-green-900 mb-1">Système de conversations amélioré</h4>
+            <p class="text-sm text-green-700">
+              Vos conversations sont maintenant organisées par produit pour une meilleure expérience d'achat et de vente. 
+              Chaque produit a sa propre discussion dédiée.
+            </p>
+            <div class="mt-3 flex items-center space-x-4 text-xs text-green-600">
+              <span>✨ Organisation par produit</span>
+              <span>🎯 Suivi des négociations</span>
+              <span>📱 Interface optimisée</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Guide d'utilisation -->
+      <div class="bg-indigo-50 rounded-xl p-6">
+        <div class="flex items-start">
+          <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center mr-3 mt-0.5">
+            <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+            </svg>
+          </div>
+          <div>
+            <h4 class="text-sm font-medium text-indigo-900 mb-1">Comment ça marche</h4>
+            <p class="text-sm text-indigo-700 mb-3">
+              Chaque produit a maintenant sa propre messagerie dédiée pour une expérience plus organisée.
+            </p>
+            <div class="space-y-2 text-xs text-indigo-600">
+              <div class="flex items-center">
+                <span class="w-4 h-4 bg-indigo-200 rounded-full flex items-center justify-center text-indigo-800 font-bold mr-2 text-xs">1</span>
+                <span>Cliquez sur "Message" sur un produit qui vous intéresse</span>
+              </div>
+              <div class="flex items-center">
+                <span class="w-4 h-4 bg-indigo-200 rounded-full flex items-center justify-center text-indigo-800 font-bold mr-2 text-xs">2</span>
+                <span>Envoyez votre message directement au vendeur</span>
+              </div>
+              <div class="flex items-center">
+                <span class="w-4 h-4 bg-indigo-200 rounded-full flex items-center justify-center text-indigo-800 font-bold mr-2 text-xs">3</span>
+                <span>Suivez toutes vos négociations dans les sections ci-dessus</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -85,160 +144,91 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import api from '@/services/api'
 
-const route = useRoute()
+const router = useRouter()
 const auth = useAuthStore()
-const meId = computed(() => auth.user?.id)
 
-// Conversations
-const conversations = ref([])
-const loadingConversations = ref(false)
-const conversationsError = ref('')
-const selectedConversation = ref(null)
-
-// Messages
-const messages = ref([])
-const loadingMessages = ref(false)
-const messagesError = ref('')
-
-// Composer
-const compose = ref('')
-const composeBusy = ref(false)
-const composeError = ref('')
-
-// Start target via query (?user=&product=)
-const startTarget = ref({ userId: null, productId: null })
-
-// Utils
-function formatDate(d) {
-  if (!d) return ''
-  return new Date(d).toLocaleString()
-}
-
-function safeParseMaybeJson(text) {
-  if (typeof text !== 'string') return String(text ?? '')
-  const trimmed = text.trim()
-  if (!(trimmed.startsWith('{') || trimmed.startsWith('['))) return text
-  try {
-    const obj = JSON.parse(trimmed)
-    // Heuristique: si c'est un message structuré {content, type}
-    if (obj && typeof obj === 'object' && 'content' in obj) return String(obj.content ?? '')
-    return typeof obj === 'string' ? obj : text
-  } catch (_) {
-    return text
-  }
-}
-
-function otherParticipantName(conv) {
-  if (!conv) return 'Conversation'
-  const me = meId.value
-  const other = conv.buyer_id === me ? conv.seller : conv.buyer
-  return other?.name || other?.username || 'Conversation'
-}
-
-function previewContent(conv) {
-  // lastMessage peut être chargé via relation ou via c.messages[0]
-  const last = conv.last_message || (conv.messages && conv.messages[0])
-  if (!last) return '—'
-  return safeParseMaybeJson(last.content)
-}
-
-function displayContent(m) {
-  return safeParseMaybeJson(m.content)
-}
-
-async function loadConversations() {
-  loadingConversations.value = true
-  conversationsError.value = ''
-  try {
-    const resp = await window.axios.get('/conversations')
-    conversations.value = resp.data?.data?.data || []
-  } catch (e) {
-    console.error(e)
-    conversationsError.value = 'Impossible de charger les conversations.'
-  } finally {
-    loadingConversations.value = false
-  }
-}
-
-function selectConversation(c) {
-  selectedConversation.value = c
-  loadMessages(c.id)
-}
-
-async function loadMessages(conversationId, page = 1) {
-  loadingMessages.value = true
-  messagesError.value = ''
-  try {
-    const resp = await window.axios.get(`/conversations/${conversationId}/messages`, { params: { page } })
-    messages.value = resp.data?.data?.data || []
-  } catch (e) {
-    console.error(e)
-    messagesError.value = 'Impossible de charger les messages.'
-  } finally {
-    loadingMessages.value = false
-  }
-}
-
-async function sendMessage() {
-  if (!selectedConversation.value || !compose.value.trim()) return
-  composeBusy.value = true
-  composeError.value = ''
-  try {
-    const resp = await window.axios.post(`/conversations/${selectedConversation.value.id}/messages`, {
-      content: compose.value.trim(),
-      type: 'text',
-      product_id: startTarget.value.productId || null
-    })
-    const msg = resp.data?.data
-    if (msg) messages.value.unshift(msg)
-    compose.value = ''
-  } catch (e) {
-    console.error(e)
-    composeError.value = 'Échec de l’envoi du message.'
-  } finally {
-    composeBusy.value = false
-  }
-}
-
-async function startConversation() {
-  if (!startTarget.value.userId || !compose.value.trim()) return
-  composeBusy.value = true
-  composeError.value = ''
-  try {
-    const resp = await window.axios.post('/conversations', {
-      participant_id: startTarget.value.userId,
-      message: compose.value.trim()
-    })
-    const conv = resp.data?.data
-    if (conv) {
-      conversations.value.unshift(conv)
-      selectedConversation.value = conv
-      compose.value = ''
-      await loadMessages(conv.id)
-    }
-  } catch (e) {
-    console.error(e)
-    composeError.value = 'Impossible de démarrer la conversation.'
-  } finally {
-    composeBusy.value = false
-  }
-}
-
-function hydrateStartTargetFromQuery() {
-  const userId = route.query.user ? Number(route.query.user) : null
-  const productId = route.query.product ? Number(route.query.product) : null
-  startTarget.value = { userId, productId }
-}
-
-onMounted(async () => {
-  hydrateStartTargetFromQuery()
-  await loadConversations()
+// Stats
+const buyerStats = ref({
+  loading: true,
+  totalDiscussions: 0,
+  unreadCount: 0
 })
 
-watch(() => route.query, () => hydrateStartTargetFromQuery(), { deep: true })
+const sellerStats = ref({
+  loading: true,
+  activeProducts: 0,
+  unreadCount: 0
+})
+
+// Conversations stats only
+
+// Navigation methods
+const goToProductDiscussions = () => {
+  router.push({ name: 'product-discussions' })
+}
+
+const goToSellerConversations = () => {
+  router.push({ name: 'seller-conversations' })
+}
+
+// Load stats
+const loadBuyerStats = async () => {
+  try {
+    const response = await api.get('/conversations/my-product-discussions')
+    const discussions = response.data.data || []
+    buyerStats.value = {
+      loading: false,
+      totalDiscussions: discussions.length,
+      unreadCount: discussions.reduce((sum, conv) => sum + (conv.unread_count || 0), 0)
+    }
+  } catch (error) {
+    console.error('Erreur chargement stats acheteur:', error)
+    buyerStats.value.loading = false
+  }
+}
+
+const loadSellerStats = async () => {
+  try {
+    const response = await api.get('/conversations/my-products-with-buyers')
+    const products = response.data.data || []
+    sellerStats.value = {
+      loading: false,
+      activeProducts: products.length,
+      unreadCount: products.reduce((sum, product) => sum + (product.unread_count || 0), 0)
+    }
+  } catch (error) {
+    console.error('Erreur chargement stats vendeur:', error)
+    sellerStats.value.loading = false
+  }
+}
+
+// Utility functions
+const formatDate = (dateString) => {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffInHours = (now - date) / (1000 * 60 * 60)
+  
+  if (diffInHours < 1) {
+    return 'À l\'instant'
+  } else if (diffInHours < 24) {
+    return `il y a ${Math.floor(diffInHours)}h`
+  } else {
+    return `il y a ${Math.floor(diffInHours / 24)}j`
+  }
+}
+
+onMounted(() => {
+  loadBuyerStats()
+  loadSellerStats()
+})
 </script>
 
+<style scoped>
+/* Add any additional styles if needed */
+</style>

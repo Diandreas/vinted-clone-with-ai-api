@@ -1,12 +1,12 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40">
-    <div class="max-w-5xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-12">
-      <!-- Header modernisé -->
-      <div class="mb-6 sm:mb-8 lg:mb-12">
+  <div class="min-h-screen bg-gradient-to-br from-gray-50 via-primary-50/20 to-green-50/30">
+    <div class="max-w-4xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+      <!-- Header -->
+      <div class="mb-6 sm:mb-8">
         <nav class="flex mb-4 sm:mb-6">
           <RouterLink 
             to="/products" 
-            class="group inline-flex items-center text-slate-600 hover:text-indigo-600 transition-all duration-200 bg-white/60 backdrop-blur-sm px-3 sm:px-4 py-2 rounded-full border border-white/50 hover:border-indigo-200 hover:bg-white/80 text-sm sm:text-base"
+            class="group inline-flex items-center text-gray-600 hover:text-primary-600 transition-all duration-200 bg-white/80 backdrop-blur-sm px-3 sm:px-4 py-2 rounded-xl border border-white/50 hover:border-primary-200 hover:bg-white shadow-soft hover:shadow-medium text-sm sm:text-base"
           >
             <ArrowLeftIcon class="w-3 h-3 sm:w-4 sm:h-4 mr-2 group-hover:-translate-x-1 transition-transform duration-200" />
             <span class="hidden sm:inline">Retour aux produits</span>
@@ -14,11 +14,11 @@
           </RouterLink>
         </nav>
         <div class="text-center lg:text-left">
-          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-slate-900 via-indigo-900 to-slate-900 bg-clip-text text-transparent">
+          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 via-primary-700 to-gray-900 bg-clip-text text-transparent">
             Créer un nouveau produit
           </h1>
-          <p class="text-slate-600 mt-2 sm:mt-3 text-base sm:text-lg max-w-2xl mx-auto lg:mx-0">
-            Partagez vos articles avec notre communauté et donnez-leur une seconde vie
+          <p class="text-gray-600 mt-2 sm:mt-3 text-base sm:text-lg max-w-2xl mx-auto lg:mx-0">
+            Partagez vos articles avec notre communauté RIKEAA et donnez-leur une seconde vie
           </p>
         </div>
       </div>
@@ -65,7 +65,7 @@
       </div>
 
       <form @submit.prevent="submitProduct" class="space-y-4 sm:space-y-6 lg:space-y-8">
-        <!-- Images Section modernisée -->
+        <!-- Images Section -->
         <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 p-4 sm:p-6 lg:p-8 hover:shadow-2xl transition-all duration-300">
           <div class="flex items-center mb-4 sm:mb-6">
             <div class="bg-gradient-to-r from-indigo-500 to-purple-500 w-6 h-6 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center mr-2 sm:mr-3">
@@ -99,632 +99,372 @@
             </div>
           </div>
 
-          <!-- Images Grid -->
-          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4" v-if="form.images.some(img => img)">
-            <template v-for="(image, index) in form.images" :key="`image-${index}`">
-              <div v-if="image" class="relative group">
-              <div class="relative aspect-square bg-slate-100 rounded-xl overflow-hidden">
-                <img 
-                  :src="image.preview" 
-                  :alt="`Photo ${index + 1}`"
-                  class="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
-                />
-                
-                <!-- Image overlay -->
-                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-200"></div>
-                
-                <!-- Main image badge -->
-                <div v-if="index === 0" class="absolute top-2 left-2 bg-indigo-500 text-white text-xs px-2 py-1 rounded-full font-medium">
-                  Principale
-                </div>
-                
-                <!-- Image actions -->
-                <div class="absolute top-2 right-2 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                  <!-- Move to main -->
-                  <button
-                    v-if="index !== 0"
-                    @click="moveToMain(index)"
-                    class="bg-blue-500 text-white rounded-full p-1.5 hover:bg-blue-600 transition-colors"
-                    title="Définir comme image principale"
-                  >
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
-                    </svg>
-                  </button>
-                  
-                  <!-- Delete -->
-                  <button
-                    @click="removeImage(index)"
-                    class="bg-red-500 text-white rounded-full p-1.5 hover:bg-red-600 transition-colors"
-                    title="Supprimer"
-                  >
-                    <XIcon class="w-3 h-3" />
-                  </button>
-                </div>
-                
-                <!-- Order indicator -->
-                <div class="absolute bottom-2 left-2 bg-white/90 text-slate-700 text-xs px-2 py-1 rounded-full font-medium">
-                  {{ index + 1 }}
-                </div>
+          <!-- Image Grid -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+            <div
+              v-for="(image, index) in form.images"
+              :key="index"
+              class="relative aspect-square bg-slate-100 rounded-xl border-2 border-dashed border-slate-300 hover:border-indigo-400 transition-colors overflow-hidden"
+            >
+              <img
+                v-if="image"
+                :src="image"
+                :alt="`Image ${index + 1}`"
+                class="w-full h-full object-cover"
+              />
+              <div v-else class="flex flex-col items-center justify-center h-full p-2">
+                <CameraIcon class="w-6 h-6 sm:w-8 sm:h-8 text-slate-400 mb-2" />
+                <span class="text-xs text-slate-500 text-center">Image {{ index + 1 }}</span>
               </div>
-            </div>
-            </template>
-          </div>
-
-          <!-- Single Image Upload Slots -->
-          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            <template v-for="(image, index) in form.images" :key="`slot-${index}`">
-              <div 
-                v-if="!image"
-                class="relative aspect-square bg-slate-100 rounded-xl border-2 border-dashed border-slate-300 hover:border-indigo-400 transition-colors cursor-pointer group"
-                @click="() => $refs[`imageInput${index}`]?.click()"
+              
+              <!-- Remove Button -->
+              <button
+                v-if="image"
+                @click="removeImage(index)"
+                type="button"
+                class="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
               >
-                <div class="absolute inset-0 flex flex-col items-center justify-center text-slate-400 group-hover:text-indigo-500 transition-colors">
-                  <CameraIcon class="w-8 h-8 mb-2" />
-                  <span class="text-xs text-center px-2">Cliquez pour ajouter</span>
-                </div>
-                <input 
-                  :ref="`imageInput${index}`"
-                  type="file"
-                  accept="image/*"
-                  @change="(event) => handleImageUpload(event, index)"
-                  class="hidden"
-                />
-              </div>
-            </template>
+                <XMarkIcon class="w-3 h-3" />
+              </button>
+            </div>
           </div>
         </div>
 
-        <!-- Product Details Section -->
-        <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 p-6 lg:p-8 hover:shadow-2xl transition-all duration-300">
-          <div class="flex items-center mb-6">
-            <div class="bg-gradient-to-r from-green-500 to-emerald-500 w-8 h-8 rounded-lg flex items-center justify-center mr-3">
-              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-              </svg>
+        <!-- Basic Information -->
+        <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 p-4 sm:p-6 lg:p-8 hover:shadow-2xl transition-all duration-300">
+          <div class="flex items-center mb-4 sm:mb-6">
+            <div class="bg-gradient-to-r from-blue-500 to-cyan-500 w-6 h-6 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center mr-2 sm:mr-3">
+              <InformationCircleIcon class="w-3 h-3 sm:w-5 sm:h-5 text-white" />
             </div>
             <div>
-              <h2 class="text-xl lg:text-2xl font-bold text-slate-900">Détails du produit</h2>
-              <p class="text-slate-600 text-sm mt-1">Informations essentielles pour les acheteurs</p>
+              <h2 class="text-lg sm:text-xl lg:text-2xl font-bold text-slate-900">Informations de base</h2>
+              <p class="text-slate-600 text-xs sm:text-sm mt-1">Décrivez votre produit</p>
             </div>
           </div>
-          
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             <!-- Title -->
             <div class="lg:col-span-2">
               <label for="title" class="block text-sm font-medium text-slate-700 mb-2">
                 Titre du produit *
               </label>
-                <input
-                  id="title"
-                  v-model="form.title"
-                  type="text"
-                  required
+              <input
+                id="title"
+                v-model="form.title"
+                type="text"
+                required
                 class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white/80 backdrop-blur-sm"
-                placeholder="Ex: T-shirt vintage en coton bio"
-                />
+                placeholder="Ex: Robe d'été élégante"
+              />
             </div>
 
             <!-- Description -->
             <div class="lg:col-span-2">
               <label for="description" class="block text-sm font-medium text-slate-700 mb-2">
-                Description détaillée *
-                </label>
+                Description *
+              </label>
               <textarea
                 id="description"
                 v-model="form.description"
                 rows="4"
-                            required
+                required
                 class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white/80 backdrop-blur-sm resize-none"
-                placeholder="Décrivez votre produit en détail : matériaux, état, histoire, etc."
+                placeholder="Décrivez votre produit en détail..."
               ></textarea>
-              </div>
+            </div>
 
-              <!-- Price -->
+            <!-- Category -->
+            <div>
+              <label for="category" class="block text-sm font-medium text-slate-700 mb-2">
+                Catégorie *
+              </label>
+              <select
+                id="category"
+                v-model="form.category_id"
+                required
+                class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white/80 backdrop-blur-sm"
+              >
+                <option value="">Sélectionnez une catégorie</option>
+                <option
+                  v-for="category in categories"
+                  :key="category.id"
+                  :value="category.id"
+                >
+                  {{ category.name }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Brand -->
+            <div>
+              <label for="brand" class="block text-sm font-medium text-slate-700 mb-2">
+                Marque
+              </label>
+              <select
+                id="brand"
+                v-model="form.brand_id"
+                class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white/80 backdrop-blur-sm"
+              >
+                <option value="">Sélectionnez une marque</option>
+                <option
+                  v-for="brand in brands"
+                  :key="brand.id"
+                  :value="brand.id"
+                >
+                  {{ brand.name }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Condition -->
+            <div>
+              <label for="condition" class="block text-sm font-medium text-slate-700 mb-2">
+                État *
+              </label>
+              <select
+                id="condition"
+                v-model="form.condition"
+                required
+                class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white/80 backdrop-blur-sm"
+              >
+                <option value="">Sélectionnez l'état</option>
+                <option value="new">Neuf</option>
+                <option value="like_new">Comme neuf</option>
+                <option value="good">Bon état</option>
+                <option value="fair">État correct</option>
+                <option value="poor">Usé</option>
+              </select>
+            </div>
+
+            <!-- Price -->
             <div>
               <label for="price" class="block text-sm font-medium text-slate-700 mb-2">
-                Prix de vente (€) *
-                </label>
-                <div class="relative">
-                <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500">€</span>
-                  <input
-                    id="price"
-                    v-model="form.price"
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    required
-                  class="w-full pl-8 pr-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white/80 backdrop-blur-sm"
-                    placeholder="0.00"
-                  />
-                </div>
-              </div>
-
-              <!-- Original Price -->
-            <div>
-              <label for="original_price" class="block text-sm font-medium text-slate-700 mb-2">
-                Prix original (€)
-                </label>
-                <div class="relative">
-                <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500">€</span>
-                  <input
-                    id="original_price"
-                    v-model="form.original_price"
-                    type="number"
-                    step="0.01"
-                    min="0"
-                  class="w-full pl-8 pr-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white/80 backdrop-blur-sm"
-                    placeholder="0.00"
-                  />
-              </div>
-            </div>
-
-              <!-- Category -->
-            <div>
-              <label for="category_id" class="block text-sm font-medium text-slate-700 mb-2">
-                  Catégorie *
-                </label>
-                                            <select
-                id="category_id"
-                            v-model="form.category_id"
-                            required
-                class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white/80 backdrop-blur-sm"
-                          >
-                <option value="">Sélectionnez une catégorie</option>
-                            <option v-for="category in categories" :key="category.id" :value="category.id">
-                  {{ category.name }}
-                            </option>
-                          </select>
-              </div>
-
-              <!-- Brand -->
-            <div>
-              <label for="brand_id" class="block text-sm font-medium text-slate-700 mb-2">
-                  Marque
-                </label>
-                  <select
-                id="brand_id"
-                    v-model="form.brand_id"
-                class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white/80 backdrop-blur-sm"
-                  >
-                <option value="">Sélectionnez une marque</option>
-                    <option v-for="brand in brands" :key="brand.id" :value="brand.id">
-                      {{ brand.name }}
-                    </option>
-                  </select>
-              </div>
-
-              <!-- Condition -->
-            <div>
-              <label for="condition_id" class="block text-sm font-medium text-slate-700 mb-2">
-                État du produit *
-                </label>
-                  <select
-                id="condition_id"
-                    v-model="form.condition_id"
-                    required
-                class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white/80 backdrop-blur-sm"
-                  >
-                <option value="">Sélectionnez un état</option>
-                    <option v-for="condition in conditions" :key="condition.id" :value="condition.id">
-                      {{ condition.name }}
-                    </option>
-                  </select>
-              </div>
-
-            <!-- Size -->
-            <div>
-              <label for="size" class="block text-sm font-medium text-slate-700 mb-2">
-                Taille
-                </label>
-                  <input
-                id="size"
-                v-model="form.size"
-                type="text"
-                class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white/80 backdrop-blur-sm"
-                placeholder="S, M, L, XL, 42, 43..."
-              />
-              </div>
-
-            <!-- Negotiable -->
-            <div class="lg:col-span-2">
-              <div class="flex items-center">
-                  <input
-                    id="negotiable"
-                    v-model="form.is_negotiable"
-                    type="checkbox"
-                  class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded transition-all duration-200"
-                />
-                <label for="negotiable" class="ml-3 text-sm text-slate-700">
-                  Prix négociable
+                Prix de vente (Fcfa) *
               </label>
+              <div class="relative">
+                <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500">Fcfa</span>
+                <input
+                  id="price"
+                  v-model="form.price"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  required
+                  class="w-full pl-12 pr-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white/80 backdrop-blur-sm"
+                  placeholder="0.00"
+                />
+              </div>
             </div>
-                      </div>
-                      </div>
-                    </div>
+          </div>
+        </div>
 
-        <!-- Submit Buttons -->
-        <div class="flex justify-center space-x-4">
+        <!-- Submit Button -->
+        <div class="flex justify-center">
           <button
-            type="button"
-            @click="resetForm"
-            :disabled="loading"
-            class="inline-flex items-center px-6 py-4 bg-gray-500 text-white font-semibold rounded-xl hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+            type="submit"
+            :disabled="submitting"
+            class="inline-flex items-center px-8 sm:px-12 py-3 sm:py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-            </svg>
-            Réinitialiser
-          </button>
-          
-            <button
-              type="submit"
-              :disabled="loading"
-            class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-            >
-            <span v-if="loading" class="mr-2">
-                <div class="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
-              </span>
-              <svg v-if="!loading" class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            <span v-if="submitting" class="inline-flex items-center">
+              <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              {{ loading ? 'Création en cours...' : 'Créer le produit' }}
-            </button>
+              Création en cours...
+            </span>
+            <span v-else class="inline-flex items-center">
+              <PlusIcon class="w-5 h-5 mr-2" />
+              Créer le produit
+            </span>
+          </button>
         </div>
       </form>
     </div>
   </div>
 </template>
 
-<script setup>
-import { ref, reactive, onMounted } from 'vue'
+<script>
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { 
-  ArrowLeftIcon, 
-  CameraIcon, 
-  PlusIcon, 
-  XIcon 
-} from 'lucide-vue-next'
+import { useAuthStore } from '@/stores/auth'
+import { useNotificationStore } from '@/stores/notification'
+import {
+  ArrowLeftIcon,
+  CameraIcon,
+  PlusIcon,
+  XMarkIcon,
+  InformationCircleIcon
+} from '@heroicons/vue/24/outline'
 
-const router = useRouter()
+export default {
+  name: 'CreateProduct',
+  setup() {
+    const router = useRouter()
+    const authStore = useAuthStore()
+    const notificationStore = useNotificationStore()
 
-// Loading state
-const loading = ref(false)
-const errors = ref({})
-const showErrors = ref(false)
+    // Form data
+    const form = ref({
+      title: '',
+      description: '',
+      price: '',
+      category_id: '',
+      brand_id: '',
+      condition: '',
+      images: Array(8).fill(null)
+    })
 
-// Form data
-const form = reactive({
-  title: '',
-  description: '',
-  price: '',
-  original_price: '',
-  category_id: '',
-  brand_id: '',
-  condition_id: '',
-  size: '',
-  is_negotiable: false,
-  status: 'active',
-  images: Array(8).fill(null) // Support for 8 images
-})
+    // UI state
+    const submitting = ref(false)
+    const showErrors = ref(false)
+    const errors = ref({})
 
-// Data for selects
-const categories = ref([])
-const brands = ref([])
-const conditions = ref([])
+    // Data
+    const categories = ref([])
+    const brands = ref([])
 
-// Fetch data for selects
-const fetchSelectData = async () => {
-  try {
-    const [categoriesRes, brandsRes, conditionsRes] = await Promise.all([
-      window.axios.get('/categories'),
-      window.axios.get('/brands'),
-      window.axios.get('/conditions')
-    ])
-    
-    // Flatten categories to include both parent and child categories
-    const categoriesData = categoriesRes.data.data || categoriesRes.data
-    const flatCategories = []
-    
-    categoriesData.forEach(category => {
-      // Add parent category
-      flatCategories.push({
-        id: category.id,
-        name: category.name,
-        icon: category.icon
-      })
+    // Refs
+    const multipleImageInput = ref(null)
+
+    // Methods
+    const loadCategories = async () => {
+      try {
+        const response = await window.axios.get('/categories')
+        categories.value = response.data.data || response.data
+      } catch (error) {
+        console.error('Error loading categories:', error)
+      }
+    }
+
+    const loadBrands = async () => {
+      try {
+        const response = await window.axios.get('/brands')
+        brands.value = response.data.data || response.data
+      } catch (error) {
+        console.error('Error loading brands:', error)
+      }
+    }
+
+    const handleMultipleImageUpload = (event) => {
+      const files = Array.from(event.target.files)
+      const availableSlots = form.value.images.filter(img => !img).length
       
-      // Add child categories with indentation
-      if (category.children && category.children.length > 0) {
-        category.children.forEach(child => {
-          flatCategories.push({
-            id: child.id,
-            name: `  ↳ ${child.name}`,
-            icon: child.icon
-          })
-        })
+      if (files.length > availableSlots) {
+        notificationStore.showError(`Vous ne pouvez ajouter que ${availableSlots} images supplémentaires`)
+        return
       }
-    })
-    
-    categories.value = flatCategories
-    brands.value = brandsRes.data.data || brandsRes.data
-    conditions.value = conditionsRes.data.data || conditionsRes.data
-  } catch (error) {
-    console.error('Erreur lors du chargement des données:', error)
-  }
-}
 
-// Handle single image upload
-const handleImageUpload = (event, index) => {
-  const file = event.target.files[0]
-  if (!file) return
-
-  // Validation du fichier côté client
-  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif']
-  const maxSize = 5 * 1024 * 1024 // 5MB
-  
-  if (!allowedTypes.includes(file.type)) {
-    alert('Type de fichier non supporté. Utilisez JPEG, PNG ou GIF.')
-    return
-  }
-  
-  if (file.size > maxSize) {
-    alert('Fichier trop volumineux. Taille maximum : 5MB.')
-    return
-  }
-
-  // Create preview
-  const reader = new FileReader()
-  reader.onload = (e) => {
-    form.images[index] = {
-      file: file,
-      preview: e.target.result
-    }
-  }
-  reader.readAsDataURL(file)
-}
-
-// Handle multiple image upload
-const handleMultipleImageUpload = (event) => {
-  const files = Array.from(event.target.files)
-  let currentIndex = 0
-  let validFiles = 0
-  
-  files.forEach((file, fileIndex) => {
-    // Validation du fichier
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif']
-    const maxSize = 5 * 1024 * 1024 // 5MB
-    
-    if (!allowedTypes.includes(file.type)) {
-      alert(`Fichier "${file.name}" : Type non supporté. Utilisez JPEG, PNG ou GIF.`)
-      return
-    }
-    
-    if (file.size > maxSize) {
-      alert(`Fichier "${file.name}" : Trop volumineux. Taille maximum : 5MB.`)
-      return
-    }
-    
-    // Find next empty slot
-    while (currentIndex < form.images.length && form.images[currentIndex]) {
-      currentIndex++
-    }
-    
-    if (currentIndex < form.images.length) {
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        form.images[currentIndex] = {
-          file: file,
-          preview: e.target.result
+      files.forEach((file, index) => {
+        const reader = new FileReader()
+        reader.onload = (e) => {
+          const emptySlotIndex = form.value.images.findIndex(img => !img)
+          if (emptySlotIndex !== -1) {
+            form.value.images[emptySlotIndex] = e.target.result
+          }
         }
+        reader.readAsDataURL(file)
+      })
+
+      // Reset input
+      if (multipleImageInput.value) {
+        multipleImageInput.value.value = ''
       }
-      reader.readAsDataURL(file)
-      currentIndex++
-      validFiles++
     }
-  })
-  
-  if (validFiles > 0) {
-    console.log(`${validFiles} images ajoutées avec succès`)
-  }
-}
 
-// Move image to main position
-const moveToMain = (index) => {
-  if (index === 0 || !form.images[index]) return
-  
-  // Swap images
-  const temp = form.images[0]
-  form.images[0] = form.images[index]
-  form.images[index] = temp
-}
-
-// Remove image
-const removeImage = (index) => {
-  // Remove image and shift remaining images
-  form.images[index] = null
-  
-  // Compact array by moving non-null images to the left
-  const compactedImages = []
-  form.images.forEach(img => {
-    if (img) compactedImages.push(img)
-  })
-  
-  // Fill with nulls up to 8 slots
-  while (compactedImages.length < 8) {
-    compactedImages.push(null)
-  }
-  
-  form.images = compactedImages
-}
-
-// Reset form
-const resetForm = () => {
-  form.title = ''
-  form.description = ''
-  form.price = ''
-  form.original_price = ''
-  form.category_id = ''
-  form.brand_id = ''
-  form.condition_id = ''
-  form.size = ''
-  form.is_negotiable = false
-  form.status = 'active'
-  form.images = Array(8).fill(null)
-  errors.value = {}
-  showErrors.value = false
-}
-
-// Display errors
-const displayErrors = (errorData) => {
-  errors.value = errorData
-  showErrors.value = true
-  
-  // Auto-hide errors after 10 seconds
-  setTimeout(() => {
-    showErrors.value = false
-  }, 10000)
-}
-
-
-
-
-
-
-
-// Submit product
-const submitProduct = async () => {
-  loading.value = true
-  
-  try {
-    // Validation côté client
-    if (!form.title.trim()) {
-      alert('Le titre est requis')
-      loading.value = false
-      return
+    const removeImage = (index) => {
+      form.value.images[index] = null
     }
-    
-    if (!form.description.trim()) {
-      alert('La description est requise')
-      loading.value = false
-      return
+
+    const validateForm = () => {
+      errors.value = {}
+      
+      if (!form.value.title.trim()) {
+        errors.value.title = ['Le titre est requis']
+      }
+      
+      if (!form.value.description.trim()) {
+        errors.value.description = ['La description est requise']
+      }
+      
+      if (!form.value.price || form.value.price <= 0) {
+        errors.value.price = ['Le prix doit être supérieur à 0']
+      }
+      
+      if (!form.value.category_id) {
+        errors.value.category_id = ['La catégorie est requise']
+      }
+      
+      if (!form.value.condition) {
+        errors.value.condition = ['L\'état est requis']
+      }
+      
+      const hasImages = form.value.images.some(img => img)
+      if (!hasImages) {
+        errors.value.images = ['Au moins une image est requise']
+      }
+
+      return Object.keys(errors.value).length === 0
     }
-    
-    if (!form.price || parseFloat(form.price) <= 0) {
-      alert('Le prix est requis et doit être supérieur à 0')
-      loading.value = false
-      return
-    }
-    
-    if (!form.category_id) {
-      alert('La catégorie est requise')
-      loading.value = false
-      return
-    }
-    
-    if (!form.condition_id) {
-      alert('L\'état du produit est requis')
-      loading.value = false
-      return
-    }
-    
-    // Vérifier qu'au moins une image est sélectionnée et pas plus de 10
-    const validImages = form.images.filter(img => img && img.file)
-    if (validImages.length === 0) {
-      alert('Au moins une image est requise')
-      loading.value = false
-      return
-    }
-    
-    if (validImages.length > 10) {
-      alert('Maximum 10 images autorisées')
-      loading.value = false
-      return
-    }
-    
-    // Create FormData for file upload
-    const formData = new FormData()
-    
-    // Add text fields
-    formData.append('title', form.title.trim())
-    formData.append('description', form.description.trim())
-    formData.append('price', form.price)
-    formData.append('category_id', form.category_id)
-    formData.append('status', form.status)
-    
-    // Add optional fields
-    if (form.original_price && parseFloat(form.original_price) > 0) {
-      formData.append('original_price', form.original_price)
-    }
-    if (form.brand_id) formData.append('brand_id', form.brand_id)
-    if (form.condition_id) formData.append('condition_id', form.condition_id)
-    if (form.size && form.size.trim()) formData.append('size', form.size.trim())
-    if (form.is_negotiable) formData.append('is_negotiable', '1')
-    
-    // Add images - Utiliser 'images[]' comme dans le test qui fonctionne
-    validImages.forEach((image, index) => {
-      if (image && image.file && image.file instanceof File) {
-        // Vérification supplémentaire que c'est bien un fichier valide
-        if (image.file.size > 0 && image.file.type.startsWith('image/')) {
-          formData.append('images[]', image.file) // Utiliser 'images[]' comme dans le test
+
+    const submitProduct = async () => {
+      if (!validateForm()) {
+        showErrors.value = true
+        return
+      }
+
+      submitting.value = true
+      showErrors.value = false
+
+      try {
+        const productData = {
+          ...form.value,
+          images: form.value.images.filter(img => img)
+        }
+
+        const response = await window.axios.post('/products', productData)
+        
+        if (response.data.success) {
+          notificationStore.showSuccess('Produit créé avec succès !')
+          router.push(`/products/${response.data.data.id}`)
         } else {
-          console.warn('Fichier invalide ignoré:', image.file.name)
+          notificationStore.showError(response.data.message || 'Erreur lors de la création')
         }
+      } catch (error) {
+        console.error('Error creating product:', error)
+        
+        if (error.response?.data?.errors) {
+          errors.value = error.response.data.errors
+          showErrors.value = true
+        } else {
+          notificationStore.showError('Erreur lors de la création du produit')
+        }
+      } finally {
+        submitting.value = false
       }
+    }
+
+    // Lifecycle
+    onMounted(() => {
+      loadCategories()
+      loadBrands()
     })
-    
-    console.log('FormData contenu:')
-    for (let [key, value] of formData.entries()) {
-      console.log(key, value)
+
+    return {
+      form,
+      submitting,
+      showErrors,
+      errors,
+      categories,
+      brands,
+      multipleImageInput,
+      handleMultipleImageUpload,
+      removeImage,
+      submitProduct
     }
-    
-    console.log('Images à envoyer:', validImages.map(img => ({
-      name: img.file.name,
-      type: img.file.type,
-      size: img.file.size
-    })))
-    
-    const response = await window.axios.post('/products', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    })
-    
-    // Success - redirect to product page or products list
-    const productId = response.data.data?.id || response.data.id
-    if (productId) {
-      router.push(`/products/${productId}`)
-    } else {
-      router.push('/products')
-    }
-    
-  } catch (error) {
-    console.error('Erreur lors de la création du produit:', error)
-    
-    // Handle validation errors
-    if (error.response?.status === 422) {
-      const errorData = error.response.data.errors
-      console.log('Erreurs de validation:', errorData)
-      displayErrors(errorData)
-    } else if (error.response?.status === 500) {
-      displayErrors({ general: ['Erreur serveur. Veuillez réessayer plus tard.'] })
-    } else {
-      displayErrors({ general: ['Erreur lors de la création du produit. Veuillez réessayer.'] })
-    }
-  } finally {
-    loading.value = false
   }
 }
-
-// Initialize component
-onMounted(() => {
-  fetchSelectData()
-})
 </script>
 
 <style scoped>
 /* Custom styles if needed */
-.aspect-square {
-  aspect-ratio: 1 / 1;
-}
 </style>

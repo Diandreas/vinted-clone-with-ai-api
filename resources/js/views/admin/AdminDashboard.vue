@@ -15,11 +15,7 @@
           <div class="text-xl sm:text-2xl font-semibold text-gray-900">{{ kpis.products_total }}</div>
           <div class="text-xs text-green-600">Actifs: {{ kpis.products_active }}</div>
         </div>
-        <div class="bg-white rounded-xl border border-gray-200 p-3 sm:p-4">
-          <div class="text-xs sm:text-sm text-gray-500">Lives</div>
-          <div class="text-xl sm:text-2xl font-semibold text-gray-900">{{ kpis.lives_total }}</div>
-          <div class="text-xs text-red-600">En direct: {{ kpis.lives_active }}</div>
-        </div>
+
         <div class="bg-white rounded-xl border border-gray-200 p-3 sm:p-4">
           <div class="text-xs sm:text-sm text-gray-500">Commandes</div>
           <div class="text-xl sm:text-2xl font-semibold text-gray-900">{{ kpis.orders_total }}</div>
@@ -58,10 +54,7 @@ const kpis = ref({
   users_verified: 0,
   products_total: 0,
   products_active: 0,
-  lives_total: 0,
-  lives_active: 0,
-  orders_total: 0,
-  stories_total: 0
+  orders_total: 0
 })
 
 const usersByDayChart = ref(null)

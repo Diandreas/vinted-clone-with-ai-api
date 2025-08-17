@@ -22,7 +22,7 @@ class WalletController extends Controller
             'success' => true,
             'data' => [
                 'balance_xaf' => $user->wallet_balance_xaf ?? 0,
-                'balance_formatted' => number_format($user->wallet_balance_xaf ?? 0) . ' FCFA',
+                'balance_formatted' => number_format($user->wallet_balance_xaf ?? 0) . ' Fcfa',
                 'currency' => 'XAF',
                 'last_updated' => $user->updated_at,
             ]
@@ -53,7 +53,7 @@ class WalletController extends Controller
     public function topUp(Request $request)
     {
         $request->validate([
-            'amount_xaf' => 'required|integer|min:100|max:1000000', // 100 FCFA to 1M FCFA
+            'amount_xaf' => 'required|integer|min:100|max:1000000', // 100 Fcfa to 1M Fcfa
             'message' => 'nullable|string|max:255',
         ]);
 

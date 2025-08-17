@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="min-h-screen bg-gray-50">
+  <div id="app" class="min-h-screen bg-gradient-to-br from-gray-50 via-primary-50/20 to-green-50/30">
     <!-- Navigation -->
     <NavBar v-if="!isAuthPage" />
     
@@ -28,22 +28,27 @@ const isAuthPage = computed(() => {
 </script>
 
 <style scoped>
-/* Custom scrollbar */
+/* Custom scrollbar avec thème vert */
 ::-webkit-scrollbar {
   width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #f1f5f9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
+  background: #86efac;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  background: #4ade80;
+}
+
+/* Smooth transitions globales */
+* {
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
 }
 </style>
 

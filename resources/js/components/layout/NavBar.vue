@@ -1,58 +1,44 @@
 <template>
-  <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between items-center h-16">
+  <nav class="bg-white/95 backdrop-blur-md shadow-soft border-b border-primary-100 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8">
+      <div class="flex justify-between items-center h-14 sm:h-16">
         <!-- Logo and Brand -->
-        <div class="flex items-center space-x-8">
-          <RouterLink to="/" class="flex items-center space-x-2">
-            <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-              <span class="text-white font-bold text-lg">R</span>
+        <div class="flex items-center space-x-4 sm:space-x-8">
+          <RouterLink to="/" class="flex items-center space-x-2 sm:space-x-3 group">
+            <div class="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-medium group-hover:shadow-strong transition-all duration-300 group-hover:scale-105">
+              <span class="text-white font-bold text-sm sm:text-lg">R</span>
             </div>
-            <span class="text-xl font-bold text-gray-900">Rikeaa</span>
+            <span class="text-lg sm:text-xl font-bold bg-gradient-to-r from-gray-900 to-primary-700 bg-clip-text text-transparent">RIKEAA</span>
           </RouterLink>
 
           <!-- Main Navigation -->
-          <div class="hidden md:flex items-center space-x-6">
+          <div class="hidden md:flex items-center space-x-1 lg:space-x-2">
             <RouterLink
               to="/products"
-              class="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors"
-              :class="{ 'text-indigo-600': $route.name === 'products' }"
+              class="text-gray-600 hover:text-primary-600 px-3 py-2 text-sm font-medium transition-all duration-200 rounded-lg hover:bg-primary-50"
+              :class="{ 'text-primary-600 bg-primary-50': $route.name === 'products' }"
             >
               Produits
             </RouterLink>
-            <RouterLink
-              to="/lives"
-              class="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors flex items-center space-x-1"
-              :class="{ 'text-red-600': $route.name === 'lives' }"
-            >
-              <RadioIcon class="w-4 h-4" />
-              <span>Lives</span>
-            </RouterLink>
-            <RouterLink
-              to="/stories"
-              class="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors"
-              :class="{ 'text-purple-600': $route.name === 'stories' }"
-            >
-              Stories
-            </RouterLink>
+
           </div>
         </div>
 
         <!-- Search Bar -->
-        <div class="hidden md:flex flex-1 max-w-lg mx-8">
+        <div class="hidden md:flex flex-1 max-w-md lg:max-w-lg mx-4 sm:mx-6 lg:mx-8">
           <div class="relative w-full">
-            <SearchIcon class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <SearchIcon class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
             <input
               v-model="searchQuery"
               type="text"
               placeholder="Rechercher des produits..."
-              class="w-full pl-10 pr-12 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              class="w-full pl-9 sm:pl-10 pr-12 py-2 sm:py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 text-sm bg-gray-50/50 hover:bg-white focus:bg-white"
               @keydown.enter="performSearch"
             />
             <div class="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
               <RouterLink
                 to="/search/image"
-                class="p-1 text-gray-400 hover:text-indigo-600 transition-colors"
+                class="p-1.5 text-gray-400 hover:text-primary-600 transition-colors rounded-lg hover:bg-primary-50"
                 title="Recherche par image"
               >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -62,7 +48,7 @@
               <button
                 v-if="searchQuery"
                 @click="clearSearch"
-                class="p-1 text-gray-400 hover:text-gray-600"
+                class="p-1.5 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
               >
                 <XIcon class="w-4 h-4" />
               </button>
@@ -71,11 +57,11 @@
         </div>
 
         <!-- Right Side Actions -->
-        <div class="flex items-center space-x-4">
+        <div class="flex items-center space-x-2 sm:space-x-3 lg:space-x-4">
           <!-- Mobile Search Toggle -->
           <button
             @click="showMobileSearch = !showMobileSearch"
-            class="md:hidden p-2 text-gray-400 hover:text-gray-600"
+            class="md:hidden p-2 text-gray-400 hover:text-primary-600 transition-colors rounded-lg hover:bg-primary-50"
           >
             <SearchIcon class="w-5 h-5" />
           </button>
@@ -85,7 +71,7 @@
             <!-- Wallet Balance -->
             <RouterLink
               to="/wallet"
-              class="hidden md:flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-indigo-600 hover:bg-gray-50 rounded-lg transition-colors"
+              class="hidden md:flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all duration-200"
             >
               <WalletIcon class="w-4 h-4" />
               <span class="font-semibold">{{ walletBalance }}</span>
@@ -95,8 +81,8 @@
             <div v-if="authStore.isAdmin || authStore.hasPermission('dashboard:view')" class="relative hidden md:block">
               <button
                 @click="showAdminMenu = !showAdminMenu"
-                class="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
-                :class="{ 'text-indigo-600': $route.name?.includes('admin') }"
+                class="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-all duration-200 rounded-xl hover:bg-gray-50"
+                :class="{ 'text-primary-600 bg-primary-50': $route.name?.includes('admin') }"
               >
                 <PackageIcon class="w-4 h-4" />
                 <span>Admin</span>
@@ -263,20 +249,7 @@
           >
             Produits
           </RouterLink>
-          <RouterLink
-            to="/lives"
-            class="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg"
-            @click="showMobileMenu = false"
-          >
-            Lives
-          </RouterLink>
-          <RouterLink
-            to="/stories"
-            class="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg"
-            @click="showMobileMenu = false"
-          >
-            Stories
-          </RouterLink>
+
 
           <template v-if="isAuthenticated">
             <div class="border-t border-gray-200 pt-2 mt-2">
@@ -346,7 +319,6 @@ import {
   MenuIcon,
   XIcon,
   ChevronDownIcon,
-  RadioIcon,
   PackageIcon,
   UsersIcon,
   TagIcon,

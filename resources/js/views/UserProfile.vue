@@ -162,10 +162,7 @@
         </div>
       </div>
 
-      <!-- Stories Section -->
-      <div class="max-w-4xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6">
-        <StoriesGrid :stories="stories" :user-id="route.params.id" />
-      </div>
+
 
       <!-- Content Tabs -->
       <div class="max-w-4xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6">
@@ -252,26 +249,7 @@
             </div>
           </div>
 
-          <!-- Lives Tab -->
-          <div v-if="activeTab === 'lives'" class="space-y-4 sm:space-y-6">
-            <div v-if="lives.length === 0" class="text-center py-12 sm:py-16">
-              <div class="w-16 h-16 sm:w-20 sm:h-20 bg-gray-700 rounded-full mx-auto mb-3 sm:mb-4 flex items-center justify-center">
-                <svg class="w-8 h-8 sm:w-10 sm:h-10 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                </svg>
-              </div>
-              <h3 class="text-lg sm:text-xl font-semibold text-gray-300 mb-2">Aucun live</h3>
-              <p class="text-gray-500 text-sm sm:text-base">Cet utilisateur n'a pas encore créé de lives.</p>
-            </div>
-            
-            <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
-              <TikTokLiveCard
-                v-for="live in lives"
-                :key="`live-${live.id}-${activeTab}`"
-                :live="live"
-              />
-            </div>
-          </div>
+
 
           <!-- Followers Tab -->
           <div v-if="activeTab === 'followers'" class="space-y-3 sm:space-y-4">
@@ -417,8 +395,8 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import TikTokProductCard from '@/components/products/TikTokProductCard.vue'
-import TikTokLiveCard from '@/components/lives/TikTokLiveCard.vue'
-import StoriesGrid from '@/components/stories/StoriesGrid.vue'
+
+
 import ProfileIcon from '@/components/ui/ProfileIcon.vue'
 import {
   ArrowLeftIcon,
@@ -454,8 +432,7 @@ const products = ref([])
 const followers = ref([])
 const following = ref([])
 const reviews = ref([])
-const stories = ref([])
-const lives = ref([])
+
 const pagination = ref({ current: 1, last: 1, total: 0, perPage: 20 })
 
 const activeTab = ref('products')
@@ -463,7 +440,6 @@ const activeTab = ref('products')
 // Tabs configuration
 const tabs = [
   { id: 'products', label: 'Produits' },
-  { id: 'lives', label: 'Lives' },
   { id: 'followers', label: 'Abonnés' },
   { id: 'following', label: 'Abonnements' },
   { id: 'reviews', label: 'Évaluations' }
@@ -540,34 +516,14 @@ async function fetchReviews() {
   }
 }
 
-async function fetchStories() {
-  try {
-    const resp = await window.axios.get(`/users/${route.params.id}/stories`)
-    stories.value = resp.data?.data || []
-  } catch (err) {
-    console.error('Failed to fetch stories:', err)
-    // Don't set error for stories as they're optional
-  }
-}
 
-async function fetchLives() {
-  try {
-    const resp = await window.axios.get(`/users/${route.params.id}/lives`)
-    lives.value = resp.data?.data || []
-  } catch (err) {
-    console.error('Failed to fetch lives:', err)
-    // Don't set error for lives as they're optional
-  }
-}
 
 async function loadTabContent() {
   switch (activeTab.value) {
     case 'products':
       await fetchProducts()
       break
-    case 'lives':
-      await fetchLives()
-      break
+
     case 'followers':
       await fetchFollowers()
       break
@@ -660,9 +616,7 @@ async function loadInitialData() {
   try {
     await Promise.all([
       fetchUser(),
-      fetchProducts(),
-      fetchStories(),
-      fetchLives()
+      fetchProducts()
     ])
   } catch (err) {
     console.error('Failed to load initial data:', err)
