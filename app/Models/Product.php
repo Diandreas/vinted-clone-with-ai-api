@@ -395,7 +395,7 @@ class Product extends Model
     public function getFormattedPriceAttribute()
     {
         $price = is_numeric($this->price) ? (float) $this->price : 0.0;
-        return '€' . number_format($price, 2);
+        return number_format($price, 0, ',', ' ') . ' FCFA';
     }
 
     /**
@@ -407,7 +407,7 @@ class Product extends Model
             return null;
         }
         $original = is_numeric($this->original_price) ? (float) $this->original_price : 0.0;
-        return '€' . number_format($original, 2);
+        return number_format($original, 0, ',', ' ') . ' FCFA';
     }
 
     /**

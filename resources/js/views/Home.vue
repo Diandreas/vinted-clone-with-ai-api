@@ -270,6 +270,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
 import { debounce } from 'lodash'
 import { TrendingUpIcon, RadioIcon, DownloadIcon, SearchIcon, EyeIcon, HeartIcon, ImageIcon, PackageIcon, MessageCircleIcon, ShareIcon } from 'lucide-vue-next'
+import { formatPrice } from '@/utils/currency'
 
 // Components
 import ProductSkeleton from '@/components/skeletons/ProductSkeleton.vue'
@@ -472,13 +473,7 @@ const viewProduct = (product) => {
   router.push(`/products/${product.id}`)
 }
 
-const formatPrice = (price) => {
-  if (!price) return '0 XOF'
-  return new Intl.NumberFormat('fr-FR', {
-    style: 'currency',
-    currency: 'XOF'
-  }).format(price)
-}
+
 
 const getStatusBadgeClass = (status) => {
   const classes = {
