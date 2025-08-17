@@ -39,76 +39,174 @@
       </div>
     </div>
 
-    <!-- Features Section -->
-    <div class="py-20 bg-white">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-16">
-          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Pourquoi choisir sellam ?
-          </h2>
-          <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-            Une plateforme complète qui révolutionne l'expérience du shopping en ligne
-          </p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <FeatureCard
-            icon="shopping-bag"
-            title="Marketplace Sécurisé"
-            description="Achetez et vendez en toute sécurité avec notre système de paiement protégé et notre service client dédié."
-            color="blue"
-          />
-          <FeatureCard
-            icon="video"
-            title="Live Shopping"
-            description="Participez à des sessions de shopping en direct, interagissez avec les vendeurs et découvrez des produits en temps réel."
-            color="red"
-          />
-          <FeatureCard
-            icon="users"
-            title="Communauté Active"
-            description="Rejoignez une communauté passionnée, suivez vos vendeurs préférés et partagez vos coups de cœur."
-            color="purple"
-          />
-        </div>
-      </div>
-    </div>
-
-    <!-- Trending Products Section -->
+    <!-- Products Section - Main Content -->
     <div class="py-20 bg-gray-50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
         <div class="flex items-center justify-between mb-12">
           <div>
-            <h2 class="text-3xl font-bold text-gray-900 mb-2">Produits Tendance</h2>
-            <p class="text-lg text-gray-600">Découvrez les articles les plus populaires du moment</p>
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">Tous les Produits</h2>
+            <p class="text-lg text-gray-600">Découvrez des articles uniques à vendre</p>
           </div>
-          <RouterLink
-            to="/products"
-            class="text-indigo-600 hover:text-indigo-700 font-semibold"
-          >
-            Voir tout →
-          </RouterLink>
         </div>
 
-        <div v-if="loadingTrending" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <ProductSkeleton v-for="i in 8" :key="i" />
+        <!-- Filters -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+          <div class="flex flex-wrap gap-4">
+            <div class="flex-1 min-w-64">
+              <div class="relative">
+                <SearchIcon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  v-model="filters.search"
+                  type="text"
+                  placeholder="Rechercher des produits..."
+                  class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  @input="debouncedSearch"
+                />
+              </div>
+            </div>
+            
+            <select 
+              v-model="filters.category"
+              @change="loadProducts"
+              class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            >
+              <option value="">Toutes les catégories</option>
+              <option v-for="category in categories" :key="category.id" :value="category.id">
+                {{ category.name }}
+              </option>
+            </select>
+
+            <select 
+              v-model="filters.sort"
+              @change="loadProducts"
+              class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            >
+              <option value="created_at">Plus récents</option>
+              <option value="price">Prix croissant</option>
+              <option value="-price">Prix décroissant</option>
+              <option value="views_count">Plus vus</option>
+              <option value="likes_count">Plus aimés</option>
+            </select>
+
+            <button
+              @click="resetFilters"
+              class="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              Réinitialiser
+            </button>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div v-if="loadingProducts" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <ProductSkeleton v-for="i in 12" :key="i" />
         </div>
         
-        <div v-else-if="trendingProducts.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <RouterLink
-            v-for="product in trendingProducts"
+        <!-- Products Grid -->
+        <div v-else-if="products.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div 
+            v-for="product in products" 
             :key="product.id"
-            :to="`/products/${product.id}`"
-            class="block"
+            class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow group cursor-pointer"
+            @click="viewProduct(product)"
           >
-            <ProductCard :product="product" />
-          </RouterLink>
+            <!-- Product Image -->
+            <div class="relative aspect-square bg-gray-100">
+              <img 
+                v-if="product.main_image"
+                :src="product.main_image" 
+                :alt="product.title"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              <div v-else class="flex items-center justify-center h-full">
+                <ImageIcon class="w-12 h-12 text-gray-400" />
+              </div>
+              
+              <!-- Status Badge -->
+              <div class="absolute top-3 left-3">
+                <span 
+                  :class="getStatusBadgeClass(product.status)"
+                  class="px-2 py-1 text-xs font-medium rounded-full"
+                >
+                  {{ getStatusText(product.status) }}
+                </span>
+              </div>
+
+              <!-- Price -->
+              <div class="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm rounded-lg px-2 py-1">
+                <span class="text-lg font-bold text-indigo-600">{{ formatPrice(product.price) }}</span>
+                <span v-if="product.original_price && product.original_price !== product.price" class="text-sm text-gray-500 line-through ml-2">
+                  {{ formatPrice(product.original_price) }}
+                </span>
+              </div>
+            </div>
+            
+            <!-- Product Info -->
+            <div class="p-4">
+              <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2">{{ product.title }}</h3>
+              <p v-if="product.description" class="text-sm text-gray-600 mb-3 line-clamp-2">{{ product.description }}</p>
+              
+              <div class="flex items-center justify-between text-sm text-gray-500 mb-3">
+                <span>{{ product.category?.name }}</span>
+                <span>{{ product.condition?.name }}</span>
+              </div>
+              
+              <div class="flex items-center justify-between">
+                <div class="flex items-center text-sm text-gray-500">
+                  <span class="flex items-center mr-3">
+                    <EyeIcon class="w-4 h-4 mr-1" />
+                    {{ product.views_count || 0 }}
+                  </span>
+                  <span class="flex items-center">
+                    <HeartIcon class="w-4 h-4 mr-1" />
+                    {{ product.likes_count || 0 }}
+                  </span>
+                </div>
+                <div class="text-sm text-gray-500">
+                  Par {{ product.user?.name }}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div v-else class="text-center py-16">
-          <TrendingUpIcon class="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h3 class="text-lg font-medium text-gray-900 mb-2">Aucun produit tendance</h3>
-          <p class="text-gray-600">Revenez plus tard pour découvrir les tendances</p>
+        <!-- No Products -->
+        <div v-else class="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+          <PackageIcon class="mx-auto h-12 w-12 text-gray-400" />
+          <h3 class="mt-2 text-sm font-medium text-gray-900">Aucun produit trouvé</h3>
+          <p class="mt-1 text-sm text-gray-500">Aucun produit ne correspond à vos critères de recherche.</p>
+        </div>
+
+        <!-- Pagination -->
+        <div v-if="pagination.total > pagination.per_page" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mt-8">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <button
+                @click="loadProducts(pagination.current_page - 1)"
+                :disabled="pagination.current_page === 1"
+                class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Précédent
+              </button>
+              
+              <span class="text-sm text-gray-700">
+                Page {{ pagination.current_page }} sur {{ pagination.last_page }}
+              </span>
+              
+              <button
+                @click="loadProducts(pagination.current_page + 1)"
+                :disabled="pagination.current_page === pagination.last_page"
+                class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Suivant
+              </button>
+            </div>
+            
+            <div class="text-sm text-gray-700">
+              {{ pagination.from }}-{{ pagination.to }} sur {{ pagination.total }} produits
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -223,11 +321,11 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import { TrendingUpIcon, RadioIcon, DownloadIcon } from 'lucide-vue-next'
+import { useRouter } from 'vue-router'
+import { debounce } from 'lodash'
+import { TrendingUpIcon, RadioIcon, DownloadIcon, SearchIcon, EyeIcon, HeartIcon, ImageIcon, PackageIcon } from 'lucide-vue-next'
 
 // Components
-import FeatureCard from '@/components/home/FeatureCard.vue'
-import ProductCard from '@/components/products/ProductCard.vue'
 import ProductSkeleton from '@/components/skeletons/ProductSkeleton.vue'
 import LiveCard from '@/components/lives/LiveCard.vue'
 import LiveSkeleton from '@/components/skeletons/LiveSkeleton.vue'
@@ -235,15 +333,32 @@ import CategoryCard from '@/components/categories/CategoryCard.vue'
 import CategorySkeleton from '@/components/skeletons/CategorySkeleton.vue'
 
 const authStore = useAuthStore()
+const router = useRouter()
 
 // Reactive data
-const trendingProducts = ref([])
+const products = ref([])
 const liveLives = ref([])
 const categories = ref([])
-const loadingTrending = ref(true)
+const loadingProducts = ref(true)
 const loadingLives = ref(true)
 const loadingCategories = ref(true)
 const downloadingAPK = ref(false)
+
+// Filters for products
+const filters = ref({
+  search: '',
+  category: '',
+  sort: 'created_at'
+})
+
+const pagination = ref({
+  current_page: 1,
+  last_page: 1,
+  per_page: 20,
+  total: 0,
+  from: 0,
+  to: 0
+})
 
 // Computed
 const isAuthenticated = computed(() => authStore.isAuthenticated)
@@ -290,19 +405,39 @@ const downloadAPK = async () => {
   }
 }
 
-const fetchTrendingProducts = async () => {
-  loadingTrending.value = true
+const loadProducts = async (page = 1) => {
+  loadingProducts.value = true
   try {
-    const response = await window.axios.get('/trending', { params: { limit: 8 } })
-    trendingProducts.value = response.data.data || []
+    const params = new URLSearchParams({
+      page: page.toString(),
+      per_page: pagination.value.per_page.toString()
+    })
+    
+    if (filters.value.search) params.append('search', filters.value.search)
+    if (filters.value.category) params.append('category_id', filters.value.category)
+    if (filters.value.sort) params.append('sort', filters.value.sort)
+    
+    const response = await window.axios.get(`/products?${params}`)
+    
+    // L'API retourne {success: true, data: Array(10)}
+    const productsData = response.data.data
+    products.value = productsData || []
+    
+    // Pour la pagination, on utilise les données de base
+    // car l'API retourne directement le tableau de produits
+    pagination.value.current_page = 1
+    pagination.value.last_page = 1
+    pagination.value.total = productsData.length || 0
+    pagination.value.from = 1
+    pagination.value.to = productsData.length || 0
   } catch (error) {
-    console.error('Error fetching trending products:', error)
+    console.error('Erreur lors du chargement des produits:', error)
   } finally {
-    loadingTrending.value = false
+    loadingProducts.value = false
   }
 }
 
-const fetchLiveLives = async () => {
+const loadLiveLives = async () => {
   loadingLives.value = true
   try {
     const response = await window.axios.get('/lives', { 
@@ -316,11 +451,11 @@ const fetchLiveLives = async () => {
   }
 }
 
-const fetchCategories = async () => {
+const loadCategories = async () => {
   loadingCategories.value = true
   try {
     const response = await window.axios.get('/categories', { params: { limit: 12 } })
-    categories.value = response.data.data || []
+    categories.value = response.data.data || response.data
   } catch (error) {
     console.error('Error fetching categories:', error)
   } finally {
@@ -328,12 +463,56 @@ const fetchCategories = async () => {
   }
 }
 
+const debouncedSearch = debounce(() => {
+  pagination.value.current_page = 1
+  loadProducts()
+}, 500)
+
+const resetFilters = () => {
+  filters.value.search = ''
+  filters.value.category = ''
+  filters.value.sort = 'created_at'
+  pagination.value.current_page = 1
+  loadProducts()
+}
+
+const viewProduct = (product) => {
+  router.push(`/products/${product.id}`)
+}
+
+const formatPrice = (price) => {
+  return new Intl.NumberFormat('fr-FR', {
+    style: 'currency',
+    currency: 'EUR'
+  }).format(price)
+}
+
+const getStatusBadgeClass = (status) => {
+  const classes = {
+    active: 'bg-green-100 text-green-800',
+    draft: 'bg-gray-100 text-gray-800',
+    sold: 'bg-blue-100 text-blue-800',
+    reserved: 'bg-yellow-100 text-yellow-800'
+  }
+  return classes[status] || classes.draft
+}
+
+const getStatusText = (status) => {
+  const texts = {
+    active: 'Actif',
+    draft: 'Brouillon',
+    sold: 'Vendu',
+    reserved: 'Réservé'
+  }
+  return texts[status] || 'Inconnu'
+}
+
 // Lifecycle
 onMounted(async () => {
   await Promise.all([
-    fetchTrendingProducts(),
-    fetchLiveLives(),
-    fetchCategories()
+    loadProducts(),
+    loadLiveLives(),
+    loadCategories()
   ])
 })
 </script>
