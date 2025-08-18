@@ -288,8 +288,9 @@ class GoogleVisionService
         $colors = [];
         if ($annotations->hasImagePropertiesAnnotation()) {
             $properties = $annotations->getImagePropertiesAnnotation();
-            if ($properties->hasDominantColorsAnnotation()) {
-                foreach ($properties->getDominantColorsAnnotation()->getColors() as $colorInfo) {
+            $dominantColors = $properties->getDominantColors();
+            if ($dominantColors && $dominantColors->getColors()) {
+                foreach ($dominantColors->getColors() as $colorInfo) {
                     $color = $colorInfo->getColor();
                     $colors[] = [
                         'red' => $color->getRed(),
