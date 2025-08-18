@@ -253,13 +253,7 @@
                 color="green"
                 @click="router.push('/orders')"
               />
-              <QuickActionButton
-                title="Messages"
-                description="Conversations clients"
-                icon="message-circle"
-                color="purple"
-                @click="router.push('/messages')"
-              />
+
               <QuickActionButton
                 title="Analytics"
                 description="Voir les statistiques"
@@ -274,14 +268,6 @@
           <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 p-6 hover:shadow-2xl transition-all duration-300">
             <h2 class="text-xl font-bold text-gray-900 mb-6">Alertes</h2>
             <div class="space-y-4">
-              <div v-if="unreadMessages > 0" class="flex items-center p-3 bg-blue-50 rounded-lg border border-blue-200">
-                <MessageCircleIcon class="w-5 h-5 text-blue-600 mr-3" />
-                <div class="flex-1">
-                  <p class="text-sm font-medium text-blue-900">{{ unreadMessages }} message(s) non lu(s)</p>
-                  <p class="text-xs text-blue-700">Clients en attente</p>
-                </div>
-              </div>
-              
               <div v-if="pendingOrders > 0" class="flex items-center p-3 bg-yellow-50 rounded-lg border border-yellow-200">
                 <ClockIcon class="w-5 h-5 text-yellow-600 mr-3" />
                 <div class="flex-1">
@@ -298,7 +284,7 @@
                 </div>
               </div>
               
-              <div v-if="unreadMessages === 0 && pendingOrders === 0 && unreadNotifications === 0" class="text-center py-4">
+              <div v-if="pendingOrders === 0 && unreadNotifications === 0" class="text-center py-4">
                 <CheckCircleIcon class="mx-auto h-8 w-8 text-green-500 mb-2" />
                 <p class="text-sm text-gray-600">Tout est à jour !</p>
               </div>
@@ -330,7 +316,6 @@ import {
   ActivityIcon,
   UserIcon,
   EditIcon,
-  MessageCircleIcon,
   BellIcon,
   CheckCircleIcon
 } from 'lucide-vue-next'
@@ -351,7 +336,6 @@ const stats = computed(() => dashboardStore.stats)
 const recentProducts = computed(() => dashboardStore.recentProducts)
 const recentActivity = computed(() => dashboardStore.recentActivity)
 const salesChartData = computed(() => dashboardStore.salesChartData)
-const unreadMessages = computed(() => dashboardStore.unreadMessages)
 const pendingOrders = computed(() => dashboardStore.pendingOrders)
 const unreadNotifications = computed(() => dashboardStore.unreadNotifications)
 

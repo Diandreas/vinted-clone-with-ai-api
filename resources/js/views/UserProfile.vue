@@ -94,13 +94,6 @@
             <!-- Action Buttons -->
             <div v-if="!isSelf" class="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-3 mt-3 sm:mt-0">
               <button
-                @click="goToMessages"
-                class="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 bg-indigo-600 hover:bg-indigo-700 rounded-full transition-colors flex items-center justify-center space-x-2 shadow-lg text-sm sm:text-base"
-              >
-                <MessageCircleIcon class="w-3 h-3 sm:w-4 sm:h-4" />
-                <span>Message</span>
-              </button>
-              <button
                 :disabled="followBusy"
                 @click="toggleFollow"
                 class="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 rounded-full transition-all flex items-center justify-center space-x-2 shadow-lg text-sm sm:text-base"
@@ -409,7 +402,7 @@ import {
   StarIcon,
   LinkIcon,
   MapPinIcon,
-  MessageCircleIcon,
+
   Loader2Icon,
   AlertTriangleIcon
 } from 'lucide-vue-next'
@@ -573,15 +566,7 @@ function goToPage(page) {
   fetchProducts(page)
 }
 
-function goToMessages() {
-  if (!isAuthenticated.value) {
-    router.push({ name: 'login', query: { redirect: route.fullPath } })
-    return
-  }
-  const q = { user: user.value?.id }
-  if (route.query.product) q.product = route.query.product
-  router.push({ name: 'messages', query: q })
-}
+
 
 function reportUser() {
   showMoreOptions.value = false

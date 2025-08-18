@@ -35,7 +35,6 @@ import { formatDistanceToNow } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import {
   HeartIcon,
-  MessageCircleIcon,
   ShoppingBagIcon,
   UserPlusIcon,
   PackageIcon,
@@ -52,7 +51,7 @@ const props = defineProps({
 
 const iconMapping = {
   like: HeartIcon,
-  comment: MessageCircleIcon,
+  comment: PackageIcon,
   order: ShoppingBagIcon,
   follow: UserPlusIcon,
   product_created: PackageIcon,
