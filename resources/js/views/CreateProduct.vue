@@ -4,8 +4,8 @@
       <!-- Header - Ultra Compact -->
       <div class="mb-2 sm:mb-3">
         <nav class="flex mb-2">
-          <RouterLink 
-            to="/products" 
+          <RouterLink
+            to="/products"
             class="group inline-flex items-center text-gray-600 hover:text-primary-600 transition-all duration-200 bg-white/80 backdrop-blur-sm px-2 py-1 rounded-md border border-white/50 hover:border-primary-200 hover:bg-white shadow-sm text-xs"
           >
             <ArrowLeftIcon class="w-3 h-3 mr-1 group-hover:-translate-x-1 transition-transform duration-200" />
@@ -76,7 +76,7 @@
               <p class="text-gray-600 text-xs">Max 8 photos</p>
             </div>
           </div>
-          
+
           <!-- Upload Button - Ultra Compact -->
           <div class="mb-2">
             <div class="flex items-center justify-between">
@@ -86,7 +86,7 @@
               <label class="cursor-pointer inline-flex items-center px-2 py-1 bg-primary-100 text-primary-700 rounded-md hover:bg-primary-200 transition-colors font-medium text-xs">
                 <PlusIcon class="w-3 h-3 mr-1" />
                 Ajouter
-                <input 
+                <input
                   ref="multipleImageInput"
                   type="file"
                   accept="image/*"
@@ -115,7 +115,7 @@
                 <CameraIcon class="w-3 h-3 text-gray-400 mb-0.5" />
                 <span class="text-xs text-gray-500">{{ index + 1 }}</span>
               </div>
-              
+
               <!-- Remove Button - Ultra Compact -->
               <button
                 v-if="image"
@@ -427,15 +427,15 @@ export default {
     const handleMultipleImageUpload = (event) => {
       const files = Array.from(event.target.files)
       const availableSlots = form.value.images.filter(img => !img).length
-      
+
       if (files.length > availableSlots) {
         notificationStore.error(`Vous ne pouvez ajouter que ${availableSlots} images supplémentaires`)
         return
       }
 
       files.forEach((file, index) => {
-        const emptySlotIndex = form.value.images.findIndex(img => !img)
-        if (emptySlotIndex !== -1) {
+          const emptySlotIndex = form.value.images.findIndex(img => !img)
+          if (emptySlotIndex !== -1) {
           form.value.images[emptySlotIndex] = file
         }
       })
@@ -465,27 +465,27 @@ export default {
 
     const validateForm = () => {
       errors.value = {}
-      
+
       if (!form.value.title.trim()) {
         errors.value.title = ['Le titre est requis']
       }
-      
+
       if (!form.value.description.trim()) {
         errors.value.description = ['La description est requise']
       }
-      
+
       if (!form.value.price || form.value.price <= 0) {
         errors.value.price = ['Le prix doit être supérieur à 0']
       }
-      
+
       if (!form.value.category_id) {
         errors.value.category_id = ['La catégorie est requise']
       }
-      
+
       if (!form.value.condition_id) {
         errors.value.condition_id = ['L\'état est requis']
       }
-      
+
       const hasImages = form.value.images.some(img => img)
       if (!hasImages) {
         errors.value.images = ['Au moins une image est requise']
@@ -505,7 +505,7 @@ export default {
 
       try {
         const formData = new FormData()
-        
+
         // Ajouter les champs texte
         formData.append('title', form.value.title)
         formData.append('description', form.value.description)
@@ -530,7 +530,7 @@ export default {
         if (form.value.location) {
           formData.append('location', form.value.location)
         }
-        
+
         // Ajouter les images
         const validImages = form.value.images.filter(img => img)
         validImages.forEach((image, index) => {
@@ -542,7 +542,7 @@ export default {
             'Content-Type': 'multipart/form-data'
           }
         })
-        
+
         if (response.data.success) {
           notificationStore.success('Produit créé avec succès !')
           router.push(`/products/${response.data.data.id}`)
@@ -551,7 +551,7 @@ export default {
         }
       } catch (error) {
         console.error('Error creating product:', error)
-        
+
         if (error.response?.data?.errors) {
           errors.value = error.response.data.errors
           showErrors.value = true

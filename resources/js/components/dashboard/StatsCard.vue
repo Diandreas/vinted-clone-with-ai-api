@@ -2,7 +2,7 @@
   <div class="group relative overflow-hidden bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
     <!-- Background gradient on hover -->
     <div class="absolute inset-0 bg-gradient-to-br from-primary-50/50 via-primary-50/30 to-primary-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-    
+
     <!-- Content -->
     <div class="relative">
       <!-- Header with icon and trend -->
@@ -17,10 +17,10 @@
             </h3>
           </div>
         </div>
-        
+
         <!-- Trend indicator -->
         <div v-if="trend !== undefined" class="flex items-center space-x-1">
-          <div 
+          <div
             :class="trendClasses"
             class="px-2 py-1 rounded-lg text-xs font-medium flex items-center space-x-1"
           >
@@ -29,23 +29,23 @@
           </div>
         </div>
       </div>
-      
+
       <!-- Main value -->
       <div class="mb-2">
         <div class="text-3xl font-bold text-gray-900 group-hover:text-primary-900 transition-colors duration-200">
           {{ formattedValue }}
         </div>
       </div>
-      
+
       <!-- Additional info or description -->
       <div v-if="description" class="text-sm text-gray-500 group-hover:text-gray-600 transition-colors duration-200">
         {{ description }}
       </div>
-      
+
       <!-- Hover effect line -->
       <div class="absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r from-primary-500 to-primary-600 group-hover:w-full transition-all duration-500"></div>
     </div>
-    
+
     <!-- Decorative elements -->
     <div class="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-primary-100/20 to-primary-100/20 rounded-full -translate-y-10 translate-x-10 group-hover:scale-110 transition-transform duration-300"></div>
     <div class="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-primary-100/20 to-gray-100/20 rounded-full translate-y-8 -translate-x-8 group-hover:scale-110 transition-transform duration-300"></div>
@@ -100,18 +100,18 @@ const props = defineProps({
 // Map icon names to components
 const iconComponent = computed(() => {
   const iconMap = {
-    'package': PackageIcon,
-    'dollar-sign': DollarSignIcon,
-    'users': UsersIcon,
-    'eye': EyeIcon,
+  'package': PackageIcon,
+  'dollar-sign': DollarSignIcon,
+  'users': UsersIcon,
+  'eye': EyeIcon,
     'shopping-cart': ShoppingCartIcon,
-    'heart': HeartIcon,
+  'heart': HeartIcon,
     'star': StarIcon,
     'bell': BellIcon,
     'clock': ClockIcon,
     'check-circle': CheckCircleIcon
   }
-  
+
   return iconMap[props.icon] || PackageIcon
 })
 

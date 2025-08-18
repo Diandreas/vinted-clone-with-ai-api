@@ -17,7 +17,7 @@
             fallback="/placeholder-product.jpg"
             image-classes="w-full h-48 object-cover"
           />
-          
+
           <!-- Status Badge -->
           <div class="absolute top-2 left-2">
             <span
@@ -51,7 +51,7 @@
           <h3 class="font-semibold text-gray-900 text-sm mb-2 line-clamp-2">
             {{ product.title }}
           </h3>
-          
+
           <!-- User Info -->
           <div class="flex items-center space-x-2 mb-3">
             <div class="w-6 h-6 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center">
@@ -65,25 +65,28 @@
           <!-- Action Buttons -->
           <div class="flex items-center justify-between pt-2 border-t border-gray-100">
             <div class="flex items-center space-x-4">
-              <button 
+              <button
                 @click="$emit('like', product)"
                 :disabled="likingProducts.includes(product.id)"
                 class="flex items-center space-x-1 text-gray-500 hover:text-gray-500 transition-colors disabled:opacity-50"
               >
-                <HeartIcon 
+                <HeartIcon
                   class="w-4 h-4"
                   :class="product.is_liked ? 'text-gray-500 fill-current' : ''"
                 />
                 <span class="text-xs">{{ product.likes_count || 0 }}</span>
               </button>
 
-              <button class="flex items-center space-x-1 text-gray-500 hover:text-primary-500 transition-colors">
-                <ChatBubbleLeftIcon class="w-4 h-4" />
-                <span class="text-xs">{{ product.comments_count || 0 }}</span>
+              <button
+                @click="shareProduct(product)"
+                class="flex items-center space-x-1 text-gray-500 hover:text-primary-500 transition-colors"
+              >
+                <ShareIcon class="w-4 h-4" />
+                <span class="text-xs">Partager</span>
               </button>
             </div>
 
-            <button 
+            <button
               @click="$emit('view', product)"
               class="text-primary-600 hover:text-primary-700 text-sm font-medium"
             >
@@ -97,7 +100,7 @@
     <!-- List Layout (using existing FacebookProductCard) -->
     <div v-else-if="viewMode === 'list'">
       <FacebookProductCard
-        v-for="product in products" 
+        v-for="product in products"
         :key="product.id"
         :product="product"
         :is-liked="product.is_liked"
@@ -141,7 +144,7 @@
 <script>
 import { computed } from 'vue'
 import { CubeIcon } from '@heroicons/vue/24/outline'
-import { HeartIcon, ChatBubbleLeftIcon } from '@heroicons/vue/24/outline'
+import { HeartIcon, ShareIcon } from '@heroicons/vue/24/outline'
 import FacebookProductCard from './FacebookProductCard.vue'
 import FacebookProductSkeleton from '../skeletons/FacebookProductSkeleton.vue'
 import ProductImage from '../ui/ProductImage.vue'
@@ -155,7 +158,7 @@ export default {
     ProductImage,
     CubeIcon,
     HeartIcon,
-    ChatBubbleLeftIcon
+    ShareIcon
   },
   props: {
     products: {
@@ -200,7 +203,10 @@ export default {
   },
   emits: ['like', 'view', 'load-more'],
   methods: {
-    formatPrice
+    formatPrice,
+    shareProduct(product) {
+      this.$emit('share', product)
+    }
   }
 }
 </script>
