@@ -393,14 +393,8 @@ Route::prefix('v1')->group(function () {
         });
     });
 
-    // File serving route (temporary solution)
-    Route::get('files/{path}', function($path) {
-        $file = storage_path('app/public/' . $path);
-        if (!file_exists($file)) {
-            abort(404);
-        }
-        return response()->file($file);
-    })->where('path', '.*');
+    // ✅ SUPPRIMÉ LA ROUTE DUPLIQUÉE ICI
+
 });
 
 // Webhook Routes (for payment providers, etc.) - PUBLIC
