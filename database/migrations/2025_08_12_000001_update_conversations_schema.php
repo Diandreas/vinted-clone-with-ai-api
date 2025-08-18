@@ -3,11 +3,13 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
     public function up(): void
     {
+        // Ajouter les colonnes d'abord
         Schema::table('conversations', function (Blueprint $table) {
             if (!Schema::hasColumn('conversations', 'product_id')) {
                 $table->unsignedBigInteger('product_id')->nullable()->after('id');
@@ -29,45 +31,108 @@ return new class extends Migration
             }
         });
 
-        // Add indexes and foreign keys in a separate Schema::table to avoid issues
-        Schema::table('conversations', function (Blueprint $table) {
-            // Indexes
-            $table->index(['buyer_id', 'seller_id'], 'conversations_buyer_seller_index');
-            $table->index(['product_id', 'buyer_id', 'seller_id'], 'conversations_product_buyer_seller_index');
+        // Ajouter les index seulement s'ils n'existent pas
+        $this->addIndexIfNotExists('conversations', ['buyer_id', 'seller_id'], 'conversations_buyer_seller_index');
+        $this->addIndexIfNotExists('conversations', ['product_id', 'buyer_id', 'seller_id'], 'conversations_product_buyer_seller_index');
 
-            // Foreign keys (guarded by try/catch in case they exist)
+        // Ajouter les clés étrangères avec gestion d'erreur
+        Schema::table('conversations', function (Blueprint $table) {
             try {
-                $table->foreign('product_id')->references('id')->on('products')->onDelete('set null');
-            } catch (\Throwable $e) {}
+                $table->foreign('product_id', 'conversations_product_id_fk')
+                    ->references('id')
+                    ->on('products')
+                    ->onDelete('set null');
+            } catch (\Throwable $e) {
+                // Contrainte déjà existante
+            }
+
             try {
-                $table->foreign('buyer_id')->references('id')->on('users')->onDelete('cascade');
-            } catch (\Throwable $e) {}
+                $table->foreign('buyer_id', 'conversations_buyer_id_fk')
+                    ->references('id')
+                    ->on('users')
+                    ->onDelete('cascade');
+            } catch (\Throwable $e) {
+                // Contrainte déjà existante
+            }
+
             try {
-                $table->foreign('seller_id')->references('id')->on('users')->onDelete('cascade');
-            } catch (\Throwable $e) {}
+                $table->foreign('seller_id', 'conversations_seller_id_fk')
+                    ->references('id')
+                    ->on('users')
+                    ->onDelete('cascade');
+            } catch (\Throwable $e) {
+                // Contrainte déjà existante
+            }
         });
     }
 
     public function down(): void
     {
         Schema::table('conversations', function (Blueprint $table) {
-            // Drop foreign keys if exist
-            try { $table->dropForeign(['product_id']); } catch (\Throwable $e) {}
-            try { $table->dropForeign(['buyer_id']); } catch (\Throwable $e) {}
-            try { $table->dropForeign(['seller_id']); } catch (\Throwable $e) {}
+            // Supprimer les clés étrangères avec noms spécifiques
+            try {
+                $table->dropForeign('conversations_product_id_fk');
+            } catch (\Throwable $e) {}
 
-            // Drop indexes
-            try { $table->dropIndex('conversations_buyer_seller_index'); } catch (\Throwable $e) {}
-            try { $table->dropIndex('conversations_product_buyer_seller_index'); } catch (\Throwable $e) {}
+            try {
+                $table->dropForeign('conversations_buyer_id_fk');
+            } catch (\Throwable $e) {}
 
-            // Drop columns if exist
-            foreach (['product_id','buyer_id','seller_id','last_message_at','is_archived','deleted_at'] as $col) {
-                if (Schema::hasColumn('conversations', $col)) {
-                    $table->dropColumn($col);
+            try {
+                $table->dropForeign('conversations_seller_id_fk');
+            } catch (\Throwable $e) {}
+
+            // Supprimer les index
+            $this->dropIndexIfExists('conversations', 'conversations_buyer_seller_index');
+            $this->dropIndexIfExists('conversations', 'conversations_product_buyer_seller_index');
+
+            // Supprimer les colonnes si elles existent
+            $columnsToRemove = ['product_id', 'buyer_id', 'seller_id', 'last_message_at', 'is_archived', 'deleted_at'];
+
+            foreach ($columnsToRemove as $column) {
+                if (Schema::hasColumn('conversations', $column)) {
+                    $table->dropColumn($column);
                 }
             }
         });
     }
+
+    /**
+     * Ajouter un index s'il n'existe pas
+     */
+    private function addIndexIfNotExists(string $table, array $columns, string $indexName): void
+    {
+        if (!$this->indexExists($table, $indexName)) {
+            $columnList = '`' . implode('`, `', $columns) . '`';
+            DB::statement("ALTER TABLE `{$table}` ADD INDEX `{$indexName}` ({$columnList})");
+        }
+    }
+
+    /**
+     * Supprimer un index s'il existe
+     */
+    private function dropIndexIfExists(string $table, string $indexName): void
+    {
+        if ($this->indexExists($table, $indexName)) {
+            DB::statement("ALTER TABLE `{$table}` DROP INDEX `{$indexName}`");
+        }
+    }
+
+    /**
+     * Vérifier si un index existe
+     */
+    private function indexExists(string $table, string $indexName): bool
+    {
+        $database = config('database.connections.' . config('database.default') . '.database');
+
+        $result = DB::selectOne("
+            SELECT COUNT(*) as count
+            FROM information_schema.statistics
+            WHERE table_schema = ?
+            AND table_name = ?
+            AND index_name = ?
+        ", [$database, $table, $indexName]);
+
+        return $result && $result->count > 0;
+    }
 };
-
-

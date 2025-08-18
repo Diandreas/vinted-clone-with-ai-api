@@ -105,7 +105,7 @@ export default {
         }
       } catch (error) {
         console.error('Erreur lors du chargement des produits:', error)
-        notificationStore.showError('Erreur lors du chargement des produits')
+        notificationStore.error('Erreur lors du chargement des produits')
       } finally {
         loadingProducts.value = false
       }
@@ -125,29 +125,28 @@ export default {
 
     const toggleLike = async (product) => {
       if (!isAuthenticated.value) {
-        notificationStore.showError('Connectez-vous pour liker ce produit')
+        notificationStore.error('Connectez-vous pour liker ce produit')
         return
       }
 
       try {
         likingProducts.value.push(product.id)
         
-        if (product.is_liked) {
-          await api.delete(`/products/${product.id}/like`)
-          product.is_liked = false
-          product.likes_count = Math.max(0, (product.likes_count || 1) - 1)
-        } else {
-          await api.post(`/products/${product.id}/like`)
-          product.is_liked = true
-          product.likes_count = (product.likes_count || 0) + 1
-        }
+        // Utiliser toujours POST pour toggle like/unlike
+        const response = await api.post(`/products/${product.id}/like`)
         
-        notificationStore.showSuccess(
-          product.is_liked ? 'Produit ajouté aux favoris' : 'Produit retiré des favoris'
-        )
+        if (response.data.success) {
+          // Mettre à jour l'état du produit selon la réponse de l'API
+          product.is_liked = response.data.liked
+          product.likes_count = response.data.likes_count
+          
+          notificationStore.success(
+            product.is_liked ? 'Produit ajouté aux favoris' : 'Produit retiré des favoris'
+          )
+        }
       } catch (error) {
         console.error('Erreur lors du like:', error)
-        notificationStore.showError('Erreur lors du like du produit')
+        notificationStore.error('Erreur lors du like du produit')
       } finally {
         const index = likingProducts.value.indexOf(product.id)
         if (index > -1) {

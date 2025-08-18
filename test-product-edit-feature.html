@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Modification des Produits</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .success {
+            background: #d1fae5;
+            border: 1px solid #10b981;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+        .info {
+            background: #dbeafe;
+            border: 1px solid #3b82f6;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+        .warning {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+        .demo-modal {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            max-width: 800px;
+        }
+        .demo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .demo-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .demo-form .full-width {
+            grid-column: 1 / -1;
+        }
+        .demo-input {
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 10px;
+            width: 100%;
+            font-size: 14px;
+        }
+        .demo-textarea {
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 10px;
+            width: 100%;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 100px;
+        }
+        .demo-select {
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 10px;
+            width: 100%;
+            font-size: 14px;
+        }
+        .demo-buttons {
+            grid-column: 1 / -1;
+            display: flex;
+            gap: 15px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+        }
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: #4f46e5;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #4338ca;
+        }
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .image-item {
+            position: relative;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .image-item img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+        }
+        .image-remove {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #dc2626;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .upload-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            background: #f9fafb;
+        }
+        .upload-area:hover {
+            border-color: #4f46e5;
+            background: #f0f9ff;
+        }
+    </style>
+</head>
+<body>
+    <h1>🛠️ Test de la fonctionnalité de modification des produits</h1>
+    
+    <div class="test-section">
+        <h2>✅ Fonctionnalité implémentée</h2>
+        <p>Les vendeurs peuvent maintenant modifier leurs produits directement depuis la page de détail du produit.</p>
+        
+        <div class="success">
+            <strong>Fonctionnalités ajoutées :</strong>
+            <ul>
+                <li>✅ Bouton "Modifier le produit" visible uniquement pour le propriétaire</li>
+                <li>✅ Bouton "Supprimer" pour supprimer le produit</li>
+                <li>✅ Modal de modification complet avec tous les champs</li>
+                <li>✅ Gestion des images (ajout/suppression)</li>
+                <li>✅ Validation des données</li>
+                <li>✅ Mise à jour en temps réel</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>👀 Démonstration de l'interface</h2>
+        
+        <h3>1. Boutons d'action pour le propriétaire</h3>
+        <p>Ces boutons n'apparaissent que si vous êtes le propriétaire du produit :</p>
+        <div style="display: flex; gap: 15px; margin: 15px 0;">
+            <button class="btn btn-primary">
+                ✏️ Modifier le produit
+            </button>
+            <button class="btn btn-danger">
+                🗑️ Supprimer
+            </button>
+        </div>
+        
+        <h3>2. Modal de modification</h3>
+        <div class="demo-modal">
+            <div class="demo-header">
+                <h2 style="margin: 0; font-size: 24px;">Modifier le produit</h2>
+                <button class="btn btn-secondary" style="padding: 8px; font-size: 18px;">✕</button>
+            </div>
+            
+            <form>
+                <div class="demo-form">
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Titre du produit *</label>
+                        <input type="text" class="demo-input" value="iPhone 14 Pro" placeholder="Titre du produit">
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Prix *</label>
+                        <input type="number" class="demo-input" value="899.00" step="0.01" min="0">
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Prix original (optionnel)</label>
+                        <input type="number" class="demo-input" value="999.00" step="0.01" min="0">
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Frais de port</label>
+                        <input type="number" class="demo-input" value="5.99" step="0.01" min="0">
+                    </div>
+                    
+                    <div class="full-width">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Description *</label>
+                        <textarea class="demo-textarea" placeholder="Décrivez votre produit...">iPhone 14 Pro en excellent état, jamais utilisé. Boîte d'origine incluse.</textarea>
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Catégorie</label>
+                        <select class="demo-select">
+                            <option value="">Sélectionner une catégorie</option>
+                            <option value="1" selected>Électronique</option>
+                            <option value="2">Vêtements</option>
+                            <option value="3">Maison</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Marque</label>
+                        <select class="demo-select">
+                            <option value="">Sélectionner une marque</option>
+                            <option value="1" selected>Apple</option>
+                            <option value="2">Samsung</option>
+                            <option value="3">Sony</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">État</label>
+                        <select class="demo-select">
+                            <option value="">Sélectionner un état</option>
+                            <option value="1" selected>Excellent</option>
+                            <option value="2">Bon</option>
+                            <option value="3">Moyen</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Taille</label>
+                        <input type="text" class="demo-input" value="128GB" placeholder="S, M, L, XL...">
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Couleur</label>
+                        <input type="text" class="demo-input" value="Or" placeholder="Rouge, Bleu...">
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Matériau</label>
+                        <input type="text" class="demo-input" value="Verre" placeholder="Coton, Cuir...">
+                    </div>
+                    
+                    <div class="full-width">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Localisation</label>
+                        <input type="text" class="demo-input" value="Paris, France" placeholder="Ville, Pays">
+                    </div>
+                    
+                    <div class="full-width">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Images du produit</label>
+                        
+                        <!-- Images existantes -->
+                        <div class="image-gallery">
+                            <div class="image-item">
+                                <img src="https://via.placeholder.com/120x120/4f46e5/ffffff?text=📱" alt="Image 1">
+                                <button class="image-remove">✕</button>
+                            </div>
+                            <div class="image-item">
+                                <img src="https://via.placeholder.com/120x120/10b981/ffffff?text=📱" alt="Image 2">
+                                <button class="image-remove">✕</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Zone d'upload -->
+                        <div class="upload-area">
+                            <div style="font-size: 48px; margin-bottom: 15px;">📤</div>
+                            <p style="margin: 0 0 15px 0; color: #6b7280;">Glissez-déposez vos images ici ou</p>
+                            <button class="btn btn-primary">Sélectionner des images</button>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Statut</label>
+                        <select class="demo-select">
+                            <option value="active" selected>Actif</option>
+                            <option value="draft">Brouillon</option>
+                            <option value="reserved">Réservé</option>
+                            <option value="sold">Vendu</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="demo-buttons">
+                    <button type="button" class="btn btn-secondary">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Mettre à jour le produit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔧 Fonctionnalités techniques</h2>
+        
+        <h3>1. Gestion des permissions</h3>
+        <div class="info">
+            <p><strong>Computed property :</strong> <code>isProductOwner</code> vérifie si l'utilisateur connecté est le propriétaire du produit</p>
+            <p><strong>Affichage conditionnel :</strong> Les boutons de modification ne s'affichent que pour le propriétaire</p>
+        </div>
+        
+        <h3>2. Formulaire de modification</h3>
+        <div class="info">
+            <p><strong>Champs inclus :</strong> Tous les champs du produit (titre, description, prix, catégorie, marque, état, etc.)</p>
+            <p><strong>Validation :</strong> Champs requis marqués avec *</p>
+            <p><strong>Données de référence :</strong> Catégories, marques et conditions chargées dynamiquement</p>
+        </div>
+        
+        <h3>3. Gestion des images</h3>
+        <div class="info">
+            <p><strong>Images existantes :</strong> Affichage avec possibilité de suppression</p>
+            <p><strong>Nouvelles images :</strong> Upload multiple avec aperçu</p>
+            <p><strong>FormData :</strong> Envoi des images via FormData pour l'API</p>
+        </div>
+        
+        <h3>4. API et mise à jour</h3>
+        <div class="info">
+            <p><strong>Méthode HTTP :</strong> POST vers <code>/products/{id}</code></p>
+            <p><strong>Headers :</strong> <code>Content-Type: multipart/form-data</code></p>
+            <p><strong>Mise à jour locale :</strong> Le produit est mis à jour en temps réel dans l'interface</p>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🧪 Comment tester</h2>
+        <ol>
+            <li><strong>Connectez-vous</strong> à l'application avec un compte qui possède des produits</li>
+            <li><strong>Allez sur la page d'un de vos produits</strong> : <code>http://127.0.0.1:8000/products/1</code></li>
+            <li><strong>Vérifiez que les boutons "Modifier" et "Supprimer" sont visibles</strong></li>
+            <li><strong>Cliquez sur "Modifier le produit"</strong> pour ouvrir le modal</li>
+            <li><strong>Modifiez les informations</strong> du produit</li>
+            <li><strong>Ajoutez/supprimez des images</strong> si nécessaire</li>
+            <li><strong>Cliquez sur "Mettre à jour le produit"</strong></li>
+            <li><strong>Vérifiez que les modifications</strong> sont bien appliquées</li>
+        </ol>
+        
+        <div class="warning">
+            <strong>Important :</strong> Cette fonctionnalité n'est visible que pour le propriétaire du produit. Si vous n'êtes pas connecté ou si vous n'êtes pas le propriétaire, les boutons ne s'afficheront pas.
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🎯 Cas d'usage</h2>
+        
+        <h3>1. Modification d'informations de base</h3>
+        <ul>
+            <li>Changer le titre ou la description</li>
+            <li>Modifier le prix ou ajouter un prix original</li>
+            <li>Ajuster les frais de port</li>
+            <li>Changer la catégorie, marque ou état</li>
+        </ul>
+        
+        <h3>2. Gestion des images</h3>
+        <ul>
+            <li>Supprimer des images existantes</li>
+            <li>Ajouter de nouvelles images</li>
+            <li>Réorganiser la galerie</li>
+        </ul>
+        
+        <h3>3. Changement de statut</h3>
+        <ul>
+            <li>Passer de "Actif" à "Réservé"</li>
+            <li>Marquer comme "Vendu"</li>
+            <li>Mettre en "Brouillon" temporairement</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>🔒 Sécurité et validation</h2>
+        
+        <div class="info">
+            <ul>
+                <li><strong>Vérification des permissions :</strong> Seul le propriétaire peut modifier</li>
+                <li><strong>Validation côté client :</strong> Champs requis et formats</li>
+                <li><strong>Validation côté serveur :</strong> Vérification des permissions et données</li>
+                <li><strong>Gestion des erreurs :</strong> Messages d'erreur clairs pour l'utilisateur</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🚀 Améliorations futures possibles</h2>
+        <ul>
+            <li><strong>Historique des modifications</strong> pour tracer les changements</li>
+            <li><strong>Versioning des images</strong> pour conserver l'historique</li>
+            <li><strong>Notifications</strong> aux acheteurs potentiels lors de modifications importantes</li>
+            <li><strong>Prévisualisation en temps réel</strong> des modifications</li>
+            <li><strong>Modification par lot</strong> de plusieurs produits</li>
+        </ul>
+    </div>
+
+    <script>
+        // Fonction pour tester la fonctionnalité
+        function testProductEdit() {
+            const productId = prompt('Entrez l\'ID du produit à modifier :', '1');
+            if (productId) {
+                const url = `http://127.0.0.1:8000/products/${productId}`;
+                console.log('Test de modification du produit:', url);
+                window.open(url, '_blank');
+            }
+        }
+        
+        // Ajouter un bouton de test
+        document.addEventListener('DOMContentLoaded', function() {
+            const testButton = document.createElement('button');
+            testButton.textContent = '🧪 Tester la modification de produit';
+            testButton.className = 'btn btn-primary';
+            testButton.style.cssText = 'margin: 20px 0; font-size: 16px;';
+            testButton.onclick = testProductEdit;
+            
+            document.querySelector('.test-section:last-child').appendChild(testButton);
+        });
+    </script>
+</body>
+</html>
+
+

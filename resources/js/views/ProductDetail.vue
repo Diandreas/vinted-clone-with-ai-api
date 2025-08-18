@@ -42,10 +42,10 @@
             <div v-if="product" class="absolute top-2 left-2 bg-black bg-opacity-50 text-white text-xs p-1 rounded z-10">
               Debug: main_image_url = {{ product.main_image_url || 'null' }}
             </div>
-            
-            <img 
+
+            <img
               v-if="product.main_image_url"
-              :src="product.main_image_url" 
+              :src="product.main_image_url"
               :alt="product.title"
               class="w-full h-full object-cover"
               @load="console.log('✅ Image principale chargée:', product.main_image_url)"
@@ -66,15 +66,15 @@
             <div class="col-span-4 bg-yellow-100 text-yellow-800 text-xs p-2 rounded mb-2">
               Galerie: {{ product.images.length }} images trouvées
             </div>
-            
-            <div 
-              v-for="image in product.images" 
+
+            <div
+              v-for="image in product.images"
               :key="image.id"
               class="aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover:opacity-80 transition-opacity relative"
               @click="selectMainImage(image)"
             >
-              <img 
-                :src="image.url" 
+              <img
+                :src="image.url"
                 :alt="image.alt_text || product.title"
                 class="w-full h-full object-cover"
                 @load="console.log('✅ Image galerie chargée:', image.url)"
@@ -86,12 +86,12 @@
               </div>
             </div>
           </div>
-          
+
           <!-- Debug: Aucune image -->
           <div v-else-if="product.images && product.images.length === 1" class="bg-blue-100 text-blue-800 text-xs p-2 rounded">
             Une seule image trouvée (pas de galerie)
           </div>
-          
+
           <div v-else class="bg-red-100 text-red-800 text-xs p-2 rounded">
             Aucune image trouvée dans product.images
           </div>
@@ -103,7 +103,7 @@
           <div>
             <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ product.title }}</h1>
             <div class="flex items-center space-x-3">
-              <span 
+              <span
                 :class="getStatusBadgeClass(product.status)"
                 class="px-3 py-1 text-sm font-medium rounded-full"
               >
@@ -123,7 +123,7 @@
                 {{ formatPrice(product.original_price) }}
               </span>
             </div>
-            
+
             <div v-if="product.original_price && product.original_price !== product.price" class="mt-2">
               <span class="text-sm text-green-600 font-medium">
                 {{ calculateDiscount(product.original_price, product.price) }}% de réduction
@@ -145,7 +145,7 @@
               <HeartIcon :class="isLiked ? 'w-5 h-5' : 'w-5 h-5'" class="mr-2" />
               {{ isLiked ? 'Aimé' : 'J\'aime' }}
             </button>
-            
+
             <button
               @click="toggleFavorite"
               :class="isFavorited ? 'bg-yellow-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
@@ -156,11 +156,9 @@
             </button>
           </div>
 
-          <!-- Contact Seller / Product Owner Actions -->
+          <!-- Contact Seller -->
           <div class="bg-white rounded-xl border border-gray-200 p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">
-              {{ isProductOwner ? 'Gestion du produit' : 'Contacter le vendeur' }}
-            </h3>
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Contacter le vendeur</h3>
             <div class="flex items-center space-x-4 mb-4">
               <!-- Avatar avec initiales -->
               <div class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-semibold text-lg">
@@ -171,35 +169,8 @@
                 <p class="text-sm text-gray-500">Membre depuis {{ formatDate(product.user?.created_at) }}</p>
               </div>
             </div>
-            
-            <!-- Actions pour le propriétaire du produit -->
-            <div v-if="isProductOwner" class="space-y-3">
-              <button
-                @click="viewMyProductConversations"
-                class="w-full bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 transition-colors"
-              >
-                <MessageCircleIcon class="w-4 h-4 mr-2 inline" />
-                Voir mes conversations ({{ product?.conversations_count || 0 }})
-              </button>
-              
-              <div class="grid grid-cols-2 gap-2">
-                <button
-                  @click="editProduct"
-                  class="bg-blue-600 text-white px-3 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors text-sm"
-                >
-                  Modifier
-                </button>
-                <button
-                  @click="toggleProductStatus"
-                  class="bg-gray-600 text-white px-3 py-2 rounded-lg font-medium hover:bg-gray-700 transition-colors text-sm"
-                >
-                  {{ product?.status === 'active' ? 'Suspendre' : 'Activer' }}
-                </button>
-              </div>
-            </div>
-            
-            <!-- Actions pour les autres utilisateurs -->
-            <div v-else class="flex space-x-3">
+
+            <div class="flex space-x-3">
               <button
                 @click="startConversation"
                 class="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors"
@@ -207,7 +178,7 @@
                 <MessageCircleIcon class="w-4 h-4 mr-2 inline" />
                 Message
               </button>
-              
+
               <button
                 @click="viewSellerProfile"
                 class="flex-1 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-200 transition-colors"
@@ -239,32 +210,32 @@
                 <dt class="text-sm font-medium text-gray-500">Catégorie</dt>
                 <dd class="text-sm text-gray-900">{{ product.category.name }}</dd>
               </div>
-              
+
               <div v-if="product.brand">
                 <dt class="text-sm font-medium text-gray-500">Marque</dt>
                 <dd class="text-sm text-gray-900">{{ product.brand.name }}</dd>
               </div>
-              
+
               <div v-if="product.condition">
                 <dt class="text-sm font-medium text-gray-500">État</dt>
                 <dd class="text-sm text-gray-900">{{ product.condition.name }}</dd>
               </div>
-              
+
               <div v-if="product.size">
                 <dt class="text-sm font-medium text-gray-500">Taille</dt>
                 <dd class="text-sm text-gray-900">{{ product.size }}</dd>
               </div>
-              
+
               <div v-if="product.color">
                 <dt class="text-sm font-medium text-gray-500">Couleur</dt>
                 <dd class="text-sm text-gray-900">{{ product.color }}</dd>
               </div>
-              
+
               <div v-if="product.material">
                 <dt class="text-sm font-medium text-gray-500">Matériau</dt>
                 <dd class="text-sm text-gray-900">{{ product.material }}</dd>
               </div>
-              
+
               <div v-if="product.location">
                 <dt class="text-sm font-medium text-gray-500">Localisation</dt>
                 <dd class="text-sm text-gray-900">{{ product.location }}</dd>
@@ -301,16 +272,16 @@
       <div v-if="similarProducts.length > 0" class="mt-12">
         <h3 class="text-2xl font-bold text-gray-900 mb-6">Produits similaires</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div 
-            v-for="similarProduct in similarProducts" 
+          <div
+            v-for="similarProduct in similarProducts"
             :key="similarProduct.id"
             class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
             @click="viewProduct(similarProduct)"
           >
             <div class="aspect-square bg-gray-100">
-              <img 
+              <img
                 v-if="similarProduct.main_image"
-                :src="similarProduct.main_image" 
+                :src="similarProduct.main_image"
                 :alt="similarProduct.title"
                 class="w-full h-full object-cover"
               />
@@ -343,92 +314,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Modal d'envoi de message -->
-    <div v-if="showMessageModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div class="bg-white rounded-xl shadow-xl max-w-md w-full" @click.stop>
-        <!-- Header du modal -->
-        <div class="p-6 border-b border-gray-200">
-          <div class="flex items-center justify-between">
-            <h3 class="text-lg font-semibold text-gray-900">Envoyer un message</h3>
-            <button 
-              @click="closeMessageModal"
-              class="text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        <!-- Body du modal -->
-        <div class="p-6">
-          <!-- Info produit -->
-          <div class="flex items-center space-x-3 mb-4 p-3 bg-gray-50 rounded-lg">
-            <img 
-              :src="product?.main_image_url" 
-              :alt="product?.title"
-              class="w-12 h-12 object-cover rounded-lg"
-            />
-            <div>
-              <p class="font-medium text-gray-900 text-sm">{{ product?.title }}</p>
-              <p class="text-sm text-gray-500">{{ formatPrice(product?.price) }}</p>
-            </div>
-          </div>
-
-          <!-- Info vendeur -->
-          <div class="flex items-center space-x-3 mb-4">
-            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm">
-              {{ getUserInitials(product?.user?.name) }}
-            </div>
-            <div>
-              <p class="text-sm font-medium text-gray-900">{{ product?.user?.name }}</p>
-              <p class="text-xs text-gray-500">Vendeur</p>
-            </div>
-          </div>
-
-          <!-- Zone de message -->
-          <div class="mb-4">
-            <label for="message" class="block text-sm font-medium text-gray-700 mb-2">
-              Votre message
-            </label>
-            <textarea
-              id="message"
-              v-model="messageContent"
-              rows="4"
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none"
-              placeholder="Bonjour, je suis intéressé(e) par votre produit..."
-              :disabled="sendingMessage"
-            ></textarea>
-          </div>
-
-          <!-- Erreur -->
-          <div v-if="messageError" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-            <p class="text-sm text-red-600">{{ messageError }}</p>
-          </div>
-        </div>
-
-        <!-- Footer du modal -->
-        <div class="p-6 border-t border-gray-200 flex space-x-3">
-          <button
-            @click="closeMessageModal"
-            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-            :disabled="sendingMessage"
-          >
-            Annuler
-          </button>
-          <button
-            @click="sendMessage"
-            class="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            :disabled="sendingMessage || !messageContent.trim()"
-          >
-            <span v-if="sendingMessage">Envoi...</span>
-            <span v-else>Envoyer</span>
-          </button>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -436,7 +321,6 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import api from '@/services/api'
 import {
   HomeIcon,
   ChevronRightIcon,
@@ -461,37 +345,22 @@ const isFavorited = ref(false)
 const likingProduct = ref(false)
 const favoritingProduct = ref(false)
 
-// Message Modal State
-const showMessageModal = ref(false)
-const messageContent = ref('')
-const sendingMessage = ref(false)
-const messageError = ref('')
-
 // Computed
 const isAuthenticated = computed(() => authStore.isAuthenticated)
 const currentUserId = computed(() => authStore.user?.id)
-const isProductOwner = computed(() => {
-  return currentUserId.value === product.value?.user_id
-})
 
 // Methods
 const loadProduct = async () => {
-  console.log('🔵 loadProduct appelé pour ID:', route.params.id)
   loading.value = true
   try {
-    console.log('📡 Appel API GET /products/' + route.params.id)
-    const response = await api.get(`/products/${route.params.id}`)
-    console.log('📊 Réponse API produit:', response.data)
-    
+    const response = await window.axios.get(`/products/${route.params.id}`)
     if (response.data.success) {
       product.value = response.data.data
-      
+
       // Debug des données du produit
       console.log('🖼️ Données du produit chargées:', {
         id: product.value.id,
         title: product.value.title,
-        user_id: product.value.user_id,
-        user: product.value.user,
         main_image_url: product.value.main_image_url,
         images_count: product.value.images?.length || 0,
         images: product.value.images?.map(img => ({
@@ -501,7 +370,7 @@ const loadProduct = async () => {
           alt_text: img.alt_text
         }))
       })
-      
+
       await loadSimilarProducts()
       await checkUserInteractions()
     }
@@ -520,8 +389,8 @@ const loadSimilarProducts = async () => {
       per_page: 4,
       exclude: route.params.id
     })
-    
-    const response = await api.get(`/products?${params}`)
+
+    const response = await window.axios.get(`/products?${params}`)
     if (response.data.success) {
       similarProducts.value = response.data.data.data || []
     }
@@ -532,14 +401,14 @@ const loadSimilarProducts = async () => {
 
 const checkUserInteractions = async () => {
   if (!isAuthenticated.value) return
-  
+
   try {
     // Check if user liked the product
-    const likeResponse = await api.get(`/products/${route.params.id}/like-status`)
+    const likeResponse = await window.axios.get(`/products/${route.params.id}/like-status`)
     isLiked.value = likeResponse.data.liked || false
-    
+
     // Check if user favorited the product
-    const favoriteResponse = await api.get(`/products/${route.params.id}/favorite-status`)
+    const favoriteResponse = await window.axios.get(`/products/${route.params.id}/favorite-status`)
     isFavorited.value = favoriteResponse.data.favorited || false
   } catch (error) {
     console.error('Erreur lors de la vérification des interactions:', error)
@@ -551,30 +420,30 @@ const toggleLike = async () => {
     router.push('/login')
     return
   }
-  
+
   // Protection contre les doubles clics
   if (likingProduct.value) {
     console.log('⚠️ toggleLike déjà en cours, ignoré')
     return
   }
-  
+
   likingProduct.value = true
-  
+
   console.log('🔄 toggleLike appelé - État avant:', {
     isLiked: isLiked.value,
     likes_count: product.value?.likes_count
   })
-  
+
   try {
-    const response = await api.post(`/products/${route.params.id}/like`)
-    
+    const response = await window.axios.post(`/products/${route.params.id}/like`)
+
     console.log('📡 Réponse API:', response.data)
-    
+
     if (response.data.success) {
       // Mettre à jour l'état local
       isLiked.value = response.data.liked
       product.value.likes_count = response.data.likes_count
-      
+
       console.log('✅ État après mise à jour:', {
         isLiked: isLiked.value,
         likes_count: product.value.likes_count
@@ -592,30 +461,30 @@ const toggleFavorite = async () => {
     router.push('/login')
     return
   }
-  
+
   // Protection contre les doubles clics
   if (favoritingProduct.value) {
     console.log('⚠️ toggleFavorite déjà en cours, ignoré')
     return
   }
-  
+
   favoritingProduct.value = true
-  
+
   console.log('🔄 toggleFavorite appelé - État avant:', {
     isFavorited: isFavorited.value,
     favorites_count: product.value?.favorites_count
   })
-  
+
   try {
-    const response = await api.post(`/products/${route.params.id}/favorite`)
-    
+    const response = await window.axios.post(`/products/${route.params.id}/favorite`)
+
     console.log('📡 Réponse API:', response.data)
-    
+
     if (response.data.success) {
       // Mettre à jour l'état local
       isFavorited.value = response.data.favorited
       product.value.favorites_count = response.data.favorites_count
-      
+
       console.log('✅ État après mise à jour:', {
         isFavorited: isFavorited.value,
         favorites_count: product.value.favorites_count
@@ -629,128 +498,21 @@ const toggleFavorite = async () => {
 }
 
 const startConversation = () => {
-  console.log('🔵 startConversation appelé')
-  console.log('Authentification:', {
-    isAuthenticated: isAuthenticated.value,
-    currentUserId: currentUserId.value,
-    productOwnerId: product.value?.user_id,
-    authStore: authStore.user
-  })
-  
   if (!isAuthenticated.value) {
-    console.log('❌ Utilisateur non authentifié, redirection vers /login')
     router.push('/login')
     return
   }
-  
+
   if (currentUserId.value === product.value.user_id) {
-    console.log('❌ Utilisateur essaie de s\'envoyer un message à lui-même')
     alert('Vous ne pouvez pas vous envoyer un message à vous-même.')
     return
   }
-  
-  console.log('✅ Ouverture du modal de message')
-  // Ouvrir le modal d'envoi de message
-  showMessageModal.value = true
-}
 
-// Fonctions pour le modal de message
-const closeMessageModal = () => {
-  console.log('🔵 closeMessageModal appelé')
-  showMessageModal.value = false
-  messageContent.value = ''
-  messageError.value = ''
-}
-
-const sendMessage = async () => {
-  console.log('🔵 sendMessage appelé')
-  console.log('Message content:', messageContent.value)
-  console.log('Modal state:', {
-    showMessageModal: showMessageModal.value,
-    sendingMessage: sendingMessage.value,
-    messageError: messageError.value
-  })
-  
-  if (!messageContent.value.trim()) {
-    console.log('❌ Message vide')
-    messageError.value = 'Veuillez écrire un message'
-    return
-  }
-  
-  sendingMessage.value = true
-  messageError.value = ''
-  
-  console.log('🚀 Début envoi message:', {
-    productId: product.value.id,
-    message: messageContent.value.trim(),
-    isAuthenticated: isAuthenticated.value,
-    userId: currentUserId.value,
-    token: localStorage.getItem('auth_token')?.substring(0, 20) + '...'
-  })
-  
-  try {
-    // Utiliser le nouvel endpoint pour démarrer une conversation par produit
-    const response = await api.post(`/conversations/start/${product.value.id}`, {
-      message: messageContent.value.trim()
-    })
-    
-    console.log('📡 Réponse API:', response.data)
-    
-    if (response.data.success) {
-      console.log('✅ Message envoyé avec succès')
-      // Fermer le modal
-      closeMessageModal()
-      
-      // Rediriger vers les discussions produit (vue acheteur)
-      router.push('/discussions')
-    } else {
-      console.log('❌ Échec envoi (success=false):', response.data.message)
-      messageError.value = response.data.message || 'Erreur lors de l\'envoi du message'
-    }
-  } catch (error) {
-    console.error('❌ Erreur envoi message:', error)
-    console.error('Status:', error.response?.status)
-    console.error('Data:', error.response?.data)
-    
-    if (error.response?.status === 401) {
-      messageError.value = 'Vous devez être connecté pour envoyer un message'
-    } else if (error.response?.status === 403) {
-      messageError.value = 'Vous n\'êtes pas autorisé à envoyer ce message'
-    } else {
-      messageError.value = error.response?.data?.message || 'Erreur lors de l\'envoi du message'
-    }
-  } finally {
-    sendingMessage.value = false
-  }
+  router.push(`/messages?user=${product.value.user_id}&product=${product.value.id}`)
 }
 
 const viewSellerProfile = () => {
   router.push(`/users/${product.value.user_id}`)
-}
-
-// Nouvelles méthodes pour le propriétaire du produit
-const viewMyProductConversations = () => {
-  // Rediriger vers la vue vendeur avec ce produit spécifique
-  router.push(`/my-sales-conversations?product=${product.value.id}`)
-}
-
-const editProduct = () => {
-  router.push(`/products/${product.value.id}/edit`)
-}
-
-const toggleProductStatus = async () => {
-  try {
-    const newStatus = product.value.status === 'active' ? 'draft' : 'active'
-    const response = await api.put(`/products/${product.value.id}/status`, {
-      status: newStatus
-    })
-    
-    if (response.data.success) {
-      product.value.status = newStatus
-    }
-  } catch (error) {
-    console.error('Erreur changement statut:', error)
-  }
 }
 
 const viewProduct = (product) => {
@@ -784,7 +546,7 @@ const calculateDiscount = (originalPrice, currentPrice) => {
 
 const getUserInitials = (fullName) => {
   if (!fullName) return '?'
-  
+
   // Diviser le nom en mots et prendre la première lettre de chaque mot
   const names = fullName.trim().split(' ')
   if (names.length === 1) {
@@ -818,13 +580,6 @@ const getStatusText = (status) => {
 
 // Lifecycle
 onMounted(() => {
-  console.log('🔵 ProductDetail onMounted')
-  console.log('Route params:', route.params)
-  console.log('Auth store state:', {
-    isAuthenticated: authStore.isAuthenticated,
-    user: authStore.user,
-    token: authStore.token?.substring(0, 20) + '...'
-  })
   loadProduct()
 })
 </script>

@@ -10,7 +10,7 @@
         fallback="/placeholder-product.jpg"
         image-classes="w-full h-full object-cover"
       />
-      
+
       <!-- Status Badge -->
       <div class="absolute top-2 left-2">
         <span
@@ -120,7 +120,7 @@
             <CheckCircleIcon class="w-4 h-4" />
           </div>
         </div>
-        
+
         <!-- Stats -->
         <div class="flex items-center space-x-3 text-xs text-gray-500">
           <div class="flex items-center space-x-1">
@@ -157,6 +157,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { formatPrice } from '@/utils/currency'
 import ProductImage from '@/components/ui/ProductImage.vue'
 import {
   HeartIcon,
@@ -191,12 +192,6 @@ const isLiked = computed(() => props.product.is_liked_by_user)
 const isFavorite = computed(() => props.product.is_favorited_by_user)
 
 // Methods
-const formatPrice = (price) => {
-  return new Intl.NumberFormat('fr-FR', {
-    style: 'currency',
-    currency: 'EUR'
-  }).format(price)
-}
 
 const handleImageError = (event) => {
   event.target.src = '/placeholder-product.jpg'
@@ -215,12 +210,12 @@ const toggleLike = async () => {
   likingProduct.value = true
   try {
     const response = await window.axios.post(`/products/${props.product.id}/like`)
-    
+
     if (response.data.success) {
       // Mettre à jour l'état local du produit
       props.product.is_liked_by_user = response.data.liked
       props.product.likes_count = response.data.likes_count
-      
+
       // Émettre l'événement pour notifier le parent
       emit('like', props.product)
     }
@@ -241,12 +236,12 @@ const toggleFavorite = async () => {
   favoritingProduct.value = true
   try {
     const response = await window.axios.post(`/products/${props.product.id}/favorite`)
-    
+
     if (response.data.success) {
       // Mettre à jour l'état local du produit
       props.product.is_favorited_by_user = response.data.favorited
       props.product.favorites_count = response.data.favorites_count
-      
+
       // Émettre l'événement pour notifier le parent
       emit('favorite', props.product)
     }

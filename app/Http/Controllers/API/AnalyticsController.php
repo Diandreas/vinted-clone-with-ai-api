@@ -28,10 +28,10 @@ class AnalyticsController extends Controller
                 'avg_rating' => $user->average_rating ?? 0,
             ],
             'this_month' => [
-                'products_added' => $user->products()->where('created_at', '>=', $lastMonth)->count(),
-                'sales_count' => $user->sales()->where('status', 'completed')->where('created_at', '>=', $lastMonth)->count(),
-                'sales_amount' => $user->sales()->where('status', 'completed')->where('created_at', '>=', $lastMonth)->sum('total_amount'),
-                'new_followers' => $user->followers()->where('created_at', '>=', $lastMonth)->count(),
+                'products_added' => $user->products()->where('products.created_at', '>=', $lastMonth)->count(),
+                'sales_count' => $user->sales()->where('status', 'completed')->where('orders.created_at', '>=', $lastMonth)->count(),
+                'sales_amount' => $user->sales()->where('status', 'completed')->where('orders.created_at', '>=', $lastMonth)->sum('total_amount'),
+                'new_followers' => $user->followers()->where('follows.created_at', '>=', $lastMonth)->count(),
             ]
         ];
 
@@ -49,7 +49,7 @@ class AnalyticsController extends Controller
 
         $products = $user->products()
             ->with(['category', 'brand'])
-            ->where('created_at', '>=', $startDate)
+            ->where('products.created_at', '>=', $startDate)
             ->get();
 
         $analytics = [
@@ -80,7 +80,7 @@ class AnalyticsController extends Controller
 
         $sales = $user->sales()
             ->with(['product', 'buyer'])
-            ->where('created_at', '>=', $startDate)
+            ->where('orders.created_at', '>=', $startDate)
             ->get();
 
         $analytics = [
@@ -105,7 +105,7 @@ class AnalyticsController extends Controller
         $startDate = Carbon::now()->subDays($period);
 
         $followers = $user->followers()
-            ->where('created_at', '>=', $startDate)
+            ->where('follows.created_at', '>=', $startDate)
             ->get();
 
         $analytics = [
@@ -128,7 +128,7 @@ class AnalyticsController extends Controller
         $startDate = Carbon::now()->subDays($period);
 
         $products = $user->products();
-        
+
         $analytics = [
             'total_views' => $products->sum('views_count'),
             'total_likes' => $products->sum('likes_count'),
@@ -206,7 +206,7 @@ class AnalyticsController extends Controller
     {
         return $user->sales()
             ->with('product')
-            ->where('created_at', '>=', Carbon::now()->subDays($period))
+            ->where('orders.created_at', '>=', Carbon::now()->subDays($period))
             ->where('status', 'completed')
             ->select('product_id', DB::raw('COUNT(*) as sales_count'))
             ->groupBy('product_id')
@@ -221,12 +221,12 @@ class AnalyticsController extends Controller
     private function getFollowerGrowthRate($user, $period)
     {
         $currentPeriodFollowers = $user->followers()
-            ->where('created_at', '>=', Carbon::now()->subDays($period))
+            ->where('follows.created_at', '>=', Carbon::now()->subDays($period))
             ->count();
-        
+
         $previousPeriodFollowers = $user->followers()
-            ->where('created_at', '>=', Carbon::now()->subDays($period * 2))
-            ->where('created_at', '<', Carbon::now()->subDays($period))
+            ->where('follows.created_at', '>=', Carbon::now()->subDays($period * 2))
+            ->where('follows.created_at', '<', Carbon::now()->subDays($period))
             ->count();
 
         if ($previousPeriodFollowers == 0) return 100;
@@ -246,8 +246,8 @@ class AnalyticsController extends Controller
     private function calculateEngagementRate($user)
     {
         $totalViews = $user->products()->sum('views_count');
-        $totalEngagements = $user->products()->sum('likes_count') + 
-                           $user->products()->sum('favorites_count') + 
+        $totalEngagements = $user->products()->sum('likes_count') +
+                           $user->products()->sum('favorites_count') +
                            $user->products()->sum('comments_count');
 
         return $totalViews > 0 ? ($totalEngagements / $totalViews) * 100 : 0;

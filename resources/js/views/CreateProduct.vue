@@ -108,7 +108,7 @@
             >
               <img
                 v-if="image"
-                :src="image"
+                :src="getImageSrc(image)"
                 :alt="`Image ${index + 1}`"
                 class="w-full h-full object-cover"
               />
@@ -218,21 +218,23 @@
 
             <!-- Condition -->
             <div>
-              <label for="condition" class="block text-sm font-medium text-slate-700 mb-2">
+              <label for="condition_id" class="block text-sm font-medium text-slate-700 mb-2">
                 État *
               </label>
               <select
-                id="condition"
-                v-model="form.condition"
+                id="condition_id"
+                v-model="form.condition_id"
                 required
                 class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white/80 backdrop-blur-sm"
               >
                 <option value="">Sélectionnez l'état</option>
-                <option value="new">Neuf</option>
-                <option value="like_new">Comme neuf</option>
-                <option value="good">Bon état</option>
-                <option value="fair">État correct</option>
-                <option value="poor">Usé</option>
+                <option
+                  v-for="condition in conditions"
+                  :key="condition.id"
+                  :value="condition.id"
+                >
+                  {{ condition.name }}
+                </option>
               </select>
             </div>
 
@@ -254,6 +256,81 @@
                   placeholder="0.00"
                 />
               </div>
+            </div>
+
+            <!-- Size -->
+            <div>
+              <label for="size" class="block text-sm font-medium text-slate-700 mb-2">
+                Taille
+              </label>
+              <input
+                id="size"
+                v-model="form.size"
+                type="text"
+                class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white/80 backdrop-blur-sm"
+                placeholder="Ex: M, L, XL, 42, 43..."
+              />
+            </div>
+
+            <!-- Color -->
+            <div>
+              <label for="color" class="block text-sm font-medium text-slate-700 mb-2">
+                Couleur
+              </label>
+              <input
+                id="color"
+                v-model="form.color"
+                type="text"
+                class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white/80 backdrop-blur-sm"
+                placeholder="Ex: Bleu, Rouge, Noir..."
+              />
+            </div>
+
+            <!-- Material -->
+            <div>
+              <label for="material" class="block text-sm font-medium text-slate-700 mb-2">
+                Matériau
+              </label>
+              <input
+                id="material"
+                v-model="form.material"
+                type="text"
+                class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white/80 backdrop-blur-sm"
+                placeholder="Ex: Coton, Cuir, Polyester..."
+              />
+            </div>
+
+            <!-- Shipping Cost -->
+            <div>
+              <label for="shipping_cost" class="block text-sm font-medium text-slate-700 mb-2">
+                Frais de livraison (Fcfa)
+              </label>
+              <div class="relative">
+                <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500">Fcfa</span>
+                <input
+                  id="shipping_cost"
+                  v-model="form.shipping_cost"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  class="w-full pl-12 pr-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white/80 backdrop-blur-sm"
+                  placeholder="0.00"
+                />
+              </div>
+            </div>
+
+            <!-- Location -->
+            <div>
+              <label for="location" class="block text-sm font-medium text-slate-700 mb-2">
+                Localisation
+              </label>
+              <input
+                id="location"
+                v-model="form.location"
+                type="text"
+                class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white/80 backdrop-blur-sm"
+                placeholder="Ex: Abidjan, Yamoussoukro..."
+              />
             </div>
           </div>
         </div>
@@ -288,13 +365,37 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useNotificationStore } from '@/stores/notification'
-import {
-  ArrowLeftIcon,
-  CameraIcon,
-  PlusIcon,
-  XMarkIcon,
-  InformationCircleIcon
-} from '@heroicons/vue/24/outline'
+// Icônes SVG inline pour éviter les problèmes d'import
+const ArrowLeftIcon = {
+  template: `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+  </svg>`
+}
+
+const CameraIcon = {
+  template: `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+  </svg>`
+}
+
+const PlusIcon = {
+  template: `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+  </svg>`
+}
+
+const XMarkIcon = {
+  template: `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+  </svg>`
+}
+
+const InformationCircleIcon = {
+  template: `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+  </svg>`
+}
 
 export default {
   name: 'CreateProduct',
@@ -310,7 +411,12 @@ export default {
       price: '',
       category_id: '',
       brand_id: '',
-      condition: '',
+      condition_id: '',
+      size: '',
+      color: '',
+      material: '',
+      shipping_cost: '',
+      location: '',
       images: Array(8).fill(null)
     })
 
@@ -322,6 +428,7 @@ export default {
     // Data
     const categories = ref([])
     const brands = ref([])
+    const conditions = ref([])
 
     // Refs
     const multipleImageInput = ref(null)
@@ -345,24 +452,29 @@ export default {
       }
     }
 
+    const loadConditions = async () => {
+      try {
+        const response = await window.axios.get('/conditions')
+        conditions.value = response.data.data || response.data
+      } catch (error) {
+        console.error('Error loading conditions:', error)
+      }
+    }
+
     const handleMultipleImageUpload = (event) => {
       const files = Array.from(event.target.files)
       const availableSlots = form.value.images.filter(img => !img).length
       
       if (files.length > availableSlots) {
-        notificationStore.showError(`Vous ne pouvez ajouter que ${availableSlots} images supplémentaires`)
+        notificationStore.error(`Vous ne pouvez ajouter que ${availableSlots} images supplémentaires`)
         return
       }
 
       files.forEach((file, index) => {
-        const reader = new FileReader()
-        reader.onload = (e) => {
-          const emptySlotIndex = form.value.images.findIndex(img => !img)
-          if (emptySlotIndex !== -1) {
-            form.value.images[emptySlotIndex] = e.target.result
-          }
+        const emptySlotIndex = form.value.images.findIndex(img => !img)
+        if (emptySlotIndex !== -1) {
+          form.value.images[emptySlotIndex] = file
         }
-        reader.readAsDataURL(file)
       })
 
       // Reset input
@@ -373,6 +485,19 @@ export default {
 
     const removeImage = (index) => {
       form.value.images[index] = null
+    }
+
+    // Helper function to check if image is a File object
+    const isFile = (image) => {
+      return image && typeof image === 'object' && image.name && image.type
+    }
+
+    // Helper function to get image source
+    const getImageSrc = (image) => {
+      if (isFile(image)) {
+        return URL.createObjectURL(image)
+      }
+      return image
     }
 
     const validateForm = () => {
@@ -394,8 +519,8 @@ export default {
         errors.value.category_id = ['La catégorie est requise']
       }
       
-      if (!form.value.condition) {
-        errors.value.condition = ['L\'état est requis']
+      if (!form.value.condition_id) {
+        errors.value.condition_id = ['L\'état est requis']
       }
       
       const hasImages = form.value.images.some(img => img)
@@ -416,18 +541,50 @@ export default {
       showErrors.value = false
 
       try {
-        const productData = {
-          ...form.value,
-          images: form.value.images.filter(img => img)
+        const formData = new FormData()
+        
+        // Ajouter les champs texte
+        formData.append('title', form.value.title)
+        formData.append('description', form.value.description)
+        formData.append('price', form.value.price)
+        formData.append('category_id', form.value.category_id)
+        if (form.value.brand_id) {
+          formData.append('brand_id', form.value.brand_id)
         }
+        formData.append('condition_id', form.value.condition_id)
+        if (form.value.size) {
+          formData.append('size', form.value.size)
+        }
+        if (form.value.color) {
+          formData.append('color', form.value.color)
+        }
+        if (form.value.material) {
+          formData.append('material', form.value.material)
+        }
+        if (form.value.shipping_cost) {
+          formData.append('shipping_cost', form.value.shipping_cost)
+        }
+        if (form.value.location) {
+          formData.append('location', form.value.location)
+        }
+        
+        // Ajouter les images
+        const validImages = form.value.images.filter(img => img)
+        validImages.forEach((image, index) => {
+          formData.append(`images[${index}]`, image)
+        })
 
-        const response = await window.axios.post('/products', productData)
+        const response = await window.axios.post('/products', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        })
         
         if (response.data.success) {
-          notificationStore.showSuccess('Produit créé avec succès !')
+          notificationStore.success('Produit créé avec succès !')
           router.push(`/products/${response.data.data.id}`)
         } else {
-          notificationStore.showError(response.data.message || 'Erreur lors de la création')
+          notificationStore.error(response.data.message || 'Erreur lors de la création')
         }
       } catch (error) {
         console.error('Error creating product:', error)
@@ -436,7 +593,7 @@ export default {
           errors.value = error.response.data.errors
           showErrors.value = true
         } else {
-          notificationStore.showError('Erreur lors de la création du produit')
+          notificationStore.error('Erreur lors de la création du produit')
         }
       } finally {
         submitting.value = false
@@ -447,6 +604,7 @@ export default {
     onMounted(() => {
       loadCategories()
       loadBrands()
+      loadConditions()
     })
 
     return {
@@ -456,9 +614,12 @@ export default {
       errors,
       categories,
       brands,
+      conditions,
       multipleImageInput,
       handleMultipleImageUpload,
       removeImage,
+      isFile,
+      getImageSrc,
       submitProduct
     }
   }
