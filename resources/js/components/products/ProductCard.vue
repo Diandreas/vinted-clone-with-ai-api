@@ -11,30 +11,30 @@
         image-classes="w-full h-full object-cover"
       />
 
-      <!-- Status Badge - Compact -->
-      <div class="absolute top-1.5 left-1.5">
+      <!-- Status Badge - Ultra Compact mobile -->
+      <div class="absolute top-0.5 sm:top-1 left-0.5 sm:left-1">
         <span
           v-if="product.status === 'sold'"
-          class="bg-gray-100 text-gray-800 text-xs font-medium px-1.5 py-0.5 rounded-full"
+          class="bg-gray-100 text-gray-800 text-xs font-medium px-1 py-0.5 sm:px-1.5 sm:py-0.5 rounded-full"
         >
           Vendu
         </span>
         <span
           v-else-if="product.status === 'reserved'"
-          class="bg-gray-100 text-gray-800 text-xs font-medium px-1.5 py-0.5 rounded-full"
+          class="bg-gray-100 text-gray-800 text-xs font-medium px-1 py-0.5 sm:px-1.5 sm:py-0.5 rounded-full"
         >
           Réservé
         </span>
         <span
           v-else-if="product.is_boosted"
-          class="bg-primary-100 text-primary-800 text-xs font-medium px-1.5 py-0.5 rounded-full"
+          class="bg-primary-100 text-primary-800 text-xs font-medium px-1 py-0.5 sm:px-1.5 sm:py-0.5 rounded-full"
         >
           Boosté
         </span>
       </div>
 
-      <!-- Action Buttons - Compact -->
-      <div v-if="showActions" class="absolute top-1.5 right-1.5 flex space-x-1">
+      <!-- Action Buttons - Ultra Compact mobile -->
+      <div v-if="showActions" class="absolute top-0.5 sm:top-1 right-0.5 sm:right-1 flex space-x-0.5 sm:space-x-1">
         <button
           @click.stop="$emit('edit', product)"
         >
@@ -42,18 +42,18 @@
         </button>
         <button
           @click.stop="$emit('delete', product)"
-          class="bg-white bg-opacity-90 hover:bg-opacity-100 p-1.5 rounded-full shadow-sm transition-all"
+          class="bg-white bg-opacity-90 hover:bg-opacity-100 p-0.5 sm:p-1 rounded-full shadow-sm transition-all"
         >
           <TrashIcon class="w-3 h-3 sm:w-4 sm:h-4 text-gray-700" />
         </button>
       </div>
 
-      <!-- Quick Actions - Compact -->
-      <div v-else class="absolute top-1.5 right-1.5 flex space-x-1">
+      <!-- Quick Actions - Ultra Compact mobile -->
+      <div v-else class="absolute top-0.5 sm:top-1 right-0.5 sm:right-1 flex space-x-0.5 sm:space-x-1">
         <button
           @click.stop="toggleLike"
           :disabled="likingProduct"
-          class="bg-white bg-opacity-90 hover:bg-opacity-100 p-1.5 rounded-full shadow-sm transition-all"
+          class="bg-white bg-opacity-90 hover:bg-opacity-100 p-0.5 sm:p-1 rounded-full shadow-sm transition-all"
         >
           <HeartIcon
             class="w-3 h-3 sm:w-4 sm:h-4"
@@ -63,7 +63,7 @@
         <button
           @click.stop="toggleFavorite"
           :disabled="favoritingProduct"
-          class="bg-white bg-opacity-90 hover:bg-opacity-100 p-1.5 rounded-full shadow-sm transition-all"
+          class="bg-white bg-opacity-90 hover:bg-opacity-100 p-0.5 sm:p-1 rounded-full shadow-sm transition-all"
         >
           <BookmarkIcon
             class="w-3 h-3 sm:w-4 sm:h-4"
@@ -73,19 +73,19 @@
       </div>
     </div>
 
-    <!-- Product Info - Compact -->
-    <div class="p-3 sm:p-4">
-      <div class="flex items-start justify-between mb-1.5 sm:mb-2">
-        <h3 class="font-semibold text-gray-900 text-sm line-clamp-2 flex-1">
+    <!-- Product Info - Ultra Compact mobile -->
+    <div class="p-2 sm:p-3 lg:p-4">
+      <div class="flex items-start justify-between mb-1 sm:mb-1.5 lg:mb-2">
+        <h3 class="font-semibold text-gray-900 text-xs sm:text-sm line-clamp-2 flex-1">
           {{ product.title }}
         </h3>
-        <div class="ml-2">
-          <div class="text-lg font-bold text-gray-900">
+        <div class="ml-1 sm:ml-1.5 lg:ml-2">
+          <div class="text-sm sm:text-base lg:text-lg font-bold text-gray-900">
             {{ formatPrice(product.price) }}
           </div>
           <div
             v-if="product.original_price && product.original_price > product.price"
-            class="text-sm text-gray-500 line-through"
+            class="text-xs sm:text-sm text-gray-500 line-through"
           >
             {{ formatPrice(product.original_price) }}
           </div>
@@ -93,51 +93,51 @@
       </div>
 
       <!-- Product Details -->
-      <div class="space-y-1 mb-3">
-        <div v-if="product.brand" class="text-sm text-gray-600">
+      <div class="space-y-0.5 sm:space-y-1 mb-1.5 sm:mb-2 lg:mb-3">
+        <div v-if="product.brand" class="text-xs sm:text-sm text-gray-600">
           {{ product.brand.name }}
         </div>
-        <div v-if="product.size" class="text-sm text-gray-600">
+        <div v-if="product.size" class="text-xs sm:text-sm text-gray-600">
           Taille: {{ product.size }}
         </div>
-        <div v-if="product.condition" class="text-sm text-gray-600">
+        <div v-if="product.condition" class="text-xs sm:text-sm text-gray-600">
           État: {{ product.condition.name }}
         </div>
       </div>
 
       <!-- Seller Info -->
       <div class="flex items-center justify-between">
-        <div class="flex items-center space-x-2">
+        <div class="flex items-center space-x-1 sm:space-x-1.5 lg:space-x-2">
           <img
             :src="product.user?.avatar || generateDefaultAvatar(product.user?.name, product.user?.id)"
             :alt="product.user?.name"
-            class="w-6 h-6 rounded-full object-cover"
+            class="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 rounded-full object-cover"
             @error="handleAvatarError"
           />
-          <span class="text-sm text-gray-600">{{ product.user?.name }}</span>
+          <span class="text-xs sm:text-sm text-gray-600">{{ product.user?.name }}</span>
           <div v-if="product.user?.is_verified" class="text-primary-500">
-            <CheckCircleIcon class="w-4 h-4" />
+            <CheckCircleIcon class="w-2.5 h-2.5 sm:w-3 sm:h-3 lg:w-4 lg:h-4" />
           </div>
         </div>
 
         <!-- Stats -->
-        <div class="flex items-center space-x-3 text-xs text-gray-500">
-          <div class="flex items-center space-x-1">
-            <EyeIcon class="w-3 h-3" />
+        <div class="flex items-center space-x-1.5 sm:space-x-2 lg:space-x-3 text-xs text-gray-500">
+          <div class="flex items-center space-x-0.5 sm:space-x-1">
+            <EyeIcon class="w-2 h-2 sm:w-2.5 sm:h-2.5 lg:w-3 lg:h-3" />
             <span>{{ product.views_count || 0 }}</span>
           </div>
-          <div class="flex items-center space-x-1">
-            <HeartIcon class="w-3 h-3" />
+          <div class="flex items-center space-x-0.5 sm:space-x-1">
+            <HeartIcon class="w-2 h-2 sm:w-2.5 sm:h-2.5 lg:w-3 lg:h-3" />
             <span>{{ product.likes_count || 0 }}</span>
           </div>
         </div>
       </div>
 
       <!-- Action Buttons for Own Products -->
-      <div v-if="showActions" class="mt-4 flex space-x-2">
+      <div v-if="showActions" class="mt-2 sm:mt-3 lg:mt-4 flex space-x-1 sm:space-x-1.5 lg:space-x-2">
         <button
           @click.stop="$emit('share', product)"
-          class="flex-1 bg-gray-50 text-gray-600 text-sm py-2 px-3 rounded-lg hover:bg-gray-100 transition-colors"
+          class="flex-1 bg-gray-50 text-gray-600 text-xs sm:text-sm py-1 sm:py-1.5 lg:py-2 px-1.5 sm:px-2 lg:px-3 rounded-lg hover:bg-gray-100 transition-colors"
         >
           Partager
         </button>

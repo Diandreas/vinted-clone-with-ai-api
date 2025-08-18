@@ -1,161 +1,161 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
-    <!-- Header avec navigation -->
+    <!-- Header avec navigation - Ultra Compact mobile -->
     <div class="bg-white/90 backdrop-blur-sm shadow-sm border-b border-green-200/50 sticky top-0 z-10">
-      <div class="max-w-4xl mx-auto px-4 py-4">
+      <div class="max-w-4xl mx-auto px-2 py-1.5 sm:px-4 sm:py-4">
         <div class="flex items-center justify-between">
           <button
             @click="router.back()"
-            class="p-2 rounded-lg bg-green-100 text-green-700 hover:bg-green-200 transition-colors"
+            class="p-1 sm:p-2 rounded-lg bg-green-100 text-green-700 hover:bg-green-200 transition-colors"
           >
-            <ArrowLeftIcon class="w-5 h-5" />
+            <ArrowLeftIcon class="w-3.5 h-3.5 sm:w-5 sm:h-5" />
           </button>
           
-          <h1 class="text-lg font-semibold text-green-900">Profil</h1>
+          <h1 class="text-sm sm:text-lg font-semibold text-green-900">Profil</h1>
           
           <RouterLink
             to="/profile/edit"
-            class="p-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition-colors"
+            class="p-1 sm:p-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition-colors"
           >
-            <EditIcon class="w-5 h-5" />
+            <EditIcon class="w-3.5 h-3.5 sm:w-5 sm:h-5" />
           </RouterLink>
         </div>
       </div>
     </div>
 
-    <!-- Contenu principal -->
-    <div class="max-w-4xl mx-auto px-4 py-6">
+    <!-- Contenu principal - Ultra Compact mobile -->
+    <div class="max-w-4xl mx-auto px-2 py-2 sm:px-4 sm:py-6">
       
-      <!-- Section Profil -->
-      <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-green-200/50 p-6 mb-6">
-        <!-- Avatar et infos principales -->
-        <div class="text-center mb-6">
-          <div class="relative inline-block mb-4">
-            <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-green-500 via-emerald-500 to-teal-600 flex items-center justify-center text-white text-2xl sm:text-3xl font-bold border-4 border-white shadow-lg">
+      <!-- Section Profil - Ultra Compact mobile -->
+      <div class="bg-white/80 backdrop-blur-sm rounded-lg sm:rounded-2xl shadow-lg sm:shadow-xl border border-green-200/50 p-2.5 sm:p-6 mb-3 sm:mb-6">
+        <!-- Avatar et infos principales - Ultra Compact mobile -->
+        <div class="text-center mb-3 sm:mb-6">
+          <div class="relative inline-block mb-2 sm:mb-4">
+            <div class="w-14 h-14 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-full bg-gradient-to-br from-green-500 via-emerald-500 to-teal-600 flex items-center justify-center text-white text-lg sm:text-2xl lg:text-3xl font-bold border-2 sm:border-4 border-white shadow-lg">
               {{ user?.name?.charAt(0)?.toUpperCase() || 'U' }}
             </div>
-            <div class="absolute -bottom-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
-              <div class="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-white rounded-full"></div>
+            <div class="absolute -bottom-0.5 sm:-bottom-1 -right-0.5 sm:-right-1 w-3 h-3 sm:w-5 sm:h-5 lg:w-6 lg:h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+              <div class="w-1 h-1 sm:w-2 sm:h-2 lg:w-2.5 lg:h-2.5 bg-white rounded-full"></div>
             </div>
           </div>
           
-          <h2 class="text-2xl sm:text-3xl font-bold text-green-900 mb-2">{{ user?.name || 'Utilisateur' }}</h2>
-          <p v-if="user?.username" class="text-green-600 text-lg mb-3">@{{ user.username }}</p>
-          <p v-if="user?.bio" class="text-gray-600 text-sm max-w-md mx-auto">{{ user.bio }}</p>
+          <h2 class="text-lg sm:text-2xl lg:text-3xl font-bold text-green-900 mb-1 sm:mb-2">{{ user?.name || 'Utilisateur' }}</h2>
+          <p v-if="user?.username" class="text-green-600 text-sm sm:text-lg mb-1.5 sm:mb-3">@{{ user.username }}</p>
+          <p v-if="user?.bio" class="text-gray-600 text-xs sm:text-sm max-w-md mx-auto">{{ user.bio }}</p>
           
-          <div v-if="user?.is_verified" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 mt-3">
-            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+          <div v-if="user?.is_verified" class="inline-flex items-center px-1.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-xs sm:text-sm font-medium bg-green-100 text-green-800 mt-1.5 sm:mt-3">
+            <svg class="w-2.5 h-2.5 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
             </svg>
             Vérifié
           </div>
         </div>
         
-        <!-- Infos supplémentaires -->
-        <div v-if="user?.location || user?.website" class="flex flex-col sm:flex-row justify-center items-center space-y-2 sm:space-y-0 sm:space-x-6 text-sm text-gray-600 mb-6">
+        <!-- Infos supplémentaires - Ultra Compact mobile -->
+        <div v-if="user?.location || user?.website" class="flex flex-col sm:flex-row justify-center items-center space-y-1 sm:space-y-0 sm:space-x-6 text-xs sm:text-sm text-gray-600 mb-3 sm:mb-6">
           <span v-if="user?.location" class="flex items-center">
-            <MapPinIcon class="w-4 h-4 mr-2 text-green-600" />
+            <MapPinIcon class="w-2.5 h-2.5 sm:w-4 sm:h-4 mr-1 sm:mr-2 text-green-600" />
             {{ user.location }}
           </span>
           <span v-if="user?.website" class="flex items-center">
-            <LinkIcon class="w-4 h-4 mr-2 text-green-600" />
+            <LinkIcon class="w-2.5 h-2.5 sm:w-4 sm:h-4 mr-1 sm:mr-2 text-green-600" />
             <a :href="user.website" target="_blank" class="text-green-600 hover:text-green-700 transition-colors">
               Site web
             </a>
           </span>
         </div>
         
-        <!-- Actions rapides -->
-        <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 justify-center">
+        <!-- Actions rapides - Ultra Compact mobile -->
+        <div class="flex flex-col sm:flex-row space-y-1.5 sm:space-y-0 sm:space-x-4 justify-center">
           <RouterLink
             to="/products/create"
-            class="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+            class="inline-flex items-center justify-center px-3 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-lg sm:rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-xs sm:text-base"
           >
-            <PlusIcon class="w-5 h-5 mr-2" />
+            <PlusIcon class="w-3.5 h-3.5 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
             Vendre un article
           </RouterLink>
           
           <RouterLink
             to="/profile/edit"
-            class="inline-flex items-center justify-center px-6 py-3 bg-white text-green-700 border-2 border-green-300 font-semibold rounded-xl hover:bg-green-50 hover:border-green-400 transition-all duration-200 shadow-md hover:shadow-lg"
+            class="inline-flex items-center justify-center px-3 py-2 sm:px-6 sm:py-3 bg-white text-green-700 border-2 border-green-300 font-semibold rounded-lg sm:rounded-xl hover:bg-green-50 hover:border-green-400 transition-all duration-200 shadow-md hover:shadow-lg text-xs sm:text-base"
           >
-            <EditIcon class="w-5 h-5 mr-2" />
+            <EditIcon class="w-3.5 h-3.5 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
             Modifier profil
           </RouterLink>
           
           <!-- Bouton de déconnexion -->
           <button
             @click="logout"
-            class="inline-flex items-center justify-center px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-xl transition-all duration-200 shadow-md hover:shadow-lg"
+            class="inline-flex items-center justify-center px-3 py-2 sm:px-6 sm:py-3 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg sm:rounded-xl transition-all duration-200 shadow-md hover:shadow-lg text-xs sm:text-base"
           >
-            <LogOutIcon class="w-5 h-5 mr-2" />
+            <LogOutIcon class="w-3.5 h-3.5 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
             Se déconnecter
           </button>
         </div>
       </div>
 
-      <!-- Stats principales -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-        <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-green-200/50 p-4 text-center hover:shadow-xl transition-all duration-200">
-          <div class="text-2xl font-bold text-green-600 mb-1">{{ stats?.products_count || 0 }}</div>
-          <div class="text-sm text-gray-600">Produits</div>
+      <!-- Stats principales - Ultra Compact mobile -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-4 mb-3 sm:mb-6">
+        <div class="bg-white/80 backdrop-blur-sm rounded-lg sm:rounded-xl shadow-lg border border-green-200/50 p-2 sm:p-4 text-center hover:shadow-xl transition-all duration-200">
+          <div class="text-base sm:text-xl lg:text-2xl font-bold text-green-600 mb-0.5 sm:mb-1">{{ stats?.products_count || 0 }}</div>
+          <div class="text-xs sm:text-sm text-gray-600">Produits</div>
         </div>
-        <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-green-200/50 p-4 text-center hover:shadow-xl transition-all duration-200">
-          <div class="text-2xl font-bold text-green-600 mb-1">{{ stats?.followers_count || 0 }}</div>
-          <div class="text-sm text-gray-600">Followers</div>
+        <div class="bg-white/80 backdrop-blur-sm rounded-lg sm:rounded-xl shadow-lg border border-green-200/50 p-2 sm:p-4 text-center hover:shadow-xl transition-all duration-200">
+          <div class="text-base sm:text-xl lg:text-2xl font-bold text-green-600 mb-0.5 sm:mb-1">{{ stats?.followers_count || 0 }}</div>
+          <div class="text-xs sm:text-sm text-gray-600">Followers</div>
         </div>
-        <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-green-200/50 p-4 text-center hover:shadow-xl transition-all duration-200">
-          <div class="text-2xl font-bold text-green-600 mb-1">{{ stats?.following_count || 0 }}</div>
-          <div class="text-sm text-gray-600">Following</div>
+        <div class="bg-white/80 backdrop-blur-sm rounded-lg sm:rounded-xl shadow-lg border border-green-200/50 p-2 sm:p-4 text-center hover:shadow-xl transition-all duration-200">
+          <div class="text-base sm:text-xl lg:text-2xl font-bold text-green-600 mb-0.5 sm:mb-1">{{ stats?.following_count || 0 }}</div>
+          <div class="text-xs sm:text-sm text-gray-600">Following</div>
         </div>
-        <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-green-200/50 p-4 text-center hover:shadow-xl transition-all duration-200">
-          <div class="text-2xl font-bold text-green-600 mb-1">{{ stats?.total_sales || 0 }}</div>
-          <div class="text-sm text-gray-600">Ventes</div>
+        <div class="bg-white/80 backdrop-blur-sm rounded-lg sm:rounded-xl shadow-lg border border-green-200/50 p-2 sm:p-4 text-center hover:shadow-xl transition-all duration-200">
+          <div class="text-base sm:text-xl lg:text-2xl font-bold text-green-600 mb-0.5 sm:mb-1">{{ stats?.total_sales || 0 }}</div>
+          <div class="text-xs sm:text-sm text-gray-600">Ventes</div>
         </div>
       </div>
 
-      <!-- Navigation par onglets -->
-      <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-green-200/50 mb-6">
-        <!-- Tabs navigation -->
+      <!-- Navigation par onglets - Ultra Compact mobile -->
+      <div class="bg-white/80 backdrop-blur-sm rounded-lg sm:rounded-2xl shadow-lg sm:shadow-xl border border-green-200/50 mb-3 sm:mb-6">
+        <!-- Tabs navigation - Ultra Compact mobile -->
         <div class="flex border-b border-green-200/50">
           <button
             v-for="tab in tabs"
             :key="tab.id"
             @click="activeTab = tab.id"
             :class="[
-              'flex-1 px-4 py-3 text-sm font-medium transition-all duration-200',
+              'flex-1 px-1.5 sm:px-4 py-1.5 sm:py-3 text-xs sm:text-sm font-medium transition-all duration-200',
               activeTab === tab.id
                 ? 'text-green-700 border-b-2 border-green-600 bg-green-50/50'
                 : 'text-gray-600 hover:text-green-600 hover:bg-green-50/30'
             ]"
           >
-            <div class="flex items-center justify-center space-x-2">
-              <component :is="tab.icon" class="w-4 h-4" />
+            <div class="flex items-center justify-center space-x-1 sm:space-x-2">
+              <component :is="tab.icon" class="w-3 h-3 sm:w-4 sm:h-4" />
               <span class="hidden sm:inline">{{ tab.label }}</span>
             </div>
           </button>
         </div>
         
-        <!-- Tab content -->
-        <div class="p-4 sm:p-6">
+        <!-- Tab content - Ultra Compact mobile -->
+        <div class="p-2.5 sm:p-4 lg:p-6">
           <!-- Produits -->
-          <div v-if="activeTab === 'products'" class="space-y-4">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-lg font-semibold text-green-900">Mes Produits</h3>
+          <div v-if="activeTab === 'products'" class="space-y-2.5 sm:space-y-4">
+            <div class="flex items-center justify-between mb-2.5 sm:mb-4">
+              <h3 class="text-sm sm:text-lg font-semibold text-green-900">Mes Produits</h3>
               <RouterLink 
                 to="/products/create"
-                class="inline-flex items-center px-3 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors"
+                class="inline-flex items-center px-2 py-1 sm:px-3 sm:py-2 bg-green-600 text-white text-xs sm:text-sm rounded-lg hover:bg-green-700 transition-colors"
               >
-                <PlusIcon class="w-4 h-4 mr-2" />
+                <PlusIcon class="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                 Ajouter
               </RouterLink>
             </div>
             
-            <div v-if="loadingProducts" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div v-if="loadingProducts" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-4">
               <ProductSkeleton v-for="i in 4" :key="i" />
             </div>
             
-            <div v-else-if="products.length > 0" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div v-else-if="products.length > 0" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-4">
               <ProductCard
                 v-for="product in products"
                 :key="product.id"
@@ -166,143 +166,143 @@
               />
             </div>
             
-            <div v-else class="text-center py-8">
-              <PackageIcon class="mx-auto h-12 w-12 text-gray-400 mb-4" />
-              <h3 class="text-lg font-medium text-gray-900 mb-2">Aucun produit</h3>
-              <p class="text-gray-600 mb-4">Commencez par créer votre premier produit</p>
+            <div v-else class="text-center py-5 sm:py-8">
+              <PackageIcon class="mx-auto h-8 w-8 sm:h-12 sm:w-12 text-gray-400 mb-2.5 sm:mb-4" />
+              <h3 class="text-sm sm:text-lg font-medium text-gray-900 mb-1.5 sm:mb-2">Aucun produit</h3>
+              <p class="text-gray-600 mb-2.5 sm:mb-4 text-xs sm:text-base">Commencez par créer votre premier produit</p>
               <RouterLink 
                 to="/products/create"
-                class="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                class="inline-flex items-center px-3 py-2 sm:px-6 sm:py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-xs sm:text-base"
               >
-                <PlusIcon class="w-5 h-5 mr-2" />
+                <PlusIcon class="w-3.5 h-3.5 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
                 Créer un produit
               </RouterLink>
             </div>
           </div>
 
           <!-- Followers -->
-          <div v-if="activeTab === 'followers'" class="space-y-4">
-            <h3 class="text-lg font-semibold text-green-900 mb-4">Mes Followers</h3>
+          <div v-if="activeTab === 'followers'" class="space-y-1.5 sm:space-y-4">
+            <h3 class="text-sm sm:text-lg font-semibold text-green-900 mb-2.5 sm:mb-4">Mes Followers</h3>
             
-            <div v-if="loadingFollowers" class="space-y-4">
-              <div v-for="i in 3" :key="i" class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg animate-pulse">
-                <div class="w-10 h-10 bg-gray-300 rounded-full"></div>
+            <div v-if="loadingFollowers" class="space-y-1.5 sm:space-y-4">
+              <div v-for="i in 3" :key="i" class="flex items-center space-x-2.5 sm:space-x-3 p-2.5 sm:p-4 bg-gray-50 rounded-lg animate-pulse">
+                <div class="w-7 h-7 sm:w-10 sm:h-10 bg-gray-300 rounded-full"></div>
                 <div class="flex-1">
-                  <div class="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
-                  <div class="h-3 bg-gray-300 rounded w-1/2"></div>
+                  <div class="h-2.5 sm:h-4 bg-gray-300 rounded w-3/4 mb-1 sm:mb-2"></div>
+                  <div class="h-2 sm:h-3 bg-gray-300 rounded w-1/2"></div>
                 </div>
               </div>
             </div>
             
-            <div v-else-if="followers.length > 0" class="space-y-3">
+            <div v-else-if="followers.length > 0" class="space-y-1.5 sm:space-y-3">
               <div
                 v-for="follower in followers"
                 :key="follower.id"
-                class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                class="flex items-center justify-between p-2.5 sm:p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
               >
-                <div class="flex items-center space-x-3">
-                  <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center text-white font-semibold">
+                <div class="flex items-center space-x-2 sm:space-x-3">
+                  <div class="w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center text-white font-semibold text-xs sm:text-base">
                     {{ follower.name?.charAt(0)?.toUpperCase() || 'U' }}
                   </div>
                   <div>
-                    <div class="font-medium text-gray-900">{{ follower.name }}</div>
-                    <div class="text-sm text-gray-600">@{{ follower.username }}</div>
+                    <div class="font-medium text-gray-900 text-xs sm:text-base">{{ follower.name }}</div>
+                    <div class="text-xs sm:text-sm text-gray-600">@{{ follower.username }}</div>
                   </div>
                 </div>
                 <RouterLink
                   :to="`/users/${follower.id}`"
-                  class="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors text-center"
+                  class="px-2.5 py-1 sm:px-4 sm:py-2 bg-green-600 text-white text-xs sm:text-sm rounded-lg hover:bg-green-700 transition-colors text-center"
                 >
                   Voir profil
                 </RouterLink>
               </div>
             </div>
             
-            <div v-else class="text-center py-8">
-              <UsersIcon class="mx-auto h-12 w-12 text-gray-400 mb-4" />
-              <h3 class="text-lg font-medium text-gray-900 mb-2">Aucun follower</h3>
-              <p class="text-gray-600">Partagez vos produits pour attirer des followers</p>
+            <div v-else class="text-center py-5 sm:py-8">
+              <UsersIcon class="mx-auto h-8 w-8 sm:h-12 sm:w-12 text-gray-400 mb-2.5 sm:mb-4" />
+              <h3 class="text-sm sm:text-lg font-medium text-gray-900 mb-1.5 sm:mb-2">Aucun follower</h3>
+              <p class="text-gray-600 text-xs sm:text-base">Partagez vos produits pour attirer des followers</p>
             </div>
           </div>
 
           <!-- Following -->
-          <div v-if="activeTab === 'following'" class="space-y-4">
-            <h3 class="text-lg font-semibold text-green-900 mb-4">Mes Abonnements</h3>
+          <div v-if="activeTab === 'following'" class="space-y-1.5 sm:space-y-4">
+            <h3 class="text-sm sm:text-lg font-semibold text-green-900 mb-2.5 sm:mb-4">Mes Abonnements</h3>
             
-            <div v-if="loadingFollowing" class="space-y-4">
-              <div v-for="i in 3" :key="i" class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg animate-pulse">
-                <div class="w-10 h-10 bg-gray-300 rounded-full"></div>
+            <div v-if="loadingFollowing" class="space-y-1.5 sm:space-y-4">
+              <div v-for="i in 3" :key="i" class="flex items-center space-x-2.5 sm:space-x-3 p-2.5 sm:p-4 bg-gray-50 rounded-lg animate-pulse">
+                <div class="w-7 h-7 sm:w-10 sm:h-10 bg-gray-300 rounded-full"></div>
                 <div class="flex-1">
-                  <div class="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
-                  <div class="h-3 bg-gray-300 rounded w-1/2"></div>
+                  <div class="h-2.5 sm:h-4 bg-gray-300 rounded w-3/4 mb-1 sm:mb-2"></div>
+                  <div class="h-2 sm:h-3 bg-gray-300 rounded w-1/2"></div>
                 </div>
               </div>
             </div>
             
-            <div v-else-if="following.length > 0" class="space-y-3">
+            <div v-else-if="following.length > 0" class="space-y-1.5 sm:space-y-3">
               <div
                 v-for="followed in following"
                 :key="followed.id"
-                class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                class="flex items-center justify-between p-2.5 sm:p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
               >
-                <div class="flex items-center space-x-3">
-                  <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center text-white font-semibold">
+                <div class="flex items-center space-x-2 sm:space-x-3">
+                  <div class="w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center text-white font-semibold text-xs sm:text-base">
                     {{ followed.name?.charAt(0)?.toUpperCase() || 'U' }}
                   </div>
                   <div>
-                    <div class="font-medium text-gray-900">{{ followed.name }}</div>
-                    <div class="text-sm text-gray-600">@{{ followed.username }}</div>
+                    <div class="font-medium text-gray-900 text-xs sm:text-base">{{ followed.name }}</div>
+                    <div class="text-xs sm:text-sm text-gray-600">@{{ followed.username }}</div>
                   </div>
                 </div>
                 <button 
                   @click="unfollowUser(followed.id)"
-                  class="px-4 py-2 bg-gray-600 text-white text-sm rounded-lg hover:bg-gray-700 transition-colors"
+                  class="px-2.5 py-1 sm:px-4 sm:py-2 bg-gray-600 text-white text-xs sm:text-sm rounded-lg hover:bg-gray-700 transition-colors"
                 >
                   Se désabonner
                 </button>
               </div>
             </div>
             
-            <div v-else class="text-center py-8">
-              <UsersIcon class="mx-auto h-12 w-12 text-gray-400 mb-4" />
-              <h3 class="text-lg font-medium text-gray-900 mb-2">Aucun abonnement</h3>
-              <p class="text-gray-600">Découvrez et suivez d'autres vendeurs</p>
+            <div v-else class="text-center py-5 sm:py-8">
+              <UsersIcon class="mx-auto h-8 w-8 sm:h-12 sm:w-12 text-gray-400 mb-2.5 sm:mb-4" />
+              <h3 class="text-sm sm:text-lg font-medium text-gray-900 mb-1.5 sm:mb-2">Aucun abonnement</h3>
+              <p class="text-gray-600 text-xs sm:text-base">Découvrez et suivez d'autres vendeurs</p>
             </div>
           </div>
 
           <!-- Activité -->
-          <div v-if="activeTab === 'activity'" class="space-y-4">
-            <h3 class="text-lg font-semibold text-green-900 mb-4">Mon Activité</h3>
+          <div v-if="activeTab === 'activity'" class="space-y-1.5 sm:space-y-4">
+            <h3 class="text-sm sm:text-lg font-semibold text-green-900 mb-2.5 sm:mb-4">Mon Activité</h3>
             
-            <div v-if="loadingActivity" class="space-y-4">
-              <div v-for="i in 3" :key="i" class="p-4 bg-gray-50 rounded-lg animate-pulse">
-                <div class="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
-                <div class="h-3 bg-gray-300 rounded w-1/2"></div>
+            <div v-if="loadingActivity" class="space-y-1.5 sm:space-y-4">
+              <div v-for="i in 3" :key="i" class="p-2.5 sm:p-4 bg-gray-50 rounded-lg animate-pulse">
+                <div class="h-2.5 sm:h-4 bg-gray-300 rounded w-3/4 mb-1 sm:mb-2"></div>
+                <div class="h-2 sm:h-3 bg-gray-300 rounded w-1/2"></div>
               </div>
             </div>
             
-            <div v-else-if="recentActivity.length > 0" class="space-y-3">
+            <div v-else-if="recentActivity.length > 0" class="space-y-1.5 sm:space-y-3">
               <div
                 v-for="activity in recentActivity"
                 :key="activity.id"
-                class="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                class="p-2.5 sm:p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
               >
-                <div class="flex items-start space-x-3">
-                  <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                    <component :is="getActivityIcon(activity.type)" class="w-4 h-4 text-green-600" />
+                <div class="flex items-start space-x-2 sm:space-x-3">
+                  <div class="w-5 h-5 sm:w-8 sm:h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                    <component :is="getActivityIcon(activity.type)" class="w-2.5 h-2.5 sm:w-4 sm:h-4 text-green-600" />
                   </div>
                   <div class="flex-1">
-                    <div class="text-sm text-gray-900">{{ activity.description }}</div>
-                    <div class="text-xs text-gray-500 mt-1">{{ formatDate(activity.created_at) }}</div>
+                    <div class="text-xs sm:text-sm text-gray-900">{{ activity.description }}</div>
+                    <div class="text-xs text-gray-500 mt-0.5 sm:mt-1">{{ formatDate(activity.created_at) }}</div>
                   </div>
                 </div>
               </div>
             </div>
             
-            <div v-else class="text-center py-8">
-              <ActivityIcon class="mx-auto h-12 w-12 text-gray-400 mb-4" />
-              <h3 class="text-lg font-medium text-gray-900 mb-2">Aucune activité</h3>
-              <p class="text-gray-600">Vos actions apparaîtront ici</p>
+            <div v-else class="text-center py-5 sm:py-8">
+              <ActivityIcon class="mx-auto h-8 w-8 sm:h-12 sm:w-12 text-gray-400 mb-2.5 sm:mb-4" />
+              <h3 class="text-sm sm:text-lg font-medium text-gray-900 mb-1.5 sm:mb-2">Aucune activité</h3>
+              <p class="text-gray-600 text-xs sm:text-base">Vos actions apparaîtront ici</p>
             </div>
           </div>
         </div>
