@@ -57,15 +57,15 @@
         <!-- Profile Stats - Centered on mobile -->
         <div class="grid grid-cols-3 gap-4 sm:gap-6 max-w-xs sm:max-w-md mx-auto sm:mx-0 mb-6 sm:mb-8">
           <div class="text-center cursor-pointer hover:bg-gray-50 rounded-lg p-3 sm:p-4 transition-colors" @click="goToProfile('products')">
-            <div class="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{{ stats.products_count || 0 }}</div>
+            <div class="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{{ stats?.products_count || 0 }}</div>
             <div class="text-sm text-gray-500">Produits</div>
           </div>
           <div class="text-center cursor-pointer hover:bg-gray-50 rounded-lg p-3 sm:p-4 transition-colors" @click="goToProfile('followers')">
-            <div class="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{{ stats.followers_count || 0 }}</div>
+            <div class="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{{ stats?.followers_count || 0 }}</div>
             <div class="text-sm text-gray-500">Followers</div>
           </div>
           <div class="text-center cursor-pointer hover:bg-gray-50 rounded-lg p-3 sm:p-4 transition-colors" @click="goToProfile('following')">
-            <div class="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{{ stats.following_count || 0 }}</div>
+            <div class="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{{ stats?.following_count || 0 }}</div>
             <div class="text-sm text-gray-500">Following</div>
           </div>
         </div>
@@ -95,31 +95,31 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12">
         <StatsCard
           title="Mes Produits"
-          :value="stats.products_count"
+          :value="stats?.products_count || 0"
           icon="package"
           color="blue"
-          :trend="stats.products_trend"
+          :trend="stats?.products_trend || 0"
         />
         <StatsCard
           title="Ventes Totales"
-          :value="formatCurrency(stats.total_sales)"
+          :value="formatCurrency(stats?.total_sales || 0)"
           icon="dollar-sign"
           color="green"
-          :trend="stats.sales_trend"
+          :trend="stats?.sales_trend || 0"
         />
         <StatsCard
           title="Followers"
-          :value="stats.followers_count"
+          :value="stats?.followers_count || 0"
           icon="users"
           color="purple"
-          :trend="stats.followers_trend"
+          :trend="stats?.followers_trend || 0"
         />
         <StatsCard
           title="Vues ce mois"
-          :value="stats.monthly_views"
+          :value="stats?.monthly_views || 0"
           icon="eye"
           color="orange"
-          :trend="stats.views_trend"
+          :trend="stats?.views_trend || 0"
         />
       </div>
 

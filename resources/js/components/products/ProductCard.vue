@@ -192,15 +192,6 @@ const isLiked = computed(() => props.product.is_liked_by_user)
 const isFavorite = computed(() => props.product.is_favorited_by_user)
 
 // Methods
-<<<<<<< Updated upstream
-=======
-const formatPrice = (price) => {
-  return new Intl.NumberFormat('fr-FR', {
-    style: 'currency',
-                            currency: 'XAF'
-  }).format(price)
-}
->>>>>>> Stashed changes
 
 const handleImageError = (event) => {
   event.target.src = '/placeholder-product.jpg'
