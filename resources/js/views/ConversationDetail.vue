@@ -111,6 +111,7 @@
       </div>
     </div>
   </div>
+</template>
 
 <script setup>
 import { ref, onMounted, computed, nextTick } from 'vue'
@@ -251,7 +252,6 @@ onMounted(() => {
   loadConversation()
 })
 </script>
-</template>
 
 <style scoped>
 /* Custom scrollbar for messages */

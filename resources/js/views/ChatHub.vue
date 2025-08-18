@@ -198,7 +198,6 @@
                   <div v-if="getUnreadCount(conversation) > 0" class="bg-gray-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold min-w-[20px] h-5 flex items-center justify-center">
                     {{ getUnreadCount(conversation) }}
                   </div>
-                  </div>
                 </div>
               </div>
             </div>
