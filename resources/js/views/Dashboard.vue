@@ -1,223 +1,307 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
-    <!-- Header -->
-    <div class="bg-white shadow-sm border-b border-gray-200">
+  <div class="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/20 to-indigo-50/30">
+    <!-- Header avec navigation -->
+    <div class="bg-white/80 backdrop-blur-sm shadow-sm border-b border-gray-200/50 sticky top-0 z-10">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center py-6 sm:py-8 space-y-6 sm:space-y-0">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center py-6 space-y-4 sm:space-y-0">
           <div class="text-center sm:text-left">
-            <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
-              Bonjour, {{ user?.name || 'Utilisateur' }} 👋
+            <h1 class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-gray-900 via-blue-700 to-indigo-800 bg-clip-text text-transparent">
+              Tableau de bord
             </h1>
-            <p class="text-base sm:text-lg text-gray-600">Voici un aperçu de votre activité</p>
+            <p class="text-base sm:text-lg text-gray-600 mt-2">Bienvenue, {{ user?.name || 'Utilisateur' }} 👋</p>
           </div>
-          <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 justify-center sm:justify-end">
+          
+          <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 justify-center sm:justify-end">
             <RouterLink
               to="/products/create"
-              class="bg-indigo-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg hover:bg-indigo-700 transition-colors flex items-center justify-center space-x-3 text-base sm:text-lg font-medium shadow-lg"
+              class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
             >
-              <PlusIcon class="w-5 h-5 sm:w-6 sm:h-6" />
-              <span class="hidden sm:inline">Vendre un article</span>
-              <span class="sm:hidden">Vendre</span>
+              <PlusIcon class="w-5 h-5 mr-2" />
+              Vendre un article
             </RouterLink>
-
+            
+            <RouterLink
+              to="/profile/edit"
+              class="inline-flex items-center px-6 py-3 bg-white text-gray-700 border-2 border-gray-300 font-semibold rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 shadow-md hover:shadow-lg"
+            >
+              <EditIcon class="w-5 h-5 mr-2" />
+              Modifier profil
+            </RouterLink>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Profile Section - Style TikTok -->
-    <div class="bg-white border-b border-gray-200">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        <!-- Profile Header - Centered on mobile -->
-        <div class="text-center sm:text-left mb-6 sm:mb-8">
-          <!-- Profile Avatar - Centered on mobile -->
-          <div class="relative mx-auto sm:mx-0 mb-4 sm:mb-6">
-            <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-3xl sm:text-4xl font-bold border-4 border-white shadow-lg mx-auto sm:mx-0">
-              {{ user?.name?.charAt(0)?.toUpperCase() || 'U' }}
+    <!-- Contenu principal -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      
+      <!-- Section Profil et Stats principales -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+        
+        <!-- Carte de profil -->
+        <div class="lg:col-span-1">
+          <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 p-6 hover:shadow-2xl transition-all duration-300">
+            <!-- Avatar et infos -->
+            <div class="text-center mb-6">
+              <div class="relative inline-block mb-4">
+                <div class="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 flex items-center justify-center text-white text-3xl font-bold border-4 border-white shadow-lg">
+                  {{ user?.name?.charAt(0)?.toUpperCase() || 'U' }}
+                </div>
+                <div class="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+                  <div class="w-2.5 h-2.5 bg-white rounded-full"></div>
+                </div>
+              </div>
+              
+              <h2 class="text-2xl font-bold text-gray-900 mb-2">{{ user?.name || 'Utilisateur' }}</h2>
+              <p v-if="user?.username" class="text-gray-500 text-lg mb-3">@{{ user.username }}</p>
+              <p v-if="user?.bio" class="text-gray-600 text-sm">{{ user.bio }}</p>
+              
+              <div v-if="user?.is_verified" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 mt-3">
+                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                Vérifié
+              </div>
             </div>
-            <div class="absolute -bottom-1 -right-1 w-6 h-6 sm:w-7 sm:h-7 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
-              <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-white rounded-full"></div>
+            
+            <!-- Stats rapides -->
+            <div class="grid grid-cols-3 gap-4 mb-6">
+              <div class="text-center p-3 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors cursor-pointer" @click="goToProfile('products')">
+                <div class="text-2xl font-bold text-blue-600">{{ stats?.products_count || 0 }}</div>
+                <div class="text-sm text-blue-700">Produits</div>
+              </div>
+              <div class="text-center p-3 bg-purple-50 rounded-xl hover:bg-purple-100 transition-colors cursor-pointer" @click="goToProfile('followers')">
+                <div class="text-2xl font-bold text-purple-600">{{ stats?.followers_count || 0 }}</div>
+                <div class="text-sm text-purple-700">Followers</div>
+              </div>
+              <div class="text-center p-3 bg-green-50 rounded-xl hover:bg-green-100 transition-colors cursor-pointer" @click="goToProfile('following')">
+                <div class="text-2xl font-bold text-green-600">{{ stats?.following_count || 0 }}</div>
+                <div class="text-sm text-green-700">Following</div>
+              </div>
             </div>
-          </div>
-
-          <!-- Profile Info - Centered on mobile -->
-          <div class="mb-6 sm:mb-8">
-            <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">{{ user?.name || 'Utilisateur' }}</h2>
-            <span v-if="user?.username" class="text-gray-500 text-base sm:text-lg block mb-3">@{{ user.username }}</span>
-            <span v-if="user?.is_verified" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 mb-3">
-              <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-              </svg>
-              Vérifié
-            </span>
-            <p v-if="user?.bio" class="text-gray-600 text-sm sm:text-base max-w-2xl mx-auto sm:mx-0">{{ user.bio }}</p>
+            
+            <!-- Actions rapides -->
+            <div class="space-y-3">
+              <RouterLink
+                :to="`/profile/${user?.id}`"
+                class="w-full bg-gradient-to-r from-gray-900 to-gray-700 text-white px-4 py-3 rounded-xl hover:from-gray-800 hover:to-gray-600 transition-all duration-200 flex items-center justify-center space-x-2 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+              >
+                <UserIcon class="w-5 h-5" />
+                <span>Voir mon profil</span>
+              </RouterLink>
+            </div>
           </div>
         </div>
-
-        <!-- Profile Stats - Centered on mobile -->
-        <div class="grid grid-cols-3 gap-4 sm:gap-6 max-w-xs sm:max-w-md mx-auto sm:mx-0 mb-6 sm:mb-8">
-          <div class="text-center cursor-pointer hover:bg-gray-50 rounded-lg p-3 sm:p-4 transition-colors" @click="goToProfile('products')">
-            <div class="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{{ stats?.products_count || 0 }}</div>
-            <div class="text-sm text-gray-500">Produits</div>
+        
+        <!-- Stats principales -->
+        <div class="lg:col-span-2">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <StatsCard
+              title="Mes Produits"
+              :value="stats?.products_count || 0"
+              icon="package"
+              color="blue"
+              :trend="stats?.products_trend || 0"
+              class="hover:scale-105 transition-transform duration-200"
+            />
+            <StatsCard
+              title="Ventes Totales"
+              :value="formatCurrency(stats?.total_sales || 0)"
+              icon="dollar-sign"
+              color="green"
+              :trend="stats?.sales_trend || 0"
+              class="hover:scale-105 transition-transform duration-200"
+            />
+            <StatsCard
+              title="Followers"
+              :value="stats?.followers_count || 0"
+              icon="users"
+              color="purple"
+              :trend="stats?.followers_trend || 0"
+              class="hover:scale-105 transition-transform duration-200"
+            />
+            <StatsCard
+              title="Vues ce mois"
+              :value="stats?.monthly_views || 0"
+              icon="eye"
+              color="orange"
+              :trend="stats?.views_trend || 0"
+              class="hover:scale-105 transition-transform duration-200"
+            />
           </div>
-          <div class="text-center cursor-pointer hover:bg-gray-50 rounded-lg p-3 sm:p-4 transition-colors" @click="goToProfile('followers')">
-            <div class="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{{ stats?.followers_count || 0 }}</div>
-            <div class="text-sm text-gray-500">Followers</div>
-          </div>
-          <div class="text-center cursor-pointer hover:bg-gray-50 rounded-lg p-3 sm:p-4 transition-colors" @click="goToProfile('following')">
-            <div class="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{{ stats?.following_count || 0 }}</div>
-            <div class="text-sm text-gray-500">Following</div>
-          </div>
-        </div>
-
-        <!-- Profile Actions - Centered on mobile -->
-        <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 justify-center sm:justify-start">
-          <RouterLink
-            :to="`/profile/${user?.id}`"
-            class="bg-gray-900 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full hover:bg-gray-800 transition-colors flex items-center justify-center space-x-3 text-base sm:text-lg font-medium shadow-lg"
-          >
-            <UserIcon class="w-5 h-5 sm:w-6 sm:h-6" />
-            <span>Voir mon profil</span>
-          </RouterLink>
-          <RouterLink
-            to="/profile/edit"
-            class="bg-white text-gray-700 border-2 border-gray-300 px-6 sm:px-8 py-3 sm:py-4 rounded-full hover:bg-gray-50 hover:border-gray-400 transition-colors flex items-center justify-center space-x-3 text-base sm:text-lg font-medium shadow-lg"
-          >
-            <EditIcon class="w-5 h-5 sm:w-6 sm:h-6" />
-            <span>Modifier</span>
-          </RouterLink>
         </div>
       </div>
-    </div>
 
-    <!-- Stats Cards -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12">
-        <StatsCard
-          title="Mes Produits"
-          :value="stats?.products_count || 0"
-          icon="package"
-          color="blue"
-          :trend="stats?.products_trend || 0"
-        />
-        <StatsCard
-          title="Ventes Totales"
-          :value="formatCurrency(stats?.total_sales || 0)"
-          icon="dollar-sign"
-          color="green"
-          :trend="stats?.sales_trend || 0"
-        />
-        <StatsCard
-          title="Followers"
-          :value="stats?.followers_count || 0"
-          icon="users"
-          color="purple"
-          :trend="stats?.followers_trend || 0"
-        />
-        <StatsCard
-          title="Vues ce mois"
-          :value="stats?.monthly_views || 0"
-          icon="eye"
-          color="orange"
-          :trend="stats?.views_trend || 0"
-        />
-      </div>
-
-      <!-- Main Content Grid -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
-        <!-- Left Column -->
-        <div class="lg:col-span-2 space-y-6 sm:space-y-8">
-          <!-- Sales Chart -->
-          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 space-y-4 sm:space-y-0">
-              <h2 class="text-xl sm:text-2xl font-semibold text-gray-900">Ventes des 30 derniers jours</h2>
-              <select v-model="chartPeriod" class="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+      <!-- Section Graphiques et Activité -->
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-8">
+        
+        <!-- Graphique des ventes -->
+        <div class="xl:col-span-2">
+          <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 p-6 hover:shadow-2xl transition-all duration-300">
+            <div class="flex items-center justify-between mb-6">
+              <h2 class="text-xl font-bold text-gray-900">Évolution des ventes</h2>
+              <select 
+                v-model="chartPeriod" 
+                @change="onChartPeriodChange"
+                class="px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
                 <option value="7">7 jours</option>
                 <option value="30">30 jours</option>
                 <option value="90">90 jours</option>
+                <option value="365">1 an</option>
               </select>
             </div>
-            <SalesChart :data="salesChartData" :loading="loadingStats" />
-          </div>
-
-          <!-- Recent Products -->
-          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 space-y-4 sm:space-y-0">
-              <h2 class="text-xl sm:text-2xl font-semibold text-gray-900">Mes Produits Récents</h2>
-              <RouterLink
-                to="/products?filter=my-products"
-                class="text-indigo-600 hover:text-indigo-700 text-sm font-medium hover:underline"
-              >
-                Voir tout
-              </RouterLink>
+            
+            <div v-if="loadingStats" class="flex items-center justify-center h-64">
+              <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
             </div>
-            <div v-if="loadingProducts" class="space-y-4">
-              <ProductSkeleton v-for="i in 3" :key="i" />
-            </div>
-            <div v-else-if="recentProducts.length > 0" class="space-y-4">
-              <ProductCard
-                v-for="product in recentProducts"
-                :key="product.id"
-                :product="product"
-                class="border border-gray-200 rounded-lg p-4"
-              />
-            </div>
-            <div v-else class="text-center py-8">
-              <PackageIcon class="mx-auto h-8 w-8 sm:h-12 sm:w-12 text-gray-400" />
-              <h3 class="mt-2 text-sm font-medium text-gray-900">Aucun produit</h3>
-              <p class="mt-1 text-sm text-gray-500">Commencez par créer votre premier produit</p>
-            </div>
+            <SalesChart v-else :data="salesChartData" />
           </div>
         </div>
-
-        <!-- Right Column -->
-        <div class="space-y-6 sm:space-y-8">
-          <!-- Quick Actions -->
-          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
-            <h2 class="text-xl sm:text-2xl font-semibold text-gray-900 mb-6">Actions Rapides</h2>
-            <div class="space-y-4">
-              <QuickActionButton
-                to="/products/create"
-                icon="plus"
-                title="Ajouter un produit"
-                description="Vendez vos articles"
-                color="blue"
-              />
-
-              <QuickActionButton
-                :to="`/profile/${user?.id}?tab=followers`"
-                icon="users"
-                title="Gérer mes followers"
-                description="Voir mes abonnés"
-                color="purple"
-              />
-              <QuickActionButton
-                :to="`/profile/${user?.id}`"
-                icon="user"
-                title="Mon profil complet"
-                description="Voir tous mes détails"
-                color="gray"
-              />
-            </div>
-          </div>
-
-          <!-- Recent Activity -->
-          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
-            <h2 class="text-xl sm:text-2xl font-semibold text-gray-900 mb-6">Activité Récente</h2>
+        
+        <!-- Activité récente -->
+        <div class="xl:col-span-1">
+          <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 p-6 hover:shadow-2xl transition-all duration-300">
+            <h2 class="text-xl font-bold text-gray-900 mb-6">Activité Récente</h2>
+            
             <div v-if="loadingActivity" class="space-y-4">
               <ActivitySkeleton v-for="i in 3" :key="i" />
             </div>
-            <div v-else-if="recentActivity.length > 0" class="space-y-4">
+            
+            <div v-else-if="recentActivity.length > 0" class="space-y-4 max-h-96 overflow-y-auto">
               <ActivityItem
                 v-for="activity in recentActivity"
                 :key="activity.id"
                 :activity="activity"
               />
             </div>
+            
             <div v-else class="text-center py-8">
-              <ActivityIcon class="mx-auto h-8 w-8 sm:h-12 sm:w-12 text-gray-400" />
+              <ActivityIcon class="mx-auto h-12 w-12 text-gray-400" />
               <h3 class="mt-2 text-sm font-medium text-gray-900">Aucune activité</h3>
               <p class="mt-1 text-sm text-gray-500">Vos actions apparaîtront ici</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Produits récents et Actions rapides -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Produits récents -->
+        <div class="lg:col-span-2">
+          <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 p-6 hover:shadow-2xl transition-all duration-300">
+            <div class="flex items-center justify-between mb-6">
+              <h2 class="text-xl font-bold text-gray-900">Mes Produits Récents</h2>
+              <RouterLink 
+                to="/my-products" 
+                class="text-blue-600 hover:text-blue-700 font-medium text-sm hover:underline"
+              >
+                Voir tous →
+              </RouterLink>
+            </div>
+            
+            <div v-if="loadingProducts" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <ProductSkeleton v-for="i in 4" :key="i" />
+            </div>
+            
+            <div v-else-if="recentProducts.length > 0" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <ProductCard
+                v-for="product in recentProducts"
+                :key="product.id"
+                :product="product"
+                :show-actions="true"
+                @edit="$emit('edit', $event)"
+                @delete="$emit('delete', $event)"
+                @boost="$emit('boost', $event)"
+                @share="$emit('share', $event)"
+              />
+            </div>
+            
+            <div v-else class="text-center py-8">
+              <PackageIcon class="mx-auto h-12 w-12 text-gray-400" />
+              <h3 class="mt-2 text-sm font-medium text-gray-900">Aucun produit</h3>
+              <p class="mt-1 text-sm text-gray-500">Commencez par créer votre premier produit</p>
+              <RouterLink 
+                to="/products/create"
+                class="mt-4 inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Créer un produit
+              </RouterLink>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Actions rapides et notifications -->
+        <div class="lg:col-span-1 space-y-6">
+          
+          <!-- Actions rapides -->
+          <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 p-6 hover:shadow-2xl transition-all duration-300">
+            <h2 class="text-xl font-bold text-gray-900 mb-6">Actions Rapides</h2>
+            <div class="space-y-3">
+              <QuickActionButton
+                title="Créer un produit"
+                description="Vendre un article"
+                icon="plus"
+                color="blue"
+                @click="router.push('/products/create')"
+              />
+              <QuickActionButton
+                title="Mes commandes"
+                description="Gérer les ventes"
+                icon="shopping-cart"
+                color="green"
+                @click="router.push('/orders')"
+              />
+              <QuickActionButton
+                title="Messages"
+                description="Conversations clients"
+                icon="message-circle"
+                color="purple"
+                @click="router.push('/messages')"
+              />
+              <QuickActionButton
+                title="Analytics"
+                description="Voir les statistiques"
+                icon="bar-chart"
+                color="orange"
+                @click="router.push('/analytics')"
+              />
+            </div>
+          </div>
+          
+          <!-- Notifications et alertes -->
+          <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 p-6 hover:shadow-2xl transition-all duration-300">
+            <h2 class="text-xl font-bold text-gray-900 mb-6">Alertes</h2>
+            <div class="space-y-4">
+              <div v-if="unreadMessages > 0" class="flex items-center p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <MessageCircleIcon class="w-5 h-5 text-blue-600 mr-3" />
+                <div class="flex-1">
+                  <p class="text-sm font-medium text-blue-900">{{ unreadMessages }} message(s) non lu(s)</p>
+                  <p class="text-xs text-blue-700">Clients en attente</p>
+                </div>
+              </div>
+              
+              <div v-if="pendingOrders > 0" class="flex items-center p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                <ClockIcon class="w-5 h-5 text-yellow-600 mr-3" />
+                <div class="flex-1">
+                  <p class="text-sm font-medium text-yellow-900">{{ pendingOrders }} commande(s) en attente</p>
+                  <p class="text-xs text-yellow-700">À traiter</p>
+                </div>
+              </div>
+              
+              <div v-if="unreadNotifications > 0" class="flex items-center p-3 bg-red-50 rounded-lg border border-red-200">
+                <BellIcon class="w-5 h-5 text-red-600 mr-3" />
+                <div class="flex-1">
+                  <p class="text-sm font-medium text-red-900">{{ unreadNotifications }} notification(s)</p>
+                  <p class="text-xs text-red-700">À consulter</p>
+                </div>
+              </div>
+              
+              <div v-if="unreadMessages === 0 && pendingOrders === 0 && unreadNotifications === 0" class="text-center py-4">
+                <CheckCircleIcon class="mx-auto h-8 w-8 text-green-500 mb-2" />
+                <p class="text-sm text-gray-600">Tout est à jour !</p>
+              </div>
             </div>
           </div>
         </div>
@@ -245,7 +329,10 @@ import {
   TrendingUpIcon,
   ActivityIcon,
   UserIcon,
-  EditIcon
+  EditIcon,
+  MessageCircleIcon,
+  BellIcon,
+  CheckCircleIcon
 } from 'lucide-vue-next'
 
 const router = useRouter()
@@ -264,6 +351,9 @@ const stats = computed(() => dashboardStore.stats)
 const recentProducts = computed(() => dashboardStore.recentProducts)
 const recentActivity = computed(() => dashboardStore.recentActivity)
 const salesChartData = computed(() => dashboardStore.salesChartData)
+const unreadMessages = computed(() => dashboardStore.unreadMessages)
+const pendingOrders = computed(() => dashboardStore.pendingOrders)
+const unreadNotifications = computed(() => dashboardStore.unreadNotifications)
 
 // Methods
 const formatCurrency = (amount) => {
@@ -308,6 +398,12 @@ const loadRecentActivity = async () => {
   }
 }
 
+const onChartPeriodChange = async () => {
+  if (chartPeriod.value) {
+    await dashboardStore.fetchSalesChartData(chartPeriod.value)
+  }
+}
+
 const goToProfile = (tab = null) => {
   if (tab) {
     router.push(`/profile/${user.value?.id}?tab=${tab}`)
@@ -315,13 +411,6 @@ const goToProfile = (tab = null) => {
     router.push(`/profile/${user.value?.id}`)
   }
 }
-
-// Watchers
-watch(chartPeriod, async (newPeriod) => {
-  if (newPeriod) {
-    await dashboardStore.fetchSalesChartData(newPeriod)
-  }
-})
 
 // Lifecycle
 onMounted(async () => {
@@ -332,3 +421,40 @@ onMounted(async () => {
   ])
 })
 </script>
+
+<style scoped>
+/* Scrollbar personnalisée */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Animations personnalisées */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+</style>

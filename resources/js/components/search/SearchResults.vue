@@ -38,10 +38,10 @@
             class="w-full h-48 object-cover"
             loading="lazy"
           >
-          
+
           <!-- Similarity Badge -->
           <div class="absolute top-2 right-2">
-            <div 
+            <div
               class="similarity-badge px-2 py-1 rounded-full text-xs font-medium text-white"
               :class="getSimilarityBadgeClass(result.similarity_score)"
             >
@@ -99,13 +99,13 @@
             >
               <i class="fas fa-info-circle mr-1"></i>
               Détails de la correspondance
-              <i 
+              <i
                 class="fas fa-chevron-down ml-1 transition-transform"
                 :class="{ 'rotate-180': expandedDetails.includes(result.product.id) }"
               ></i>
             </button>
-            
-            <div 
+
+            <div
               v-if="expandedDetails.includes(result.product.id)"
               class="mt-2 p-2 bg-gray-50 rounded text-xs"
             >
@@ -163,7 +163,7 @@
               >
               <span>{{ result.product.user?.name }}</span>
             </div>
-            
+
             <div class="flex items-center space-x-2">
               <button
                 @click.stop="toggleFavorite(result.product)"
@@ -234,13 +234,13 @@ export default {
   computed: {
     sortedResults() {
       const results = [...this.results];
-      
+
       if (this.sortBy === 'similarity') {
         return results.sort((a, b) => b.similarity_score - a.similarity_score);
       } else if (this.sortBy === 'price') {
         return results.sort((a, b) => a.product.price - b.product.price);
       }
-      
+
       return results;
     }
   },
@@ -251,7 +251,7 @@ export default {
       if (score >= 40) return 'bg-orange-500';
       return 'bg-red-500';
     },
-    
+
     toggleMatchDetails(productId) {
       const index = this.expandedDetails.indexOf(productId);
       if (index > -1) {
@@ -260,7 +260,7 @@ export default {
         this.expandedDetails.push(productId);
       }
     },
-    
+
     async toggleFavorite(product) {
       // Vérifier l'authentification
       const user = this.$store?.state?.auth?.user;
@@ -268,7 +268,7 @@ export default {
         this.notificationStore.warning('Connectez-vous pour ajouter aux favoris');
         return;
       }
-      
+
       try {
         const response = await fetch(`/api/v1/products/${product.id}/favorite`, {
           method: 'POST',
@@ -277,30 +277,25 @@ export default {
             'Content-Type': 'application/json'
           }
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
           product.is_favorited_by_user = data.data.favorited;
-          const message = data.data.favorited ? 
-            'Produit ajouté aux favoris' : 
-            'Produit retiré des favoris';
-          
-          this.notificationStore.success(message);
         }
       } catch (error) {
         console.error('Favorite error:', error);
         this.notificationStore.error('Erreur lors de la mise à jour des favoris');
       }
     },
-    
+
     async toggleLike(product) {
       const user = this.$store?.state?.auth?.user;
       if (!user) {
         this.notificationStore.warning('Connectez-vous pour liker');
         return;
       }
-      
+
       try {
         const response = await fetch(`/api/v1/products/${product.id}/like`, {
           method: 'POST',
@@ -309,9 +304,9 @@ export default {
             'Content-Type': 'application/json'
           }
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
           product.is_liked_by_user = data.data.liked;
           product.likes_count += data.data.liked ? 1 : -1;

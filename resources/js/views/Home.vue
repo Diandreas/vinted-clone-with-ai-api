@@ -15,7 +15,7 @@
         <div v-if="loadingProducts" class="space-y-6">
           <FacebookProductSkeleton v-for="i in 3" :key="i" />
         </div>
-        
+
         <!-- Products Feed - Facebook Style -->
         <FacebookProductGridLayout
           :products="products"
@@ -86,15 +86,15 @@ export default {
           per_page: 10,
           include: 'user,category,brand,images'
         }
-        
+
         const response = await api.get('/products', { params })
-        
+
         if (page === 1) {
           products.value = response.data.data
         } else {
           products.value = [...products.value, ...response.data.data]
         }
-        
+
         pagination.value = {
           current_page: response.data.current_page,
           last_page: response.data.last_page,
@@ -131,18 +131,14 @@ export default {
 
       try {
         likingProducts.value.push(product.id)
-        
+
         // Utiliser toujours POST pour toggle like/unlike
         const response = await api.post(`/products/${product.id}/like`)
-        
+
         if (response.data.success) {
           // Mettre à jour l'état du produit selon la réponse de l'API
           product.is_liked = response.data.liked
           product.likes_count = response.data.likes_count
-          
-          notificationStore.success(
-            product.is_liked ? 'Produit ajouté aux favoris' : 'Produit retiré des favoris'
-          )
         }
       } catch (error) {
         console.error('Erreur lors du like:', error)

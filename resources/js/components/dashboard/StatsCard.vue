@@ -1,42 +1,54 @@
 <template>
-  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 hover:shadow-md transition-shadow">
-    <div class="flex items-start justify-between">
-      <div class="flex-1">
-        <p class="text-sm sm:text-base font-medium text-gray-600 mb-2">{{ title }}</p>
-        <p class="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">{{ formattedValue }}</p>
-        <div v-if="trend !== undefined" class="flex items-center">
-          <TrendingUpIcon
-            v-if="trend > 0"
-            class="w-4 h-4 text-green-500 mr-2"
-          />
-          <TrendingDownIcon
-            v-else-if="trend < 0"
-            class="w-4 h-4 text-red-500 mr-2"
-          />
-          <MinusIcon
-            v-else
-            class="w-4 h-4 text-gray-400 mr-2"
-          />
-          <span
-            :class="{
-              'text-green-600': trend > 0,
-              'text-red-600': trend < 0,
-              'text-gray-500': trend === 0
-            }"
-            class="text-sm font-medium"
+  <div class="group relative overflow-hidden bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+    <!-- Background gradient on hover -->
+    <div class="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-indigo-50/30 to-purple-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+    
+    <!-- Content -->
+    <div class="relative">
+      <!-- Header with icon and trend -->
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center space-x-3">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-lg group-hover:shadow-xl transition-shadow duration-300">
+            <component :is="iconComponent" class="w-6 h-6" />
+          </div>
+          <div>
+            <h3 class="text-sm font-medium text-gray-600 group-hover:text-gray-700 transition-colors duration-200">
+              {{ title }}
+            </h3>
+          </div>
+        </div>
+        
+        <!-- Trend indicator -->
+        <div v-if="trend !== undefined" class="flex items-center space-x-1">
+          <div 
+            :class="trendClasses"
+            class="px-2 py-1 rounded-lg text-xs font-medium flex items-center space-x-1"
           >
-            {{ Math.abs(trend) }}%
-          </span>
-          <span class="text-gray-500 text-sm ml-2">vs mois dernier</span>
+            <component :is="trendIcon" class="w-3 h-3" />
+            <span>{{ Math.abs(trend) }}%</span>
+          </div>
         </div>
       </div>
-      <div
-        :class="iconColorClasses"
-        class="p-3 sm:p-4 rounded-lg flex-shrink-0"
-      >
-        <component :is="iconComponent" class="w-6 h-6 sm:w-7 sm:h-7" />
+      
+      <!-- Main value -->
+      <div class="mb-2">
+        <div class="text-3xl font-bold text-gray-900 group-hover:text-blue-900 transition-colors duration-200">
+          {{ formattedValue }}
+        </div>
       </div>
+      
+      <!-- Additional info or description -->
+      <div v-if="description" class="text-sm text-gray-500 group-hover:text-gray-600 transition-colors duration-200">
+        {{ description }}
+      </div>
+      
+      <!-- Hover effect line -->
+      <div class="absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-600 group-hover:w-full transition-all duration-500"></div>
     </div>
+    
+    <!-- Decorative elements -->
+    <div class="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-100/20 to-indigo-100/20 rounded-full -translate-y-10 translate-x-10 group-hover:scale-110 transition-transform duration-300"></div>
+    <div class="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-purple-100/20 to-pink-100/20 rounded-full translate-y-8 -translate-x-8 group-hover:scale-110 transition-transform duration-300"></div>
   </div>
 </template>
 
@@ -50,9 +62,13 @@ import {
   TrendingUpIcon,
   TrendingDownIcon,
   MinusIcon,
-  ShoppingBagIcon,
+  ShoppingCartIcon,
   HeartIcon,
-  MessageCircleIcon
+  StarIcon,
+  MessageCircleIcon,
+  BellIcon,
+  ClockIcon,
+  CheckCircleIcon
 } from 'lucide-vue-next'
 
 const props = defineProps({
@@ -75,59 +91,75 @@ const props = defineProps({
   trend: {
     type: Number,
     default: undefined
+  },
+  description: {
+    type: String,
+    default: ''
   }
 })
 
-const iconMapping = {
-  'package': PackageIcon,
-  'dollar-sign': DollarSignIcon,
-  'users': UsersIcon,
-  'eye': EyeIcon,
-  'shopping-bag': ShoppingBagIcon,
-  'heart': HeartIcon,
-  'message-circle': MessageCircleIcon
-}
-
-const colorMapping = {
-  blue: {
-    bg: 'bg-blue-50',
-    text: 'text-blue-600'
-  },
-  green: {
-    bg: 'bg-green-50',
-    text: 'text-green-600'
-  },
-  purple: {
-    bg: 'bg-purple-50',
-    text: 'text-purple-600'
-  },
-  orange: {
-    bg: 'bg-orange-50',
-    text: 'text-orange-600'
-  },
-  red: {
-    bg: 'bg-red-50',
-    text: 'text-red-600'
-  },
-  yellow: {
-    bg: 'bg-yellow-50',
-    text: 'text-yellow-600'
+// Map icon names to components
+const iconComponent = computed(() => {
+  const iconMap = {
+    'package': PackageIcon,
+    'dollar-sign': DollarSignIcon,
+    'users': UsersIcon,
+    'eye': EyeIcon,
+    'shopping-cart': ShoppingCartIcon,
+    'heart': HeartIcon,
+    'star': StarIcon,
+    'message-circle': MessageCircleIcon,
+    'bell': BellIcon,
+    'clock': ClockIcon,
+    'check-circle': CheckCircleIcon
   }
-}
-
-const iconComponent = computed(() => iconMapping[props.icon] || PackageIcon)
-
-const iconColorClasses = computed(() => {
-  const colors = colorMapping[props.color] || colorMapping.blue
-  return `${colors.bg} ${colors.text}`
+  
+  return iconMap[props.icon] || PackageIcon
 })
 
+// Format the value
 const formattedValue = computed(() => {
   if (typeof props.value === 'number') {
-    // Format numbers with proper thousand separators
-    return new Intl.NumberFormat('fr-FR').format(props.value)
+    return props.value.toLocaleString('fr-FR')
   }
   return props.value
 })
+
+// Trend indicator
+const trendIcon = computed(() => {
+  if (props.trend === undefined) return MinusIcon
+  if (props.trend > 0) return TrendingUpIcon
+  if (props.trend < 0) return TrendingDownIcon
+  return MinusIcon
+})
+
+const trendClasses = computed(() => {
+  if (props.trend === undefined) return 'bg-gray-100 text-gray-600'
+  if (props.trend > 0) return 'bg-green-100 text-green-700'
+  if (props.trend < 0) return 'bg-red-100 text-red-700'
+  return 'bg-gray-100 text-gray-600'
+})
 </script>
+
+<style scoped>
+/* Custom animations */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.group:hover .group-hover\:animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Glassmorphism effect */
+.backdrop-blur-sm {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+</style>
 
