@@ -8,6 +8,7 @@ export const RIKEAA_BRAND = {
   name: 'RIKEAA',
   slogan: 'Donnez une seconde vie à vos objets',
   description: 'Plateforme de vente et d\'achat d\'articles de seconde main',
+  currency: 'Fcfa',
   
   // Couleurs principales
   colors: {

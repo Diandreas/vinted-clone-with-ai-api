@@ -175,11 +175,11 @@
             <!-- Actions pour le propriétaire du produit -->
             <div v-if="isProductOwner" class="space-y-3">
               <button
-                @click="viewMyProductConversations"
+                @click="loadProductConversations"
                 class="w-full bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 transition-colors"
               >
                 <MessageCircleIcon class="w-4 h-4 mr-2 inline" />
-                Voir mes conversations ({{ product?.conversations_count || 0 }})
+                {{ showProductConversations ? 'Masquer' : 'Voir' }} conversations ({{ productConversations.length }})
               </button>
               
               <div class="grid grid-cols-2 gap-2">
@@ -325,6 +325,70 @@
           </div>
         </div>
       </div>
+
+      <!-- Product Conversations (for owner) -->
+      <div v-if="isProductOwner && showProductConversations" class="mt-8">
+        <div class="bg-white rounded-xl border border-gray-200 p-6">
+          <h3 class="text-xl font-semibold text-gray-900 mb-4">
+            Personnes intéressées par ce produit
+          </h3>
+          
+          <!-- Loading conversations -->
+          <div v-if="loadingConversations" class="flex items-center justify-center py-8">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+            <span class="ml-2 text-gray-600">Chargement des conversations...</span>
+          </div>
+          
+          <!-- No conversations -->
+          <div v-else-if="productConversations.length === 0" class="text-center py-8">
+            <MessageCircleIcon class="mx-auto h-12 w-12 text-gray-400 mb-4" />
+            <p class="text-gray-500">Aucune personne ne s'est encore manifestée pour ce produit.</p>
+          </div>
+          
+          <!-- Conversations list -->
+          <div v-else class="space-y-4">
+            <div 
+              v-for="conversation in productConversations" 
+              :key="conversation.id"
+              class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <div class="flex items-center space-x-4">
+                <!-- Buyer avatar -->
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
+                  {{ getUserInitials(conversation.buyer?.name) }}
+                </div>
+                
+                <!-- Buyer info & last message -->
+                <div>
+                  <p class="font-medium text-gray-900">{{ conversation.buyer?.name }}</p>
+                  <p class="text-sm text-gray-500" v-if="conversation.last_message">
+                    "{{ conversation.last_message.content.substring(0, 50) }}..."
+                  </p>
+                  <p class="text-xs text-gray-400">
+                    {{ formatMessageDate(conversation.last_message_at) }}
+                  </p>
+                </div>
+              </div>
+              
+              <!-- Actions -->
+              <div class="flex items-center space-x-2">
+                <span 
+                  v-if="conversation.unread_count > 0"
+                  class="bg-red-500 text-white text-xs px-2 py-1 rounded-full"
+                >
+                  {{ conversation.unread_count }} nouveau{{ conversation.unread_count > 1 ? 'x' : '' }}
+                </span>
+                <button
+                  @click="openConversation(conversation)"
+                  class="px-3 py-1 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700 transition-colors"
+                >
+                  Répondre
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Error State -->
@@ -466,6 +530,11 @@ const showMessageModal = ref(false)
 const messageContent = ref('')
 const sendingMessage = ref(false)
 const messageError = ref('')
+
+// Product Conversations State (for owner)
+const showProductConversations = ref(false)
+const productConversations = ref([])
+const loadingConversations = ref(false)
 
 // Computed
 const isAuthenticated = computed(() => authStore.isAuthenticated)
@@ -734,6 +803,45 @@ const viewMyProductConversations = () => {
   router.push(`/my-sales-conversations?product=${product.value.id}`)
 }
 
+const loadProductConversations = async () => {
+  if (showProductConversations.value) {
+    // Si déjà ouvert, fermer
+    showProductConversations.value = false
+    return
+  }
+  
+  showProductConversations.value = true
+  loadingConversations.value = true
+  
+  console.log('🔵 Chargement conversations pour produit:', product.value.id)
+  
+  try {
+    const response = await api.get(`/conversations/product/${product.value.id}/conversations`)
+    
+    console.log('📡 Réponse conversations produit:', response.data)
+    
+    if (response.data.success) {
+      productConversations.value = response.data.data.conversations || []
+      
+      console.log('✅ Conversations chargées:', {
+        product: response.data.data.product?.title,
+        conversations_count: productConversations.value.length,
+        unread_total: response.data.data.unread_count
+      })
+    }
+  } catch (error) {
+    console.error('❌ Erreur chargement conversations produit:', error)
+    productConversations.value = []
+  } finally {
+    loadingConversations.value = false
+  }
+}
+
+const openConversation = (conversation) => {
+  console.log('🔵 Ouverture conversation:', conversation.id)
+  router.push(`/conversations/${conversation.id}`)
+}
+
 const editProduct = () => {
   router.push(`/products/${product.value.id}/edit`)
 }
@@ -775,6 +883,26 @@ const formatDate = (dateString) => {
     year: 'numeric',
     month: 'long'
   })
+}
+
+const formatMessageDate = (dateString) => {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffInHours = (now - date) / (1000 * 60 * 60)
+  
+  if (diffInHours < 1) {
+    return 'À l\'instant'
+  } else if (diffInHours < 24) {
+    return `il y a ${Math.floor(diffInHours)}h`
+  } else {
+    return date.toLocaleDateString('fr-FR', {
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
 }
 
 const calculateDiscount = (originalPrice, currentPrice) => {

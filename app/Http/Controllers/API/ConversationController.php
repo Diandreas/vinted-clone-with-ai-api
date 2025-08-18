@@ -94,7 +94,7 @@ class ConversationController extends Controller
             ], 403);
         }
 
-        $conversation->load(['buyer', 'seller', 'messages' => function($query) {
+        $conversation->load(['buyer', 'seller', 'product', 'messages' => function($query) {
             $query->with('sender')->latest()->limit(50);
         }]);
 
