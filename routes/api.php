@@ -91,6 +91,7 @@ Route::prefix('v1')->group(function () {
         // Search
         Route::get('search', [SearchController::class, 'search']);
         Route::get('search/suggestions', [SearchController::class, 'suggestions']);
+        Route::get('search/stats', [SearchController::class, 'stats']);
         
         // Image Search (public endpoint for testing)
         Route::post('search/image', [ImageSearchController::class, 'searchByImage']);

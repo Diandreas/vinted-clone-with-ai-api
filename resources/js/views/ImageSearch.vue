@@ -1,7 +1,5 @@
 <template>
   <div class="image-search-page">
-    <NavBar />
-    
     <main class="main-content">
       <ImageSearchComponent />
     </main>
@@ -9,13 +7,11 @@
 </template>
 
 <script>
-import NavBar from '../components/layout/NavBar.vue';
 import ImageSearchComponent from '../components/search/ImageSearch.vue';
 
 export default {
   name: 'ImageSearchPage',
   components: {
-    NavBar,
     ImageSearchComponent
   },
   mounted() {
@@ -40,7 +36,9 @@ export default {
 }
 
 .main-content {
-  padding-top: 80px; /* Space for fixed navbar */
-  min-height: calc(100vh - 80px);
+  padding-top: 100px; /* Space for fixed navbar from App.vue */
+  padding-left: 1rem;
+  padding-right: 1rem;
+  min-height: calc(100vh - 100px);
 }
 </style>

@@ -1,17 +1,17 @@
 <template>
-  <div class="image-search-container">
-    <!-- Header -->
-    <div class="text-center mb-8">
-      <h1 class="text-3xl font-bold text-gray-900 mb-4">Recherche par Image</h1>
-      <p class="text-gray-600 max-w-2xl mx-auto">
+  <div class="image-search-container px-2 sm:px-4">
+    <!-- Header - Ultra Compact -->
+    <div class="text-center mb-3 sm:mb-6">
+      <h1 class="text-lg sm:text-2xl font-bold text-gray-900 mb-1 sm:mb-3">Recherche par Image</h1>
+      <p class="text-gray-600 max-w-2xl mx-auto text-xs sm:text-sm">
         Trouvez des produits similaires en uploadant une photo. Notre IA analyse l'image et vous propose les articles les plus ressemblants.
       </p>
     </div>
 
-    <!-- Upload Zone -->
-    <div class="upload-section mb-8">
+    <!-- Upload Zone - Ultra Compact -->
+    <div class="upload-section mb-3 sm:mb-6">
       <div 
-        class="upload-zone border-2 border-dashed border-gray-300 rounded-lg p-8 text-center transition-colors hover:border-primary-400"
+        class="upload-zone border-2 border-dashed border-gray-300 rounded-md p-3 sm:p-6 text-center transition-colors hover:border-primary-400"
         :class="{ 
           'border-primary-500 bg-primary-50': isDragOver,
           'border-green-500 bg-green-50': uploadedImage
@@ -20,31 +20,31 @@
         @dragleave.prevent="handleDragLeave"
         @drop.prevent="handleDrop"
       >
-        <!-- Image Preview -->
-        <div v-if="uploadedImage" class="mb-4">
+        <!-- Image Preview - Ultra Compact -->
+        <div v-if="uploadedImage" class="mb-2 sm:mb-3">
           <img 
             :src="imagePreview" 
             alt="Image uploadée"
-            class="max-h-64 mx-auto rounded-lg shadow-md"
+            class="max-h-32 sm:max-h-48 mx-auto rounded-md shadow-sm"
           >
           <button 
             @click="clearImage"
-            class="mt-3 text-sm text-gray-700 hover:text-gray-900"
+            class="mt-2 text-xs sm:text-sm text-gray-700 hover:text-gray-900"
           >
             <i class="fas fa-trash mr-1"></i>
             Supprimer l'image
           </button>
         </div>
 
-        <!-- Upload Interface -->
+        <!-- Upload Interface - Ultra Compact -->
         <div v-else>
-          <div class="mb-4">
-            <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-3"></i>
+          <div class="mb-2 sm:mb-3">
+            <i class="fas fa-cloud-upload-alt text-2xl sm:text-3xl text-gray-400 mb-1 sm:mb-2"></i>
           </div>
-          <p class="text-lg font-medium text-gray-700 mb-2">
+          <p class="text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
             Glissez votre image ici ou cliquez pour parcourir
           </p>
-          <p class="text-sm text-gray-500 mb-4">
+          <p class="text-xs sm:text-sm text-gray-500 mb-2 sm:mb-3">
             Formats supportés: JPEG, PNG, GIF, SVG (max 10MB)
           </p>
           <input
@@ -56,31 +56,31 @@
           >
           <button
             @click="$refs.fileInput.click()"
-            class="bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition-colors"
+            class="bg-primary-600 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-md hover:bg-primary-700 transition-colors text-xs sm:text-sm"
           >
-            <i class="fas fa-folder-open mr-2"></i>
+            <i class="fas fa-folder-open mr-1"></i>
             Choisir une image
           </button>
         </div>
       </div>
 
-      <!-- Search Button -->
-      <div v-if="uploadedImage" class="text-center mt-4">
+      <!-- Search Button - Ultra Compact -->
+      <div v-if="uploadedImage" class="text-center mt-2 sm:mt-3">
         <button
           @click="searchByImage"
           :disabled="isSearching"
-          class="bg-green-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          class="bg-green-600 text-white px-4 py-2 sm:px-6 sm:py-2.5 rounded-md font-medium hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm"
         >
-          <i v-if="isSearching" class="fas fa-spinner fa-spin mr-2"></i>
-          <i v-else class="fas fa-search mr-2"></i>
+          <i v-if="isSearching" class="fas fa-spinner fa-spin mr-1"></i>
+          <i v-else class="fas fa-search mr-1"></i>
           {{ isSearching ? 'Recherche en cours...' : 'Rechercher des produits similaires' }}
         </button>
 
-        <!-- Options -->
-        <div class="mt-4 flex justify-center items-center space-x-4">
-          <label class="flex items-center text-sm text-gray-600">
-            <span class="mr-2">Nombre de résultats:</span>
-            <select v-model="searchLimit" class="border border-gray-300 rounded px-2 py-1">
+        <!-- Options - Ultra Compact -->
+        <div class="mt-2 sm:mt-3 flex justify-center items-center space-x-2 sm:space-x-3">
+          <label class="flex items-center text-xs sm:text-sm text-gray-600">
+            <span class="mr-1 sm:mr-2">Résultats:</span>
+            <select v-model="searchLimit" class="border border-gray-300 rounded px-1 py-0.5 sm:px-2 sm:py-1 text-xs sm:text-sm">
               <option value="5">5</option>
               <option value="10">10</option>
               <option value="20">20</option>
@@ -91,33 +91,33 @@
       </div>
     </div>
 
-    <!-- Loading State -->
-    <div v-if="isSearching" class="text-center py-8">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
-      <p class="text-gray-600">Analyse de l'image en cours...</p>
+    <!-- Loading State - Ultra Compact -->
+    <div v-if="isSearching" class="text-center py-4 sm:py-6">
+      <div class="animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 border-b-2 border-primary-600 mx-auto mb-2 sm:mb-3"></div>
+      <p class="text-gray-600 text-xs sm:text-sm">Analyse de l'image en cours...</p>
     </div>
 
-    <!-- Error State -->
-    <div v-if="error" class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
+    <!-- Error State - Ultra Compact -->
+    <div v-if="error" class="bg-gray-50 border border-gray-200 rounded-md p-2 sm:p-3 mb-3 sm:mb-4">
       <div class="flex items-center">
-        <i class="fas fa-exclamation-circle text-gray-500 mr-2"></i>
-        <span class="text-gray-800">{{ error }}</span>
+        <i class="fas fa-exclamation-circle text-gray-500 mr-1 sm:mr-2 text-sm"></i>
+        <span class="text-gray-800 text-xs sm:text-sm">{{ error }}</span>
       </div>
     </div>
 
     <!-- Results -->
     <SearchResults 
-      v-if="searchResults.length > 0"
+      v-if="hasSearched && !isSearching && searchResults.length > 0"
       :results="searchResults"
       :search-meta="searchMeta"
       @product-click="handleProductClick"
     />
 
-    <!-- Empty State -->
-    <div v-else-if="hasSearched && !isSearching" class="text-center py-12">
-      <i class="fas fa-search text-6xl text-gray-300 mb-4"></i>
-      <h3 class="text-xl font-medium text-gray-700 mb-2">Aucun produit similaire trouvé</h3>
-      <p class="text-gray-500">Essayez avec une autre image ou ajustez vos critères de recherche.</p>
+    <!-- Empty State - Ultra Compact -->
+    <div v-else-if="hasSearched && !isSearching && searchResults.length === 0" class="text-center py-6 sm:py-8">
+      <i class="fas fa-search text-3xl sm:text-4xl text-gray-300 mb-2 sm:mb-3"></i>
+      <h3 class="text-sm sm:text-lg font-medium text-gray-700 mb-1 sm:mb-2">Aucun produit similaire trouvé</h3>
+      <p class="text-gray-500 text-xs sm:text-sm">Essayez avec une autre image ou ajustez vos critères de recherche.</p>
     </div>
 
     <!-- Tips Section -->
@@ -290,6 +290,8 @@ export default {
                 });
               }
             });
+          } else {
+            console.warn('Search returned 0 results despite success:', data);
           }
         } else {
           throw new Error(data.message || 'Erreur lors de la recherche');

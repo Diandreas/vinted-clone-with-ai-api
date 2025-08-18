@@ -1,6 +1,6 @@
+/* Import des styles RIKEAA */
+@import './rikeaa.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Import des styles RIKEAA */
-@import './rikeaa.css';

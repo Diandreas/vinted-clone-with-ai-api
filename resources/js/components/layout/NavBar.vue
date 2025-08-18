@@ -206,7 +206,7 @@
             </RouterLink>
             <RouterLink
               to="/register"
-              class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors"
+              class="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
             >
               S'inscrire
             </RouterLink>
@@ -222,9 +222,27 @@
             v-model="searchQuery"
             type="text"
             placeholder="Rechercher des produits..."
-            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            class="w-full pl-10 pr-16 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             @keydown.enter="performSearch"
           />
+          <div class="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
+            <RouterLink
+              to="/search/image"
+              class="p-1.5 text-gray-400 hover:text-primary-600 transition-colors rounded-lg hover:bg-primary-50"
+              title="Recherche par image"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+            </RouterLink>
+            <button
+              v-if="searchQuery"
+              @click="clearSearch"
+              class="p-1.5 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+            >
+              <XIcon class="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -319,6 +337,6 @@ onUnmounted(() => {
 
 <style scoped>
 .router-link-active {
-  @apply text-indigo-600 font-semibold;
+  @apply text-primary-600 font-semibold;
 }
 </style>

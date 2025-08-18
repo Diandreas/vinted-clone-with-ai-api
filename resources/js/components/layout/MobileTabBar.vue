@@ -2,7 +2,7 @@
   <div class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-xl">
     <!-- Safe area pour iPhone -->
     <div class="safe-area-inset-bottom">
-      <div class="flex justify-around items-center py-2 px-4">
+      <div class="flex justify-between items-center py-2 px-1">
         <!-- Accueil -->
         <RouterLink 
           to="/"
@@ -19,19 +19,35 @@
           </span>
         </RouterLink>
 
-        <!-- Rechercher -->
+        <!-- Produits -->
         <RouterLink 
           to="/products"
           class="flex flex-col items-center justify-center p-2 min-w-0 flex-1 transform transition-all duration-150 hover:scale-105 active:scale-95"
-          :class="{ 'text-primary-600': $route.name === 'products' || $route.name === 'search' }"
+          :class="{ 'text-primary-600': $route.name === 'products' }"
         >
           <div class="relative">
-            <svg class="w-6 h-6" :class="$route.name === 'products' || $route.name === 'search' ? 'text-primary-600' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-6 h-6" :class="$route.name === 'products' ? 'text-primary-600' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
           </div>
-          <span class="text-xs mt-1 font-medium truncate" :class="$route.name === 'products' || $route.name === 'search' ? 'text-primary-600' : 'text-gray-500'">
-            Rechercher
+          <span class="text-xs mt-1 font-medium truncate" :class="$route.name === 'products' ? 'text-primary-600' : 'text-gray-500'">
+            Produits
+          </span>
+        </RouterLink>
+
+        <!-- Recherche avancée -->
+        <RouterLink 
+          to="/search"
+          class="flex flex-col items-center justify-center p-2 min-w-0 flex-1 transform transition-all duration-150 hover:scale-105 active:scale-95"
+          :class="{ 'text-primary-600': $route.name === 'search' }"
+        >
+          <div class="relative">
+            <svg class="w-6 h-6" :class="$route.name === 'search' ? 'text-primary-600' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+          </div>
+          <span class="text-xs mt-1 font-medium truncate" :class="$route.name === 'search' ? 'text-primary-600' : 'text-gray-500'">
+            Recherche
           </span>
         </RouterLink>
 
