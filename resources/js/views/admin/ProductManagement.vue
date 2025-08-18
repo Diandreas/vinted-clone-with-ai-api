@@ -21,7 +21,7 @@
         <div class="mt-4 flex md:mt-0 md:ml-4">
           <button
             @click="showCreateModal = true"
-            class="ml-3 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            class="ml-3 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
           >
             <PlusIcon class="-ml-1 mr-2 h-5 w-5" />
             Nouveau Produit
@@ -43,7 +43,7 @@
                   id="search"
                   v-model="filters.search"
                   type="text"
-                  class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
                   placeholder="Rechercher un produit..."
                   @input="debounceSearch"
                 />
@@ -55,7 +55,7 @@
               <select
                 id="category"
                 v-model="filters.category"
-                class="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                class="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md"
                 @change="loadProducts"
               >
                 <option value="">Toutes les catégories</option>
@@ -70,7 +70,7 @@
               <select
                 id="status"
                 v-model="filters.status"
-                class="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                class="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md"
                 @change="loadProducts"
               >
                 <option value="">Tous les statuts</option>
@@ -87,7 +87,7 @@
               <select
                 id="sort"
                 v-model="filters.sort"
-                class="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                class="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md"
                 @change="loadProducts"
               >
                 <option value="created_at">Date de création</option>
@@ -114,7 +114,7 @@
           <div class="mt-6">
             <button
               @click="showCreateModal = true"
-              class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
             >
               <PlusIcon class="-ml-1 mr-2 h-5 w-5" />
               Nouveau Produit
@@ -173,14 +173,14 @@
                 </button>
                 <button
                   @click="editProduct(product)"
-                  class="text-indigo-600 hover:text-indigo-900"
+                  class="text-primary-600 hover:text-primary-900"
                   title="Modifier"
                 >
                   <PencilIcon class="h-5 w-5" />
                 </button>
                 <button
                   @click="deleteProduct(product)"
-                  class="text-red-600 hover:text-red-900"
+                  class="text-gray-700 hover:text-gray-900"
                   title="Supprimer"
                 >
                   <TrashIcon class="h-5 w-5" />
@@ -201,7 +201,7 @@
         
         <!-- État d'erreur -->
         <div v-else-if="!loading && !Array.isArray(products)" class="text-center py-12">
-          <AlertTriangleIcon class="mx-auto h-12 w-12 text-red-400" />
+          <AlertTriangleIcon class="mx-auto h-12 w-12 text-gray-400" />
           <h3 class="mt-2 text-sm font-medium text-gray-900">Erreur de chargement</h3>
           <p class="mt-1 text-sm text-gray-500">
             Impossible de charger les produits. Veuillez réessayer.
@@ -254,7 +254,7 @@
                     @click="loadProducts(page)"
                     :class="[
                       page === pagination.current_page
-                        ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600'
+                        ? 'z-10 bg-primary-50 border-primary-500 text-primary-600'
                         : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50',
                       'relative inline-flex items-center px-4 py-2 border text-sm font-medium'
                     ]"
@@ -300,7 +300,7 @@
       title="Supprimer le produit"
       :message="`Êtes-vous sûr de vouloir supprimer le produit '${selectedProduct?.title}' ? Cette action est irréversible.`"
       confirm-text="Supprimer"
-      confirm-class="bg-red-600 hover:bg-red-700 focus:ring-red-500"
+      confirm-class="bg-gray-700 hover:bg-gray-800 focus:ring-gray-500"
       @confirm="confirmDelete"
       @cancel="showDeleteModal = false"
     />

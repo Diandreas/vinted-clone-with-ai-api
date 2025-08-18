@@ -21,7 +21,7 @@
     <div v-if="hasAction" class="flex-shrink-0">
       <RouterLink
         :to="getActivityUrl(activity)"
-        class="text-xs text-indigo-600 hover:text-indigo-700 font-medium"
+        class="text-xs text-primary-600 hover:text-primary-700 font-medium"
       >
         Voir
       </RouterLink>
@@ -61,13 +61,13 @@ const iconMapping = {
 }
 
 const iconColorMapping = {
-  like: 'bg-red-50 text-red-600',
-  comment: 'bg-blue-50 text-blue-600',
+  like: 'bg-gray-50 text-gray-700',
+  comment: 'bg-primary-50 text-primary-600',
   order: 'bg-green-50 text-green-600',
-  follow: 'bg-purple-50 text-purple-600',
-  product_created: 'bg-indigo-50 text-indigo-600',
+  follow: 'bg-primary-50 text-primary-600',
+  product_created: 'bg-primary-50 text-primary-600',
   product_viewed: 'bg-gray-50 text-gray-600',
-  review: 'bg-yellow-50 text-yellow-600'
+  review: 'bg-gray-50 text-gray-600'
 }
 
 const iconComponent = computed(() => iconMapping[props.activity.type] || PackageIcon)

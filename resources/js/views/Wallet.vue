@@ -24,46 +24,46 @@
         </div>
 
         <!-- Error Message -->
-        <div v-if="messages.error" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+        <div v-if="messages.error" class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
           <div class="flex items-center">
             <div class="flex-shrink-0">
-              <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+              <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
               </svg>
             </div>
             <div class="ml-3">
-              <p class="text-sm font-medium text-red-800">{{ messages.error }}</p>
+              <p class="text-sm font-medium text-gray-900">{{ messages.error }}</p>
             </div>
           </div>
         </div>
 
         <!-- Warning Message -->
-        <div v-if="messages.warning" class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+        <div v-if="messages.warning" class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
           <div class="flex items-center">
             <div class="flex-shrink-0">
-              <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+              <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
               </svg>
             </div>
             <div class="ml-3">
-              <p class="text-sm font-medium text-yellow-800">{{ messages.warning }}</p>
+              <p class="text-sm font-medium text-gray-800">{{ messages.warning }}</p>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Balance Card -->
-      <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-6 text-white mb-8">
+      <div class="bg-gradient-to-r from-primary-500 to-primary-600 rounded-xl p-6 text-white mb-8">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-indigo-100 text-sm font-medium">Solde disponible</p>
+            <p class="text-primary-100 text-sm font-medium">Solde disponible</p>
             <p class="text-3xl font-bold">{{ walletStore.balanceFormatted }}</p>
-            <p class="text-indigo-100 text-xs mt-1">
+            <p class="text-primary-100 text-xs mt-1">
               Dernière mise à jour: {{ formatDate(walletStore.lastUpdated) }}
             </p>
           </div>
           <div class="text-right">
-            <WalletIcon class="w-12 h-12 text-indigo-200" />
+            <WalletIcon class="w-12 h-12 text-primary-200" />
           </div>
         </div>
       </div>
@@ -99,8 +99,8 @@
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div class="flex items-center">
-            <div class="p-2 bg-blue-100 rounded-lg mr-3">
-              <TrendingUpIcon class="w-6 h-6 text-blue-600" />
+            <div class="p-2 bg-primary-100 rounded-lg mr-3">
+              <TrendingUpIcon class="w-6 h-6 text-primary-600" />
             </div>
             <div>
               <p class="text-2xl font-bold text-gray-900">{{ walletStore.formatAmount(walletStore.monthlyStats.deposits) }}</p>
@@ -123,8 +123,8 @@
 
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div class="flex items-center">
-            <div class="p-2 bg-purple-100 rounded-lg mr-3">
-              <ActivityIcon class="w-6 h-6 text-purple-600" />
+            <div class="p-2 bg-primary-100 rounded-lg mr-3">
+              <ActivityIcon class="w-6 h-6 text-primary-600" />
             </div>
             <div>
               <p class="text-2xl font-bold text-gray-900">{{ walletStore.monthlyStats.transactionCount }}</p>
@@ -294,45 +294,45 @@ const getTransactionTitle = (transaction) => {
 }
 
 const getTransactionBgColor = (transaction) => {
-  if (transaction.status === 'failed') return 'bg-red-100'
-  if (transaction.status === 'pending') return 'bg-yellow-100'
+  if (transaction.status === 'failed') return 'bg-gray-100'
+  if (transaction.status === 'pending') return 'bg-gray-100'
   
   switch (transaction.purpose) {
     case 'topup':
     case 'refund':
       return 'bg-green-100'
     case 'order_payment':
-      return 'bg-blue-100'
+      return 'bg-primary-100'
     default:
       return 'bg-gray-100'
   }
 }
 
 const getTransactionIconColor = (transaction) => {
-  if (transaction.status === 'failed') return 'text-red-600'
-  if (transaction.status === 'pending') return 'text-yellow-600'
+  if (transaction.status === 'failed') return 'text-gray-700'
+  if (transaction.status === 'pending') return 'text-gray-600'
   
   switch (transaction.purpose) {
     case 'topup':
     case 'refund':
       return 'text-green-600'
     case 'order_payment':
-      return 'text-blue-600'
+      return 'text-primary-600'
     default:
       return 'text-gray-600'
   }
 }
 
 const getAmountColor = (transaction) => {
-  if (transaction.status === 'failed') return 'text-red-500'
-  if (transaction.status === 'pending') return 'text-yellow-500'
+  if (transaction.status === 'failed') return 'text-gray-500'
+  if (transaction.status === 'pending') return 'text-gray-500'
   
   switch (transaction.purpose) {
     case 'topup':
     case 'refund':
       return 'text-green-600'
     case 'order_payment':
-      return 'text-red-600'
+      return 'text-gray-700'
     default:
       return 'text-gray-600'
   }
@@ -370,9 +370,9 @@ const getStatusBadgeColor = (status) => {
     case 'completed':
       return 'bg-green-100 text-green-800'
     case 'pending':
-      return 'bg-yellow-100 text-yellow-800'
+      return 'bg-gray-100 text-gray-800'
     case 'failed':
-      return 'bg-red-100 text-red-800'
+      return 'bg-gray-100 text-gray-900'
     case 'cancelled':
       return 'bg-gray-100 text-gray-800'
     default:

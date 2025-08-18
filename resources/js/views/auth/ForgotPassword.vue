@@ -21,10 +21,10 @@
           </div>
         </div>
 
-        <div v-if="error" class="rounded-md bg-red-50 p-3 sm:p-4">
+        <div v-if="error" class="rounded-md bg-gray-50 p-3 sm:p-4">
           <div class="flex">
             <div class="ml-3">
-              <h3 class="text-xs sm:text-sm font-medium text-red-800">
+              <h3 class="text-xs sm:text-sm font-medium text-gray-900">
                 {{ error }}
               </h3>
             </div>
@@ -41,7 +41,7 @@
               type="email"
               autocomplete="email"
               required
-              class="appearance-none rounded-md relative block w-full px-3 py-2 sm:py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 text-sm sm:text-base"
+              class="appearance-none rounded-md relative block w-full px-3 py-2 sm:py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 text-sm sm:text-base"
               placeholder="Adresse email"
             />
           </div>
@@ -51,7 +51,7 @@
           <button
             type="submit"
             :disabled="loading"
-            class="group relative w-full flex justify-center py-2 sm:py-3 px-4 border border-transparent text-sm sm:text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 transition-colors"
+            class="group relative w-full flex justify-center py-2 sm:py-3 px-4 border border-transparent text-sm sm:text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 transition-colors"
           >
             <span v-if="loading">Envoi en cours...</span>
             <span v-else>Envoyer le lien de réinitialisation</span>
@@ -61,7 +61,7 @@
         <div class="text-center">
           <RouterLink
             to="/login"
-            class="font-medium text-indigo-600 hover:text-indigo-500 text-xs sm:text-sm"
+            class="font-medium text-primary-600 hover:text-primary-500 text-xs sm:text-sm"
           >
             Retour à la connexion
           </RouterLink>

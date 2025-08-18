@@ -28,18 +28,18 @@ const statusConfig = {
   },
   sold: {
     text: 'Vendu',
-    badge: 'bg-blue-100 text-blue-800',
-    dot: 'bg-blue-500'
+    badge: 'bg-primary-100 text-primary-800',
+    dot: 'bg-primary-500'
   },
   reserved: {
     text: 'Réservé',
-    badge: 'bg-yellow-100 text-yellow-800',
-    dot: 'bg-yellow-500'
+    badge: 'bg-gray-100 text-gray-800',
+    dot: 'bg-gray-500'
   },
   removed: {
     text: 'Supprimé',
-    badge: 'bg-red-100 text-red-800',
-    dot: 'bg-red-500'
+    badge: 'bg-gray-100 text-gray-900',
+    dot: 'bg-gray-500'
   }
 }
 

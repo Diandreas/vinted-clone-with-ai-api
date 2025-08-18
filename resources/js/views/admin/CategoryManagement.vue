@@ -9,7 +9,7 @@
         </div>
         <button
           @click="showCreateModal = true"
-          class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors"
+          class="inline-flex items-center px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors"
         >
           <PlusIcon class="w-5 h-5 mr-2" />
           Nouvelle catégorie
@@ -26,7 +26,7 @@
                 v-model="filters.search"
                 type="text"
                 placeholder="Rechercher une catégorie..."
-                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 @input="debouncedSearch"
               />
             </div>
@@ -35,7 +35,7 @@
           <select 
             v-model="filters.status"
             @change="loadCategories"
-            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
           >
             <option value="">Tous les statuts</option>
             <option value="active">Actives</option>
@@ -54,7 +54,7 @@
       <!-- Loading -->
       <div v-if="loading" class="bg-white rounded-xl shadow-sm border border-gray-200 p-12">
         <div class="flex justify-center">
-          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
         </div>
       </div>
 
@@ -119,7 +119,7 @@
                       'inline-flex px-2 py-1 text-xs font-medium rounded-full',
                       category.status === 'active' 
                         ? 'bg-green-100 text-green-800' 
-                        : 'bg-red-100 text-red-800'
+                        : 'bg-gray-100 text-gray-900'
                     ]"
                   >
                     {{ category.status === 'active' ? 'Active' : 'Inactive' }}
@@ -132,14 +132,14 @@
                   <div class="flex justify-end space-x-2">
                     <button
                       @click="editCategory(category)"
-                      class="text-indigo-600 hover:text-indigo-900 transition-colors"
+                      class="text-primary-600 hover:text-primary-900 transition-colors"
                       title="Modifier"
                     >
                       <PencilIcon class="w-4 h-4" />
                     </button>
                     <button
                       @click="deleteCategory(category)"
-                      class="text-red-600 hover:text-red-900 transition-colors"
+                      class="text-gray-700 hover:text-gray-900 transition-colors"
                       title="Supprimer"
                     >
                       <TrashIcon class="w-4 h-4" />
@@ -193,7 +193,7 @@
         title="Confirmer la suppression"
         :message="`Êtes-vous sûr de vouloir supprimer la catégorie '${categoryToDelete?.name}' ?`"
         confirm-text="Supprimer"
-        confirm-class="bg-red-600 hover:bg-red-700 focus:ring-red-500"
+        confirm-class="bg-gray-700 hover:bg-gray-800 focus:ring-gray-500"
         @confirm="confirmDelete"
         @cancel="showDeleteModal = false"
       />

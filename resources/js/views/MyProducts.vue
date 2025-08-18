@@ -11,7 +11,7 @@
           <div class="flex space-x-3">
             <RouterLink
               to="/products/create"
-              class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors flex items-center space-x-2"
+              class="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center space-x-2"
             >
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -35,7 +35,7 @@
               v-model="filters.search"
               type="text"
               placeholder="Nom du produit..."
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               @input="debouncedSearch"
             />
           </div>
@@ -45,7 +45,7 @@
             <label class="block text-sm font-medium text-gray-700 mb-2">Statut</label>
             <select
               v-model="filters.status"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               @change="loadProducts"
             >
               <option value="">Tous les statuts</option>
@@ -61,7 +61,7 @@
             <label class="block text-sm font-medium text-gray-700 mb-2">Catégorie</label>
             <select
               v-model="filters.category"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               @change="loadProducts"
             >
               <option value="">Toutes les catégories</option>
@@ -85,7 +85,7 @@
 
       <!-- Products Grid -->
       <div v-if="loading" class="text-center py-12">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
         <p class="mt-4 text-gray-600">Chargement de vos produits...</p>
       </div>
 
@@ -98,7 +98,7 @@
         <div class="mt-6">
           <RouterLink
             to="/products/create"
-            class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+            class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700"
           >
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -155,7 +155,7 @@
                 class="bg-white bg-opacity-90 hover:bg-opacity-100 p-2 rounded-full shadow-sm transition-all"
                 title="Supprimer"
               >
-                <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                 </svg>
               </button>
@@ -167,7 +167,7 @@
             <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2">{{ product.title }}</h3>
             
             <div class="flex items-center justify-between mb-2">
-              <span class="text-lg font-bold text-indigo-600">{{ formatPrice(product.price) }}</span>
+              <span class="text-lg font-bold text-primary-600">{{ formatPrice(product.price) }}</span>
               <span class="text-sm text-gray-500">{{ formatDate(product.created_at) }}</span>
             </div>
 
@@ -201,7 +201,7 @@
               
               <RouterLink
                 :to="`/products/${product.id}/edit`"
-                class="flex-1 bg-indigo-100 text-indigo-700 px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-200 transition-colors text-center"
+                class="flex-1 bg-primary-100 text-primary-700 px-3 py-2 rounded-md text-sm font-medium hover:bg-primary-200 transition-colors text-center"
               >
                 Modifier
               </RouterLink>
@@ -240,8 +240,8 @@
     <div v-if="showDeleteModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
       <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
         <div class="mt-3 text-center">
-          <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
-            <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-gray-100">
+            <svg class="h-6 w-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
             </svg>
           </div>
@@ -261,7 +261,7 @@
             <button
               @click="deleteProduct"
               :disabled="deleting"
-              class="px-4 py-2 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700 disabled:opacity-50 transition-colors"
+              class="px-4 py-2 bg-gray-700 text-white rounded-md text-sm font-medium hover:bg-gray-800 disabled:opacity-50 transition-colors"
             >
               {{ deleting ? 'Suppression...' : 'Supprimer' }}
             </button>
@@ -426,9 +426,9 @@ const getStatusBadgeClass = (status) => {
   const classes = {
     active: 'bg-green-100 text-green-800',
     draft: 'bg-gray-100 text-gray-800',
-    sold: 'bg-blue-100 text-blue-800',
-    reserved: 'bg-yellow-100 text-yellow-800',
-    removed: 'bg-red-100 text-red-800'
+    sold: 'bg-primary-100 text-primary-800',
+    reserved: 'bg-gray-100 text-gray-800',
+    removed: 'bg-gray-100 text-gray-900'
   }
   return classes[status] || classes.draft
 }

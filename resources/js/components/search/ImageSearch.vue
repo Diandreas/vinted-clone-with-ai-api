@@ -11,9 +11,9 @@
     <!-- Upload Zone -->
     <div class="upload-section mb-8">
       <div 
-        class="upload-zone border-2 border-dashed border-gray-300 rounded-lg p-8 text-center transition-colors hover:border-blue-400"
+        class="upload-zone border-2 border-dashed border-gray-300 rounded-lg p-8 text-center transition-colors hover:border-primary-400"
         :class="{ 
-          'border-blue-500 bg-blue-50': isDragOver,
+          'border-primary-500 bg-primary-50': isDragOver,
           'border-green-500 bg-green-50': uploadedImage
         }"
         @dragover.prevent="handleDragOver"
@@ -29,7 +29,7 @@
           >
           <button 
             @click="clearImage"
-            class="mt-3 text-sm text-red-600 hover:text-red-800"
+            class="mt-3 text-sm text-gray-700 hover:text-gray-900"
           >
             <i class="fas fa-trash mr-1"></i>
             Supprimer l'image
@@ -56,7 +56,7 @@
           >
           <button
             @click="$refs.fileInput.click()"
-            class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            class="bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition-colors"
           >
             <i class="fas fa-folder-open mr-2"></i>
             Choisir une image
@@ -93,15 +93,15 @@
 
     <!-- Loading State -->
     <div v-if="isSearching" class="text-center py-8">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
       <p class="text-gray-600">Analyse de l'image en cours...</p>
     </div>
 
     <!-- Error State -->
-    <div v-if="error" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+    <div v-if="error" class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
       <div class="flex items-center">
-        <i class="fas fa-exclamation-circle text-red-500 mr-2"></i>
-        <span class="text-red-700">{{ error }}</span>
+        <i class="fas fa-exclamation-circle text-gray-500 mr-2"></i>
+        <span class="text-gray-800">{{ error }}</span>
       </div>
     </div>
 
@@ -127,7 +127,7 @@
       </h3>
       <div class="grid md:grid-cols-3 gap-6">
         <div class="tip-card text-center p-6 bg-gray-50 rounded-lg">
-          <i class="fas fa-camera text-3xl text-blue-500 mb-3"></i>
+          <i class="fas fa-camera text-3xl text-primary-500 mb-3"></i>
           <h4 class="font-medium text-gray-800 mb-2">Image claire</h4>
           <p class="text-sm text-gray-600">
             Utilisez des photos nettes avec un bon éclairage pour de meilleurs résultats.
@@ -141,7 +141,7 @@
           </p>
         </div>
         <div class="tip-card text-center p-6 bg-gray-50 rounded-lg">
-          <i class="fas fa-palette text-3xl text-purple-500 mb-3"></i>
+          <i class="fas fa-palette text-3xl text-primary-500 mb-3"></i>
           <h4 class="font-medium text-gray-800 mb-2">Couleurs fidèles</h4>
           <p class="text-sm text-gray-600">
             Évitez les filtres pour que les couleurs soient authentiques.

@@ -22,19 +22,19 @@
           <div class="absolute top-2 left-2">
             <span
               v-if="product.status === 'sold'"
-              class="bg-red-500 text-white text-xs font-medium px-2 py-1 rounded-full shadow-sm"
+              class="bg-gray-500 text-white text-xs font-medium px-2 py-1 rounded-full shadow-sm"
             >
               Vendu
             </span>
             <span
               v-else-if="product.status === 'reserved'"
-              class="bg-yellow-500 text-white text-xs font-medium px-2 py-1 rounded-full shadow-sm"
+              class="bg-gray-500 text-white text-xs font-medium px-2 py-1 rounded-full shadow-sm"
             >
               Réservé
             </span>
             <span
               v-else-if="product.is_boosted"
-              class="bg-indigo-500 text-white text-xs font-medium px-2 py-1 rounded-full shadow-sm"
+              class="bg-primary-500 text-white text-xs font-medium px-2 py-1 rounded-full shadow-sm"
             >
               Boosté
             </span>
@@ -54,7 +54,7 @@
           
           <!-- User Info -->
           <div class="flex items-center space-x-2 mb-3">
-            <div class="w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+            <div class="w-6 h-6 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center">
               <span class="text-white font-bold text-xs">
                 {{ product.user?.name?.charAt(0)?.toUpperCase() || 'U' }}
               </span>
@@ -68,16 +68,16 @@
               <button 
                 @click="$emit('like', product)"
                 :disabled="likingProducts.includes(product.id)"
-                class="flex items-center space-x-1 text-gray-500 hover:text-red-500 transition-colors disabled:opacity-50"
+                class="flex items-center space-x-1 text-gray-500 hover:text-gray-500 transition-colors disabled:opacity-50"
               >
                 <HeartIcon 
                   class="w-4 h-4"
-                  :class="product.is_liked ? 'text-red-500 fill-current' : ''"
+                  :class="product.is_liked ? 'text-gray-500 fill-current' : ''"
                 />
                 <span class="text-xs">{{ product.likes_count || 0 }}</span>
               </button>
 
-              <button class="flex items-center space-x-1 text-gray-500 hover:text-blue-500 transition-colors">
+              <button class="flex items-center space-x-1 text-gray-500 hover:text-primary-500 transition-colors">
                 <ChatBubbleLeftIcon class="w-4 h-4" />
                 <span class="text-xs">{{ product.comments_count || 0 }}</span>
               </button>
@@ -85,7 +85,7 @@
 
             <button 
               @click="$emit('view', product)"
-              class="text-blue-600 hover:text-blue-700 text-sm font-medium"
+              class="text-primary-600 hover:text-primary-700 text-sm font-medium"
             >
               Voir
             </button>
@@ -124,7 +124,7 @@
       <button
         @click="$emit('load-more')"
         :disabled="loadingMore"
-        class="bg-blue-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        class="bg-primary-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <span v-if="loadingMore">Chargement...</span>
         <span v-else>Charger plus de produits</span>

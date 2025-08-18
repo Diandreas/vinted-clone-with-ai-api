@@ -1,14 +1,14 @@
 <template>
   <div class="group relative overflow-hidden bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
     <!-- Background gradient on hover -->
-    <div class="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-indigo-50/30 to-purple-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+    <div class="absolute inset-0 bg-gradient-to-br from-primary-50/50 via-primary-50/30 to-primary-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
     
     <!-- Content -->
     <div class="relative">
       <!-- Header with icon and trend -->
       <div class="flex items-center justify-between mb-4">
         <div class="flex items-center space-x-3">
-          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-lg group-hover:shadow-xl transition-shadow duration-300">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white shadow-lg group-hover:shadow-xl transition-shadow duration-300">
             <component :is="iconComponent" class="w-6 h-6" />
           </div>
           <div>
@@ -32,7 +32,7 @@
       
       <!-- Main value -->
       <div class="mb-2">
-        <div class="text-3xl font-bold text-gray-900 group-hover:text-blue-900 transition-colors duration-200">
+        <div class="text-3xl font-bold text-gray-900 group-hover:text-primary-900 transition-colors duration-200">
           {{ formattedValue }}
         </div>
       </div>
@@ -43,12 +43,12 @@
       </div>
       
       <!-- Hover effect line -->
-      <div class="absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-600 group-hover:w-full transition-all duration-500"></div>
+      <div class="absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r from-primary-500 to-primary-600 group-hover:w-full transition-all duration-500"></div>
     </div>
     
     <!-- Decorative elements -->
-    <div class="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-100/20 to-indigo-100/20 rounded-full -translate-y-10 translate-x-10 group-hover:scale-110 transition-transform duration-300"></div>
-    <div class="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-purple-100/20 to-pink-100/20 rounded-full translate-y-8 -translate-x-8 group-hover:scale-110 transition-transform duration-300"></div>
+    <div class="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-primary-100/20 to-primary-100/20 rounded-full -translate-y-10 translate-x-10 group-hover:scale-110 transition-transform duration-300"></div>
+    <div class="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-primary-100/20 to-gray-100/20 rounded-full translate-y-8 -translate-x-8 group-hover:scale-110 transition-transform duration-300"></div>
   </div>
 </template>
 
@@ -136,7 +136,7 @@ const trendIcon = computed(() => {
 const trendClasses = computed(() => {
   if (props.trend === undefined) return 'bg-gray-100 text-gray-600'
   if (props.trend > 0) return 'bg-green-100 text-green-700'
-  if (props.trend < 0) return 'bg-red-100 text-red-700'
+  if (props.trend < 0) return 'bg-gray-100 text-gray-800'
   return 'bg-gray-100 text-gray-600'
 })
 </script>

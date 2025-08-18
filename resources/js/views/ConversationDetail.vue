@@ -1,18 +1,18 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-gray-50 pb-16 sm:pb-0">
     <!-- Loading -->
     <div v-if="loading" class="min-h-screen flex items-center justify-center">
-      <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-indigo-600"></div>
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
     </div>
 
     <!-- Conversation Detail -->
-    <div v-else-if="conversation" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <!-- Header -->
-      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+    <div v-else-if="conversation" class="max-w-4xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-6">
+      <!-- Header - Compact -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4 mb-3 sm:mb-4">
         <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-4">
-            <!-- Product Image -->
-            <div class="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden">
+          <div class="flex items-center space-x-3">
+            <!-- Product Image - Compact -->
+            <div class="w-12 h-12 sm:w-14 sm:h-14 bg-gray-100 rounded-lg overflow-hidden">
               <img 
                 v-if="conversation.product?.main_image_url"
                 :src="conversation.product.main_image_url" 
@@ -20,13 +20,13 @@
                 class="w-full h-full object-cover"
               />
               <div v-else class="flex items-center justify-center h-full">
-                <ImageIcon class="w-6 h-6 text-gray-400" />
+                <ImageIcon class="w-5 h-5 text-gray-400" />
               </div>
             </div>
             
-            <!-- Product & Participant Info -->
+            <!-- Product & Participant Info - Compact -->
             <div>
-              <h1 class="text-xl font-semibold text-gray-900">{{ conversation.product?.title }}</h1>
+              <h1 class="text-lg sm:text-xl font-semibold text-gray-900 truncate max-w-48 sm:max-w-none">{{ conversation.product?.title }}</h1>
               <p class="text-sm text-gray-500">
                 Conversation avec {{ otherParticipant?.name }}
               </p>
@@ -34,20 +34,20 @@
             </div>
           </div>
           
-          <!-- Back Button -->
+          <!-- Back Button - Compact -->
           <button
             @click="goBack"
-            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+            class="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm"
           >
             ← Retour
           </button>
         </div>
       </div>
 
-      <!-- Messages -->
-      <div class="bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col h-96">
-        <!-- Messages List -->
-        <div class="flex-1 overflow-y-auto p-4 space-y-4" ref="messagesContainer">
+      <!-- Messages - Compact -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col h-80 sm:h-96">
+        <!-- Messages List - Compact -->
+        <div class="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3" ref="messagesContainer">
           <div
             v-for="message in messages"
             :key="message.id"
@@ -58,9 +58,9 @@
           >
             <div
               :class="[
-                'max-w-xs lg:max-w-md px-4 py-2 rounded-lg',
+                'max-w-xs lg:max-w-md px-3 py-2 rounded-lg',
                 message.sender_id === currentUserId
-                  ? 'bg-indigo-600 text-white'
+                  ? 'bg-primary-600 text-white'
                   : 'bg-gray-100 text-gray-900'
               ]"
             >
@@ -72,20 +72,20 @@
           </div>
         </div>
 
-        <!-- Message Input -->
-        <div class="p-4 border-t border-gray-200">
-          <form @submit.prevent="sendMessage" class="flex space-x-3">
+        <!-- Message Input - Compact -->
+        <div class="p-3 sm:p-4 border-t border-gray-200">
+          <form @submit.prevent="sendMessage" class="flex space-x-2 sm:space-x-3">
             <input
               v-model="newMessage"
               type="text"
               placeholder="Tapez votre message..."
-              class="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              class="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               :disabled="sendingMessage"
             />
             <button
               type="submit"
               :disabled="!newMessage.trim() || sendingMessage"
-              class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {{ sendingMessage ? 'Envoi...' : 'Envoyer' }}
             </button>
@@ -97,13 +97,13 @@
     <!-- Error State -->
     <div v-else class="min-h-screen flex items-center justify-center">
       <div class="text-center">
-        <AlertTriangleIcon class="mx-auto h-12 w-12 text-red-400" />
+        <AlertTriangleIcon class="mx-auto h-12 w-12 text-gray-400" />
         <h3 class="mt-2 text-sm font-medium text-gray-900">Conversation non trouvée</h3>
         <p class="mt-1 text-sm text-gray-500">Cette conversation n'existe pas ou vous n'y avez pas accès.</p>
         <div class="mt-6">
           <button
             @click="goBack"
-            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700"
           >
             Retour aux discussions
           </button>

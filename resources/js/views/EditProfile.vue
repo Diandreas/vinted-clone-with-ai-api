@@ -16,7 +16,7 @@
           <button
             @click="saveProfile"
             :disabled="saving"
-            class="px-4 sm:px-6 py-2 sm:py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-600 rounded-full transition-colors flex items-center space-x-2"
+            class="px-4 sm:px-6 py-2 sm:py-3 bg-primary-600 hover:bg-primary-700 disabled:bg-gray-600 rounded-full transition-colors flex items-center space-x-2"
           >
             <Loader2Icon v-if="saving" class="w-4 h-4 animate-spin" />
             <CheckIcon v-else class="w-4 h-4" />
@@ -36,7 +36,7 @@
       </div>
       
       <div v-if="error" class="mb-6">
-        <div class="bg-red-500/20 border border-red-500/50 rounded-xl p-4 text-red-400">
+        <div class="bg-gray-500/20 border border-gray-500/50 rounded-xl p-4 text-gray-400">
           {{ error }}
         </div>
       </div>
@@ -52,7 +52,7 @@
           <div class="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-6">
             <!-- Current Avatar -->
             <div class="relative">
-              <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-2xl sm:text-3xl md:text-4xl font-bold border-4 border-white shadow-lg overflow-hidden">
+              <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white text-2xl sm:text-3xl md:text-4xl font-bold border-4 border-white shadow-lg overflow-hidden">
                 <img
                   v-if="form.avatar"
                   :src="form.avatar"
@@ -69,7 +69,7 @@
             <!-- Upload Controls -->
             <div class="flex-1 space-y-3">
               <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
-                <label class="cursor-pointer inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors">
+                <label class="cursor-pointer inline-flex items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors">
                   <CameraIcon class="w-4 h-4 mr-2" />
                   Changer la photo
                   <input
@@ -114,7 +114,7 @@
               <button
                 @click="removeCoverImage"
                 type="button"
-                class="absolute top-2 right-2 p-2 bg-red-600 hover:bg-red-700 rounded-full transition-colors"
+                class="absolute top-2 right-2 p-2 bg-gray-700 hover:bg-gray-800 rounded-full transition-colors"
               >
                 <XIcon class="w-4 h-4" />
               </button>
@@ -122,7 +122,7 @@
             
             <!-- Upload Cover -->
             <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
-              <label class="cursor-pointer inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors">
+              <label class="cursor-pointer inline-flex items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors">
                 <ImageIcon class="w-4 h-4 mr-2" />
                 {{ form.cover_image ? 'Changer la couverture' : 'Ajouter une couverture' }}
                 <input
@@ -157,7 +157,7 @@
                 v-model="form.name"
                 type="text"
                 required
-                class="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-white placeholder-gray-400"
+                class="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-white placeholder-gray-400"
                 placeholder="Votre nom complet"
               />
             </div>
@@ -171,7 +171,7 @@
                 v-model="form.username"
                 type="text"
                 required
-                class="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-white placeholder-gray-400"
+                class="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-white placeholder-gray-400"
                 placeholder="nom_utilisateur"
               />
             </div>
@@ -185,7 +185,7 @@
                 v-model="form.email"
                 type="email"
                 required
-                class="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-white placeholder-gray-400"
+                class="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-white placeholder-gray-400"
                 placeholder="votre@email.com"
               />
             </div>
@@ -198,7 +198,7 @@
                 id="phone"
                 v-model="form.phone"
                 type="tel"
-                class="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-white placeholder-gray-400"
+                class="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-white placeholder-gray-400"
                 placeholder="+33 6 12 34 56 78"
               />
             </div>
@@ -221,7 +221,7 @@
                 id="bio"
                 v-model="form.bio"
                 rows="4"
-                class="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-white placeholder-gray-400 resize-none"
+                class="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-white placeholder-gray-400 resize-none"
                 placeholder="Parlez-nous un peu de vous..."
               ></textarea>
               <p class="text-xs text-gray-400 mt-1">
@@ -238,7 +238,7 @@
                   id="location"
                   v-model="form.location"
                   type="text"
-                  class="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-white placeholder-gray-400"
+                  class="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-white placeholder-gray-400"
                   placeholder="Paris, France"
                 />
               </div>
@@ -251,7 +251,7 @@
                   id="website"
                   v-model="form.website"
                   type="url"
-                  class="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-white placeholder-gray-400"
+                  class="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-white placeholder-gray-400"
                   placeholder="https://monsite.com"
                 />
               </div>
@@ -266,7 +266,7 @@
                   id="birth_date"
                   v-model="form.birth_date"
                   type="date"
-                  class="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-white placeholder-gray-400"
+                  class="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-white placeholder-gray-400"
                 />
               </div>
               
@@ -277,7 +277,7 @@
                 <select
                   id="gender"
                   v-model="form.gender"
-                  class="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-white"
+                  class="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-white"
                 >
                   <option value="">Non spécifié</option>
                   <option value="male">Homme</option>
@@ -306,7 +306,7 @@
                 id="instagram"
                 v-model="form.instagram"
                 type="text"
-                class="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-white placeholder-gray-400"
+                class="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-white placeholder-gray-400"
                 placeholder="@votre_username"
               />
             </div>
@@ -319,7 +319,7 @@
                 id="twitter"
                 v-model="form.twitter"
                 type="text"
-                class="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-white placeholder-gray-400"
+                class="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-white placeholder-gray-400"
                 placeholder="@votre_username"
               />
             </div>
@@ -332,7 +332,7 @@
                 id="facebook"
                 v-model="form.facebook"
                 type="text"
-                class="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-white placeholder-gray-400"
+                class="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-white placeholder-gray-400"
                 placeholder="votre.nom"
               />
             </div>
@@ -345,7 +345,7 @@
                 id="linkedin"
                 v-model="form.linkedin"
                 type="text"
-                class="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-white placeholder-gray-400"
+                class="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-white placeholder-gray-400"
                 placeholder="votre-nom"
               />
             </div>
@@ -371,7 +371,7 @@
                   type="checkbox"
                   class="sr-only peer"
                 />
-                <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
               </label>
             </div>
             
@@ -386,7 +386,7 @@
                   type="checkbox"
                   class="sr-only peer"
                 />
-                <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
               </label>
             </div>
             
@@ -401,7 +401,7 @@
                   type="checkbox"
                   class="sr-only peer"
                 />
-                <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
               </label>
             </div>
           </div>
@@ -412,7 +412,7 @@
           <button
             type="submit"
             :disabled="saving"
-            class="flex-1 sm:flex-none px-6 sm:px-8 py-3 sm:py-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-600 rounded-full transition-colors font-medium flex items-center justify-center space-x-2"
+            class="flex-1 sm:flex-none px-6 sm:px-8 py-3 sm:py-4 bg-primary-600 hover:bg-primary-700 disabled:bg-gray-600 rounded-full transition-colors font-medium flex items-center justify-center space-x-2"
           >
             <Loader2Icon v-if="saving" class="w-5 h-5 animate-spin" />
             <CheckIcon v-else class="w-5 h-5" />

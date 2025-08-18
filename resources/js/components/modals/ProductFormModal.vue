@@ -49,7 +49,7 @@
                         v-model="form.title"
                         type="text"
                         required
-                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
                         placeholder="Titre du produit"
                       />
                     </div>
@@ -66,7 +66,7 @@
                         v-model="form.description"
                         rows="4"
                         required
-                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
                         placeholder="Description détaillée du produit"
                       ></textarea>
                     </div>
@@ -82,7 +82,7 @@
                         id="category_id"
                         v-model="form.category_id"
                         required
-                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
                       >
                         <option value="">Sélectionnez une catégorie</option>
                         <option v-for="category in categories" :key="category.id" :value="category.id">
@@ -101,7 +101,7 @@
                       <select
                         id="brand_id"
                         v-model="form.brand_id"
-                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
                       >
                         <option value="">Sélectionnez une marque</option>
                         <option v-for="brand in brands" :key="brand.id" :value="brand.id">
@@ -121,7 +121,7 @@
                         id="condition_id"
                         v-model="form.condition_id"
                         required
-                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
                       >
                         <option value="">Sélectionnez un état</option>
                         <option v-for="condition in conditions" :key="condition.id" :value="condition.id">
@@ -144,7 +144,7 @@
                         step="0.01"
                         min="0"
                         required
-                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
                         placeholder="0.00"
                       />
                     </div>
@@ -162,7 +162,7 @@
                         type="number"
                         step="0.01"
                         min="0"
-                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
                         placeholder="0.00"
                       />
                     </div>
@@ -178,7 +178,7 @@
                         id="size"
                         v-model="form.size"
                         type="text"
-                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
                         placeholder="S, M, L, XL..."
                       />
                     </div>
@@ -194,7 +194,7 @@
                         id="color"
                         v-model="form.color"
                         type="text"
-                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
                         placeholder="Noir, Blanc, Rouge..."
                       />
                     </div>
@@ -210,7 +210,7 @@
                         id="material"
                         v-model="form.material"
                         type="text"
-                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
                         placeholder="Coton, Polyester, Cuir..."
                       />
                     </div>
@@ -225,7 +225,7 @@
                       <select
                         id="status"
                         v-model="form.status"
-                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
                       >
                         <option value="draft">Brouillon</option>
                         <option value="active">Actif</option>
@@ -244,7 +244,7 @@
                           id="is_negotiable"
                           v-model="form.is_negotiable"
                           type="checkbox"
-                          class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                          class="focus:ring-primary-500 h-4 w-4 text-primary-600 border-gray-300 rounded"
                         />
                         <label for="is_negotiable" class="ml-2 block text-sm text-gray-900">
                           Prix négociable
@@ -256,7 +256,7 @@
                           id="is_featured"
                           v-model="form.is_featured"
                           type="checkbox"
-                          class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                          class="focus:ring-primary-500 h-4 w-4 text-primary-600 border-gray-300 rounded"
                         />
                         <label for="is_featured" class="ml-2 block text-sm text-gray-900">
                           Produit mis en avant
@@ -266,8 +266,8 @@
                   </div>
                 </div>
 
-                <div v-if="error" class="mt-4 bg-red-50 border border-red-200 rounded-md p-4">
-                  <div class="text-sm text-red-700">
+                <div v-if="error" class="mt-4 bg-gray-50 border border-gray-200 rounded-md p-4">
+                  <div class="text-sm text-gray-800">
                     {{ error }}
                   </div>
                 </div>
@@ -276,7 +276,7 @@
                   <button
                     type="submit"
                     :disabled="loading"
-                    class="inline-flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed sm:col-start-2 sm:text-sm"
+                    class="inline-flex w-full justify-center rounded-md border border-transparent bg-primary-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed sm:col-start-2 sm:text-sm"
                   >
                     <LoaderIcon v-if="loading" class="w-4 h-4 mr-2 animate-spin" />
                     {{ loading ? 'Enregistrement...' : (isEditing ? 'Modifier' : 'Créer') }}
@@ -284,7 +284,7 @@
                   <button
                     type="button"
                     @click="$emit('close')"
-                    class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:col-start-1 sm:mt-0 sm:text-sm"
+                    class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 sm:col-start-1 sm:mt-0 sm:text-sm"
                   >
                     Annuler
                   </button>

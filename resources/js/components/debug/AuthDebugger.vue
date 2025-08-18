@@ -13,7 +13,7 @@
       <!-- État de l'authentification -->
       <div class="flex items-center justify-between">
         <span class="text-gray-600">Authentifié:</span>
-        <span :class="isAuthenticated ? 'text-green-600' : 'text-red-600'">
+        <span :class="isAuthenticated ? 'text-green-600' : 'text-gray-700'">
           {{ isAuthenticated ? '✅ Oui' : '❌ Non' }}
         </span>
       </div>
@@ -21,7 +21,7 @@
       <!-- Token -->
       <div class="flex items-center justify-between">
         <span class="text-gray-600">Token:</span>
-        <span :class="hasToken ? 'text-green-600' : 'text-red-600'">
+        <span :class="hasToken ? 'text-green-600' : 'text-gray-700'">
           {{ hasToken ? '✅ Présent' : '❌ Absent' }}
         </span>
       </div>
@@ -29,7 +29,7 @@
       <!-- Utilisateur -->
       <div class="flex items-center justify-between">
         <span class="text-gray-600">Utilisateur:</span>
-        <span :class="user ? 'text-green-600' : 'text-red-600'">
+        <span :class="user ? 'text-green-600' : 'text-gray-700'">
           {{ user ? `✅ ${user.name}` : '❌ Non chargé' }}
         </span>
       </div>
@@ -43,7 +43,7 @@
       <div class="flex space-x-2 pt-2">
         <button 
           @click="testAuthEndpoint"
-          class="px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600"
+          class="px-2 py-1 bg-primary-500 text-white text-xs rounded hover:bg-primary-600"
         >
           Test Auth
         </button>
@@ -55,7 +55,7 @@
         </button>
         <button 
           @click="refreshAuth"
-          class="px-2 py-1 bg-purple-500 text-white text-white text-xs rounded hover:bg-purple-600"
+          class="px-2 py-1 bg-primary-500 text-white text-white text-xs rounded hover:bg-primary-600"
         >
           Refresh
         </button>
@@ -64,7 +64,7 @@
       <!-- Résultats des tests -->
       <div v-if="testResults.length > 0" class="mt-3 space-y-1">
         <div v-for="(result, index) in testResults" :key="index" class="text-xs">
-          <span :class="result.success ? 'text-green-600' : 'text-red-600'">
+          <span :class="result.success ? 'text-green-600' : 'text-gray-700'">
             {{ result.success ? '✅' : '❌' }}
           </span>
           {{ result.message }}

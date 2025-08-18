@@ -100,9 +100,9 @@
           />
           <label for="terms" class="text-xs sm:text-sm text-gray-900 leading-relaxed">
             J'accepte les
-            <a href="/terms" class="text-indigo-600 hover:text-indigo-500">conditions d'utilisation</a>
+            <a href="/terms" class="text-primary-600 hover:text-primary-500">conditions d'utilisation</a>
             et la
-            <a href="/privacy" class="text-indigo-600 hover:text-indigo-500">politique de confidentialité</a>
+            <a href="/privacy" class="text-primary-600 hover:text-primary-500">politique de confidentialité</a>
           </label>
         </div>
 
@@ -110,17 +110,17 @@
           <button
             type="submit"
             :disabled="loading"
-            class="group relative w-full flex justify-center py-2 sm:py-3 px-4 border border-transparent text-sm sm:text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            class="group relative w-full flex justify-center py-2 sm:py-3 px-4 border border-transparent text-sm sm:text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <span v-if="loading" class="absolute left-0 inset-y-0 flex items-center pl-3">
-              <LoaderIcon class="h-5 w-5 text-indigo-500 animate-spin" />
+              <LoaderIcon class="h-5 w-5 text-primary-500 animate-spin" />
             </span>
             {{ loading ? 'Création du compte...' : 'Créer mon compte' }}
           </button>
         </div>
 
-        <div v-if="error" class="bg-red-50 border border-red-200 rounded-md p-3 sm:p-4">
-          <div class="text-xs sm:text-sm text-red-700">
+        <div v-if="error" class="bg-gray-50 border border-gray-200 rounded-md p-3 sm:p-4">
+          <div class="text-xs sm:text-sm text-gray-800">
             {{ error }}
           </div>
         </div>

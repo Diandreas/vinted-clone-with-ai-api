@@ -42,9 +42,9 @@ const iconMapping = {
 }
 
 const colorMapping = {
-  blue: 'bg-blue-100 text-blue-600',
-  red: 'bg-red-100 text-red-600',
-  purple: 'bg-purple-100 text-purple-600'
+  blue: 'bg-primary-100 text-primary-600',
+  red: 'bg-gray-100 text-gray-700',
+  purple: 'bg-primary-100 text-primary-600'
 }
 
 const iconComponent = computed(() => iconMapping[props.icon] || ShoppingBagIcon)

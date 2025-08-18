@@ -1,11 +1,11 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/20 to-indigo-50/30">
+  <div class="min-h-screen bg-gradient-to-br from-gray-50 via-primary-50/20 to-primary-50/30">
     <!-- Header avec navigation -->
     <div class="bg-white/80 backdrop-blur-sm shadow-sm border-b border-gray-200/50 sticky top-0 z-10">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center py-6 space-y-4 sm:space-y-0">
           <div class="text-center sm:text-left">
-            <h1 class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-gray-900 via-blue-700 to-indigo-800 bg-clip-text text-transparent">
+            <h1 class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-gray-900 via-primary-700 to-primary-800 bg-clip-text text-transparent">
               Tableau de bord
             </h1>
             <p class="text-base sm:text-lg text-gray-600 mt-2">Bienvenue, {{ user?.name || 'Utilisateur' }} 👋</p>
@@ -14,7 +14,7 @@
           <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 justify-center sm:justify-end">
             <RouterLink
               to="/products/create"
-              class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+              class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-600 text-white font-semibold rounded-xl hover:from-primary-700 hover:to-primary-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
             >
               <PlusIcon class="w-5 h-5 mr-2" />
               Vendre un article
@@ -44,7 +44,7 @@
             <!-- Avatar et infos -->
             <div class="text-center mb-6">
               <div class="relative inline-block mb-4">
-                <div class="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 flex items-center justify-center text-white text-3xl font-bold border-4 border-white shadow-lg">
+                <div class="w-24 h-24 rounded-full bg-gradient-to-br from-primary-500 via-primary-500 to-primary-600 flex items-center justify-center text-white text-3xl font-bold border-4 border-white shadow-lg">
                   {{ user?.name?.charAt(0)?.toUpperCase() || 'U' }}
                 </div>
                 <div class="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
@@ -56,7 +56,7 @@
               <p v-if="user?.username" class="text-gray-500 text-lg mb-3">@{{ user.username }}</p>
               <p v-if="user?.bio" class="text-gray-600 text-sm">{{ user.bio }}</p>
               
-              <div v-if="user?.is_verified" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 mt-3">
+              <div v-if="user?.is_verified" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary-100 text-primary-800 mt-3">
                 <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                 </svg>
@@ -66,13 +66,13 @@
             
             <!-- Stats rapides -->
             <div class="grid grid-cols-3 gap-4 mb-6">
-              <div class="text-center p-3 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors cursor-pointer" @click="goToProfile('products')">
-                <div class="text-2xl font-bold text-blue-600">{{ stats?.products_count || 0 }}</div>
-                <div class="text-sm text-blue-700">Produits</div>
+              <div class="text-center p-3 bg-primary-50 rounded-xl hover:bg-primary-100 transition-colors cursor-pointer" @click="goToProfile('products')">
+                <div class="text-2xl font-bold text-primary-600">{{ stats?.products_count || 0 }}</div>
+                <div class="text-sm text-primary-700">Produits</div>
               </div>
-              <div class="text-center p-3 bg-purple-50 rounded-xl hover:bg-purple-100 transition-colors cursor-pointer" @click="goToProfile('followers')">
-                <div class="text-2xl font-bold text-purple-600">{{ stats?.followers_count || 0 }}</div>
-                <div class="text-sm text-purple-700">Followers</div>
+              <div class="text-center p-3 bg-primary-50 rounded-xl hover:bg-primary-100 transition-colors cursor-pointer" @click="goToProfile('followers')">
+                <div class="text-2xl font-bold text-primary-600">{{ stats?.followers_count || 0 }}</div>
+                <div class="text-sm text-primary-700">Followers</div>
               </div>
               <div class="text-center p-3 bg-green-50 rounded-xl hover:bg-green-100 transition-colors cursor-pointer" @click="goToProfile('following')">
                 <div class="text-2xl font-bold text-green-600">{{ stats?.following_count || 0 }}</div>
@@ -143,7 +143,7 @@
               <select 
                 v-model="chartPeriod" 
                 @change="onChartPeriodChange"
-                class="px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                class="px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               >
                 <option value="7">7 jours</option>
                 <option value="30">30 jours</option>
@@ -153,7 +153,7 @@
             </div>
             
             <div v-if="loadingStats" class="flex items-center justify-center h-64">
-              <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+              <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
             </div>
             <SalesChart v-else :data="salesChartData" />
           </div>
@@ -195,7 +195,7 @@
               <h2 class="text-xl font-bold text-gray-900">Mes Produits Récents</h2>
               <RouterLink 
                 to="/my-products" 
-                class="text-blue-600 hover:text-blue-700 font-medium text-sm hover:underline"
+                class="text-primary-600 hover:text-primary-700 font-medium text-sm hover:underline"
               >
                 Voir tous →
               </RouterLink>
@@ -224,7 +224,7 @@
               <p class="mt-1 text-sm text-gray-500">Commencez par créer votre premier produit</p>
               <RouterLink 
                 to="/products/create"
-                class="mt-4 inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                class="mt-4 inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
               >
                 Créer un produit
               </RouterLink>
@@ -274,27 +274,27 @@
           <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 p-6 hover:shadow-2xl transition-all duration-300">
             <h2 class="text-xl font-bold text-gray-900 mb-6">Alertes</h2>
             <div class="space-y-4">
-              <div v-if="unreadMessages > 0" class="flex items-center p-3 bg-blue-50 rounded-lg border border-blue-200">
-                <MessageCircleIcon class="w-5 h-5 text-blue-600 mr-3" />
+              <div v-if="unreadMessages > 0" class="flex items-center p-3 bg-primary-50 rounded-lg border border-primary-200">
+                <MessageCircleIcon class="w-5 h-5 text-primary-600 mr-3" />
                 <div class="flex-1">
-                  <p class="text-sm font-medium text-blue-900">{{ unreadMessages }} message(s) non lu(s)</p>
-                  <p class="text-xs text-blue-700">Clients en attente</p>
+                  <p class="text-sm font-medium text-primary-900">{{ unreadMessages }} message(s) non lu(s)</p>
+                  <p class="text-xs text-primary-700">Clients en attente</p>
                 </div>
               </div>
               
-              <div v-if="pendingOrders > 0" class="flex items-center p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-                <ClockIcon class="w-5 h-5 text-yellow-600 mr-3" />
+              <div v-if="pendingOrders > 0" class="flex items-center p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <ClockIcon class="w-5 h-5 text-gray-600 mr-3" />
                 <div class="flex-1">
-                  <p class="text-sm font-medium text-yellow-900">{{ pendingOrders }} commande(s) en attente</p>
-                  <p class="text-xs text-yellow-700">À traiter</p>
+                  <p class="text-sm font-medium text-gray-900">{{ pendingOrders }} commande(s) en attente</p>
+                  <p class="text-xs text-gray-700">À traiter</p>
                 </div>
               </div>
               
-              <div v-if="unreadNotifications > 0" class="flex items-center p-3 bg-red-50 rounded-lg border border-red-200">
-                <BellIcon class="w-5 h-5 text-red-600 mr-3" />
+              <div v-if="unreadNotifications > 0" class="flex items-center p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <BellIcon class="w-5 h-5 text-gray-700 mr-3" />
                 <div class="flex-1">
-                  <p class="text-sm font-medium text-red-900">{{ unreadNotifications }} notification(s)</p>
-                  <p class="text-xs text-red-700">À consulter</p>
+                  <p class="text-sm font-medium text-gray-900">{{ unreadNotifications }} notification(s)</p>
+                  <p class="text-xs text-gray-800">À consulter</p>
                 </div>
               </div>
               

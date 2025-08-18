@@ -16,9 +16,9 @@
             'flex items-center p-4 rounded-lg shadow-lg max-w-sm',
             {
               'bg-green-50 border border-green-200': notification.type === 'success',
-              'bg-red-50 border border-red-200': notification.type === 'error',
-              'bg-blue-50 border border-blue-200': notification.type === 'info',
-              'bg-yellow-50 border border-yellow-200': notification.type === 'warning'
+              'bg-gray-50 border border-gray-200': notification.type === 'error',
+              'bg-primary-50 border border-primary-200': notification.type === 'info',
+              'bg-gray-50 border border-gray-200': notification.type === 'warning'
             }
           ]"
         >
@@ -29,15 +29,15 @@
             />
             <XCircleIcon 
               v-else-if="notification.type === 'error'"
-              class="w-5 h-5 text-red-500"
+              class="w-5 h-5 text-gray-500"
             />
             <InfoIcon 
               v-else-if="notification.type === 'info'"
-              class="w-5 h-5 text-blue-500"
+              class="w-5 h-5 text-primary-500"
             />
             <AlertTriangleIcon 
               v-else-if="notification.type === 'warning'"
-              class="w-5 h-5 text-yellow-500"
+              class="w-5 h-5 text-gray-500"
             />
           </div>
           
@@ -48,9 +48,9 @@
                 'font-medium text-sm',
                 {
                   'text-green-800': notification.type === 'success',
-                  'text-red-800': notification.type === 'error',
-                  'text-blue-800': notification.type === 'info',
-                  'text-yellow-800': notification.type === 'warning'
+                  'text-gray-900': notification.type === 'error',
+                  'text-primary-800': notification.type === 'info',
+                  'text-gray-800': notification.type === 'warning'
                 }
               ]"
             >
@@ -61,9 +61,9 @@
                 'text-sm',
                 {
                   'text-green-700': notification.type === 'success',
-                  'text-red-700': notification.type === 'error',
-                  'text-blue-700': notification.type === 'info',
-                  'text-yellow-700': notification.type === 'warning'
+                  'text-gray-800': notification.type === 'error',
+                  'text-primary-700': notification.type === 'info',
+                  'text-gray-700': notification.type === 'warning'
                 }
               ]"
             >
@@ -77,9 +77,9 @@
               'flex-shrink-0 ml-3 p-1 rounded-full hover:bg-opacity-20 transition-colors',
               {
                 'hover:bg-green-500': notification.type === 'success',
-                'hover:bg-red-500': notification.type === 'error',
-                'hover:bg-blue-500': notification.type === 'info',
-                'hover:bg-yellow-500': notification.type === 'warning'
+                'hover:bg-gray-500': notification.type === 'error',
+                'hover:bg-primary-500': notification.type === 'info',
+                'hover:bg-gray-500': notification.type === 'warning'
               }
             ]"
           >

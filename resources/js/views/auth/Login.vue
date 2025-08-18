@@ -2,7 +2,7 @@
   <div class="min-h-screen flex items-center justify-center bg-gray-50 py-6 sm:py-12 px-3 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-6 sm:space-y-8">
       <div>
-        <div class="mx-auto h-10 w-10 sm:h-12 sm:w-12 bg-indigo-600 rounded-lg flex items-center justify-center">
+        <div class="mx-auto h-10 w-10 sm:h-12 sm:w-12 bg-primary-600 rounded-lg flex items-center justify-center">
           <span class="text-white font-bold text-lg sm:text-xl">V</span>
         </div>
         <h2 class="mt-4 sm:mt-6 text-center text-2xl sm:text-3xl font-extrabold text-gray-900">
@@ -10,7 +10,7 @@
         </h2>
         <p class="mt-2 text-center text-xs sm:text-sm text-gray-600">
           Ou
-          <RouterLink to="/register" class="font-medium text-indigo-600 hover:text-indigo-500">
+          <RouterLink to="/register" class="font-medium text-primary-600 hover:text-primary-500">
             créez un nouveau compte
           </RouterLink>
         </p>
@@ -80,8 +80,8 @@
           </button>
         </div>
 
-        <div v-if="error" class="bg-red-50 border border-red-200 rounded-md p-3 sm:p-4">
-          <div class="text-xs sm:text-sm text-red-700">
+        <div v-if="error" class="bg-gray-50 border border-gray-200 rounded-md p-3 sm:p-4">
+          <div class="text-xs sm:text-sm text-gray-800">
             {{ error }}
           </div>
         </div>

@@ -13,7 +13,7 @@
           </span>
           <button
             @click="sortBy = sortBy === 'similarity' ? 'price' : 'similarity'"
-            class="flex items-center text-blue-600 hover:text-blue-800"
+            class="flex items-center text-primary-600 hover:text-primary-800"
           >
             <i class="fas fa-sort mr-1"></i>
             Trier par {{ sortBy === 'similarity' ? 'prix' : 'pertinence' }}
@@ -51,7 +51,7 @@
 
           <!-- Boost Badge -->
           <div v-if="result.product.is_boosted" class="absolute top-2 left-2">
-            <div class="bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+            <div class="bg-gray-500 text-white px-2 py-1 rounded-full text-xs font-medium">
               <i class="fas fa-rocket mr-1"></i>
               Boosté
             </div>
@@ -95,7 +95,7 @@
           <div class="match-details mb-3">
             <button
               @click.stop="toggleMatchDetails(result.product.id)"
-              class="text-xs text-blue-600 hover:text-blue-800 flex items-center"
+              class="text-xs text-primary-600 hover:text-primary-800 flex items-center"
             >
               <i class="fas fa-info-circle mr-1"></i>
               Détails de la correspondance
@@ -116,7 +116,7 @@
                   <span
                     v-for="label in result.match_details.labels.slice(0, 3)"
                     :key="label.description"
-                    class="bg-blue-100 text-blue-800 px-2 py-1 rounded"
+                    class="bg-primary-100 text-primary-800 px-2 py-1 rounded"
                   >
                     {{ label.description }} ({{ Math.round(label.score * 100) }}%)
                   </span>
@@ -167,15 +167,15 @@
             <div class="flex items-center space-x-2">
               <button
                 @click.stop="toggleFavorite(result.product)"
-                class="text-gray-400 hover:text-red-500 transition-colors"
-                :class="{ 'text-red-500': result.product.is_favorited_by_user }"
+                class="text-gray-400 hover:text-gray-500 transition-colors"
+                :class="{ 'text-gray-500': result.product.is_favorited_by_user }"
               >
                 <i class="fas fa-heart"></i>
               </button>
               <button
                 @click.stop="toggleLike(result.product)"
-                class="text-gray-400 hover:text-blue-500 transition-colors flex items-center"
-                :class="{ 'text-blue-500': result.product.is_liked_by_user }"
+                class="text-gray-400 hover:text-primary-500 transition-colors flex items-center"
+                :class="{ 'text-primary-500': result.product.is_liked_by_user }"
               >
                 <i class="fas fa-thumbs-up mr-1"></i>
                 <span class="text-xs">{{ result.product.likes_count }}</span>
@@ -190,7 +190,7 @@
     <div v-if="canLoadMore" class="text-center mt-8">
       <button
         @click="$emit('load-more')"
-        class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+        class="bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition-colors"
       >
         Voir plus de résultats
       </button>
@@ -247,9 +247,9 @@ export default {
   methods: {
     getSimilarityBadgeClass(score) {
       if (score >= 80) return 'bg-green-500';
-      if (score >= 60) return 'bg-yellow-500';
-      if (score >= 40) return 'bg-orange-500';
-      return 'bg-red-500';
+      if (score >= 60) return 'bg-gray-500';
+      if (score >= 40) return 'bg-gray-500';
+      return 'bg-gray-500';
     },
 
     toggleMatchDetails(productId) {

@@ -30,7 +30,7 @@
       <button
         @click="$emit('load-more')"
         :disabled="loadingMore"
-        class="bg-blue-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        class="bg-primary-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <span v-if="loadingMore">Chargement...</span>
         <span v-else>Charger plus de produits</span>

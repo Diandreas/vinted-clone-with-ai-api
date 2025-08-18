@@ -7,7 +7,7 @@
         <button
           v-if="unreadCount > 0"
           @click="markAllAsRead"
-          class="text-sm text-indigo-600 hover:text-indigo-700"
+          class="text-sm text-primary-600 hover:text-primary-700"
         >
           Tout marquer comme lu
         </button>
@@ -34,7 +34,7 @@
           :key="notification.id"
           :class="[
             'p-4 hover:bg-gray-50 cursor-pointer transition-colors',
-            { 'bg-blue-50': !notification.read_at }
+            { 'bg-primary-50': !notification.read_at }
           ]"
           @click="handleNotificationClick(notification)"
         >
@@ -69,7 +69,7 @@
             
             <!-- Unread indicator -->
             <div v-if="!notification.read_at" class="flex-shrink-0">
-              <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+              <div class="w-2 h-2 bg-primary-500 rounded-full"></div>
             </div>
           </div>
         </div>
@@ -86,7 +86,7 @@
     <div v-if="notifications.length > 0" class="border-t border-gray-100 p-3">
       <RouterLink
         to="/notifications"
-        class="block text-center text-sm text-indigo-600 hover:text-indigo-700"
+        class="block text-center text-sm text-primary-600 hover:text-primary-700"
         @click="$emit('close')"
       >
         Voir toutes les notifications
@@ -208,12 +208,12 @@ const getNotificationIcon = (type) => {
 
 const getNotificationIconClass = (type) => {
   const classMap = {
-    like: 'bg-red-100 text-red-600',
-    comment: 'bg-blue-100 text-blue-600',
+    like: 'bg-gray-100 text-gray-700',
+    comment: 'bg-primary-100 text-primary-600',
     order: 'bg-green-100 text-green-600',
-    follow: 'bg-purple-100 text-purple-600',
-    review: 'bg-yellow-100 text-yellow-600',
-    message: 'bg-indigo-100 text-indigo-600',
+    follow: 'bg-primary-100 text-primary-600',
+    review: 'bg-gray-100 text-gray-600',
+    message: 'bg-primary-100 text-primary-600',
     product: 'bg-gray-100 text-gray-600'
   }
   return classMap[type] || 'bg-gray-100 text-gray-600'

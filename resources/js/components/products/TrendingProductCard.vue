@@ -11,7 +11,7 @@
       
       <!-- Trending Badge -->
       <div class="absolute top-2 left-2">
-        <span class="bg-orange-100 text-orange-800 text-xs font-medium px-2 py-1 rounded-full flex items-center space-x-1">
+        <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-1 rounded-full flex items-center space-x-1">
           <TrendingUpIcon class="w-3 h-3" />
           <span>Tendance</span>
         </span>
@@ -25,7 +25,7 @@
       >
         <HeartIcon
           class="w-4 h-4"
-          :class="isLiked ? 'text-red-500 fill-current' : 'text-gray-600'"
+          :class="isLiked ? 'text-gray-500 fill-current' : 'text-gray-600'"
         />
       </button>
     </div>

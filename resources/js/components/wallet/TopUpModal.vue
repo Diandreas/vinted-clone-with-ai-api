@@ -24,7 +24,7 @@
               min="100"
               max="1000000"
               step="100"
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent pr-16"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent pr-16"
               placeholder="Entrez le montant"
               required
             />
@@ -47,7 +47,7 @@
               type="button"
               @click="form.amount = amount"
               class="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-              :class="{ 'bg-indigo-50 border-indigo-300 text-indigo-700': form.amount == amount }"
+              :class="{ 'bg-primary-50 border-primary-300 text-primary-700': form.amount == amount }"
             >
               {{ formatAmount(amount) }}
             </button>
@@ -63,17 +63,17 @@
           <textarea
             v-model="form.message"
             rows="2"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             placeholder="Note pour cette transaction..."
             maxlength="255"
           ></textarea>
         </div>
 
         <!-- Payment Info -->
-        <div class="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-6">
+        <div class="bg-primary-50 border border-primary-200 rounded-lg p-4 mb-6">
           <div class="flex items-start space-x-3">
-            <InfoIcon class="w-5 h-5 text-purple-600 mt-0.5" />
-            <div class="text-sm text-purple-800">
+            <InfoIcon class="w-5 h-5 text-primary-600 mt-0.5" />
+            <div class="text-sm text-primary-800">
               <p class="font-medium mb-1">Paiement sécurisé avec NotchPay</p>
               <p>Vous serez redirigé vers la plateforme de paiement sécurisée. Les méthodes acceptées :</p>
               <ul class="list-disc list-inside mt-1 space-y-1">
@@ -87,8 +87,8 @@
         </div>
 
         <!-- Error Display -->
-        <div v-if="error" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-          <p class="text-sm text-red-800">{{ error }}</p>
+        <div v-if="error" class="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+          <p class="text-sm text-gray-900">{{ error }}</p>
         </div>
 
         <!-- Action Buttons -->
@@ -103,7 +103,7 @@
           <button
             type="submit"
             :disabled="loading || !form.amount || form.amount < 100"
-            class="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            class="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <span v-if="!loading">Recharger {{ formatAmount(form.amount || 0) }}</span>
             <span v-else class="flex items-center justify-center">

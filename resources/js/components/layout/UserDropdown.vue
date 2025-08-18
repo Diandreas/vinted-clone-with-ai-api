@@ -68,7 +68,7 @@
       
       <RouterLink
         to="/products/create"
-        class="flex items-center px-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50"
+        class="flex items-center px-4 py-2 text-sm text-primary-600 hover:bg-primary-50"
         @click="$emit('close')"
       >
         <PlusIcon class="w-4 h-4 mr-3" />
@@ -90,7 +90,7 @@
       
       <button
         @click="logout"
-        class="w-full flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+        class="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
       >
         <LogOutIcon class="w-4 h-4 mr-3" />
         Déconnexion

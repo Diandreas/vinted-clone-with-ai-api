@@ -46,7 +46,7 @@ export const theme = {
         },
         input: {
             base: 'w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-150 bg-white text-gray-900 placeholder-gray-500',
-            error: 'w-full px-3 py-2.5 border border-red-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-150 bg-red-50 text-gray-900 placeholder-red-400',
+            error: 'w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-150 bg-gray-50 text-gray-900 placeholder-red-400',
         },
         badge: {
             primary: 'bg-primary-100 text-primary-800 px-2.5 py-1 rounded-md text-xs font-medium',

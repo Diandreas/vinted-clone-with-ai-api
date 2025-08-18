@@ -160,8 +160,8 @@ export const useWalletStore = defineStore('wallet', () => {
   }
   
   const getTransactionColor = (transaction) => {
-    if (transaction.status === 'failed') return 'text-red-500'
-    if (transaction.status === 'pending') return 'text-yellow-500'
+    if (transaction.status === 'failed') return 'text-gray-500'
+    if (transaction.status === 'pending') return 'text-gray-500'
     
     switch (transaction.purpose) {
       case 'topup':
@@ -169,7 +169,7 @@ export const useWalletStore = defineStore('wallet', () => {
         return 'text-green-500'
       case 'payout':
       case 'order_payment':
-        return 'text-red-500'
+        return 'text-gray-500'
       default:
         return 'text-gray-500'
     }

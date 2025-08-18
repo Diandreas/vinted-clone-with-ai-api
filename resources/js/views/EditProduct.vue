@@ -23,7 +23,7 @@
     <!-- Content -->
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div v-if="loading" class="text-center py-12">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
         <p class="mt-4 text-gray-600">Chargement du produit...</p>
       </div>
 
@@ -36,7 +36,7 @@
         <div class="mt-6">
           <RouterLink
             to="/my-products"
-            class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+            class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700"
           >
             Retour à mes produits
           </RouterLink>
@@ -52,13 +52,13 @@
             <!-- Title -->
             <div class="md:col-span-2">
               <label class="block text-sm font-medium text-gray-700 mb-2">
-                Titre du produit <span class="text-red-500">*</span>
+                Titre du produit <span class="text-gray-500">*</span>
               </label>
               <input
                 v-model="form.title"
                 type="text"
                 required
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 placeholder="Ex: iPhone 13 Pro Max 256GB"
               />
             </div>
@@ -66,13 +66,13 @@
             <!-- Description -->
             <div class="md:col-span-2">
               <label class="block text-sm font-medium text-gray-700 mb-2">
-                Description <span class="text-red-500">*</span>
+                Description <span class="text-gray-500">*</span>
               </label>
               <textarea
                 v-model="form.description"
                 rows="4"
                 required
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 placeholder="Décrivez votre produit en détail..."
               ></textarea>
             </div>
@@ -80,7 +80,7 @@
             <!-- Price -->
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">
-                Prix de vente <span class="text-red-500">*</span>
+                Prix de vente <span class="text-gray-500">*</span>
               </label>
               <div class="relative">
                 <span class="absolute left-3 top-2 text-gray-500">Fcfa</span>
@@ -90,7 +90,7 @@
                   step="0.01"
                   min="0.01"
                   required
-                  class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   placeholder="0.00"
                 />
               </div>
@@ -108,7 +108,7 @@
                   type="number"
                   step="0.01"
                   min="0.01"
-                  class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   placeholder="0.00"
                 />
               </div>
@@ -117,12 +117,12 @@
             <!-- Category -->
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">
-                Catégorie <span class="text-red-500">*</span>
+                Catégorie <span class="text-gray-500">*</span>
               </label>
               <select
                 v-model="form.category_id"
                 required
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               >
                 <option value="">Sélectionner une catégorie</option>
                 <option v-for="category in categories" :key="category.id" :value="category.id">
@@ -138,7 +138,7 @@
               </label>
               <select
                 v-model="form.brand_id"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               >
                 <option value="">Sans marque</option>
                 <option v-for="brand in brands" :key="brand.id" :value="brand.id">
@@ -150,12 +150,12 @@
             <!-- Condition -->
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">
-                État <span class="text-red-500">*</span>
+                État <span class="text-gray-500">*</span>
               </label>
               <select
                 v-model="form.condition_id"
                 required
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               >
                 <option value="">Sélectionner l'état</option>
                 <option v-for="condition in conditions" :key="condition.id" :value="condition.id">
@@ -171,7 +171,7 @@
               </label>
               <select
                 v-model="form.status"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               >
                 <option value="active">Actif</option>
                 <option value="draft">Brouillon</option>
@@ -194,7 +194,7 @@
               <input
                 v-model="form.size"
                 type="text"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 placeholder="Ex: M, 42, 10.5"
               />
             </div>
@@ -207,7 +207,7 @@
               <input
                 v-model="form.color"
                 type="text"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 placeholder="Ex: Rouge, Bleu, Noir"
               />
             </div>
@@ -220,7 +220,7 @@
               <input
                 v-model="form.material"
                 type="text"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 placeholder="Ex: Cuir, Coton, Métal"
               />
             </div>
@@ -237,7 +237,7 @@
                   type="number"
                   step="0.01"
                   min="0"
-                  class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   placeholder="0.00"
                 />
               </div>
@@ -251,7 +251,7 @@
               <input
                 v-model="form.location"
                 type="text"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 placeholder="Ex: Paris, Lyon, Marseille"
               />
             </div>
@@ -262,7 +262,7 @@
                 v-model="form.is_negotiable"
                 type="checkbox"
                 id="negotiable"
-                class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
               />
               <label for="negotiable" class="ml-2 block text-sm text-gray-900">
                 Prix négociable
@@ -281,7 +281,7 @@
                   type="number"
                   step="0.01"
                   min="0.01"
-                  class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   placeholder="0.00"
                 />
               </div>
@@ -308,7 +308,7 @@
                 <button
                   @click="removeImage(image.id)"
                   type="button"
-                  class="bg-red-600 text-white p-2 rounded-full hover:bg-red-700 transition-colors"
+                  class="bg-gray-700 text-white p-2 rounded-full hover:bg-gray-800 transition-colors"
                   title="Supprimer cette image"
                 >
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -350,7 +350,7 @@
                 <button
                   type="button"
                   @click="$refs.imageInput.click()"
-                  class="text-indigo-600 hover:text-indigo-500 font-medium"
+                  class="text-primary-600 hover:text-primary-500 font-medium"
                 >
                   cliquez pour sélectionner
                 </button>
@@ -376,7 +376,7 @@
                     <button
                       @click="removeNewImage(index)"
                       type="button"
-                      class="bg-red-600 text-white p-2 rounded-full hover:bg-red-700 transition-colors"
+                      class="bg-gray-700 text-white p-2 rounded-full hover:bg-gray-800 transition-colors"
                       title="Supprimer cette image"
                     >
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -390,7 +390,7 @@
               <button
                 type="button"
                 @click="$refs.imageInput.click()"
-                class="text-indigo-600 hover:text-indigo-500 font-medium"
+                class="text-primary-600 hover:text-primary-500 font-medium"
               >
                 Ajouter plus d'images
               </button>
@@ -410,7 +410,7 @@
           <button
             type="submit"
             :disabled="updating"
-            class="px-6 py-3 bg-indigo-600 text-white font-medium rounded-md hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+            class="px-6 py-3 bg-primary-600 text-white font-medium rounded-md hover:bg-primary-700 disabled:opacity-50 transition-colors"
           >
             {{ updating ? 'Mise à jour...' : 'Mettre à jour le produit' }}
           </button>

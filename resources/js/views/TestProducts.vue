@@ -8,7 +8,7 @@
         
         <button 
           @click="testAPI" 
-          class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
         >
           Tester l'API
         </button>
@@ -17,7 +17,7 @@
           Chargement...
         </div>
         
-        <div v-if="error" class="mt-4 text-red-600">
+        <div v-if="error" class="mt-4 text-gray-700">
           Erreur: {{ error }}
         </div>
         

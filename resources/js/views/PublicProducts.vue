@@ -19,7 +19,7 @@
                 v-model="filters.search"
                 type="text"
                 placeholder="Rechercher des produits..."
-                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 @input="debouncedSearch"
               />
             </div>
@@ -28,7 +28,7 @@
           <select 
             v-model="filters.category"
             @change="loadProducts"
-            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
           >
             <option value="">Toutes les catégories</option>
             <option v-for="category in categories" :key="category.id" :value="category.id">
@@ -39,7 +39,7 @@
           <select 
             v-model="filters.sort"
             @change="loadProducts"
-            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
           >
             <option value="created_at">Plus récents</option>
             <option value="price">Prix croissant</option>
@@ -60,7 +60,7 @@
       <!-- Loading -->
       <div v-if="loading" class="bg-white rounded-xl shadow-sm border border-gray-200 p-12">
         <div class="flex justify-center">
-          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
         </div>
       </div>
 
@@ -96,7 +96,7 @@
 
             <!-- Price -->
             <div class="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm rounded-lg px-2 py-1">
-              <span class="text-lg font-bold text-indigo-600">{{ formatPrice(product.price) }}</span>
+              <span class="text-lg font-bold text-primary-600">{{ formatPrice(product.price) }}</span>
               <span v-if="product.original_price && product.original_price !== product.price" class="text-sm text-gray-500 line-through ml-2">
                 {{ formatPrice(product.original_price) }}
               </span>
@@ -277,8 +277,8 @@ const getStatusBadgeClass = (status) => {
   const classes = {
     active: 'bg-green-100 text-green-800',
     draft: 'bg-gray-100 text-gray-800',
-    sold: 'bg-blue-100 text-blue-800',
-    reserved: 'bg-yellow-100 text-yellow-800'
+    sold: 'bg-primary-100 text-primary-800',
+    reserved: 'bg-gray-100 text-gray-800'
   }
   return classes[status] || classes.draft
 }

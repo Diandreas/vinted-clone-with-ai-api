@@ -14,7 +14,7 @@
             >Rafraîchir</button>
           </div>
           <div v-if="loadingConversations" class="p-6 text-center text-gray-500">Chargement…</div>
-          <div v-else-if="conversationsError" class="p-6 text-center text-red-600">{{ conversationsError }}</div>
+          <div v-else-if="conversationsError" class="p-6 text-center text-gray-700">{{ conversationsError }}</div>
           <ul v-else class="divide-y divide-gray-100 max-h-[60vh] overflow-auto">
             <li
               v-for="c in conversations"
@@ -50,19 +50,19 @@
               <span v-if="startTarget.productId">à propos du produit #{{ startTarget.productId }}</span>
             </div>
             <div class="mt-3 flex items-center gap-2">
-              <input v-model="compose" type="text" class="flex-1 rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Votre message…" />
-              <button class="px-4 py-2 text-sm rounded-md bg-indigo-600 text-white hover:bg-indigo-700" :disabled="composeBusy || !compose.trim()" @click="startConversation()">Envoyer</button>
+              <input v-model="compose" type="text" class="flex-1 rounded-md border-gray-300 focus:ring-primary-500 focus:border-primary-500" placeholder="Votre message…" />
+              <button class="px-4 py-2 text-sm rounded-md bg-primary-600 text-white hover:bg-primary-700" :disabled="composeBusy || !compose.trim()" @click="startConversation()">Envoyer</button>
             </div>
-            <div v-if="composeError" class="mt-2 text-sm text-red-600">{{ composeError }}</div>
+            <div v-if="composeError" class="mt-2 text-sm text-gray-700">{{ composeError }}</div>
           </div>
 
           <!-- Messages -->
           <div class="p-4 h-[50vh] overflow-auto" v-if="selectedConversation">
             <div v-if="loadingMessages" class="text-center text-gray-500">Chargement des messages…</div>
-            <div v-else-if="messagesError" class="text-center text-red-600">{{ messagesError }}</div>
+            <div v-else-if="messagesError" class="text-center text-gray-700">{{ messagesError }}</div>
             <div v-else class="space-y-3">
               <div v-for="m in messages" :key="m.id" class="max-w-xl" :class="m.sender_id === meId ? 'ml-auto text-right' : ''">
-                <div class="inline-block px-3 py-2 rounded-lg" :class="m.sender_id === meId ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-900'">
+                <div class="inline-block px-3 py-2 rounded-lg" :class="m.sender_id === meId ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-900'">
                   <div class="text-sm">{{ displayContent(m) }}</div>
                   <div class="text-[11px] mt-1 opacity-70">{{ formatDate(m.created_at) }}</div>
                 </div>
@@ -73,10 +73,10 @@
           <!-- Composer -->
           <div class="p-4 border-t border-gray-100" v-if="selectedConversation">
             <div class="flex items-center gap-2">
-              <input v-model="compose" type="text" class="flex-1 rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Votre message…" @keyup.enter="sendMessage()" />
-              <button class="px-4 py-2 text-sm rounded-md bg-indigo-600 text-white hover:bg-indigo-700" :disabled="composeBusy || !compose.trim()" @click="sendMessage()">Envoyer</button>
+              <input v-model="compose" type="text" class="flex-1 rounded-md border-gray-300 focus:ring-primary-500 focus:border-primary-500" placeholder="Votre message…" @keyup.enter="sendMessage()" />
+              <button class="px-4 py-2 text-sm rounded-md bg-primary-600 text-white hover:bg-primary-700" :disabled="composeBusy || !compose.trim()" @click="sendMessage()">Envoyer</button>
             </div>
-            <div v-if="composeError" class="mt-2 text-sm text-red-600">{{ composeError }}</div>
+            <div v-if="composeError" class="mt-2 text-sm text-gray-700">{{ composeError }}</div>
           </div>
         </div>
       </div>

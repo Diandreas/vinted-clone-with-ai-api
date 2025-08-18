@@ -24,11 +24,11 @@
             v-model="form.name"
             type="text"
             required
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            :class="{ 'border-red-300': errors.name }"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            :class="{ 'border-gray-300': errors.name }"
             placeholder="Ex: Électronique, Vêtements..."
           />
-          <p v-if="errors.name" class="mt-1 text-sm text-red-600">{{ errors.name[0] }}</p>
+          <p v-if="errors.name" class="mt-1 text-sm text-gray-700">{{ errors.name[0] }}</p>
         </div>
 
         <!-- Description -->
@@ -40,11 +40,11 @@
             id="description"
             v-model="form.description"
             rows="3"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            :class="{ 'border-red-300': errors.description }"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            :class="{ 'border-gray-300': errors.description }"
             placeholder="Description de la catégorie..."
           ></textarea>
-          <p v-if="errors.description" class="mt-1 text-sm text-red-600">{{ errors.description[0] }}</p>
+          <p v-if="errors.description" class="mt-1 text-sm text-gray-700">{{ errors.description[0] }}</p>
         </div>
 
         <!-- Parent Category -->
@@ -55,8 +55,8 @@
           <select
             id="parent_id"
             v-model="form.parent_id"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            :class="{ 'border-red-300': errors.parent_id }"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            :class="{ 'border-gray-300': errors.parent_id }"
           >
             <option value="">Aucune (catégorie racine)</option>
             <option 
@@ -67,7 +67,7 @@
               {{ cat.name }}
             </option>
           </select>
-          <p v-if="errors.parent_id" class="mt-1 text-sm text-red-600">{{ errors.parent_id[0] }}</p>
+          <p v-if="errors.parent_id" class="mt-1 text-sm text-gray-700">{{ errors.parent_id[0] }}</p>
         </div>
 
         <!-- Icon -->
@@ -79,11 +79,11 @@
             id="icon"
             v-model="form.icon"
             type="text"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            :class="{ 'border-red-300': errors.icon }"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            :class="{ 'border-gray-300': errors.icon }"
             placeholder="Ex: <svg>...</svg> ou classe d'icône"
           />
-          <p v-if="errors.icon" class="mt-1 text-sm text-red-600">{{ errors.icon[0] }}</p>
+          <p v-if="errors.icon" class="mt-1 text-sm text-gray-700">{{ errors.icon[0] }}</p>
         </div>
 
         <!-- Color -->
@@ -96,18 +96,18 @@
               id="color"
               v-model="form.color"
               type="color"
-              class="w-16 h-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              :class="{ 'border-red-300': errors.color }"
+              class="w-16 h-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              :class="{ 'border-gray-300': errors.color }"
             />
             <input
               v-model="form.color"
               type="text"
-              class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              :class="{ 'border-red-300': errors.color }"
+              class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              :class="{ 'border-gray-300': errors.color }"
               placeholder="#000000"
             />
           </div>
-          <p v-if="errors.color" class="mt-1 text-sm text-red-600">{{ errors.color[0] }}</p>
+          <p v-if="errors.color" class="mt-1 text-sm text-gray-700">{{ errors.color[0] }}</p>
         </div>
 
         <!-- Sort Order -->
@@ -120,11 +120,11 @@
             v-model="form.sort_order"
             type="number"
             min="0"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            :class="{ 'border-red-300': errors.sort_order }"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            :class="{ 'border-gray-300': errors.sort_order }"
             placeholder="0"
           />
-          <p v-if="errors.sort_order" class="mt-1 text-sm text-red-600">{{ errors.sort_order[0] }}</p>
+          <p v-if="errors.sort_order" class="mt-1 text-sm text-gray-700">{{ errors.sort_order[0] }}</p>
         </div>
 
         <!-- Active Status -->
@@ -133,7 +133,7 @@
             id="is_active"
             v-model="form.is_active"
             type="checkbox"
-            class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+            class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
           />
           <label for="is_active" class="ml-2 block text-sm text-gray-900">
             Catégorie active
@@ -152,7 +152,7 @@
           <button
             type="submit"
             :disabled="loading"
-            class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+            class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
           >
             <span v-if="loading" class="mr-2">
               <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>

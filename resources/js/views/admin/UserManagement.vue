@@ -5,7 +5,7 @@
         <h1 class="text-2xl font-bold text-gray-900">Gestion des Utilisateurs</h1>
         <button
           @click="showCreateModal = true"
-          class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
+          class="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700"
         >
           Créer un utilisateur
         </button>
@@ -42,11 +42,11 @@
       </div>
 
       <!-- Bulk Actions -->
-      <div v-if="selectedUsers.length > 0" class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+      <div v-if="selectedUsers.length > 0" class="bg-primary-50 border border-primary-200 rounded-lg p-4 mb-6">
         <div class="flex items-center justify-between">
-          <span class="text-blue-800">{{ selectedUsers.length }} utilisateur(s) sélectionné(s)</span>
+          <span class="text-primary-800">{{ selectedUsers.length }} utilisateur(s) sélectionné(s)</span>
           <div class="flex gap-2">
-            <select v-model="bulkAction" class="border border-blue-300 rounded px-3 py-1">
+            <select v-model="bulkAction" class="border border-primary-300 rounded px-3 py-1">
               <option value="">Action groupée...</option>
               <option value="verify">Vérifier</option>
               <option value="unverify">Dévérifier</option>
@@ -58,7 +58,7 @@
             <button
               @click="executeBulkAction"
               :disabled="!bulkAction"
-              class="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700 disabled:opacity-50"
+              class="bg-primary-600 text-white px-4 py-1 rounded hover:bg-primary-700 disabled:opacity-50"
             >
               Appliquer
             </button>
@@ -127,10 +127,10 @@
                 <td class="px-6 py-4 whitespace-nowrap">
                   <span
                     :class="{
-                      'bg-red-100 text-red-800': user.role === 'admin',
-                      'bg-blue-100 text-blue-800': user.role === 'manager',
+                      'bg-gray-100 text-gray-900': user.role === 'admin',
+                      'bg-primary-100 text-primary-800': user.role === 'manager',
                       'bg-green-100 text-green-800': user.role === 'analyst',
-                      'bg-yellow-100 text-yellow-800': user.role === 'moderator',
+                      'bg-gray-100 text-gray-800': user.role === 'moderator',
                       'bg-gray-100 text-gray-800': user.role === 'user'
                     }"
                     class="px-2 py-1 text-xs font-medium rounded-full"
@@ -143,7 +143,7 @@
                     <span
                       :class="{
                         'bg-green-100 text-green-800': user.is_verified,
-                        'bg-red-100 text-red-800': !user.is_verified
+                        'bg-gray-100 text-gray-900': !user.is_verified
                       }"
                       class="px-2 py-1 text-xs font-medium rounded-full"
                     >
@@ -151,7 +151,7 @@
                     </span>
                     <span
                       v-if="user.is_admin"
-                      class="bg-purple-100 text-purple-800 px-2 py-1 text-xs font-medium rounded-full"
+                      class="bg-primary-100 text-primary-800 px-2 py-1 text-xs font-medium rounded-full"
                     >
                       Admin
                     </span>
@@ -167,20 +167,20 @@
                   <div class="flex gap-2">
                     <button
                       @click="editUser(user)"
-                      class="text-indigo-600 hover:text-indigo-900"
+                      class="text-primary-600 hover:text-primary-900"
                     >
                       Modifier
                     </button>
                     <button
                       @click="viewUser(user)"
-                      class="text-blue-600 hover:text-blue-900"
+                      class="text-primary-600 hover:text-primary-900"
                     >
                       Voir
                     </button>
                     <button
                       v-if="user.id !== authStore.user?.id"
                       @click="deleteUser(user)"
-                      class="text-red-600 hover:text-red-900"
+                      class="text-gray-700 hover:text-gray-900"
                     >
                       Supprimer
                     </button>
@@ -323,7 +323,7 @@
             </button>
             <button
               type="submit"
-              class="px-4 py-2 bg-indigo-600 text-white rounded-md text-sm hover:bg-indigo-700"
+              class="px-4 py-2 bg-primary-600 text-white rounded-md text-sm hover:bg-primary-700"
             >
               {{ showEditModal ? 'Modifier' : 'Créer' }}
             </button>

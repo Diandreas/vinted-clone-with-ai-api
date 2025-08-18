@@ -49,7 +49,7 @@
                         v-model="form.name"
                         type="text"
                         required
-                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
                         placeholder="Nom complet"
                       />
                     </div>
@@ -66,7 +66,7 @@
                         v-model="form.username"
                         type="text"
                         required
-                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
                         placeholder="nom_utilisateur"
                       />
                     </div>
@@ -83,7 +83,7 @@
                         v-model="form.email"
                         type="email"
                         required
-                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
                         placeholder="email@example.com"
                       />
                     </div>
@@ -99,7 +99,7 @@
                         id="phone"
                         v-model="form.phone"
                         type="tel"
-                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
                         placeholder="+33 1 23 45 67 89"
                       />
                     </div>
@@ -115,7 +115,7 @@
                         id="date_of_birth"
                         v-model="form.date_of_birth"
                         type="date"
-                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
                       />
                     </div>
                   </div>
@@ -129,7 +129,7 @@
                       <select
                         id="gender"
                         v-model="form.gender"
-                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
                       >
                         <option value="">Non spécifié</option>
                         <option value="male">Homme</option>
@@ -149,7 +149,7 @@
                         id="bio"
                         v-model="form.bio"
                         rows="3"
-                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
                         placeholder="Biographie de l'utilisateur..."
                       ></textarea>
                     </div>
@@ -165,7 +165,7 @@
                         id="address"
                         v-model="form.address"
                         type="text"
-                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
                         placeholder="Adresse complète"
                       />
                     </div>
@@ -179,7 +179,7 @@
                           id="email_verified"
                           v-model="form.email_verified"
                           type="checkbox"
-                          class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                          class="focus:ring-primary-500 h-4 w-4 text-primary-600 border-gray-300 rounded"
                         />
                         <label for="email_verified" class="ml-2 block text-sm text-gray-900">
                           Email vérifié
@@ -191,7 +191,7 @@
                           id="is_active"
                           v-model="form.is_active"
                           type="checkbox"
-                          class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                          class="focus:ring-primary-500 h-4 w-4 text-primary-600 border-gray-300 rounded"
                         />
                         <label for="is_active" class="ml-2 block text-sm text-gray-900">
                           Compte actif
@@ -201,8 +201,8 @@
                   </div>
                 </div>
 
-                <div v-if="error" class="mt-4 bg-red-50 border border-red-200 rounded-md p-4">
-                  <div class="text-sm text-red-700">
+                <div v-if="error" class="mt-4 bg-gray-50 border border-gray-200 rounded-md p-4">
+                  <div class="text-sm text-gray-800">
                     {{ error }}
                   </div>
                 </div>
@@ -211,7 +211,7 @@
                   <button
                     type="submit"
                     :disabled="loading"
-                    class="inline-flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed sm:col-start-2 sm:text-sm"
+                    class="inline-flex w-full justify-center rounded-md border border-transparent bg-primary-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed sm:col-start-2 sm:text-sm"
                   >
                     <LoaderIcon v-if="loading" class="w-4 h-4 mr-2 animate-spin" />
                     {{ loading ? 'Enregistrement...' : 'Modifier' }}
@@ -219,7 +219,7 @@
                   <button
                     type="button"
                     @click="$emit('close')"
-                    class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:col-start-1 sm:mt-0 sm:text-sm"
+                    class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 sm:col-start-1 sm:mt-0 sm:text-sm"
                   >
                     Annuler
                   </button>
@@ -392,7 +392,7 @@ watch(() => props.user, (newUser) => {
                         v-model="form.name"
                         type="text"
                         required
-                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
                         placeholder="Nom complet"
                       />
                     </div>
@@ -409,7 +409,7 @@ watch(() => props.user, (newUser) => {
                         v-model="form.username"
                         type="text"
                         required
-                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
                         placeholder="nom_utilisateur"
                       />
                     </div>
@@ -426,7 +426,7 @@ watch(() => props.user, (newUser) => {
                         v-model="form.email"
                         type="email"
                         required
-                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
                         placeholder="email@example.com"
                       />
                     </div>
@@ -442,7 +442,7 @@ watch(() => props.user, (newUser) => {
                         id="phone"
                         v-model="form.phone"
                         type="tel"
-                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
                         placeholder="+33 1 23 45 67 89"
                       />
                     </div>
@@ -458,7 +458,7 @@ watch(() => props.user, (newUser) => {
                         id="date_of_birth"
                         v-model="form.date_of_birth"
                         type="date"
-                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
                       />
                     </div>
                   </div>
@@ -472,7 +472,7 @@ watch(() => props.user, (newUser) => {
                       <select
                         id="gender"
                         v-model="form.gender"
-                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
                       >
                         <option value="">Non spécifié</option>
                         <option value="male">Homme</option>
@@ -492,7 +492,7 @@ watch(() => props.user, (newUser) => {
                         id="bio"
                         v-model="form.bio"
                         rows="3"
-                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
                         placeholder="Biographie de l'utilisateur..."
                       ></textarea>
                     </div>
@@ -508,7 +508,7 @@ watch(() => props.user, (newUser) => {
                         id="address"
                         v-model="form.address"
                         type="text"
-                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
                         placeholder="Adresse complète"
                       />
                     </div>
@@ -522,7 +522,7 @@ watch(() => props.user, (newUser) => {
                           id="email_verified"
                           v-model="form.email_verified"
                           type="checkbox"
-                          class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                          class="focus:ring-primary-500 h-4 w-4 text-primary-600 border-gray-300 rounded"
                         />
                         <label for="email_verified" class="ml-2 block text-sm text-gray-900">
                           Email vérifié
@@ -534,7 +534,7 @@ watch(() => props.user, (newUser) => {
                           id="is_active"
                           v-model="form.is_active"
                           type="checkbox"
-                          class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                          class="focus:ring-primary-500 h-4 w-4 text-primary-600 border-gray-300 rounded"
                         />
                         <label for="is_active" class="ml-2 block text-sm text-gray-900">
                           Compte actif
@@ -544,8 +544,8 @@ watch(() => props.user, (newUser) => {
                   </div>
                 </div>
 
-                <div v-if="error" class="mt-4 bg-red-50 border border-red-200 rounded-md p-4">
-                  <div class="text-sm text-red-700">
+                <div v-if="error" class="mt-4 bg-gray-50 border border-gray-200 rounded-md p-4">
+                  <div class="text-sm text-gray-800">
                     {{ error }}
                   </div>
                 </div>
@@ -554,7 +554,7 @@ watch(() => props.user, (newUser) => {
                   <button
                     type="submit"
                     :disabled="loading"
-                    class="inline-flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed sm:col-start-2 sm:text-sm"
+                    class="inline-flex w-full justify-center rounded-md border border-transparent bg-primary-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed sm:col-start-2 sm:text-sm"
                   >
                     <LoaderIcon v-if="loading" class="w-4 h-4 mr-2 animate-spin" />
                     {{ loading ? 'Enregistrement...' : 'Modifier' }}
@@ -562,7 +562,7 @@ watch(() => props.user, (newUser) => {
                   <button
                     type="button"
                     @click="$emit('close')"
-                    class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:col-start-1 sm:mt-0 sm:text-sm"
+                    class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 sm:col-start-1 sm:mt-0 sm:text-sm"
                   >
                     Annuler
                   </button>

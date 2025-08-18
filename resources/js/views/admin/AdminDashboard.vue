@@ -64,13 +64,13 @@ const productsByStatusChart = ref(null)
 
 const buildLineChart = (el, labels, data, label) => new Chart(el, {
   type: 'line',
-  data: { labels, datasets: [{ label, data, borderColor: '#4f46e5', tension: 0.3 }] },
+  data: { labels, datasets: [{ label, data, borderColor: '#2f7f52', tension: 0.3 }] },
   options: { responsive: true, plugins: { legend: { display: false } } }
 })
 
 const buildPieChart = (el, labels, data) => new Chart(el, {
   type: 'doughnut',
-  data: { labels, datasets: [{ data, backgroundColor: ['#22c55e','#ef4444','#f59e0b','#3b82f6','#6366f1'] }] },
+  data: { labels, datasets: [{ data, backgroundColor: ['#22c55e','#525252','#737373','#3da066','#3da066'] }] },
   options: { responsive: true }
 })
 

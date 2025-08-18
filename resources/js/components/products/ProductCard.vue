@@ -11,72 +11,71 @@
         image-classes="w-full h-full object-cover"
       />
 
-      <!-- Status Badge -->
-      <div class="absolute top-2 left-2">
+      <!-- Status Badge - Compact -->
+      <div class="absolute top-1.5 left-1.5">
         <span
           v-if="product.status === 'sold'"
-          class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-1 rounded-full"
+          class="bg-gray-100 text-gray-800 text-xs font-medium px-1.5 py-0.5 rounded-full"
         >
           Vendu
         </span>
         <span
           v-else-if="product.status === 'reserved'"
-          class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-1 rounded-full"
+          class="bg-gray-100 text-gray-800 text-xs font-medium px-1.5 py-0.5 rounded-full"
         >
           Réservé
         </span>
         <span
           v-else-if="product.is_boosted"
-          class="bg-primary-100 text-primary-800 text-xs font-medium px-2 py-1 rounded-full"
+          class="bg-primary-100 text-primary-800 text-xs font-medium px-1.5 py-0.5 rounded-full"
         >
           Boosté
         </span>
       </div>
 
-      <!-- Action Buttons -->
-      <div v-if="showActions" class="absolute top-2 right-2 flex space-x-1">
+      <!-- Action Buttons - Compact -->
+      <div v-if="showActions" class="absolute top-1.5 right-1.5 flex space-x-1">
         <button
           @click.stop="$emit('edit', product)"
-          class="bg-white bg-opacity-90 hover:bg-opacity-100 p-2 rounded-full shadow-sm transition-all"
         >
-          <EditIcon class="w-4 h-4 text-gray-600" />
+          <EditIcon class="w-3 h-3 sm:w-4 sm:h-4 text-gray-600" />
         </button>
         <button
           @click.stop="$emit('delete', product)"
-          class="bg-white bg-opacity-90 hover:bg-opacity-100 p-2 rounded-full shadow-sm transition-all"
+          class="bg-white bg-opacity-90 hover:bg-opacity-100 p-1.5 rounded-full shadow-sm transition-all"
         >
-          <TrashIcon class="w-4 h-4 text-red-600" />
+          <TrashIcon class="w-3 h-3 sm:w-4 sm:h-4 text-gray-700" />
         </button>
       </div>
 
-      <!-- Quick Actions -->
-      <div v-else class="absolute top-2 right-2 flex space-x-1">
+      <!-- Quick Actions - Compact -->
+      <div v-else class="absolute top-1.5 right-1.5 flex space-x-1">
         <button
           @click.stop="toggleLike"
           :disabled="likingProduct"
-          class="bg-white bg-opacity-90 hover:bg-opacity-100 p-2 rounded-full shadow-sm transition-all"
+          class="bg-white bg-opacity-90 hover:bg-opacity-100 p-1.5 rounded-full shadow-sm transition-all"
         >
           <HeartIcon
-            class="w-4 h-4"
+            class="w-3 h-3 sm:w-4 sm:h-4"
             :class="isLiked ? 'text-primary-500 fill-current' : 'text-gray-600'"
           />
         </button>
         <button
           @click.stop="toggleFavorite"
           :disabled="favoritingProduct"
-          class="bg-white bg-opacity-90 hover:bg-opacity-100 p-2 rounded-full shadow-sm transition-all"
+          class="bg-white bg-opacity-90 hover:bg-opacity-100 p-1.5 rounded-full shadow-sm transition-all"
         >
           <BookmarkIcon
-            class="w-4 h-4"
+            class="w-3 h-3 sm:w-4 sm:h-4"
             :class="isFavorite ? 'text-primary-500 fill-current' : 'text-gray-600'"
           />
         </button>
       </div>
     </div>
 
-    <!-- Product Info -->
-    <div class="p-4">
-      <div class="flex items-start justify-between mb-2">
+    <!-- Product Info - Compact -->
+    <div class="p-3 sm:p-4">
+      <div class="flex items-start justify-between mb-1.5 sm:mb-2">
         <h3 class="font-semibold text-gray-900 text-sm line-clamp-2 flex-1">
           {{ product.title }}
         </h3>
@@ -116,7 +115,7 @@
             @error="handleAvatarError"
           />
           <span class="text-sm text-gray-600">{{ product.user?.name }}</span>
-          <div v-if="product.user?.is_verified" class="text-blue-500">
+          <div v-if="product.user?.is_verified" class="text-primary-500">
             <CheckCircleIcon class="w-4 h-4" />
           </div>
         </div>
@@ -139,7 +138,7 @@
         <button
           v-if="!product.is_boosted && product.status === 'active'"
           @click.stop="$emit('boost', product)"
-          class="flex-1 bg-indigo-50 text-indigo-600 text-sm py-2 px-3 rounded-lg hover:bg-indigo-100 transition-colors"
+          class="flex-1 bg-primary-50 text-primary-600 text-sm py-2 px-3 rounded-lg hover:bg-primary-100 transition-colors"
         >
           Booster
         </button>

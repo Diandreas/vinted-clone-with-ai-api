@@ -43,16 +43,14 @@
           <div class="relative">
             <!-- Cercle de fond avec animation et ombre -->
             <div class="w-14 h-14 bg-primary-500 rounded-full flex items-center justify-center shadow-medium hover:shadow-strong transform transition-all duration-150 hover:scale-110 active:scale-95 relative -mt-2">
-              <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
-              </svg>
-              <!-- Effet de brillance -->
-              <div class="absolute inset-0 rounded-full bg-white opacity-20 animate-pulse"></div>
-            </div>
-          </div>
-          <span class="text-xs mt-1 font-bold text-primary-600">
+             <span class="text-xs mt-1 font-bold text-white">
             Vendre
           </span>
+              <!-- Effet de brillance -->
+              
+            </div>
+          </div>
+        
         </RouterLink>
 
         <!-- Messages / Discussions -->
@@ -66,7 +64,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
             </svg>
             <!-- Badge pour les messages non lus -->
-            <div v-if="unreadMessages > 0" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold shadow-md">
+            <div v-if="unreadMessages > 0" class="absolute -top-2 -right-2 bg-gray-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold shadow-md">
               {{ unreadMessages > 9 ? '9+' : unreadMessages }}
             </div>
           </div>

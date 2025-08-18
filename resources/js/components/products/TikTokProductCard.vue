@@ -22,19 +22,19 @@
       <div class="absolute top-3 left-3">
         <span
           v-if="product.status === 'sold'"
-          class="bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg"
+          class="bg-gray-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg"
         >
           VENDU
         </span>
         <span
           v-else-if="product.status === 'reserved'"
-          class="bg-yellow-500 text-black text-xs font-bold px-3 py-1 rounded-full shadow-lg"
+          class="bg-gray-500 text-black text-xs font-bold px-3 py-1 rounded-full shadow-lg"
         >
           RÉSERVÉ
         </span>
         <span
           v-else-if="product.is_boosted"
-          class="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg"
+          class="bg-gradient-to-r from-primary-500 to-gray-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg"
         >
           BOOSTÉ
         </span>
@@ -59,26 +59,26 @@
           <button
             @click.stop="toggleLike"
             :disabled="likingProduct"
-            class="bg-black/80 backdrop-blur-sm hover:bg-red-500 p-2 rounded-full shadow-lg transition-all duration-200 transform hover:scale-110"
+            class="bg-black/80 backdrop-blur-sm hover:bg-gray-500 p-2 rounded-full shadow-lg transition-all duration-200 transform hover:scale-110"
           >
             <HeartIcon
               class="w-4 h-4 text-white"
-              :class="isLiked ? 'text-red-500 fill-current' : ''"
+              :class="isLiked ? 'text-gray-500 fill-current' : ''"
             />
           </button>
           <button
             @click.stop="toggleFavorite"
             :disabled="favoritingProduct"
-            class="bg-black/80 backdrop-blur-sm hover:bg-yellow-500 p-2 rounded-full shadow-lg transition-all duration-200 transform hover:scale-110"
+            class="bg-black/80 backdrop-blur-sm hover:bg-gray-500 p-2 rounded-full shadow-lg transition-all duration-200 transform hover:scale-110"
           >
             <BookmarkIcon
               class="w-4 h-4 text-white"
-              :class="isFavorite ? 'text-yellow-500 fill-current' : ''"
+              :class="isFavorite ? 'text-gray-500 fill-current' : ''"
             />
           </button>
           <button
             @click.stop="shareProduct"
-            class="bg-black/80 backdrop-blur-sm hover:bg-blue-500 p-2 rounded-full shadow-lg transition-all duration-200 transform hover:scale-110"
+            class="bg-black/80 backdrop-blur-sm hover:bg-primary-500 p-2 rounded-full shadow-lg transition-all duration-200 transform hover:scale-110"
           >
             <ShareIcon class="w-4 h-4 text-white" />
           </button>
@@ -96,13 +96,13 @@
 
     <!-- Product Info -->
     <div class="p-4">
-      <h3 class="font-bold text-white text-sm line-clamp-2 mb-2 group-hover:text-red-400 transition-colors duration-200">
+      <h3 class="font-bold text-white text-sm line-clamp-2 mb-2 group-hover:text-gray-400 transition-colors duration-200">
         {{ product.title }}
       </h3>
       
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-2">
-          <div class="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold">
+          <div class="w-6 h-6 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white text-xs font-bold">
             {{ getUserInitials(product.user?.name) }}
           </div>
           <span class="text-gray-400 text-xs">{{ product.user?.name }}</span>

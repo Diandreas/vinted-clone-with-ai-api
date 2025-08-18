@@ -44,7 +44,7 @@ const TOKEN_PACKS = [
         bonusTokens: 10,
         priceEuros: 5,
         priceFCFA: 3000,
-        color: 'from-purple-400 to-purple-600',
+        color: 'from-primary-400 to-primary-600',
         popularityText: 'plus'
     },
     {
@@ -54,7 +54,7 @@ const TOKEN_PACKS = [
         priceEuros: 10,
         priceFCFA: 6000,
 
-        color: 'from-blue-400 to-blue-600',
+        color: 'from-primary-400 to-primary-600',
         popularityText: 'ultimate'
     },
 
@@ -126,7 +126,7 @@ const NotchPayButton = ({ pack, onSuccess, auth }) => {
         <button
             onClick={handlePayment}
             disabled={loading}
-            className={`w-full py-3 px-4 rounded-lg font-medium text-white bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 transition-all duration-200 flex items-center justify-center gap-2 ${loading ? 'opacity-75 cursor-not-allowed' : ''}`}
+            className={`w-full py-3 px-4 rounded-lg font-medium text-white bg-gradient-to-r from-primary-600 to-primary-800 hover:from-primary-700 hover:to-primary-900 transition-all duration-200 flex items-center justify-center gap-2 ${loading ? 'opacity-75 cursor-not-allowed' : ''}`}
         >
             {loading ? (
                 <>
@@ -188,7 +188,7 @@ const PayPalPackButton = ({ pack, onSuccess }) => {
     if (isPending) {
         return (
             <div className="flex items-center justify-center h-12">
-                <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
+                <Loader2 className="w-6 h-6 animate-spin text-primary-500" />
             </div>
         );
     }
@@ -196,7 +196,7 @@ const PayPalPackButton = ({ pack, onSuccess }) => {
     return (
         <div className="space-y-3">
             {error && (
-                <div className="text-red-500 text-sm p-2 bg-red-50 rounded-lg">
+                <div className="text-gray-500 text-sm p-2 bg-gray-50 rounded-lg">
                     {error}
                 </div>
             )}
@@ -326,11 +326,11 @@ export default function Index({ auth, paypalConfig }) {
                                 animate={{ opacity: 1, y: 0 }}
                                 className="mb-8"
                             >
-                                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-amber-500 to-purple-500 mb-6">
+                                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-amber-500 to-primary-500 mb-6">
                                     <Coins className="h-10 w-10 text-white" />
                                 </div>
                                 <h1 className="text-4xl font-bold mb-4">
-                                    <span className="bg-gradient-to-r from-amber-500 to-purple-500 text-transparent bg-clip-text">
+                                    <span className="bg-gradient-to-r from-amber-500 to-primary-500 text-transparent bg-clip-text">
                                         {t('payment.title')}
                                     </span>
                                 </h1>
@@ -340,21 +340,21 @@ export default function Index({ auth, paypalConfig }) {
                             </motion.div>
 
                             <div className="flex flex-wrap justify-center gap-4 mb-8">
-                                <div className="flex items-center gap-2 px-4 py-2 bg-amber-100 dark:bg-amber-900/50 rounded-full">
-                                    <Gift className="w-5 h-5 text-amber-500" />
-                                    <span className="text-amber-700 dark:text-amber-300">
+                                <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-900/50 rounded-full">
+                                    <Gift className="w-5 h-5 text-gray-500" />
+                                    <span className="text-gray-700 dark:text-gray-300">
                                         {t('payment.features.bonus')}
                                     </span>
                                 </div>
-                                <div className="flex items-center gap-2 px-4 py-2 bg-purple-100 dark:bg-purple-900/50 rounded-full">
-                                    <Smartphone className="w-5 h-5 text-purple-500" />
-                                    <span className="text-purple-700 dark:text-purple-300">
+                                <div className="flex items-center gap-2 px-4 py-2 bg-primary-100 dark:bg-primary-900/50 rounded-full">
+                                    <Smartphone className="w-5 h-5 text-primary-500" />
+                                    <span className="text-primary-700 dark:text-primary-300">
                                         {t('payment.features.mobile')}
                                     </span>
                                 </div>
-                                <div className="flex items-center gap-2 px-4 py-2 bg-blue-100 dark:bg-blue-900/50 rounded-full">
-                                    <CreditCard className="w-5 h-5 text-blue-500" />
-                                    <span className="text-blue-700 dark:text-blue-300">
+                                <div className="flex items-center gap-2 px-4 py-2 bg-primary-100 dark:bg-primary-900/50 rounded-full">
+                                    <CreditCard className="w-5 h-5 text-primary-500" />
+                                    <span className="text-primary-700 dark:text-primary-300">
                                         {t('payment.features.card')}
                                     </span>
                                 </div>
@@ -379,11 +379,11 @@ export default function Index({ auth, paypalConfig }) {
                                     <Card className={cn(
                                         "relative overflow-hidden",
                                         "transition-all duration-300 hover:scale-105 hover:shadow-lg",
-                                        pack.mostPopular && "ring-2 ring-amber-500 dark:ring-amber-400"
+                                        pack.mostPopular && "ring-2 ring-gray-500 dark:ring-gray-400"
                                     )}>
                                         {pack.mostPopular && (
                                             <div className="absolute top-0 right-0">
-                                                <div className="bg-gradient-to-r from-amber-500 to-purple-500 text-white px-4 py-1 rounded-bl-lg text-sm font-medium">
+                                                <div className="bg-gradient-to-r from-amber-500 to-primary-500 text-white px-4 py-1 rounded-bl-lg text-sm font-medium">
                                                     {t(`payment.popularityText.${pack.popularityText}`)}
                                                 </div>
                                             </div>

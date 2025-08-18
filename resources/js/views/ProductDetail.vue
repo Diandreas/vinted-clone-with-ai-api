@@ -1,43 +1,43 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-gray-50 pb-16 sm:pb-0">
     <!-- Loading -->
     <div v-if="loading" class="min-h-screen flex items-center justify-center">
-      <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-indigo-600"></div>
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
     </div>
 
     <!-- Product Detail -->
-    <div v-else-if="product" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <!-- Breadcrumb -->
-      <nav class="flex mb-8" aria-label="Breadcrumb">
-        <ol class="inline-flex items-center space-x-1 md:space-x-3">
+    <div v-else-if="product" class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-6">
+      <!-- Breadcrumb - Compact -->
+      <nav class="flex mb-3 sm:mb-6" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center space-x-1 md:space-x-2">
           <li class="inline-flex items-center">
-            <RouterLink to="/" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-indigo-600">
-              <HomeIcon class="w-4 h-4 mr-2" />
+            <RouterLink to="/" class="inline-flex items-center text-xs sm:text-sm font-medium text-gray-700 hover:text-primary-600">
+              <HomeIcon class="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
               Accueil
             </RouterLink>
           </li>
           <li>
             <div class="flex items-center">
-              <ChevronRightIcon class="w-4 h-4 text-gray-400" />
-              <RouterLink to="/products" class="ml-1 text-sm font-medium text-gray-700 hover:text-indigo-600 md:ml-2">
+              <ChevronRightIcon class="w-3 h-3 sm:w-4 sm:h-4 text-gray-400" />
+              <RouterLink to="/products" class="ml-1 text-xs sm:text-sm font-medium text-gray-700 hover:text-primary-600 md:ml-2">
                 Produits
               </RouterLink>
             </div>
           </li>
           <li aria-current="page">
             <div class="flex items-center">
-              <ChevronRightIcon class="w-4 h-4 text-gray-400" />
-              <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">{{ product.title }}</span>
+              <ChevronRightIcon class="w-3 h-3 sm:w-4 sm:h-4 text-gray-400" />
+              <span class="ml-1 text-xs sm:text-sm font-medium text-gray-500 md:ml-2 truncate max-w-32 sm:max-w-none">{{ product.title }}</span>
             </div>
           </li>
         </ol>
       </nav>
 
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <!-- Product Images -->
-        <div class="space-y-4">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        <!-- Product Images - Compact -->
+        <div class="space-y-3">
           <!-- Main Image -->
-          <div class="aspect-square bg-gray-100 rounded-xl overflow-hidden">
+          <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden relative">
             <!-- Debug info -->
             <div v-if="product" class="absolute top-2 left-2 bg-black bg-opacity-50 text-white text-xs p-1 rounded z-10">
               Debug: main_image_url = {{ product.main_image_url || 'null' }}
@@ -52,18 +52,18 @@
               @error="console.error('❌ Erreur chargement image principale:', product.main_image_url)"
             />
             <div v-else class="flex items-center justify-center h-full">
-              <ImageIcon class="w-24 h-24 text-gray-400" />
+              <ImageIcon class="w-16 h-16 sm:w-24 sm:h-24 text-gray-400" />
               <div class="text-center text-gray-500 mt-2">
-                <p>Aucune image principale</p>
+                <p class="text-sm">Aucune image principale</p>
                 <p class="text-xs">main_image_url: {{ product?.main_image_url || 'null' }}</p>
               </div>
             </div>
           </div>
 
-          <!-- Image Gallery (if multiple images) -->
+          <!-- Image Gallery (if multiple images) - Compact -->
           <div v-if="product.images && product.images.length > 1" class="grid grid-cols-4 gap-2">
             <!-- Debug info -->
-            <div class="col-span-4 bg-yellow-100 text-yellow-800 text-xs p-2 rounded mb-2">
+            <div class="col-span-4 bg-gray-100 text-gray-800 text-xs p-2 rounded mb-1">
               Galerie: {{ product.images.length }} images trouvées
             </div>
 
@@ -77,78 +77,77 @@
                 :src="image.url"
                 :alt="image.alt_text || product.title"
                 class="w-full h-full object-cover"
-                @load="console.log('✅ Image galerie chargée:', image.url)"
                 @error="console.error('❌ Erreur chargement image galerie:', image.url)"
               />
               <!-- Debug info sur chaque image -->
-              <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1">
+              <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-0.5">
                 {{ image.filename }}
               </div>
             </div>
           </div>
 
           <!-- Debug: Aucune image -->
-          <div v-else-if="product.images && product.images.length === 1" class="bg-blue-100 text-blue-800 text-xs p-2 rounded">
+          <div v-else-if="product.images && product.images.length === 1" class="bg-primary-100 text-primary-800 text-xs p-1.5 rounded">
             Une seule image trouvée (pas de galerie)
           </div>
 
-          <div v-else class="bg-red-100 text-red-800 text-xs p-2 rounded">
+          <div v-else class="bg-gray-100 text-gray-900 text-xs p-1.5 rounded">
             Aucune image trouvée dans product.images
           </div>
         </div>
 
-        <!-- Product Info -->
-        <div class="space-y-6">
-          <!-- Title and Status -->
+        <!-- Product Info - Compact -->
+        <div class="space-y-4 sm:space-y-6">
+          <!-- Title and Status - Compact -->
           <div>
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ product.title }}</h1>
-            <div class="flex items-center space-x-3">
+            <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2">{{ product.title }}</h1>
+            <div class="flex items-center space-x-2 sm:space-x-3">
               <span
                 :class="getStatusBadgeClass(product.status)"
-                class="px-3 py-1 text-sm font-medium rounded-full"
+                class="px-2 py-1 text-xs sm:text-sm font-medium rounded-full"
               >
                 {{ getStatusText(product.status) }}
               </span>
-              <span class="text-sm text-gray-500">
+              <span class="text-xs sm:text-sm text-gray-500">
                 {{ formatDate(product.created_at) }}
               </span>
             </div>
           </div>
 
-          <!-- Price Section -->
-          <div class="bg-gray-50 rounded-xl p-6">
-            <div class="flex items-baseline space-x-3">
-              <span class="text-4xl font-bold text-indigo-600">{{ formatPrice(product.price) }}</span>
-              <span v-if="product.original_price && product.original_price !== product.price" class="text-xl text-gray-500 line-through">
+          <!-- Price Section - Compact -->
+          <div class="bg-gray-50 rounded-lg p-4 sm:p-6">
+            <div class="flex items-baseline space-x-2 sm:space-x-3">
+              <span class="text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-600">{{ formatPrice(product.price) }}</span>
+              <span v-if="product.original_price && product.original_price !== product.price" class="text-lg sm:text-xl text-gray-500 line-through">
                 {{ formatPrice(product.original_price) }}
               </span>
             </div>
 
-            <div v-if="product.original_price && product.original_price !== product.price" class="mt-2">
-              <span class="text-sm text-green-600 font-medium">
+            <div v-if="product.original_price && product.original_price !== product.price" class="mt-1 sm:mt-2">
+              <span class="text-xs sm:text-sm text-green-600 font-medium">
                 {{ calculateDiscount(product.original_price, product.price) }}% de réduction
               </span>
             </div>
 
-            <div v-if="product.shipping_cost && parseFloat(product.shipping_cost) > 0" class="mt-2 text-sm text-gray-600">
+            <div v-if="product.shipping_cost && parseFloat(product.shipping_cost) > 0" class="mt-1 sm:mt-2 text-xs sm:text-sm text-gray-600">
               + {{ formatPrice(product.shipping_cost) }} de frais de port
             </div>
           </div>
 
-          <!-- Action Buttons -->
-          <div class="flex space-x-4">
+          <!-- Action Buttons - Compact -->
+          <div class="flex space-x-3">
             <button
               @click="toggleLike"
-              :class="isLiked ? 'bg-red-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
-              class="flex-1 flex items-center justify-center px-6 py-3 rounded-lg font-medium transition-colors"
+              :class="isLiked ? 'bg-gray-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+              class="flex-1 flex items-center justify-center px-4 py-2.5 rounded-lg font-medium transition-colors text-sm"
             >
-              <HeartIcon :class="isLiked ? 'w-5 h-5' : 'w-5 h-5'" class="mr-2" />
+              <HeartIcon :class="isLiked ? 'w-4 h-4' : 'w-4 h-4'" class="mr-2" />
               {{ isLiked ? 'Aimé' : 'J\'aime' }}
             </button>
 
             <button
               @click="toggleFavorite"
-              :class="isFavorited ? 'bg-yellow-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+              :class="isFavorited ? 'bg-gray-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
               class="flex-1 flex items-center justify-center px-6 py-3 rounded-lg font-medium transition-colors"
             >
               <StarIcon :class="isFavorited ? 'w-5 h-5' : 'w-5 h-5'" class="mr-2" />
@@ -163,7 +162,7 @@
             </h3>
             <div class="flex items-center space-x-4 mb-4">
               <!-- Avatar avec initiales -->
-              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-semibold text-lg">
+              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-semibold text-lg">
                 {{ getUserInitials(product.user?.name) }}
               </div>
               <div>
@@ -185,7 +184,7 @@
               <div class="grid grid-cols-2 gap-2">
                 <button
                   @click="editProduct"
-                  class="bg-blue-600 text-white px-3 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors text-sm"
+                  class="bg-primary-600 text-white px-3 py-2 rounded-lg font-medium hover:bg-primary-700 transition-colors text-sm"
                 >
                   Modifier
                 </button>
@@ -202,7 +201,7 @@
             <div v-else class="flex space-x-3">
               <button
                 @click="startConversation"
-                class="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors"
+                class="flex-1 bg-primary-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-primary-700 transition-colors"
               >
                 <MessageCircleIcon class="w-4 h-4 mr-2 inline" />
                 Message
@@ -277,15 +276,15 @@
             <h3 class="text-lg font-semibold text-gray-900 mb-4">Statistiques</h3>
             <div class="grid grid-cols-2 gap-4">
               <div class="text-center">
-                <div class="text-2xl font-bold text-indigo-600">{{ product.views_count }}</div>
+                <div class="text-2xl font-bold text-primary-600">{{ product.views_count }}</div>
                 <div class="text-sm text-gray-500">Vues</div>
               </div>
               <div class="text-center">
-                <div class="text-2xl font-bold text-red-500">{{ product.likes_count }}</div>
+                <div class="text-2xl font-bold text-gray-500">{{ product.likes_count }}</div>
                 <div class="text-sm text-gray-500">J'aime</div>
               </div>
               <div class="text-center">
-                <div class="text-2xl font-bold text-yellow-500">{{ product.favorites_count }}</div>
+                <div class="text-2xl font-bold text-gray-500">{{ product.favorites_count }}</div>
                 <div class="text-sm text-gray-500">Favoris</div>
               </div>
               <div class="text-center">
@@ -320,7 +319,7 @@
             </div>
             <div class="p-4">
               <h4 class="font-semibold text-gray-900 mb-2 line-clamp-2">{{ similarProduct.title }}</h4>
-              <p class="text-lg font-bold text-indigo-600">{{ formatPrice(similarProduct.price) }}</p>
+              <p class="text-lg font-bold text-primary-600">{{ formatPrice(similarProduct.price) }}</p>
             </div>
           </div>
         </div>
@@ -335,7 +334,7 @@
 
           <!-- Loading conversations -->
           <div v-if="loadingConversations" class="flex items-center justify-center py-8">
-            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
             <span class="ml-2 text-gray-600">Chargement des conversations...</span>
           </div>
 
@@ -354,7 +353,7 @@
             >
               <div class="flex items-center space-x-4">
                 <!-- Buyer avatar -->
-                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-semibold">
                   {{ getUserInitials(conversation.buyer?.name) }}
                 </div>
 
@@ -374,13 +373,13 @@
               <div class="flex items-center space-x-2">
                 <span
                   v-if="conversation.unread_count > 0"
-                  class="bg-red-500 text-white text-xs px-2 py-1 rounded-full"
+                  class="bg-gray-500 text-white text-xs px-2 py-1 rounded-full"
                 >
                   {{ conversation.unread_count }} nouveau{{ conversation.unread_count > 1 ? 'x' : '' }}
                 </span>
                 <button
                   @click="openConversation(conversation)"
-                  class="px-3 py-1 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700 transition-colors"
+                  class="px-3 py-1 bg-primary-600 text-white text-sm rounded hover:bg-primary-700 transition-colors"
                 >
                   Répondre
                 </button>
@@ -394,13 +393,13 @@
     <!-- Error State -->
     <div v-else class="min-h-screen flex items-center justify-center">
       <div class="text-center">
-        <AlertTriangleIcon class="mx-auto h-12 w-12 text-red-400" />
+        <AlertTriangleIcon class="mx-auto h-12 w-12 text-gray-400" />
         <h3 class="mt-2 text-sm font-medium text-gray-900">Produit non trouvé</h3>
         <p class="mt-1 text-sm text-gray-500">Le produit que vous recherchez n'existe pas ou a été supprimé.</p>
         <div class="mt-6">
           <RouterLink
             to="/products"
-            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700"
           >
             Retour aux produits
           </RouterLink>
@@ -443,7 +442,7 @@
 
           <!-- Info vendeur -->
           <div class="flex items-center space-x-3 mb-4">
-            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm">
+            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-semibold text-sm">
               {{ getUserInitials(product?.user?.name) }}
             </div>
             <div>
@@ -461,15 +460,15 @@
               id="message"
               v-model="messageContent"
               rows="4"
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none"
               placeholder="Bonjour, je suis intéressé(e) par votre produit..."
               :disabled="sendingMessage"
             ></textarea>
           </div>
 
           <!-- Erreur -->
-          <div v-if="messageError" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-            <p class="text-sm text-red-600">{{ messageError }}</p>
+          <div v-if="messageError" class="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+            <p class="text-sm text-gray-700">{{ messageError }}</p>
           </div>
         </div>
 
@@ -484,7 +483,7 @@
           </button>
           <button
             @click="sendMessage"
-            class="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            class="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             :disabled="sendingMessage || !messageContent.trim()"
           >
             <span v-if="sendingMessage">Envoi...</span>
@@ -928,8 +927,8 @@ const getStatusBadgeClass = (status) => {
   const classes = {
     active: 'bg-green-100 text-green-800',
     draft: 'bg-gray-100 text-gray-800',
-    sold: 'bg-blue-100 text-blue-800',
-    reserved: 'bg-yellow-100 text-yellow-800'
+    sold: 'bg-primary-100 text-primary-800',
+    reserved: 'bg-gray-100 text-gray-800'
   }
   return classes[status] || classes.draft
 }
