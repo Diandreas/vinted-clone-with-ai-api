@@ -172,6 +172,13 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/conversations/:id',
+    name: 'conversation-detail',
+    component: () => import('@/views/ConversationDetail.vue'),
+    props: true,
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/orders',
     name: 'orders',
     component: Orders,

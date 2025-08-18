@@ -1,4 +1,4 @@
-# Configuration de la Devise - FCFA
+# Configuration de la Devise - Fcfa
 
 ## Vue d'ensemble
 
@@ -12,7 +12,7 @@ La configuration de devise se trouve dans `config/currency.php` :
 
 ```php
 'code' => 'XAF',        // Code ISO 4217
-'symbol' => 'FCFA',     // Symbole affiché
+'symbol' => 'Fcfa',     // Symbole affiché
 'name' => 'Franc CFA',  // Nom complet
 'locale' => 'fr_FR',    // Locale pour le formatage
 'decimals' => 2,        // Nombre de décimales
@@ -25,7 +25,7 @@ La configuration se trouve dans `resources/js/config/currency.js` :
 ```javascript
 export const CURRENCY_CONFIG = {
     code: 'XAF',
-    symbol: 'FCFA',
+    symbol: 'Fcfa',
     name: 'Franc CFA',
     locale: 'fr-FR',
     decimals: 2
@@ -38,10 +38,10 @@ export const CURRENCY_CONFIG = {
 
 ```php
 // Formater un prix
-format_price(1000) // Retourne "1 000 FCFA"
+format_price(1000) // Retourne "1 000 Fcfa"
 
 // Obtenir le symbole
-get_currency_symbol() // Retourne "FCFA"
+get_currency_symbol() // Retourne "Fcfa"
 
 // Obtenir le code
 get_currency_code() // Retourne "XAF"
@@ -53,7 +53,7 @@ get_currency_code() // Retourne "XAF"
 import { formatPrice } from '@/utils/currency.js'
 
 // Formater un prix
-formatPrice(1000) // Retourne "1 000 FCFA"
+formatPrice(1000) // Retourne "1 000 Fcfa"
 ```
 
 ## Variables d'environnement
@@ -62,7 +62,7 @@ Ajoutez ces variables dans votre fichier `.env` :
 
 ```bash
 CURRENCY_CODE=XAF
-CURRENCY_SYMBOL=FCFA
+CURRENCY_SYMBOL=Fcfa
 CURRENCY_NAME="Franc CFA"
 CURRENCY_LOCALE=fr_FR
 CURRENCY_DECIMALS=2
@@ -78,8 +78,8 @@ Lors du changement de devise :
 
 ## Formatage des prix
 
-- **Affichage** : Les prix sont affichés avec le symbole "FCFA"
-- **Saisie** : Les champs de saisie montrent "FCFA" comme indicateur
+- **Affichage** : Les prix sont affichés avec le symbole "Fcfa"
+- **Saisie** : Les champs de saisie montrent "Fcfa" comme indicateur
 - **API** : Les valeurs restent numériques dans les réponses JSON
 
 ## Exemple d'utilisation

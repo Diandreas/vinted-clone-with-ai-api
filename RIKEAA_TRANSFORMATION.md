@@ -48,7 +48,7 @@ resources/
 ├── js/
 │   ├── config/
 │   │   ├── branding.js      # Configuration RIKEAA
-│   │   └── currency.js      # Configuration FCFA
+│   │   └── currency.js      # Configuration Fcfa
 │   ├── utils/
 │   │   └── currency.js      # Utilitaires devise
 │   └── views/
@@ -131,11 +131,11 @@ theme: {
 </template>
 ```
 
-## 💰 Devise FCFA
+## 💰 Devise Fcfa
 
 ### Configuration
 - **Code ISO**: XAF
-- **Symbole**: FCFA
+- **Symbole**: Fcfa
 - **Formatage**: Français (espace comme séparateur)
 
 ### Utilisation
@@ -143,7 +143,7 @@ theme: {
 import { formatPrice } from '@/utils/currency.js'
 
 // Formatage automatique
-formatPrice(1000) // "1 000 FCFA"
+formatPrice(1000) // "1 000 Fcfa"
 ```
 
 ## 🔧 Installation & Configuration
