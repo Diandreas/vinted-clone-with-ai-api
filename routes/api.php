@@ -79,6 +79,7 @@ Route::prefix('v1')->group(function () {
         Route::get('products/{product}/similar', [ProductController::class, 'similar'])->where('product', '[0-9]+');
 
         // Users (lecture seule)
+        Route::get('users/search', [UserController::class, 'search']);
         Route::get('users/{user}', [UserController::class, 'show']);
         Route::get('users/{user}/products', [UserController::class, 'userProducts']);
         Route::get('users/{user}/followers', [UserController::class, 'followers']);

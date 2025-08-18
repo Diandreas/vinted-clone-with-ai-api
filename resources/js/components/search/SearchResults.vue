@@ -1,20 +1,7 @@
 <template>
   <div class="search-results px-2 sm:px-4">
     <!-- Header - Ultra Compact -->
-             <!-- Match Details - Ultra Compact -->
-          <div class="match-details mb-1 sm:mb-2">
-            <button
-              @click.stop="toggleMatchDetails(result.product.id)"
-              class="text-xs text-primary-600 hover:text-primary-800 flex items-center"
-            >
-              <i class="fas fa-info-circle mr-0.5"></i>
-              <span class="hidden sm:inline">Détails correspondance</span>
-              <span class="sm:hidden">Détails</span>
-              <i 
-                class="fas fa-chevron-down ml-1 transition-transform"
-                :class="{ 'rotate-180': expandedDetails.includes(result.product.id) }"
-              ></i>
-            </button>results-header mb-3 sm:mb-4">
+    <div class="results-header mb-3 sm:mb-4">
       <h2 class="text-lg sm:text-xl font-bold text-gray-900 mb-1 sm:mb-2">
         Résultats de la recherche
       </h2>
@@ -36,10 +23,11 @@
     </div>
 
     <!-- Results Grid - Ultra Compact -->
-    <div class="results-grid grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4">
+    <div v-if="sortedResults.length > 0" class="results-grid grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4">
       <div
         v-for="(result, index) in sortedResults"
-        :key="result.product.id"
+        :key="result.product?.id || index"
+        v-if="result && result.product"
         class="result-card bg-white rounded-md shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
         @click="$emit('product-click', result.product)"
       >
@@ -70,9 +58,9 @@
           <div class="absolute top-1 right-1">
             <div
               class="similarity-badge px-1 py-0.5 rounded-full text-xs font-medium text-white"
-              :class="getSimilarityBadgeClass(result.similarity_score)"
+              :class="getSimilarityBadgeClass(result.similarity_score || 0)"
             >
-              {{ result.similarity_score }}%
+              {{ (result.similarity_score || 0).toFixed(0) }}%
             </div>
           </div>
 
@@ -90,11 +78,11 @@
           <!-- Title and Price - Ultra Compact -->
           <div class="mb-1 sm:mb-2">
             <h3 class="font-medium text-gray-900 mb-0.5 line-clamp-2 text-xs sm:text-sm">
-              {{ result.product.title }}
+              {{ result.product.title || 'Sans titre' }}
             </h3>
             <div class="flex items-center justify-between">
               <span class="text-sm sm:text-lg font-bold text-green-600">
-                {{ result.product.formatted_price }}
+                {{ result.product.formatted_price || 'Prix non disponible' }}
               </span>
               <span v-if="result.product.original_price" class="text-xs text-gray-500 line-through">
                 {{ result.product.formatted_original_price }}
@@ -102,116 +90,47 @@
             </div>
           </div>
 
-          <!-- Product Info - Ultra Compact -->
-          <div class="mb-1 sm:mb-2 space-y-0.5 sm:space-y-1">
-            <div v-if="result.product.brand" class="flex items-center text-xs text-gray-600">
-              <i class="fas fa-tag mr-1 text-gray-400 text-xs"></i>
-              {{ result.product.brand.name }}
-            </div>
-            <div v-if="result.product.size" class="flex items-center text-xs text-gray-600">
-              <i class="fas fa-ruler mr-1 text-gray-400 text-xs"></i>
-              Taille {{ result.product.size }}
-            </div>
-            <div v-if="result.product.condition" class="flex items-center text-xs text-gray-600">
-              <i class="fas fa-check-circle mr-1 text-gray-400 text-xs"></i>
-              {{ result.product.condition.name }}
-            </div>
-          </div>
-
-          <!-- Match Details -->
-          <div class="match-details mb-3">
-            <button
-              @click.stop="toggleMatchDetails(result.product.id)"
-              class="text-xs text-primary-600 hover:text-primary-800 flex items-center"
-            >
-              <i class="fas fa-info-circle mr-1"></i>
-              Détails de la correspondance
-              <i
-                class="fas fa-chevron-down ml-1 transition-transform"
-                :class="{ 'rotate-180': expandedDetails.includes(result.product.id) }"
-              ></i>
-            </button>
-
-            <div
-              v-if="expandedDetails.includes(result.product.id)"
-              class="mt-2 p-2 bg-gray-50 rounded text-xs"
-            >
-              <!-- Labels similaires -->
-              <div v-if="result.match_details.labels && result.match_details.labels.length > 0" class="mb-2">
-                <strong class="text-gray-700">Labels détectés:</strong>
-                <div class="flex flex-wrap gap-1 mt-1">
-                  <span
-                    v-for="label in result.match_details.labels.slice(0, 3)"
-                    :key="label.description"
-                    class="bg-primary-100 text-primary-800 px-2 py-1 rounded"
-                  >
-                    {{ label.description }} ({{ Math.round(label.score * 100) }}%)
-                  </span>
-                </div>
-              </div>
-
-              <!-- Objets détectés -->
-              <div v-if="result.match_details.objects && result.match_details.objects.length > 0" class="mb-2">
-                <strong class="text-gray-700">Objets détectés:</strong>
-                <div class="flex flex-wrap gap-1 mt-1">
-                  <span
-                    v-for="object in result.match_details.objects.slice(0, 3)"
-                    :key="object.name"
-                    class="bg-green-100 text-green-800 px-2 py-1 rounded"
-                  >
-                    {{ object.name }} ({{ Math.round(object.score * 100) }}%)
-                  </span>
-                </div>
-              </div>
-
-              <!-- Couleurs dominantes -->
-              <div v-if="result.match_details.dominant_colors && result.match_details.dominant_colors.length > 0">
-                <strong class="text-gray-700">Couleurs dominantes:</strong>
-                <div class="flex gap-1 mt-1">
-                  <div
-                    v-for="color in result.match_details.dominant_colors.slice(0, 5)"
-                    :key="color.red + color.green + color.blue"
-                    class="w-4 h-4 rounded border border-gray-300"
-                    :style="{ backgroundColor: `rgb(${color.red}, ${color.green}, ${color.blue})` }"
-                    :title="`RGB(${color.red}, ${color.green}, ${color.blue}) - ${Math.round(color.pixel_fraction * 100)}%`"
-                  ></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- User and Actions - Ultra Compact -->
-          <div class="flex items-center justify-between">
-            <div class="flex items-center text-xs text-gray-600">
+          <!-- User Info - Ultra Compact -->
+          <div class="flex items-center justify-between text-xs text-gray-500 mb-1 sm:mb-2">
+            <div class="flex items-center">
               <img
                 :src="getUserAvatarUrl(result.product.user)"
-                :alt="result.product.user?.name"
-                class="w-3 h-3 sm:w-4 sm:h-4 rounded-full mr-1"
+                :alt="result.product.user?.name || 'Utilisateur'"
+                class="w-4 h-4 rounded-full mr-1"
                 @error="handleAvatarError"
               >
-              <span class="truncate">{{ result.product.user?.name }}</span>
+              <span class="truncate max-w-20">{{ result.product.user?.name || 'Utilisateur' }}</span>
             </div>
+            <span class="text-xs">{{ result.product.created_at_formatted || 'Date non disponible' }}</span>
+          </div>
 
-            <div class="flex items-center space-x-1 sm:space-x-2">
-              <button
-                @click.stop="toggleFavorite(result.product)"
-                class="text-gray-400 hover:text-gray-500 transition-colors text-xs"
-                :class="{ 'text-gray-500': result.product.is_favorited_by_user }"
-              >
-                <i class="fas fa-heart"></i>
-              </button>
-              <button
-                @click.stop="toggleLike(result.product)"
-                class="text-gray-400 hover:text-primary-500 transition-colors flex items-center text-xs"
-                :class="{ 'text-primary-500': result.product.is_liked_by_user }"
-              >
-                <i class="fas fa-thumbs-up mr-0.5"></i>
-                <span class="text-xs">{{ result.product.likes_count }}</span>
-              </button>
-            </div>
+          <!-- Actions - Ultra Compact -->
+          <div class="flex items-center justify-between text-xs">
+            <button
+              @click.stop="toggleFavorite(result.product)"
+              class="text-gray-400 hover:text-red-500 transition-colors flex items-center"
+              :class="{ 'text-red-500': result.product.is_favorited_by_user }"
+            >
+              <i class="fas fa-heart"></i>
+            </button>
+            <button
+              @click.stop="toggleLike(result.product)"
+              class="text-gray-400 hover:text-primary-500 transition-colors flex items-center text-xs"
+              :class="{ 'text-primary-500': result.product.is_liked_by_user }"
+            >
+              <i class="fas fa-thumbs-up mr-0.5"></i>
+              <span class="text-xs">{{ result.product.likes_count || 0 }}</span>
+            </button>
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- No Results Message -->
+    <div v-else-if="results.length > 0" class="text-center py-8">
+      <i class="fas fa-exclamation-triangle text-3xl text-yellow-500 mb-3"></i>
+      <h3 class="text-lg font-medium text-gray-700 mb-2">Aucun résultat valide</h3>
+      <p class="text-gray-500 text-sm">Les résultats de recherche contiennent des données invalides. Veuillez réessayer.</p>
     </div>
 
     <!-- Load More Button - Ultra Compact -->
@@ -261,19 +180,40 @@ export default {
   },
   computed: {
     sortedResults() {
-      const results = [...this.results];
-
+      // Filter out any results that don't have a valid product
+      const validResults = this.results.filter(result => result && result.product);
+      
       if (this.sortBy === 'similarity') {
-        return results.sort((a, b) => b.similarity_score - a.similarity_score);
+        return validResults.sort((a, b) => b.similarity_score - a.similarity_score);
       } else if (this.sortBy === 'price') {
-        return results.sort((a, b) => a.product.price - b.product.price);
+        return validResults.sort((a, b) => (a.product.price || 0) - (b.product.price || 0));
       }
 
-      return results;
+      return validResults;
+    }
+  },
+  watch: {
+    results: {
+      handler(newResults) {
+        if (newResults && newResults.length > 0) {
+          const invalidResults = newResults.filter(result => !result || !result.product);
+          if (invalidResults.length > 0) {
+            console.warn(`SearchResults: Received ${invalidResults.length} invalid results:`, invalidResults);
+          }
+          
+          // Log the structure of valid results for debugging
+          const validResults = newResults.filter(result => result && result.product);
+          if (validResults.length > 0) {
+            console.log('SearchResults: Valid result structure:', validResults[0]);
+          }
+        }
+      },
+      immediate: true
     }
   },
   methods: {
     getSimilarityBadgeClass(score) {
+      if (!score || isNaN(score)) return 'bg-gray-500';
       if (score >= 80) return 'bg-green-500';
       if (score >= 60) return 'bg-gray-500';
       if (score >= 40) return 'bg-gray-500';
@@ -281,6 +221,8 @@ export default {
     },
 
     toggleMatchDetails(productId) {
+      if (!productId) return;
+      
       const index = this.expandedDetails.indexOf(productId);
       if (index > -1) {
         this.expandedDetails.splice(index, 1);
@@ -290,6 +232,8 @@ export default {
     },
 
     async toggleFavorite(product) {
+      if (!product || !product.id) return;
+      
       // Vérifier l'authentification
       const user = this.$store?.state?.auth?.user;
       if (!user) {
@@ -318,6 +262,8 @@ export default {
     },
 
     async toggleLike(product) {
+      if (!product || !product.id) return;
+      
       const user = this.$store?.state?.auth?.user;
       if (!user) {
         this.notificationStore.warning('Connectez-vous pour liker');
@@ -337,7 +283,7 @@ export default {
 
         if (data.success) {
           product.is_liked_by_user = data.data.liked;
-          product.likes_count += data.data.liked ? 1 : -1;
+          product.likes_count = (product.likes_count || 0) + (data.data.liked ? 1 : -1);
         }
       } catch (error) {
         console.error('Like error:', error);
@@ -346,73 +292,77 @@ export default {
     },
 
     getImageUrl(product) {
+      if (!product) return null;
+      
       // Priorité 1: Image principale
       if (product.main_image && product.main_image.trim() !== '') {
         return product.main_image;
       }
       
-      // Priorité 2: Première image de la galerie
+      // Priorité 2: URL de l'image principale
+      if (product.main_image_url && product.main_image_url.trim() !== '') {
+        return product.main_image_url;
+      }
+      
+      // Priorité 3: Première image du tableau d'images
       if (product.images && product.images.length > 0) {
         const firstImage = product.images[0];
-        if (firstImage && (firstImage.url || firstImage.image_url)) {
-          const imageUrl = firstImage.url || firstImage.image_url;
-          return imageUrl;
+        if (firstImage.url && firstImage.url.trim() !== '') {
+          return firstImage.url;
+        }
+        if (firstImage.image_url && firstImage.image_url.trim() !== '') {
+          return firstImage.image_url;
         }
       }
       
-      // Priorité 3: Image URL générique
+      // Priorité 4: URL d'image générique
       if (product.image_url && product.image_url.trim() !== '') {
         return product.image_url;
       }
       
-      // Priorité 4: Image uploadée (file object)
-      if (product.uploaded_image) {
+      // Priorité 5: Image uploadée
+      if (product.uploaded_image && product.uploaded_image.trim() !== '') {
         return product.uploaded_image;
       }
       
-      // Dernière option: Pas d'image disponible
       return null;
     },
 
     handleImageError(event, product) {
-      console.warn('Image loading failed for product:', product.id, 'URL:', event.target.src);
+      if (!product) return;
       
-      // Essayer les autres sources d'images disponibles
       const currentSrc = event.target.src;
       
-      // Si on a échoué sur main_image_url, essayer images[0]
-      if (product.images && product.images.length > 0 && currentSrc !== (product.images[0].url || product.images[0].image_url)) {
+      // Si on a échoué sur main_image, essayer main_image_url
+      if (product.main_image_url && currentSrc !== product.main_image_url) {
+        event.target.src = product.main_image_url;
+        return;
+      }
+      
+      // Si on a échoué sur main_image, essayer images[0]
+      if (product.images && product.images.length > 0) {
         const fallbackUrl = product.images[0].url || product.images[0].image_url;
-        if (fallbackUrl && fallbackUrl.trim() !== '') {
+        if (fallbackUrl && fallbackUrl.trim() !== '' && currentSrc !== fallbackUrl) {
           event.target.src = fallbackUrl;
           return;
         }
       }
       
-      // Si on a échoué sur images[0], essayer image_url
+      // Si on a échoué, essayer image_url
       if (product.image_url && currentSrc !== product.image_url) {
         event.target.src = product.image_url;
         return;
       }
       
-      // En dernier recours, masquer l'image et afficher le placeholder
-      event.target.style.display = 'none';
-      
-      // Créer et afficher un placeholder personnalisé
-      const placeholder = document.createElement('div');
-      placeholder.className = 'w-full h-24 sm:h-32 bg-gray-100 flex items-center justify-center';
-      placeholder.innerHTML = `
-        <div class="text-center text-gray-400">
-          <i class="fas fa-image text-xl mb-1"></i>
-          <p class="text-xs">Image indisponible</p>
-        </div>
-      `;
-      
-      event.target.parentNode.appendChild(placeholder);
+      // En dernier recours, afficher le placeholder par défaut
+      event.target.src = '/placeholder-product.jpg';
     },
 
     hasValidImage(product) {
+      if (!product) return false;
+      
       return (
+        (product.main_image && product.main_image.trim() !== '') ||
         (product.main_image_url && product.main_image_url.trim() !== '') ||
         (product.images && product.images.length > 0 && (product.images[0].url || product.images[0].image_url)) ||
         (product.image_url && product.image_url.trim() !== '') ||

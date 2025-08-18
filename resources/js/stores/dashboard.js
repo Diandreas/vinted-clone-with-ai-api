@@ -14,7 +14,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
     followers_trend: 0,
     views_trend: 0
   })
-  
+
   const recentProducts = ref([])
   const recentActivity = ref([])
   const trendingProducts = ref([])
@@ -22,11 +22,11 @@ export const useDashboardStore = defineStore('dashboard', () => {
     labels: [],
     datasets: []
   })
-  
+
   const unreadMessages = ref(0)
   const pendingOrders = ref(0)
   const unreadNotifications = ref(0)
-  
+
   // Actions
   const fetchStats = async () => {
     try {
@@ -41,7 +41,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
       throw error
     }
   }
-  
+
   const fetchRecentProducts = async (limit = 5) => {
     try {
       const response = await axios.get('/products/my-products', {
@@ -54,7 +54,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
       throw error
     }
   }
-  
+
   const fetchRecentActivity = async (limit = 10) => {
     try {
       const response = await axios.get('/me/activity', {
@@ -67,7 +67,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
       throw error
     }
   }
-  
+
   const fetchTrendingProducts = async (limit = 5) => {
     try {
       const response = await axios.get('/trending', {
@@ -80,15 +80,15 @@ export const useDashboardStore = defineStore('dashboard', () => {
       throw error
     }
   }
-  
+
   const fetchSalesChart = async (period = 30) => {
     try {
       const response = await axios.get('/analytics/sales', {
         params: { period }
       })
-      
+
       const data = response.data.chart_data || []
-      
+
       salesChartData.value = {
         labels: data.map(item => item.date),
         datasets: [
@@ -111,7 +111,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
           }
         ]
       }
-      
+
       return response.data
     } catch (error) {
       console.error('Failed to fetch sales chart:', error)
@@ -123,35 +123,35 @@ export const useDashboardStore = defineStore('dashboard', () => {
       throw error
     }
   }
-  
+
   const deleteProduct = async (productId) => {
     try {
       await axios.delete(`/products/${productId}`)
-      
+
       // Remove from recent products list
       recentProducts.value = recentProducts.value.filter(
         product => product.id !== productId
       )
-      
+
       // Update stats
       stats.value.products_count = Math.max(0, stats.value.products_count - 1)
-      
+
       return true
     } catch (error) {
       console.error('Failed to delete product:', error)
       throw error
     }
   }
-  
+
   const boostProduct = async (productId) => {
     try {
       const response = await axios.put(`/products/${productId}/boost`)
-      
+
       // Update product in recent products list
       const productIndex = recentProducts.value.findIndex(
         product => product.id === productId
       )
-      
+
       if (productIndex !== -1) {
         recentProducts.value[productIndex] = {
           ...recentProducts.value[productIndex],
@@ -159,14 +159,14 @@ export const useDashboardStore = defineStore('dashboard', () => {
           boosted_until: response.data.boosted_until
         }
       }
-      
+
       return response.data
     } catch (error) {
       console.error('Failed to boost product:', error)
       throw error
     }
   }
-  
+
   const markNotificationsAsRead = async () => {
     try {
       await axios.post('/notifications/mark-all-read')
@@ -177,7 +177,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
       throw error
     }
   }
-  
+
   const refreshData = async () => {
     try {
       await Promise.all([
@@ -192,7 +192,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
       throw error
     }
   }
-  
+
   return {
     // State
     stats,
@@ -203,7 +203,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
     unreadMessages,
     pendingOrders,
     unreadNotifications,
-    
+
     // Actions
     fetchStats,
     fetchRecentProducts,

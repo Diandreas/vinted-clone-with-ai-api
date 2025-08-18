@@ -272,9 +272,21 @@ export default {
         
         const data = await response.json();
         
+        // Debug logging
+        console.log('Image search API response:', data);
+        
         if (data.success) {
-          this.searchResults = data.data.results || [];
-          this.searchMeta = data.data.search_meta;
+          // Validate the response structure
+          const results = data.data?.results || [];
+          const validResults = results.filter(result => result && result.product);
+          
+          if (validResults.length !== results.length) {
+            console.warn(`Filtered out ${results.length - validResults.length} invalid results`);
+            console.warn('Invalid results:', results.filter(result => !result || !result.product));
+          }
+          
+          this.searchResults = validResults;
+          this.searchMeta = data.data?.search_meta || {};
           this.hasSearched = true;
           
           if (this.searchResults.length > 0) {
@@ -291,7 +303,8 @@ export default {
               }
             });
           } else {
-            console.warn('Search returned 0 results despite success:', data);
+            console.warn('Search returned 0 valid results despite success:', data);
+            this.notificationStore.warning('Aucun produit valide trouvé dans la réponse');
           }
         } else {
           throw new Error(data.message || 'Erreur lors de la recherche');

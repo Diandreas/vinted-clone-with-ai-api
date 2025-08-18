@@ -7,19 +7,53 @@
         <p class="text-sm sm:text-base text-gray-600">Trouvez exactement ce que vous cherchez</p>
       </div>
 
-      <!-- Search Form - Compact sur mobile -->
-      <div class="bg-white rounded-lg sm:rounded-xl shadow-soft border border-gray-200 p-3 sm:p-4 lg:p-6 mb-4 sm:mb-6 lg:mb-8">
-        <form @submit.prevent="performSearch" class="space-y-3 sm:space-y-4">
-          <!-- Search Input -->
-          <div class="relative">
-            <SearchIcon class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
-            <input
-              v-model="searchQuery"
-              type="text"
-              placeholder="Rechercher des produits..."
-              class="w-full pl-9 sm:pl-10 pr-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 text-sm sm:text-base"
-              @input="onSearchInput"
-            />
+      <!-- Search Tabs - Ultra Compact -->
+      <div class="mb-4 sm:mb-6">
+        <div class="bg-white rounded-lg shadow-soft border border-gray-200 p-1">
+          <div class="flex">
+            <button
+              @click="activeTab = 'products'"
+              :class="[
+                'flex-1 px-3 py-2 text-xs sm:text-sm font-medium rounded-md transition-all duration-200',
+                activeTab === 'products'
+                  ? 'bg-primary-600 text-white shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+              ]"
+            >
+              <i class="fas fa-shopping-bag mr-1 sm:mr-2"></i>
+              Produits
+            </button>
+            <button
+              @click="activeTab = 'users'"
+              :class="[
+                'flex-1 px-3 py-2 text-xs sm:text-sm font-medium rounded-md transition-all duration-200',
+                activeTab === 'users'
+                  ? 'bg-primary-600 text-white shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+              ]"
+            >
+              <i class="fas fa-users mr-1 sm:mr-2"></i>
+              Utilisateurs
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Products Search -->
+      <div v-show="activeTab === 'products'">
+        <!-- Search Form - Compact sur mobile -->
+        <div class="bg-white rounded-lg sm:rounded-xl shadow-soft border border-gray-200 p-3 sm:p-4 lg:p-6 mb-4 sm:mb-6 lg:mb-8">
+          <form @submit.prevent="performSearch" class="space-y-3 sm:space-y-4">
+            <!-- Search Input -->
+            <div class="relative">
+              <SearchIcon class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
+              <input
+                v-model="searchQuery"
+                type="text"
+                placeholder="Rechercher des produits..."
+                class="w-full pl-9 sm:pl-10 pr-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 text-sm sm:text-base"
+                @input="onSearchInput"
+              />
           </div>
 
           <!-- Filters Row - Responsive -->
@@ -242,6 +276,120 @@
           </button>
         </nav>
       </div>
+      </div>
+
+      <!-- Users Search -->
+      <div v-show="activeTab === 'users'">
+        <!-- Users Search Form -->
+        <div class="bg-white rounded-lg sm:rounded-xl shadow-soft border border-gray-200 p-3 sm:p-4 lg:p-6 mb-4 sm:mb-6 lg:mb-8">
+          <form @submit.prevent="performUserSearch" class="space-y-3 sm:space-y-4">
+            <!-- Search Input -->
+            <div class="relative">
+              <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+              <input
+                v-model="userSearchQuery"
+                type="text"
+                placeholder="Rechercher des utilisateurs par nom, @username..."
+                class="w-full pl-10 pr-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 text-sm sm:text-base"
+                @input="onUserSearchInput"
+              />
+            </div>
+
+            <!-- Search Button -->
+            <div class="flex justify-center pt-2">
+              <button
+                type="submit"
+                :disabled="isUserSearching"
+                class="w-full sm:w-auto bg-primary-600 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-medium hover:bg-primary-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-soft hover:shadow-medium text-sm sm:text-base"
+              >
+                <span v-if="isUserSearching" class="inline-flex items-center">
+                  <svg class="animate-spin -ml-1 mr-2 sm:mr-3 w-4 h-4 sm:w-5 sm:h-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Recherche...
+                </span>
+                <span v-else><i class="fas fa-search mr-2"></i>Rechercher</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Users Results Count -->
+        <div v-if="hasUserSearched" class="mb-4 sm:mb-6">
+          <p class="text-sm sm:text-base text-gray-600">
+            <span v-if="isUserSearching"><i class="fas fa-search mr-1"></i>Recherche en cours...</span>
+            <span v-else-if="userSearchResults.length > 0">
+              <i class="fas fa-users mr-1"></i>{{ userSearchResults.length }} utilisateur(s) trouvé(s)
+            </span>
+            <span v-else><i class="fas fa-user-slash mr-1"></i>Aucun utilisateur trouvé</span>
+          </p>
+        </div>
+
+        <!-- Users Loading State -->
+        <div v-if="isUserSearching" class="text-center py-12">
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+          <p class="text-gray-600">Recherche d'utilisateurs en cours...</p>
+        </div>
+
+        <!-- Users Results -->
+        <div v-else-if="userSearchResults.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+          <div
+            v-for="user in userSearchResults"
+            :key="user.id"
+            class="bg-white rounded-lg shadow-soft border border-gray-200 overflow-hidden hover:shadow-medium transition-all duration-200 cursor-pointer p-4"
+            @click="viewUserProfile(user)"
+          >
+            <!-- User Avatar -->
+            <div class="flex items-center mb-3">
+              <img
+                :src="getUserAvatarUrl(user)"
+                :alt="user.name"
+                class="w-12 h-12 rounded-full object-cover mr-3 border-2 border-gray-100"
+                @error="handleAvatarError"
+              />
+              <div class="flex-1 min-w-0">
+                <h3 class="font-semibold text-gray-900 text-sm sm:text-base truncate">{{ user.name }}</h3>
+                <p class="text-gray-500 text-xs sm:text-sm truncate">@{{ user.username || user.email.split('@')[0] }}</p>
+              </div>
+            </div>
+
+            <!-- User Stats -->
+            <div class="grid grid-cols-3 gap-2 text-center">
+              <div class="bg-gray-50 rounded-lg p-2">
+                <div class="text-lg font-bold text-gray-900">{{ user.products_count || 0 }}</div>
+                <div class="text-xs text-gray-500">Produits</div>
+              </div>
+              <div class="bg-gray-50 rounded-lg p-2">
+                <div class="text-lg font-bold text-gray-900">{{ user.followers_count || 0 }}</div>
+                <div class="text-xs text-gray-500">Abonnés</div>
+              </div>
+              <div class="bg-gray-50 rounded-lg p-2">
+                <div class="text-lg font-bold text-gray-900">{{ user.following_count || 0 }}</div>
+                <div class="text-xs text-gray-500">Suivi</div>
+              </div>
+            </div>
+
+            <!-- User Location -->
+            <div v-if="user.location" class="mt-3 text-xs text-gray-500 flex items-center">
+              <i class="fas fa-map-marker-alt mr-1"></i>
+              {{ user.location }}
+            </div>
+
+            <!-- Member Since -->
+            <div class="mt-2 text-xs text-gray-400">
+              Membre depuis {{ formatDate(user.created_at) }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Users Empty State -->
+        <div v-else-if="hasUserSearched && !isUserSearching" class="text-center py-12">
+          <i class="fas fa-user-slash text-6xl text-gray-300 mb-4"></i>
+          <h3 class="text-xl font-medium text-gray-700 mb-2">Aucun utilisateur trouvé</h3>
+          <p class="text-gray-500 mb-4">Essayez de modifier votre recherche</p>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -257,6 +405,7 @@ const route = useRoute()
 const notificationStore = useNotificationStore()
 
 // Reactive data
+const activeTab = ref('products')
 const searchQuery = ref('')
 const isSearching = ref(false)
 const searchResults = ref([])
@@ -265,6 +414,12 @@ const totalResults = ref(0)
 const currentPage = ref(1)
 const totalPages = ref(1)
 const sortBy = ref('relevance')
+
+// User search data
+const userSearchQuery = ref('')
+const isUserSearching = ref(false)
+const userSearchResults = ref([])
+const hasUserSearched = ref(false)
 
 // Filters
 const filters = ref({
@@ -499,6 +654,83 @@ onMounted(async () => {
     await performSearch()
   }
 })
+
+// User search methods
+const onUserSearchInput = () => {
+  // Auto-search when typing (debounced)
+  clearTimeout(userSearchTimeout.value)
+  userSearchTimeout.value = setTimeout(() => {
+    if (userSearchQuery.value.trim()) {
+      performUserSearch()
+    }
+  }, 500)
+}
+
+let userSearchTimeout = ref(null)
+
+const performUserSearch = async () => {
+  if (!userSearchQuery.value.trim()) {
+    notificationStore.warning('Veuillez saisir un terme de recherche')
+    return
+  }
+
+  isUserSearching.value = true
+  hasUserSearched.value = true
+
+  try {
+    const params = new URLSearchParams()
+    params.append('q', userSearchQuery.value.trim())
+    params.append('per_page', 20)
+
+    const response = await fetch(`/api/v1/users/search?${params.toString()}`)
+    const data = await response.json()
+
+    if (data.success) {
+      userSearchResults.value = data.data.users || []
+      
+      if (userSearchResults.value.length === 0) {
+        notificationStore.info('Aucun utilisateur trouvé avec ce terme')
+      } else {
+        notificationStore.success(`${userSearchResults.value.length} utilisateur(s) trouvé(s)`)
+      }
+    } else {
+      throw new Error(data.message || 'Erreur lors de la recherche d\'utilisateurs')
+    }
+  } catch (error) {
+    console.error('User search error:', error)
+    notificationStore.error('Erreur lors de la recherche d\'utilisateurs. Veuillez réessayer.')
+    userSearchResults.value = []
+  } finally {
+    isUserSearching.value = false
+  }
+}
+
+const viewUserProfile = (user) => {
+  router.push(`/profile/${user.id}`)
+}
+
+const getUserAvatarUrl = (user) => {
+  if (!user) return '/default-avatar.png'
+  
+  if (user.avatar_url) {
+    return user.avatar_url
+  }
+  
+  if (user.avatar) {
+    return user.avatar
+  }
+  
+  return '/default-avatar.png'
+}
+
+const handleAvatarError = (event) => {
+  if (event.target.src !== '/default-avatar.png') {
+    event.target.src = '/default-avatar.png'
+  } else {
+    // Avatar par défaut en SVG si le fichier n'existe pas
+    event.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNGM0Y0RjYiLz4KPGNpcmNsZSBjeD0iMjAiIGN5PSIxNiIgcj0iNiIgZmlsbD0iIzlDQTNBRiIvPgo8cGF0aCBkPSJNOCAzMkM4IDI2LjQ3NzIgMTIuNDc3MiAyMiAxOCAyMkgyMkMyNy41MjI4IDIyIDMyIDI2LjQ3NzIgMzIgMzJWNDBIOFYzMloiIGZpbGw9IiM5Q0EzQUYiLz4KPC9zdmc+Cg=='
+  }
+}
 </script>
 
 <style scoped>

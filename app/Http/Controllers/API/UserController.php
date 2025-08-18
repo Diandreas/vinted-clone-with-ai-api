@@ -394,4 +394,66 @@ class UserController extends Controller
             'message' => 'Default address set successfully'
         ]);
     }
+
+    /**
+     * Search users by name, username, or email
+     */
+    public function search(Request $request)
+    {
+        try {
+            $query = $request->get('q', '');
+            $perPage = $request->get('per_page', 20);
+
+            if (empty(trim($query))) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Search query is required'
+                ], 400);
+            }
+
+            $users = User::query()
+                ->where(function($q) use ($query) {
+                    $q->where('name', 'like', "%{$query}%")
+                      ->orWhere('username', 'like', "%{$query}%")
+                      ->orWhere('email', 'like', "%{$query}%");
+                })
+                ->select([
+                    'id', 'name', 'username', 'email', 'avatar', 
+                    'location', 'created_at', 'is_verified', 'is_live'
+                ])
+                ->withCount(['products as products_count' => function($query) {
+                    $query->where('status', 'active');
+                }])
+                ->latest()
+                ->limit($perPage)
+                ->get();
+
+            // Add computed properties that the frontend expects
+            $users = $users->map(function($user) {
+                $user->avatar_url = $user->avatar_url;
+                $user->followers_count = $user->followers_count;
+                $user->following_count = $user->following_count;
+                return $user;
+            });
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'users' => $users,
+                    'total' => $users->count()
+                ]
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('User search error: ' . $e->getMessage(), [
+                'query' => $request->get('q'),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while searching users',
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error'
+            ], 500);
+        }
+    }
 }

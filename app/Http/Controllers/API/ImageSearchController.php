@@ -10,6 +10,7 @@ use App\Http\Resources\ProductResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class ImageSearchController extends Controller
@@ -184,15 +185,18 @@ class ImageSearchController extends Controller
         $processed = 0;
         $errors = 0;
 
-        // Récupérer les produits qui n'ont pas encore été traités
-        $products = Product::whereDoesntHave('visionData')
-            ->with('images')
-            ->active()
-            ->limit($limit)
+        // Récupérer tous les produits avec leurs données de vision
+        $productVisionData = ProductVisionData::with('product')
+            ->where('processed', true)
             ->get();
 
-        foreach ($products as $product) {
+        foreach ($productVisionData as $data) {
             try {
+                $product = $data->product;
+                if (!$product) {
+                    continue;
+                }
+
                 $mainImage = $product->images->first();
                 if (!$mainImage) {
                     continue;
@@ -208,7 +212,7 @@ class ImageSearchController extends Controller
 
             } catch (\Exception $e) {
                 $errors++;
-                \Log::error("Error processing product {$product->id}: " . $e->getMessage());
+                Log::error("Error processing product {$data->product_id}: " . $e->getMessage());
             }
         }
 
@@ -217,7 +221,7 @@ class ImageSearchController extends Controller
             'data' => [
                 'processed' => $processed,
                 'errors' => $errors,
-                'total_checked' => $products->count(),
+                'total_checked' => $productVisionData->count(),
             ],
             'message' => "Processed {$processed} products with {$errors} errors"
         ]);

@@ -209,9 +209,12 @@
                     <div class="text-sm text-gray-600">@{{ follower.username }}</div>
                   </div>
                 </div>
-                <button class="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors">
-                  Suivre
-                </button>
+                <RouterLink
+                  :to="`/users/${follower.id}`"
+                  class="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors text-center"
+                >
+                  Voir profil
+                </RouterLink>
               </div>
             </div>
             
@@ -251,7 +254,10 @@
                     <div class="text-sm text-gray-600">@{{ followed.username }}</div>
                   </div>
                 </div>
-                <button class="px-4 py-2 bg-gray-600 text-white text-sm rounded-lg hover:bg-gray-700 transition-colors">
+                <button 
+                  @click="unfollowUser(followed.id)"
+                  class="px-4 py-2 bg-gray-600 text-white text-sm rounded-lg hover:bg-gray-700 transition-colors"
+                >
                   Se désabonner
                 </button>
               </div>
@@ -361,10 +367,13 @@ const tabs = [
 const loadProducts = async () => {
   loadingProducts.value = true
   try {
-    const response = await dashboardStore.fetchRecentProducts(20)
-    products.value = response.data || []
+    const response = await window.axios.get('/products/my-products', {
+      params: { per_page: 20 }
+    })
+    products.value = response.data.data?.data || []
   } catch (error) {
     console.error('Error loading products:', error)
+    products.value = []
   } finally {
     loadingProducts.value = false
   }
@@ -373,11 +382,12 @@ const loadProducts = async () => {
 const loadFollowers = async () => {
   loadingFollowers.value = true
   try {
-    // Simuler le chargement des followers
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    followers.value = []
+    const response = await window.axios.get('/users/my-followers')
+    // Extraire les données des followers depuis les relations
+    followers.value = response.data.data?.data?.map(follow => follow.follower) || []
   } catch (error) {
     console.error('Error loading followers:', error)
+    followers.value = []
   } finally {
     loadingFollowers.value = false
   }
@@ -386,11 +396,12 @@ const loadFollowers = async () => {
 const loadFollowing = async () => {
   loadingFollowing.value = true
   try {
-    // Simuler le chargement des following
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    following.value = []
+    const response = await window.axios.get('/users/my-following')
+    // Extraire les données des suivis depuis les relations
+    following.value = response.data.data?.data?.map(follow => follow.following) || []
   } catch (error) {
     console.error('Error loading following:', error)
+    following.value = []
   } finally {
     loadingFollowing.value = false
   }
@@ -399,10 +410,13 @@ const loadFollowing = async () => {
 const loadActivity = async () => {
   loadingActivity.value = true
   try {
-    const response = await dashboardStore.fetchRecentActivity(10)
-    recentActivity.value = response.data || []
+    const response = await window.axios.get('/me/activity', {
+      params: { limit: 10 }
+    })
+    recentActivity.value = response.data.data?.recent_actions || []
   } catch (error) {
     console.error('Error loading activity:', error)
+    recentActivity.value = []
   } finally {
     loadingActivity.value = false
   }
@@ -418,8 +432,11 @@ const deleteProduct = async (product) => {
       // Appel API pour supprimer le produit
       await window.axios.delete(`/products/${product.id}`)
       await loadProducts()
+      // Recharger les stats après suppression
+      await loadUserStats()
     } catch (error) {
       console.error('Error deleting product:', error)
+      alert('Erreur lors de la suppression du produit')
     }
   }
 }
@@ -437,6 +454,19 @@ const getActivityIcon = (type) => {
     'view': EyeIcon
   }
   return iconMap[type] || ActivityIcon
+}
+
+const unfollowUser = async (userId) => {
+  try {
+    await window.axios.delete(`/users/${userId}/unfollow`)
+    // Recharger la liste des suivis
+    await loadFollowing()
+    // Recharger les stats
+    await loadUserStats()
+  } catch (error) {
+    console.error('Error unfollowing user:', error)
+    alert('Erreur lors du désabonnement')
+  }
 }
 
 const formatDate = (date) => {
@@ -467,9 +497,29 @@ watch(activeTab, (newTab) => {
   }
 })
 
+// Load user stats
+const loadUserStats = async () => {
+  try {
+    const response = await window.axios.get('/me/stats')
+    if (response.data.success) {
+      // Mettre à jour les stats locales
+      const userStats = response.data.data
+      dashboardStore.stats.products_count = userStats.products?.total || 0
+      dashboardStore.stats.followers_count = userStats.social?.followers_count || 0
+      dashboardStore.stats.following_count = userStats.social?.following_count || 0
+      dashboardStore.stats.total_sales = userStats.sales?.total_earnings || 0
+    }
+  } catch (error) {
+    console.error('Error loading user stats:', error)
+  }
+}
+
 // Lifecycle
 onMounted(async () => {
-  await loadProducts()
+  await Promise.all([
+    loadProducts(),
+    loadUserStats()
+  ])
 })
 </script>
 
