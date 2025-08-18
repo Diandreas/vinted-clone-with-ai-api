@@ -27,8 +27,8 @@
             <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-4xl sm:p-6">
               <form @submit.prevent="handleSubmit">
                 <div>
-                  <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
-                    <PackageIcon class="h-6 w-6 text-green-600" />
+                  <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary-100">
+                    <PackageIcon class="h-6 w-6 text-primary-600" />
                   </div>
                   <div class="mt-3 text-center sm:mt-5">
                     <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">

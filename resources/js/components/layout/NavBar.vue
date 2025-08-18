@@ -5,10 +5,10 @@
         <!-- Logo and Brand -->
         <div class="flex items-center space-x-4 sm:space-x-8">
           <RouterLink to="/" class="flex items-center space-x-2 sm:space-x-3 group">
-            <div class="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-medium group-hover:shadow-strong transition-all duration-300 group-hover:scale-105">
+            <div class="w-8 h-8 sm:w-10 sm:h-10 bg-primary-500 rounded-lg flex items-center justify-center shadow-soft group-hover:shadow-medium transition-all duration-150 group-hover:scale-105">
               <span class="text-white font-bold text-sm sm:text-lg">R</span>
             </div>
-            <span class="text-lg sm:text-xl font-bold bg-gradient-to-r from-gray-900 to-primary-700 bg-clip-text text-transparent">RIKEAA</span>
+            <span class="text-lg sm:text-xl font-bold text-primary-600">RIKEAA</span>
           </RouterLink>
 
           <!-- Main Navigation -->
@@ -62,9 +62,9 @@
           <RouterLink
             v-if="isAuthenticated"
             to="/products/create"
-            class="hidden md:flex items-center space-x-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-4 lg:px-6 py-2 lg:py-2.5 rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
+            class="hidden md:flex items-center space-x-2 bg-primary-500 hover:bg-primary-600 text-white px-4 lg:px-6 py-2 lg:py-2.5 rounded-lg font-medium transition-all duration-150 shadow-soft hover:shadow-medium transform hover:scale-105 active:scale-95"
           >
-            <svg class="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 lg:w-5 lg:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
             </svg>
             <span class="text-sm lg:text-base font-semibold">Vendre</span>
@@ -154,7 +154,7 @@
 
             <!-- Messages -->
             <RouterLink
-              to="/messages"
+              to="/discussions"
               class="relative p-2 text-gray-400 hover:text-gray-600 transition-colors"
             >
               <MessageCircleIcon class="w-6 h-6" />

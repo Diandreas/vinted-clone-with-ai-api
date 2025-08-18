@@ -11,48 +11,61 @@ export default {
         sans: ['Inter', 'Instrument Sans', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       colors: {
-        // Palette de couleurs vertes pour RIKEAA
+        // Palette monochrome verte inspirée de Vinted
         primary: {
-          50: '#f0fdf4',
-          100: '#dcfce7',
-          200: '#bbf7d0',
-          300: '#86efac',
-          400: '#4ade80',
-          500: '#22c55e',  // Vert principal
-          600: '#16a34a',  // Vert foncé pour les hovers
-          700: '#15803d',
-          800: '#166534',
-          900: '#14532d',
-          950: '#052e16',
+          50: '#f0f9f4',
+          100: '#dcf2e3',
+          200: '#b8e4c8',
+          300: '#8dd3a8',
+          400: '#5bbd85',
+          500: '#3da066',  // Vert principal Vinted
+          600: '#2f7f52',
+          700: '#276543',
+          800: '#225138',
+          900: '#1e4330',
+          950: '#0f2418',
         },
-        // Gris modernisés pour un look professionnel
+        // Gris neutres pour le contenu
         gray: {
-          50: '#f8fafc',
-          100: '#f1f5f9',
-          200: '#e2e8f0',
-          300: '#cbd5e1',
-          400: '#94a3b8',
-          500: '#64748b',
-          600: '#475569',
-          700: '#334155',
-          800: '#1e293b',
-          900: '#0f172a',
+          50: '#fafafa',
+          100: '#f5f5f5',
+          200: '#e5e5e5',
+          300: '#d4d4d4',
+          400: '#a3a3a3',
+          500: '#737373',
+          600: '#525252',
+          700: '#404040',
+          800: '#262626',
+          900: '#171717',
         },
-        // Couleurs d'accent pour les alertes et statuts
+        // Couleurs d'accent minimalistes (monochrome)
         success: {
-          50: '#f0fdf4',
-          500: '#22c55e',
-          600: '#16a34a',
+          50: '#f0f9f4',
+          500: '#3da066',
+          600: '#2f7f52',
         },
         warning: {
-          50: '#fffbeb',
-          500: '#f59e0b',
-          600: '#d97706',
+          50: '#f5f5f5',
+          500: '#737373',
+          600: '#525252',
         },
         error: {
-          50: '#fef2f2',
-          500: '#ef4444',
-          600: '#dc2626',
+          50: '#f5f5f5',
+          500: '#525252',
+          600: '#404040',
+        },
+        // Couleurs neutres pour les éléments UI
+        neutral: {
+          50: '#fafafa',
+          100: '#f5f5f5',
+          200: '#e5e5e5',
+          300: '#d4d4d4',
+          400: '#a3a3a3',
+          500: '#737373',
+          600: '#525252',
+          700: '#404040',
+          800: '#262626',
+          900: '#171717',
         }
       },
       spacing: {
@@ -65,9 +78,9 @@ export default {
         '3xl': '1.5rem',
       },
       boxShadow: {
-        'soft': '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)',
-        'medium': '0 4px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-        'strong': '0 10px 40px -10px rgba(0, 0, 0, 0.15)',
+        'soft': '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+        'medium': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+        'strong': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
       },
     },
   },

@@ -164,6 +164,13 @@ const loadConversation = async () => {
   } catch (error) {
     console.error('❌ Error loading conversation:', error)
     conversation.value = null
+    
+    // Si l'erreur est 403 ou 404, rediriger automatiquement après 3 secondes
+    if (error.response?.status === 403 || error.response?.status === 404) {
+      setTimeout(() => {
+        router.push('/discussions')
+      }, 3000)
+    }
   } finally {
     loading.value = false
   }
@@ -206,7 +213,8 @@ const scrollToBottom = () => {
 }
 
 const goBack = () => {
-  router.back()
+  // Rediriger vers les discussions produits plutôt que juste router.back()
+  router.push('/discussions')
 }
 
 const formatPrice = (price) => {

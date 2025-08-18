@@ -2,7 +2,7 @@
   <div class="bg-white rounded-lg border border-gray-200 hover:shadow-lg transition-all duration-200 overflow-hidden">
     <!-- User Header -->
     <div class="flex items-center p-3 border-b border-gray-100">
-      <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mr-3">
+      <div class="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center mr-3">
         <span class="text-white font-bold text-sm">
           {{ product.user?.name?.charAt(0)?.toUpperCase() || 'U' }}
         </span>
@@ -33,19 +33,19 @@
       <div class="absolute top-3 left-3">
         <span
           v-if="product.status === 'sold'"
-          class="bg-red-500 text-white text-xs font-medium px-3 py-1 rounded-full shadow-sm"
+          class="bg-gray-600 text-white text-xs font-medium px-3 py-1 rounded-full shadow-sm"
         >
           Vendu
         </span>
         <span
           v-else-if="product.status === 'reserved'"
-          class="bg-yellow-500 text-white text-xs font-medium px-3 py-1 rounded-full shadow-sm"
+          class="bg-gray-500 text-white text-xs font-medium px-3 py-1 rounded-full shadow-sm"
         >
           Réservé
         </span>
         <span
           v-else-if="product.is_boosted"
-          class="bg-indigo-500 text-white text-xs font-medium px-3 py-1 rounded-full shadow-sm"
+          class="bg-primary-500 text-white text-xs font-medium px-3 py-1 rounded-full shadow-sm"
         >
           Boosté
         </span>
@@ -98,39 +98,39 @@
       <!-- Action Buttons -->
       <div class="flex items-center justify-between pt-3 border-t border-gray-100">
         <div class="flex items-center space-x-6">
-          <!-- Like Button -->
-          <button 
-            @click="toggleLike"
-            :disabled="likingProduct"
-            class="flex items-center space-x-2 text-gray-500 hover:text-red-500 transition-colors disabled:opacity-50"
-          >
-            <HeartIcon 
-              class="w-5 h-5"
-              :class="isLiked ? 'text-red-500 fill-current' : ''"
-            />
-            <span class="text-sm font-medium">{{ product.likes_count || 0 }}</span>
-          </button>
+                     <!-- Like Button -->
+           <button 
+             @click="toggleLike"
+             :disabled="likingProduct"
+             class="flex items-center space-x-2 text-gray-500 hover:text-primary-500 transition-colors disabled:opacity-50"
+           >
+             <HeartIcon 
+               class="w-5 h-5"
+               :class="isLiked ? 'text-primary-500 fill-current' : ''"
+             />
+             <span class="text-sm font-medium">{{ product.likes_count || 0 }}</span>
+           </button>
 
-          <!-- Comment Button -->
-          <button class="flex items-center space-x-2 text-gray-500 hover:text-blue-500 transition-colors">
-            <ChatBubbleLeftIcon class="w-5 h-5" />
-            <span class="text-sm font-medium">{{ product.comments_count || 0 }}</span>
-          </button>
+                     <!-- Comment Button -->
+           <button class="flex items-center space-x-2 text-gray-500 hover:text-primary-500 transition-colors">
+             <ChatBubbleLeftIcon class="w-5 h-5" />
+             <span class="text-sm font-medium">{{ product.comments_count || 0 }}</span>
+           </button>
 
-          <!-- Share Button -->
-          <button class="flex items-center space-x-2 text-gray-500 hover:text-green-500 transition-colors">
-            <ShareIcon class="w-5 h-5" />
-            <span class="text-sm font-medium">Partager</span>
-          </button>
+           <!-- Share Button -->
+           <button class="flex items-center space-x-2 text-gray-500 hover:text-primary-500 transition-colors">
+             <ShareIcon class="w-5 h-5" />
+             <span class="text-sm font-medium">Partager</span>
+           </button>
         </div>
 
-        <!-- View Product Button -->
-        <button 
-          @click="viewProduct"
-          class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
-        >
-          Voir
-        </button>
+                 <!-- View Product Button -->
+         <button 
+           @click="viewProduct"
+           class="bg-primary-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-600 transition-colors"
+         >
+           Voir
+         </button>
       </div>
     </div>
   </div>

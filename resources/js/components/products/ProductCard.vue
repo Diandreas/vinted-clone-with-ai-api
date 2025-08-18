@@ -15,19 +15,19 @@
       <div class="absolute top-2 left-2">
         <span
           v-if="product.status === 'sold'"
-          class="bg-red-100 text-red-800 text-xs font-medium px-2 py-1 rounded-full"
+          class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-1 rounded-full"
         >
           Vendu
         </span>
         <span
           v-else-if="product.status === 'reserved'"
-          class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2 py-1 rounded-full"
+          class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-1 rounded-full"
         >
           Réservé
         </span>
         <span
           v-else-if="product.is_boosted"
-          class="bg-indigo-100 text-indigo-800 text-xs font-medium px-2 py-1 rounded-full"
+          class="bg-primary-100 text-primary-800 text-xs font-medium px-2 py-1 rounded-full"
         >
           Boosté
         </span>
@@ -58,7 +58,7 @@
         >
           <HeartIcon
             class="w-4 h-4"
-            :class="isLiked ? 'text-red-500 fill-current' : 'text-gray-600'"
+            :class="isLiked ? 'text-primary-500 fill-current' : 'text-gray-600'"
           />
         </button>
         <button
@@ -68,7 +68,7 @@
         >
           <BookmarkIcon
             class="w-4 h-4"
-            :class="isFavorite ? 'text-yellow-500 fill-current' : 'text-gray-600'"
+            :class="isFavorite ? 'text-primary-500 fill-current' : 'text-gray-600'"
           />
         </button>
       </div>

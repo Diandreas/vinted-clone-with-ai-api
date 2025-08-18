@@ -2,7 +2,7 @@
   <div class="min-h-screen flex items-center justify-center bg-gray-50 py-6 sm:py-12 px-3 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-6 sm:space-y-8">
       <div>
-        <div class="mx-auto h-10 w-10 sm:h-12 sm:w-12 bg-indigo-600 rounded-lg flex items-center justify-center">
+        <div class="mx-auto h-10 w-10 sm:h-12 sm:w-12 bg-primary-500 rounded-lg flex items-center justify-center">
           <span class="text-white font-bold text-lg sm:text-xl">V</span>
         </div>
         <h2 class="mt-4 sm:mt-6 text-center text-2xl sm:text-3xl font-extrabold text-gray-900">
@@ -10,7 +10,7 @@
         </h2>
         <p class="mt-2 text-center text-xs sm:text-sm text-gray-600">
           Ou
-          <RouterLink to="/login" class="font-medium text-indigo-600 hover:text-indigo-500">
+          <RouterLink to="/login" class="rikeaa-text-link">
             connectez-vous à votre compte existant
           </RouterLink>
         </p>
@@ -27,7 +27,7 @@
               type="text"
               autocomplete="name"
               required
-              class="mt-1 appearance-none relative block w-full px-3 py-2 sm:py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm sm:text-base"
+              class="rikeaa-input"
               placeholder="Votre nom complet"
             />
           </div>
@@ -41,7 +41,7 @@
               type="email"
               autocomplete="email"
               required
-              class="mt-1 appearance-none relative block w-full px-3 py-2 sm:py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm sm:text-base"
+              class="rikeaa-input"
               placeholder="votre@email.com"
             />
           </div>
@@ -55,7 +55,7 @@
               type="text"
               autocomplete="username"
               required
-              class="mt-1 appearance-none relative block w-full px-3 py-2 sm:py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm sm:text-base"
+              class="rikeaa-input"
               placeholder="nom_utilisateur"
             />
           </div>
@@ -69,7 +69,7 @@
               type="password"
               autocomplete="new-password"
               required
-              class="mt-1 appearance-none relative block w-full px-3 py-2 sm:py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm sm:text-base"
+              class="rikeaa-input"
               placeholder="Mot de passe"
             />
           </div>
@@ -83,7 +83,7 @@
               type="password"
               autocomplete="new-password"
               required
-              class="mt-1 appearance-none relative block w-full px-3 py-2 sm:py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm sm:text-base"
+              class="rikeaa-input"
               placeholder="Confirmer le mot de passe"
             />
           </div>
@@ -96,7 +96,7 @@
             name="terms"
             type="checkbox"
             required
-            class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded mt-0.5 flex-shrink-0"
+            class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded mt-0.5 flex-shrink-0"
           />
           <label for="terms" class="text-xs sm:text-sm text-gray-900 leading-relaxed">
             J'accepte les

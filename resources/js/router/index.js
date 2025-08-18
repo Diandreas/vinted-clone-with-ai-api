@@ -162,6 +162,12 @@ const routes = [
   {
     path: '/discussions',
     name: 'product-discussions',
+    component: () => import('@/views/ChatHub.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/discussions/old',
+    name: 'product-discussions-old',
     component: ProductDiscussions,
     meta: { requiresAuth: true }
   },
@@ -230,12 +236,12 @@ const router = createRouter({
 // Navigation guards
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
-  
+
   // Initialize auth state if not already done
   if (!authStore.initialized) {
     await authStore.initialize()
   }
-  
+
   // Check if route requires authentication
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     next({ name: 'login', query: { redirect: to.fullPath } })
@@ -249,7 +255,7 @@ router.beforeEach(async (to, from, next) => {
       next({ name: 'dashboard' })
       return
     }
-    
+
     // Check specific permission if required
     if (to.meta.permission) {
       const hasSpecificPermission = authStore.isAdmin || authStore.hasPermission(to.meta.permission)
@@ -259,13 +265,13 @@ router.beforeEach(async (to, from, next) => {
       }
     }
   }
-  
+
   // Redirect authenticated users away from guest-only pages
   if (to.meta.guestOnly && authStore.isAuthenticated) {
     next({ name: 'dashboard' })
     return
   }
-  
+
   next()
 })
 
