@@ -313,7 +313,7 @@ import {
   MapPinIcon,
   LinkIcon,
   HeartIcon,
-  MessageCircleIcon,
+
   ShoppingCartIcon,
   StarIcon,
   EyeIcon
@@ -417,7 +417,6 @@ const deleteProduct = async (product) => {
 const getActivityIcon = (type) => {
   const iconMap = {
     'like': HeartIcon,
-    'message': MessageCircleIcon,
     'purchase': ShoppingCartIcon,
     'review': StarIcon,
     'view': EyeIcon

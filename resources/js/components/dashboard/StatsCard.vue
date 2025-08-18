@@ -65,7 +65,6 @@ import {
   ShoppingCartIcon,
   HeartIcon,
   StarIcon,
-  MessageCircleIcon,
   BellIcon,
   ClockIcon,
   CheckCircleIcon
@@ -108,7 +107,6 @@ const iconComponent = computed(() => {
     'shopping-cart': ShoppingCartIcon,
     'heart': HeartIcon,
     'star': StarIcon,
-    'message-circle': MessageCircleIcon,
     'bell': BellIcon,
     'clock': ClockIcon,
     'check-circle': CheckCircleIcon

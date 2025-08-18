@@ -3,7 +3,7 @@
     <!-- Header avec image de couverture -->
     <div class="relative">
       <!-- Cover Image -->
-      <div class="h-40 sm:h-48 md:h-64 lg:h-80 bg-gradient-to-br from-primary-600 via-gray-600 to-gray-600 relative overflow-hidden">
+      <div class="h-40 sm:h-48 md:h-64 lg:h-80 bg-gradient-to-br from-purple-600 via-pink-600 to-red-600 relative overflow-hidden">
         <img
           v-if="user?.cover_image"
           :src="user.cover_image"
@@ -36,14 +36,14 @@
         >
           <button
             @click="reportUser"
-            class="w-full px-3 sm:px-4 py-2 sm:py-3 text-left text-gray-400 hover:bg-gray-800 transition-colors flex items-center rounded-lg mx-2 text-sm sm:text-base"
+            class="w-full px-3 sm:px-4 py-2 sm:py-3 text-left text-red-400 hover:bg-gray-800 transition-colors flex items-center rounded-lg mx-2 text-sm sm:text-base"
           >
             <FlagIcon class="w-3 h-3 sm:w-4 sm:h-4 mr-2 sm:mr-3" />
             Signaler
           </button>
           <button
             @click="blockUser"
-            class="w-full px-3 sm:px-4 py-2 sm:py-3 text-left text-gray-400 hover:bg-gray-800 transition-colors flex items-center rounded-lg mx-2 text-sm sm:text-base"
+            class="w-full px-3 sm:px-4 py-2 sm:py-3 text-left text-red-400 hover:bg-gray-800 transition-colors flex items-center rounded-lg mx-2 text-sm sm:text-base"
           >
             <BanIcon class="w-3 h-3 sm:w-4 sm:h-4 mr-2 sm:mr-3" />
             Bloquer
@@ -94,19 +94,12 @@
             <!-- Action Buttons -->
             <div v-if="!isSelf" class="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-3 mt-3 sm:mt-0">
               <button
-                @click="goToMessages"
-                class="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 bg-primary-600 hover:bg-primary-700 rounded-full transition-colors flex items-center justify-center space-x-2 shadow-lg text-sm sm:text-base"
-              >
-                <MessageCircleIcon class="w-3 h-3 sm:w-4 sm:h-4" />
-                <span>Message</span>
-              </button>
-              <button
                 :disabled="followBusy"
                 @click="toggleFollow"
                 class="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 rounded-full transition-all flex items-center justify-center space-x-2 shadow-lg text-sm sm:text-base"
                 :class="isFollowing 
                   ? 'bg-gray-700 hover:bg-gray-600 text-white' 
-                  : 'bg-gray-500 hover:bg-gray-700 text-white'"
+                  : 'bg-red-500 hover:bg-red-600 text-white'"
               >
                 <template v-if="followBusy">
                   <Loader2Icon class="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
@@ -178,7 +171,7 @@
             {{ tab.label }}
             <div
               v-if="activeTab === tab.id"
-              class="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary-500 to-primary-500 rounded-full"
+              class="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full"
             ></div>
           </button>
         </div>
@@ -186,18 +179,18 @@
         <!-- Loading State -->
         <div v-if="loading" class="flex items-center justify-center py-12 sm:py-16">
           <div class="text-center">
-            <Loader2Icon class="h-8 w-8 sm:h-12 sm:w-12 animate-spin text-primary-500 mx-auto mb-3 sm:mb-4" />
+            <Loader2Icon class="h-8 w-8 sm:h-12 sm:w-12 animate-spin text-indigo-500 mx-auto mb-3 sm:mb-4" />
             <span class="text-gray-400 text-sm sm:text-base">Chargement...</span>
           </div>
         </div>
 
         <!-- Error State -->
         <div v-else-if="error" class="text-center py-12 sm:py-16">
-          <AlertTriangleIcon class="h-12 w-12 sm:h-16 sm:w-16 text-gray-500 mx-auto mb-3 sm:mb-4" />
-          <p class="text-gray-400 mb-3 sm:mb-4 text-sm sm:text-base">{{ error }}</p>
+          <AlertTriangleIcon class="h-12 w-12 sm:h-16 sm:w-16 text-red-500 mx-auto mb-3 sm:mb-4" />
+          <p class="text-red-400 mb-3 sm:mb-4 text-sm sm:text-base">{{ error }}</p>
           <button
             @click="retryLoad"
-            class="px-4 sm:px-6 py-2 sm:py-3 bg-gray-500 hover:bg-gray-700 rounded-full transition-colors shadow-lg text-sm sm:text-base"
+            class="px-4 sm:px-6 py-2 sm:py-3 bg-red-500 hover:bg-red-600 rounded-full transition-colors shadow-lg text-sm sm:text-base"
           >
             Réessayer
           </button>
@@ -287,7 +280,7 @@
                     class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full transition-colors text-xs sm:text-sm flex-shrink-0"
                     :class="follower.is_following 
                       ? 'bg-gray-600 hover:bg-gray-500 text-white' 
-                      : 'bg-primary-600 hover:bg-primary-500 text-white'"
+                      : 'bg-indigo-600 hover:bg-indigo-500 text-white'"
                   >
                     {{ follower.is_following ? 'Abonné' : 'Suivre' }}
                   </button>
@@ -332,7 +325,7 @@
                     class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full transition-colors text-xs sm:text-sm flex-shrink-0"
                     :class="followed.is_following 
                       ? 'bg-gray-600 hover:bg-gray-500 text-white' 
-                      : 'bg-primary-600 hover:bg-primary-500 text-white'"
+                      : 'bg-indigo-600 hover:bg-indigo-500 text-white'"
                   >
                     {{ followed.is_following ? 'Abonné' : 'Suivre' }}
                   </button>
@@ -376,7 +369,7 @@
                       v-for="star in 5"
                       :key="star"
                       class="w-3 h-3 sm:w-4 sm:h-4"
-                      :class="star <= review.rating ? 'text-gray-400 fill-current' : 'text-gray-600'"
+                      :class="star <= review.rating ? 'text-yellow-400 fill-current' : 'text-gray-600'"
                     />
                   </div>
                 </div>
@@ -409,7 +402,7 @@ import {
   StarIcon,
   LinkIcon,
   MapPinIcon,
-  MessageCircleIcon,
+
   Loader2Icon,
   AlertTriangleIcon
 } from 'lucide-vue-next'
@@ -573,15 +566,7 @@ function goToPage(page) {
   fetchProducts(page)
 }
 
-function goToMessages() {
-  if (!isAuthenticated.value) {
-    router.push({ name: 'login', query: { redirect: route.fullPath } })
-    return
-  }
-  const q = { user: user.value?.id }
-  if (route.query.product) q.product = route.query.product
-  router.push({ name: 'messages', query: q })
-}
+
 
 function reportUser() {
   showMoreOptions.value = false

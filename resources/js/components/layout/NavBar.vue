@@ -80,20 +80,6 @@
 
           <!-- Authenticated User Actions -->
           <template v-if="isAuthenticated">
-            <!-- Messages - Visible sur mobile et desktop -->
-            <RouterLink
-              to="/discussions"
-              class="relative p-2 text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              <MessageCircleIcon class="w-6 h-6" />
-              <span
-                v-if="unreadMessages > 0"
-                class="absolute -top-1 -right-1 bg-gray-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
-              >
-                {{ unreadMessages > 9 ? '9+' : unreadMessages }}
-              </span>
-            </RouterLink>
-
             <!-- Wallet Balance - Visible sur desktop seulement -->
             <RouterLink
               to="/wallet"
@@ -175,7 +161,7 @@
                 <BellIcon class="w-6 h-6" />
                 <span
                   v-if="unreadNotifications > 0"
-                  class="absolute -top-1 -right-1 bg-gray-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
+                  class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
                 >
                   {{ unreadNotifications > 9 ? '9+' : unreadNotifications }}
                 </span>
@@ -220,7 +206,7 @@
             </RouterLink>
             <RouterLink
               to="/register"
-              class="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
+              class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors"
             >
               S'inscrire
             </RouterLink>
@@ -236,7 +222,7 @@
             v-model="searchQuery"
             type="text"
             placeholder="Rechercher des produits..."
-            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             @keydown.enter="performSearch"
           />
         </div>
@@ -254,7 +240,6 @@ import { useWalletStore } from '@/stores/wallet'
 import {
   SearchIcon,
   BellIcon,
-  MessageCircleIcon,
   XIcon,
   ChevronDownIcon,
   PackageIcon,
@@ -284,7 +269,6 @@ const showAdminMenu = ref(false)
 // Computed
 const isAuthenticated = computed(() => authStore.isAuthenticated)
 const user = computed(() => authStore.user)
-const unreadMessages = computed(() => dashboardStore.unreadMessages)
 const unreadNotifications = computed(() => dashboardStore.unreadNotifications)
 const walletBalance = computed(() => walletStore.balanceFormatted)
 
@@ -335,6 +319,6 @@ onUnmounted(() => {
 
 <style scoped>
 .router-link-active {
-  @apply text-primary-600 font-semibold;
+  @apply text-indigo-600 font-semibold;
 }
 </style>

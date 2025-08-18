@@ -43,7 +43,6 @@ import { computed } from 'vue'
 import {
   PlusIcon,
   ShoppingCartIcon,
-  MessageCircleIcon,
   BarChart3Icon,
   PackageIcon,
   UserIcon,
@@ -83,7 +82,6 @@ const iconComponent = computed(() => {
   const iconMap = {
     'plus': PlusIcon,
     'shopping-cart': ShoppingCartIcon,
-    'message-circle': MessageCircleIcon,
     'bar-chart': BarChart3Icon,
     'package': PackageIcon,
     'user': UserIcon,
