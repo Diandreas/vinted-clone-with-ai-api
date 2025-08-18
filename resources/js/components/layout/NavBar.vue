@@ -80,7 +80,21 @@
 
           <!-- Authenticated User Actions -->
           <template v-if="isAuthenticated">
-            <!-- Wallet Balance -->
+            <!-- Messages - Visible sur mobile et desktop -->
+            <RouterLink
+              to="/discussions"
+              class="relative p-2 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <MessageCircleIcon class="w-6 h-6" />
+              <span
+                v-if="unreadMessages > 0"
+                class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
+              >
+                {{ unreadMessages > 9 ? '9+' : unreadMessages }}
+              </span>
+            </RouterLink>
+
+            <!-- Wallet Balance - Visible sur desktop seulement -->
             <RouterLink
               to="/wallet"
               class="hidden md:flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all duration-200"
@@ -89,7 +103,7 @@
               <span class="font-semibold">{{ walletBalance }}</span>
             </RouterLink>
 
-            <!-- Admin Dropdown -->
+            <!-- Admin Dropdown - Visible sur desktop seulement -->
             <div v-if="authStore.isAdmin || authStore.hasPermission('dashboard:view')" class="relative hidden md:block">
               <button
                 @click="showAdminMenu = !showAdminMenu"
@@ -152,22 +166,8 @@
               </Transition>
             </div>
 
-            <!-- Messages -->
-            <RouterLink
-              to="/discussions"
-              class="relative p-2 text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              <MessageCircleIcon class="w-6 h-6" />
-              <span
-                v-if="unreadMessages > 0"
-                class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
-              >
-                {{ unreadMessages > 9 ? '9+' : unreadMessages }}
-              </span>
-            </RouterLink>
-
-            <!-- Notifications -->
-            <div class="relative">
+            <!-- Notifications - Visible sur desktop seulement -->
+            <div class="relative hidden md:block">
               <button
                 @click="showNotifications = !showNotifications"
                 class="relative p-2 text-gray-400 hover:text-gray-600 transition-colors"
@@ -188,8 +188,8 @@
               />
             </div>
 
-            <!-- User Menu -->
-            <div class="relative">
+            <!-- User Menu - Visible sur desktop seulement -->
+            <div class="relative hidden md:block">
               <button
                 @click="showUserMenu = !showUserMenu"
                 class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 transition-colors"
@@ -225,15 +225,6 @@
               S'inscrire
             </RouterLink>
           </template>
-
-          <!-- Mobile Menu Toggle -->
-          <button
-            @click="showMobileMenu = !showMobileMenu"
-            class="md:hidden p-2 text-gray-400 hover:text-gray-600"
-          >
-            <MenuIcon v-if="!showMobileMenu" class="w-6 h-6" />
-            <XIcon v-else class="w-6 h-6" />
-          </button>
         </div>
       </div>
 
@@ -250,83 +241,6 @@
           />
         </div>
       </div>
-
-      <!-- Mobile Menu -->
-      <div v-if="showMobileMenu" class="md:hidden py-4 border-t border-gray-200">
-        <div class="space-y-2">
-          <!-- Bouton Vendre pour mobile - en haut du menu -->
-          <RouterLink
-            v-if="isAuthenticated"
-            to="/products/create"
-            class="flex items-center justify-center space-x-2 mx-3 mb-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-xl font-medium shadow-lg"
-            @click="showMobileMenu = false"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-            </svg>
-            <span class="font-semibold">Vendre un article</span>
-          </RouterLink>
-          
-          <RouterLink
-            to="/products"
-            class="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg"
-            @click="showMobileMenu = false"
-          >
-            Produits
-          </RouterLink>
-
-
-          <template v-if="isAuthenticated">
-            <div class="border-t border-gray-200 pt-2 mt-2">
-              <RouterLink
-                to="/wallet"
-                class="flex items-center justify-between px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg"
-                @click="showMobileMenu = false"
-              >
-                <div class="flex items-center space-x-2">
-                  <WalletIcon class="w-4 h-4" />
-                  <span>Mon Portefeuille</span>
-                </div>
-                <span class="font-semibold text-indigo-600">{{ walletBalance }}</span>
-              </RouterLink>
-              <RouterLink
-                to="/dashboard"
-                class="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg"
-                @click="showMobileMenu = false"
-              >
-                Dashboard
-              </RouterLink>
-              <RouterLink
-                to="/profile"
-                class="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg"
-                @click="showMobileMenu = false"
-              >
-                Mon Profil
-              </RouterLink>
-              <RouterLink
-                to="/orders"
-                class="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg"
-                @click="showMobileMenu = false"
-              >
-                Mes Commandes
-              </RouterLink>
-              <RouterLink
-                to="/my-products"
-                class="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg"
-                @click="showMobileMenu = false"
-              >
-                Mes Produits
-              </RouterLink>
-              <button
-                @click="logout"
-                class="block w-full text-left px-3 py-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg"
-              >
-                Déconnexion
-              </button>
-            </div>
-          </template>
-        </div>
-      </div>
     </div>
   </nav>
 </template>
@@ -341,7 +255,6 @@ import {
   SearchIcon,
   BellIcon,
   MessageCircleIcon,
-  MenuIcon,
   XIcon,
   ChevronDownIcon,
   PackageIcon,
@@ -364,7 +277,6 @@ const router = useRouter()
 // Reactive data
 const searchQuery = ref('')
 const showMobileSearch = ref(false)
-const showMobileMenu = ref(false)
 const showNotifications = ref(false)
 const showUserMenu = ref(false)
 const showAdminMenu = ref(false)
@@ -392,7 +304,6 @@ const clearSearch = () => {
 }
 
 const logout = async () => {
-  showMobileMenu.value = false
   await authStore.logout()
 }
 
