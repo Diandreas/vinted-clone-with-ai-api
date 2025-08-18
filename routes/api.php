@@ -80,10 +80,10 @@ Route::prefix('v1')->group(function () {
 
         // Users (lecture seule)
         Route::get('users/search', [UserController::class, 'search']);
-        Route::get('users/{user}', [UserController::class, 'show']);
-        Route::get('users/{user}/products', [UserController::class, 'userProducts']);
-        Route::get('users/{user}/followers', [UserController::class, 'followers']);
-        Route::get('users/{user}/following', [UserController::class, 'following']);
+        Route::get('users/{user}', [UserController::class, 'show'])->where('user', '[0-9]+');
+        Route::get('users/{user}/products', [UserController::class, 'userProducts'])->where('user', '[0-9]+');
+        Route::get('users/{user}/followers', [UserController::class, 'followers'])->where('user', '[0-9]+');
+        Route::get('users/{user}/following', [UserController::class, 'following'])->where('user', '[0-9]+');
 
         // Lives publics
         Route::get('lives', [LiveController::class, 'index']);
@@ -135,11 +135,11 @@ Route::prefix('v1')->group(function () {
         // User Routes
         Route::prefix('users')->group(function () {
             Route::get('/', [UserController::class, 'index']);
+            Route::get('my-followers', [UserController::class, 'myFollowers']);
+            Route::get('my-following', [UserController::class, 'myFollowing']);
             Route::put('profile', [UserController::class, 'update']);
             Route::post('{user}/follow', [UserController::class, 'follow']);
             Route::delete('{user}/unfollow', [UserController::class, 'unfollow']);
-            Route::get('my-followers', [UserController::class, 'myFollowers']);
-            Route::get('my-following', [UserController::class, 'myFollowing']);
             Route::put('settings', [UserController::class, 'updateSettings']);
             Route::post('avatar', [UserController::class, 'updateAvatar']);
             Route::post('cover', [UserController::class, 'updateCover']);

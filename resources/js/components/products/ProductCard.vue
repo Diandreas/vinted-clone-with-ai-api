@@ -136,13 +136,6 @@
       <!-- Action Buttons for Own Products -->
       <div v-if="showActions" class="mt-4 flex space-x-2">
         <button
-          v-if="!product.is_boosted && product.status === 'active'"
-          @click.stop="$emit('boost', product)"
-          class="flex-1 bg-primary-50 text-primary-600 text-sm py-2 px-3 rounded-lg hover:bg-primary-100 transition-colors"
-        >
-          Booster
-        </button>
-        <button
           @click.stop="$emit('share', product)"
           class="flex-1 bg-gray-50 text-gray-600 text-sm py-2 px-3 rounded-lg hover:bg-gray-100 transition-colors"
         >

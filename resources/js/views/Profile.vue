@@ -383,8 +383,8 @@ const loadFollowers = async () => {
   loadingFollowers.value = true
   try {
     const response = await window.axios.get('/users/my-followers')
-    // Extraire les données des followers depuis les relations
-    followers.value = response.data.data?.data?.map(follow => follow.follower) || []
+    // Les followers sont directement les utilisateurs dans la relation many-to-many
+    followers.value = response.data.data?.data || []
   } catch (error) {
     console.error('Error loading followers:', error)
     followers.value = []
@@ -397,8 +397,8 @@ const loadFollowing = async () => {
   loadingFollowing.value = true
   try {
     const response = await window.axios.get('/users/my-following')
-    // Extraire les données des suivis depuis les relations
-    following.value = response.data.data?.data?.map(follow => follow.following) || []
+    // Les following sont directement les utilisateurs dans la relation many-to-many
+    following.value = response.data.data?.data || []
   } catch (error) {
     console.error('Error loading following:', error)
     following.value = []

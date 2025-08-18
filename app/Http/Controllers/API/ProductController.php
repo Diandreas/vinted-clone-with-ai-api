@@ -606,7 +606,7 @@ class ProductController extends Controller
     public function myProducts(Request $request)
     {
         $products = Auth::user()->products()
-                        ->with(['user', 'category', 'brand', 'condition'])
+                        ->with(['user', 'category', 'brand', 'condition', 'images', 'mainImage'])
                         ->latest()
                         ->paginate($request->per_page ?? 20);
 

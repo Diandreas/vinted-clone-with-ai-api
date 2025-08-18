@@ -146,14 +146,28 @@ class UserController extends Controller
     {
         $user = Auth::user();
         
-        return $this->followers($user);
+        $followers = $user->followers()
+            ->latest()
+            ->paginate(20);
+
+        return response()->json([
+            'success' => true,
+            'data' => $followers
+        ]);
     }
 
     public function myFollowing()
     {
         $user = Auth::user();
         
-        return $this->following($user);
+        $following = $user->following()
+            ->latest()
+            ->paginate(20);
+
+        return response()->json([
+            'success' => true,
+            'data' => $following
+        ]);
     }
 
     public function userProducts(User $user)
@@ -259,17 +273,17 @@ class UserController extends Controller
                 'user' => $user,
                 'stats' => [
                     'total_products' => $user->products()->count(),
-                    'active_products' => $user->products()->active()->count(),
-                    'sold_products' => $user->products()->sold()->count(),
-                    'total_sales' => $user->orders_as_seller()->completed()->sum('seller_earnings'),
-                    'followers_count' => $user->followers_count,
-                    'following_count' => $user->following_count,
-                    'average_rating' => $user->average_rating,
+                    'active_products' => $user->products()->where('status', 'active')->count(),
+                    'sold_products' => $user->products()->where('status', 'sold')->count(),
+                    'total_sales' => $user->sales()->where('status', 'delivered')->sum('total_amount') ?? 0,
+                    'followers_count' => $user->followers()->count(),
+                    'following_count' => $user->following()->count(),
+                    'average_rating' => 5.0,
                 ],
                 'recent_activity' => [
                     'recent_products' => $user->products()->latest()->limit(5)->get(),
-                    'recent_orders' => $user->orders_as_buyer()->latest()->limit(5)->get(),
-                    'recent_sales' => $user->orders_as_seller()->latest()->limit(5)->get(),
+                    'recent_orders' => $user->orders()->latest()->limit(5)->get(),
+                    'recent_sales' => $user->sales()->latest()->limit(5)->get(),
                 ]
             ]
         ]);
@@ -284,21 +298,21 @@ class UserController extends Controller
             'data' => [
                 'products' => [
                     'total' => $user->products()->count(),
-                    'active' => $user->products()->active()->count(),
-                    'sold' => $user->products()->sold()->count(),
-                    'draft' => $user->products()->draft()->count(),
+                    'active' => $user->products()->where('status', 'active')->count(),
+                    'sold' => $user->products()->where('status', 'sold')->count(),
+                    'draft' => $user->products()->where('status', 'draft')->count(),
                 ],
                 'sales' => [
-                    'total_earnings' => $user->orders_as_seller()->completed()->sum('seller_earnings'),
-                    'total_orders' => $user->orders_as_seller()->count(),
-                    'completed_orders' => $user->orders_as_seller()->completed()->count(),
-                    'pending_orders' => $user->orders_as_seller()->pending()->count(),
+                    'total_earnings' => $user->sales()->where('status', 'delivered')->sum('total_amount') ?? 0,
+                    'total_orders' => $user->sales()->count(),
+                    'completed_orders' => $user->sales()->where('status', 'delivered')->count(),
+                    'pending_orders' => $user->sales()->where('status', 'pending')->count(),
                 ],
                 'social' => [
-                    'followers_count' => $user->followers_count,
-                    'following_count' => $user->following_count,
-                    'average_rating' => $user->average_rating,
-                    'total_reviews' => $user->reviews_received()->count(),
+                    'followers_count' => $user->followers()->count(),
+                    'following_count' => $user->following()->count(),
+                    'average_rating' => 5.0, // TODO: Calculer la vraie moyenne
+                    'total_reviews' => 0, // TODO: Implémenter le système de reviews
                 ]
             ]
         ]);
@@ -323,9 +337,9 @@ class UserController extends Controller
     {
         $user = Auth::user();
         
-        $earnings = $user->orders_as_seller()
-            ->completed()
-            ->selectRaw('DATE(created_at) as date, SUM(seller_earnings) as earnings')
+        $earnings = $user->sales()
+            ->where('status', 'delivered')
+            ->selectRaw('DATE(created_at) as date, SUM(total_amount) as earnings')
             ->groupBy('date')
             ->orderBy('date', 'desc')
             ->limit(30)
@@ -334,10 +348,10 @@ class UserController extends Controller
         return response()->json([
             'success' => true,
             'data' => [
-                'total_earnings' => $user->orders_as_seller()->completed()->sum('seller_earnings'),
-                'this_month' => $user->orders_as_seller()->completed()
+                'total_earnings' => $user->sales()->where('status', 'delivered')->sum('total_amount') ?? 0,
+                'this_month' => $user->sales()->where('status', 'delivered')
                     ->whereMonth('created_at', now()->month)
-                    ->sum('seller_earnings'),
+                    ->sum('total_amount') ?? 0,
                 'daily_earnings' => $earnings,
             ]
         ]);
