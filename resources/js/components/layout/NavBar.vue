@@ -181,9 +181,10 @@
                 class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 <img
-                  :src="user?.avatar || '/default-avatar.png'"
+                  :src="user?.avatar || generateDefaultAvatar(user?.name, user?.id)"
                   :alt="user?.name"
                   class="w-8 h-8 rounded-full object-cover"
+                  @error="handleAvatarError"
                 />
                 <ChevronDownIcon class="w-4 h-4 text-gray-400" />
               </button>
@@ -271,6 +272,44 @@ import {
 import NotificationDropdown from '@/components/layout/NotificationDropdown.vue'
 import UserDropdown from '@/components/layout/UserDropdown.vue'
 
+// Fonctions de génération d'avatar dynamique
+const generateDefaultAvatar = (name, id) => {
+  const initials = getUserInitials(name)
+  const color = generateUserColor(name || id?.toString() || 'User')
+  
+  const svg = `
+    <svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+      <rect width="40" height="40" fill="${color}"/>
+      <text x="50%" y="50%" text-anchor="middle" dy="0.35em" fill="white" font-family="Arial, sans-serif" font-size="16" font-weight="bold">
+        ${initials}
+      </text>
+    </svg>
+  `
+  
+  return 'data:image/svg+xml;base64,' + btoa(svg)
+}
+
+const getUserInitials = (name) => {
+  if (!name) return '?'
+  const cleanName = name.trim()
+  const names = cleanName.split(' ')
+  if (names.length === 1) {
+    return names[0].charAt(0).toUpperCase()
+  } else {
+    return names[0].charAt(0).toUpperCase() + names[names.length - 1].charAt(0).toUpperCase()
+  }
+}
+
+const generateUserColor = (name) => {
+  if (!name) return '#6B7280'
+  let hash = 0
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  const colors = ['#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899', '#06B6D4']
+  return colors[Math.abs(hash) % colors.length]
+}
+
 // Stores
 const authStore = useAuthStore()
 const dashboardStore = useDashboardStore()
@@ -303,6 +342,13 @@ const performSearch = () => {
 
 const clearSearch = () => {
   searchQuery.value = ''
+}
+
+const handleAvatarError = (event) => {
+  const dynamicAvatar = generateDefaultAvatar(user.value?.name, user.value?.id)
+  if (event.target.src !== dynamicAvatar) {
+    event.target.src = dynamicAvatar
+  }
 }
 
 const logout = async () => {

@@ -345,7 +345,7 @@
               <!-- Avatar avec fallback vers les initiales -->
               <div class="relative mr-3">
                 <img
-                  v-if="getUserAvatarUrl(user) && getUserAvatarUrl(user) !== '/default-avatar.png'"
+                  v-if="getUserAvatarUrl(user) && !getUserAvatarUrl(user).startsWith('data:image/svg+xml')"
                   :src="getUserAvatarUrl(user)"
                   :alt="user.name"
                   class="w-12 h-12 rounded-full object-cover border-2 border-gray-100"
@@ -722,7 +722,7 @@ const viewUserProfile = (user) => {
 }
 
 const getUserAvatarUrl = (user) => {
-  if (!user) return '/default-avatar.png'
+  if (!user) return generateDefaultAvatar('User', 0)
   
   if (user.avatar_url) {
     return user.avatar_url
@@ -732,16 +732,12 @@ const getUserAvatarUrl = (user) => {
     return user.avatar
   }
   
-  return '/default-avatar.png'
+  return generateDefaultAvatar(user.name || 'User', user.id)
 }
 
 const handleAvatarError = (event) => {
-  if (event.target.src !== '/default-avatar.png') {
-    event.target.src = '/default-avatar.png'
-  } else {
-    // Avatar par défaut en SVG si le fichier n'existe pas
-    event.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNGM0Y0RjYiLz4KPGNpcmNsZSBjeD0iMjAiIGN5PSIxNiIgcj0iNiIgZmlsbD0iIzlDQTNBRiIvPgo8cGF0aCBkPSJNOCAzMkM4IDI2LjQ3NzIgMTIuNDc3MiAyMiAxOCAyMkgyMkMyNy41MjI4IDIyIDMyIDI2LjQ3NzIgMzIgMzJWNDBIOFYzMloiIGZpbGw9IiM5Q0EzQUYiLz4KPC9zdmc+Cg=='
-  }
+  // Fallback to generated avatar
+  event.target.src = generateDefaultAvatar('User', 0)
 }
 
 // Helper to get user initials and color
@@ -784,6 +780,23 @@ const generateUserColor = (name) => {
   ]
 
   return colors[Math.abs(hash) % colors.length]
+}
+
+// Generate dynamic avatar SVG
+const generateDefaultAvatar = (name, id) => {
+  const initials = getUserInitials(name)
+  const color = generateUserColor(name || id?.toString() || 'User')
+  
+  const svg = `
+    <svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+      <rect width="40" height="40" fill="${color}"/>
+      <text x="50%" y="50%" text-anchor="middle" dy="0.35em" fill="white" font-family="Arial, sans-serif" font-size="16" font-weight="bold">
+        ${initials}
+      </text>
+    </svg>
+  `
+  
+  return 'data:image/svg+xml;base64,' + btoa(svg)
 }
 </script>
 
@@ -3692,6 +3705,7 @@ const generateUserColor = (name) => {
     '#06B6D4', // Cyan
     '#14B8A6', // Teal
     '#F97316', // Orange
+  ];
 </script>
 
 <style scoped>

@@ -3,9 +3,10 @@
     <div class="px-4 py-3 border-b border-gray-100">
       <div class="flex items-center space-x-3">
         <img
-          :src="user?.avatar || '/default-avatar.png'"
+          :src="user?.avatar || generateDefaultAvatar(user?.name, user?.id)"
           :alt="user?.name"
           class="w-10 h-10 rounded-full object-cover"
+          @error="handleAvatarError"
         />
         <div class="flex-1 min-w-0">
           <p class="text-sm font-semibold text-gray-900 truncate">
@@ -113,6 +114,44 @@ import {
   LogOutIcon
 } from 'lucide-vue-next'
 
+// Fonctions de génération d'avatar dynamique
+const generateDefaultAvatar = (name, id) => {
+  const initials = getUserInitials(name)
+  const color = generateUserColor(name || id?.toString() || 'User')
+  
+  const svg = `
+    <svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+      <rect width="40" height="40" fill="${color}"/>
+      <text x="50%" y="50%" text-anchor="middle" dy="0.35em" fill="white" font-family="Arial, sans-serif" font-size="16" font-weight="bold">
+        ${initials}
+      </text>
+    </svg>
+  `
+  
+  return 'data:image/svg+xml;base64,' + btoa(svg)
+}
+
+const getUserInitials = (name) => {
+  if (!name) return '?'
+  const cleanName = name.trim()
+  const names = cleanName.split(' ')
+  if (names.length === 1) {
+    return names[0].charAt(0).toUpperCase()
+  } else {
+    return names[0].charAt(0).toUpperCase() + names[names.length - 1].charAt(0).toUpperCase()
+  }
+}
+
+const generateUserColor = (name) => {
+  if (!name) return '#6B7280'
+  let hash = 0
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  const colors = ['#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899', '#06B6D4']
+  return colors[Math.abs(hash) % colors.length]
+}
+
 const authStore = useAuthStore()
 
 defineEmits(['close'])
@@ -121,6 +160,13 @@ defineEmits(['close'])
 const user = computed(() => authStore.user)
 
 // Methods
+const handleAvatarError = (event) => {
+  const dynamicAvatar = generateDefaultAvatar(user.value?.name, user.value?.id)
+  if (event.target.src !== dynamicAvatar) {
+    event.target.src = dynamicAvatar
+  }
+}
+
 const logout = async () => {
   await authStore.logout()
 }

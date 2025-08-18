@@ -250,9 +250,28 @@ class  User extends Authenticatable implements MustVerifyEmail
      */
     public function getAvatarUrlAttribute()
     {
-        return $this->avatar
-            ? asset('storage/avatars/' . $this->avatar)
-            : asset('images/default-avatar.png');
+        if ($this->avatar) {
+            return asset('storage/avatars/' . $this->avatar);
+        }
+        
+        // Generate dynamic avatar with initials
+        $initials = strtoupper(substr($this->first_name ?? $this->name, 0, 1) . substr($this->last_name ?? '', 0, 1));
+        if (strlen($initials) < 2) {
+            $initials = strtoupper(substr($this->name ?? 'U', 0, 2));
+        }
+        
+        // Use a color based on user ID
+        $colors = ['#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899', '#06B6D4'];
+        $color = $colors[$this->id % count($colors)];
+        
+        return "data:image/svg+xml;base64," . base64_encode(
+            '<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">' .
+            '<rect width="40" height="40" fill="' . $color . '"/>' .
+            '<text x="50%" y="50%" text-anchor="middle" dy="0.35em" fill="white" font-family="Arial, sans-serif" font-size="16" font-weight="bold">' .
+            $initials .
+            '</text>' .
+            '</svg>'
+        );
     }
 
     /**

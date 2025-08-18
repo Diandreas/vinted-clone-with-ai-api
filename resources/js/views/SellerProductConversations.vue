@@ -111,9 +111,10 @@
               <!-- Buyer Info -->
               <div class="buyer-info">
                 <img 
-                  :src="conversation.buyer.avatar || '/default-avatar.png'" 
+                  :src="conversation.buyer.avatar || generateDefaultAvatar(conversation.buyer.name, conversation.buyer.id)" 
                   :alt="conversation.buyer.name"
                   class="buyer-avatar"
+                  @error="handleBuyerAvatarError($event, conversation.buyer)"
                 />
                 <div class="buyer-details">
                   <div class="buyer-name">@{{ conversation.buyer.name }}</div>
@@ -224,6 +225,44 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '@/services/api'
 import { extractMessageContent } from '@/utils/messageUtils'
+
+// Fonctions de génération d'avatar dynamique
+const generateDefaultAvatar = (name, id) => {
+  const initials = getUserInitials(name)
+  const color = generateUserColor(name || id?.toString() || 'User')
+  
+  const svg = `
+    <svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+      <rect width="40" height="40" fill="${color}"/>
+      <text x="50%" y="50%" text-anchor="middle" dy="0.35em" fill="white" font-family="Arial, sans-serif" font-size="16" font-weight="bold">
+        ${initials}
+      </text>
+    </svg>
+  `
+  
+  return 'data:image/svg+xml;base64,' + btoa(svg)
+}
+
+const getUserInitials = (name) => {
+  if (!name) return '?'
+  const cleanName = name.trim()
+  const names = cleanName.split(' ')
+  if (names.length === 1) {
+    return names[0].charAt(0).toUpperCase()
+  } else {
+    return names[0].charAt(0).toUpperCase() + names[names.length - 1].charAt(0).toUpperCase()
+  }
+}
+
+const generateUserColor = (name) => {
+  if (!name) return '#6B7280'
+  let hash = 0
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  const colors = ['#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899', '#06B6D4']
+  return colors[Math.abs(hash) % colors.length]
+}
 
 export default {
   name: 'SellerProductConversations',
@@ -406,7 +445,13 @@ export default {
       markAsSold,
       updatePrice,
       sendOffer,
-      blockBuyer
+      blockBuyer,
+      generateDefaultAvatar,
+      handleBuyerAvatarError: (event, buyer) => {
+        if (event.target.src !== generateDefaultAvatar(buyer.name, buyer.id)) {
+          event.target.src = generateDefaultAvatar(buyer.name, buyer.id)
+        }
+      }
     }
   }
 }

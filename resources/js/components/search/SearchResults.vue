@@ -148,6 +148,44 @@
 <script>
 import { useNotificationStore } from '../../stores/notification';
 
+// Fonctions de génération d'avatar dynamique
+const generateDefaultAvatar = (name, id) => {
+  const initials = getUserInitials(name)
+  const color = generateUserColor(name || id?.toString() || 'User')
+  
+  const svg = `
+    <svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+      <rect width="40" height="40" fill="${color}"/>
+      <text x="50%" y="50%" text-anchor="middle" dy="0.35em" fill="white" font-family="Arial, sans-serif" font-size="16" font-weight="bold">
+        ${initials}
+      </text>
+    </svg>
+  `
+  
+  return 'data:image/svg+xml;base64,' + btoa(svg)
+}
+
+const getUserInitials = (name) => {
+  if (!name) return '?'
+  const cleanName = name.trim()
+  const names = cleanName.split(' ')
+  if (names.length === 1) {
+    return names[0].charAt(0).toUpperCase()
+  } else {
+    return names[0].charAt(0).toUpperCase() + names[names.length - 1].charAt(0).toUpperCase()
+  }
+}
+
+const generateUserColor = (name) => {
+  if (!name) return '#6B7280'
+  let hash = 0
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  const colors = ['#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899', '#06B6D4']
+  return colors[Math.abs(hash) % colors.length]
+}
+
 export default {
   name: 'SearchResults',
   props: {
@@ -371,7 +409,7 @@ export default {
     },
 
     getUserAvatarUrl(user) {
-      if (!user) return '/default-avatar.png';
+      if (!user) return generateDefaultAvatar('User', null);
       
       if (user.avatar_url) {
         return user.avatar_url;
@@ -381,15 +419,17 @@ export default {
         return user.avatar;
       }
       
-      return '/default-avatar.png';
+      return generateDefaultAvatar(user.name, user.id);
     },
 
     handleAvatarError(event) {
-      if (event.target.src !== '/default-avatar.png') {
-        event.target.src = '/default-avatar.png';
-      } else {
-        // Avatar par défaut en SVG si le fichier n'existe pas
-        event.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNGM0Y0RjYiLz4KPGNpcmNsZSBjeD0iMjAiIGN5PSIxNiIgcj0iNiIgZmlsbD0iIzlDQTNBRiIvPgo8cGF0aCBkPSJNOCAzMkM4IDI2LjQ3NzIgMTIuNDc3MiAyMiAxOCAyMkgyMkMyNy41MjI4IDIyIDMyIDI2LjQ3NzIgMzIgMzJWNDBIOFYzMloiIGZpbGw9IiM5Q0EzQUYiLz4KPC9zdmc+Cg==';
+      // Essayer de récupérer les infos de l'utilisateur depuis les attributs de l'élément
+      const userElement = event.target.closest('.flex').querySelector('span');
+      const userName = userElement ? userElement.textContent : 'User';
+      const dynamicAvatar = generateDefaultAvatar(userName, null);
+      
+      if (event.target.src !== dynamicAvatar) {
+        event.target.src = dynamicAvatar;
       }
     }
   }

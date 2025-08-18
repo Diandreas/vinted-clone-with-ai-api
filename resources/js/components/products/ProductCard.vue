@@ -109,7 +109,7 @@
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-2">
           <img
-            :src="product.user?.avatar || '/default-avatar.png'"
+            :src="product.user?.avatar || generateDefaultAvatar(product.user?.name, product.user?.id)"
             :alt="product.user?.name"
             class="w-6 h-6 rounded-full object-cover"
             @error="handleAvatarError"
@@ -160,6 +160,44 @@ import {
   CheckCircleIcon
 } from 'lucide-vue-next'
 
+// Fonctions de génération d'avatar dynamique
+const generateDefaultAvatar = (name, id) => {
+  const initials = getUserInitials(name)
+  const color = generateUserColor(name || id?.toString() || 'User')
+  
+  const svg = `
+    <svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+      <rect width="40" height="40" fill="${color}"/>
+      <text x="50%" y="50%" text-anchor="middle" dy="0.35em" fill="white" font-family="Arial, sans-serif" font-size="16" font-weight="bold">
+        ${initials}
+      </text>
+    </svg>
+  `
+  
+  return 'data:image/svg+xml;base64,' + btoa(svg)
+}
+
+const getUserInitials = (name) => {
+  if (!name) return '?'
+  const cleanName = name.trim()
+  const names = cleanName.split(' ')
+  if (names.length === 1) {
+    return names[0].charAt(0).toUpperCase()
+  } else {
+    return names[0].charAt(0).toUpperCase() + names[names.length - 1].charAt(0).toUpperCase()
+  }
+}
+
+const generateUserColor = (name) => {
+  if (!name) return '#6B7280'
+  let hash = 0
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  const colors = ['#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899', '#06B6D4']
+  return colors[Math.abs(hash) % colors.length]
+}
+
 const props = defineProps({
   product: {
     type: Object,
@@ -190,7 +228,10 @@ const handleImageError = (event) => {
 }
 
 const handleAvatarError = (event) => {
-  event.target.src = '/default-avatar.png'
+  const dynamicAvatar = generateDefaultAvatar(props.product.user?.name, props.product.user?.id)
+  if (event.target.src !== dynamicAvatar) {
+    event.target.src = dynamicAvatar
+  }
 }
 
 const toggleLike = async () => {

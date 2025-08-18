@@ -10,25 +10,24 @@ class FileController extends Controller
 {
     public function serve($path)
     {
-        // Construct the full path
-        $filePath = 'public/' . $path;
+        // Use the public disk instead of default local disk
+        $publicDisk = Storage::disk('public');
         
         // Log for debugging
         \Log::info('File request', [
             'requested_path' => $path,
-            'full_path' => $filePath,
-            'storage_exists' => Storage::exists($filePath)
+            'public_disk_exists' => $publicDisk->exists($path)
         ]);
         
-        // Check if file exists
-        if (!Storage::exists($filePath)) {
-            \Log::warning('File not found', ['path' => $filePath]);
+        // Check if file exists on public disk
+        if (!$publicDisk->exists($path)) {
+            \Log::warning('File not found', ['path' => $path]);
             abort(404, 'File not found: ' . $path);
         }
         
-        // Get file content and type
-        $file = Storage::get($filePath);
-        $mimeType = Storage::mimeType($filePath);
+        // Get file content and type from public disk
+        $file = $publicDisk->get($path);
+        $mimeType = $publicDisk->mimeType($path);
         
         // Return file response
         return response($file, 200)
