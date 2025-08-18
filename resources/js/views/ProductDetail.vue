@@ -361,7 +361,7 @@
                 <div>
                   <p class="font-medium text-gray-900">{{ conversation.buyer?.name }}</p>
                   <p class="text-sm text-gray-500" v-if="conversation.last_message">
-                    "{{ conversation.last_message.content.substring(0, 50) }}..."
+                    "{{ extractMessageContent(conversation.last_message.content, 50) }}..."
                   </p>
                   <p class="text-xs text-gray-400">
                     {{ formatMessageDate(conversation.last_message_at) }}
@@ -500,6 +500,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import api from '@/services/api'
+import { extractMessageContent } from '@/utils/messageUtils'
 import {
   HomeIcon,
   ChevronRightIcon,

@@ -106,7 +106,7 @@
                   <div v-if="conversation.last_message" class="mt-1">
                     <p class="text-xs text-gray-700 truncate">
                       {{ conversation.last_message.sender_id === conversation.seller_id ? 'Vendeur: ' : 'Vous: ' }}
-                      {{ conversation.last_message.content }}
+                      {{ extractMessageContent(conversation.last_message.content) }}
                     </p>
                     <p class="text-xs text-gray-400">{{ formatDate(conversation.last_message.created_at) }}</p>
                   </div>
@@ -188,7 +188,7 @@
                     <div>
                       <p class="text-xs font-medium text-gray-900">{{ conversation.buyer?.name }}</p>
                       <div v-if="conversation.last_message" class="text-xs text-gray-500 truncate max-w-[150px]">
-                        {{ conversation.last_message.content?.substring(0, 30) }}...
+                        {{ extractMessageContent(conversation.last_message.content, 30) }}...
                         <span class="text-xs text-gray-400 ml-1">{{ formatDate(conversation.last_message.created_at) }}</span>
                       </div>
                     </div>
@@ -213,6 +213,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import api from '@/services/api'
+import { extractMessageContent } from '@/utils/messageUtils'
 
 const router = useRouter()
 const authStore = useAuthStore()

@@ -134,7 +134,7 @@
                   <span class="sender-indicator" :class="{ 'from-buyer': conversation.last_message.sender_id === conversation.buyer_id }">
                     {{ conversation.last_message.sender_id === conversation.buyer_id ? 'Acheteur:' : 'Vous:' }}
                   </span>
-                  {{ extractMessageContent(conversation.last_message.content) }}
+                  {{ conversation.last_message.content }}
                 </div>
                 <div class="message-time">
                   {{ formatTime(conversation.last_message.created_at) }}
@@ -223,7 +223,6 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '@/services/api'
-import { extractMessageContent } from '@/utils/messageUtils'
 
 export default {
   name: 'SellerProductConversations',

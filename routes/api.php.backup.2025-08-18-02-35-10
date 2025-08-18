@@ -211,18 +211,17 @@ Route::prefix('v1')->group(function () {
             Route::get('pending', [OrderController::class, 'pending']);
         });
 
-                // Conversation & Messages Routes
+        // Conversation & Messages Routes
         Route::prefix('conversations')->group(function () {
-            // Routes spécifiques (AVANT les routes avec paramètres)
             Route::get('/', [ConversationController::class, 'index']);
             Route::post('/', [ConversationController::class, 'store']);
+            
+            // Nouvelles routes pour conversations centrées produit (AVANT les routes avec paramètres)
             Route::get('my-product-discussions', [ConversationController::class, 'myProductDiscussions']);
             Route::get('my-products-with-buyers', [ConversationController::class, 'myProductsWithBuyers']);
             Route::get('my-product-interests', [ConversationController::class, 'myProductInterests']);
+            Route::post('start/{product}', [ConversationController::class, 'startProductConversation']);
             Route::get('product/{product}/conversations', [ConversationController::class, 'getProductConversations']);
-            
-            // Route start AVANT {conversation} pour éviter les conflits
-            Route::post('start/{product}', [ConversationController::class, 'startProductConversation'])->where('product', '[0-9]+');
             
             // Routes avec paramètres (APRÈS les routes spécifiques)
             Route::get('{conversation}', [ConversationController::class, 'show']);

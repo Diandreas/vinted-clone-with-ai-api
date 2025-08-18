@@ -82,6 +82,15 @@
             <EditIcon class="w-5 h-5 mr-2" />
             Modifier profil
           </RouterLink>
+          
+          <!-- Bouton de déconnexion -->
+          <button
+            @click="logout"
+            class="inline-flex items-center justify-center px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-xl transition-all duration-200 shadow-md hover:shadow-lg"
+          >
+            <LogOutIcon class="w-5 h-5 mr-2" />
+            Se déconnecter
+          </button>
         </div>
       </div>
 
@@ -316,7 +325,8 @@ import {
 
   ShoppingCartIcon,
   StarIcon,
-  EyeIcon
+  EyeIcon,
+  LogOutIcon
 } from 'lucide-vue-next'
 
 const router = useRouter()
@@ -412,6 +422,11 @@ const deleteProduct = async (product) => {
       console.error('Error deleting product:', error)
     }
   }
+}
+
+const logout = () => {
+  authStore.logout()
+  router.push('/login')
 }
 
 const getActivityIcon = (type) => {

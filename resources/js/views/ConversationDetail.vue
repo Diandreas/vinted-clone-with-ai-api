@@ -64,7 +64,7 @@
                   : 'bg-gray-100 text-gray-900'
               ]"
             >
-              <p class="text-sm">{{ message.content }}</p>
+              <p class="text-sm">{{ extractMessageContent(message.content) }}</p>
               <p class="text-xs opacity-75 mt-1">
                 {{ formatMessageDate(message.created_at) }}
               </p>
@@ -119,6 +119,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import api from '@/services/api'
 import { ImageIcon, AlertTriangleIcon } from 'lucide-vue-next'
+import { extractMessageContent } from '@/utils/messageUtils'
 
 const route = useRoute()
 const router = useRouter()

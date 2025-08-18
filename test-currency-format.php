@@ -44,3 +44,4 @@ echo "Les prix sont maintenant affichés en FCFA au lieu d'euros.\n";
 ?>
 
 
+
