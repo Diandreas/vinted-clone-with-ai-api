@@ -147,11 +147,11 @@ const imageSrc = computed(() => {
 })
 
 const formattedPrice = computed(() => {
-  if (!props.product.price) return '€0.00'
-  return new Intl.NumberFormat('fr-FR', {
-    style: 'currency',
-    currency: 'EUR'
-  }).format(props.product.price)
+          if (!props.product.price) return 'Fcfa 0.00'
+        return new Intl.NumberFormat('fr-FR', {
+        style: 'currency',
+        currency: 'XAF'
+      }).format(props.product.price)
 })
 
 const formattedViews = computed(() => {

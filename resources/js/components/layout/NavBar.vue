@@ -58,6 +58,18 @@
 
         <!-- Right Side Actions -->
         <div class="flex items-center space-x-2 sm:space-x-3 lg:space-x-4">
+          <!-- Bouton Vendre - Visible sur desktop -->
+          <RouterLink
+            v-if="isAuthenticated"
+            to="/products/create"
+            class="hidden md:flex items-center space-x-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-4 lg:px-6 py-2 lg:py-2.5 rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
+          >
+            <svg class="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            <span class="text-sm lg:text-base font-semibold">Vendre</span>
+          </RouterLink>
+
           <!-- Mobile Search Toggle -->
           <button
             @click="showMobileSearch = !showMobileSearch"
@@ -242,6 +254,19 @@
       <!-- Mobile Menu -->
       <div v-if="showMobileMenu" class="md:hidden py-4 border-t border-gray-200">
         <div class="space-y-2">
+          <!-- Bouton Vendre pour mobile - en haut du menu -->
+          <RouterLink
+            v-if="isAuthenticated"
+            to="/products/create"
+            class="flex items-center justify-center space-x-2 mx-3 mb-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-xl font-medium shadow-lg"
+            @click="showMobileMenu = false"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            <span class="font-semibold">Vendre un article</span>
+          </RouterLink>
+          
           <RouterLink
             to="/products"
             class="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg"

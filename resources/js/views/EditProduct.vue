@@ -83,7 +83,7 @@
                 Prix de vente <span class="text-red-500">*</span>
               </label>
               <div class="relative">
-                <span class="absolute left-3 top-2 text-gray-500">€</span>
+                <span class="absolute left-3 top-2 text-gray-500">Fcfa</span>
                 <input
                   v-model="form.price"
                   type="number"
@@ -102,7 +102,7 @@
                 Prix original (optionnel)
               </label>
               <div class="relative">
-                <span class="absolute left-3 top-2 text-gray-500">€</span>
+                <span class="absolute left-3 top-2 text-gray-500">Fcfa</span>
                 <input
                   v-model="form.original_price"
                   type="number"
@@ -231,7 +231,7 @@
                 Frais de livraison (optionnel)
               </label>
               <div class="relative">
-                <span class="absolute left-3 top-2 text-gray-500">€</span>
+                <span class="absolute left-3 top-2 text-gray-500">Fcfa</span>
                 <input
                   v-model="form.shipping_cost"
                   type="number"
@@ -275,7 +275,7 @@
                 Offre minimum (optionnel)
               </label>
               <div class="relative">
-                <span class="absolute left-3 top-2 text-gray-500">€</span>
+                <span class="absolute left-3 top-2 text-gray-500">Fcfa</span>
                 <input
                   v-model="form.minimum_offer"
                   type="number"

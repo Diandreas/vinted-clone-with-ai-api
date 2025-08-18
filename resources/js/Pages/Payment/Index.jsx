@@ -212,7 +212,7 @@ const PayPalPackButton = ({ pack, onSuccess }) => {
                         purchase_units: [{
                             amount: {
                                 value: pack.priceEuros.toString(),
-                                currency_code: "EUR"
+                                currency_code: "XAF"
                             },
                             description: `${pack.tokens + pack.bonusTokens} tokens`
                         }]
@@ -267,7 +267,7 @@ const PaymentTabs = ({ pack, onSuccess, auth }) => {
 
             <TabsContent value="card" className="mt-4 space-y-4">
                 <div className="text-2xl font-bold text-center">
-                    {pack.priceEuros}€
+                    {pack.priceEuros} Fcfa
                     {/*<span className="text-sm text-gray-500 ml-2">*/}
                     {/*    ({pack.priceFCFA.toLocaleString()} FCFA)*/}
                     {/*</span>*/}
@@ -300,7 +300,7 @@ export default function Index({ auth, paypalConfig }) {
 
     const initialOptions = {
         "client-id": paypalConfig.clientId,
-        currency: "EUR",
+        currency: "XAF",
         intent: "capture",
     };
 
@@ -410,7 +410,7 @@ export default function Index({ auth, paypalConfig }) {
                                                     {t('payment.total')}: {pack.tokens + pack.bonusTokens} {t('payment.tokens')}
                                                 </div>
                                                 {/* <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                                    {t('payment.unitPrice')}: {(pack.priceEuros / (pack.tokens + pack.bonusTokens) * 10).toFixed(2)}€ / 10 {t('payment.tokens')}
+                                                    {t('payment.unitPrice')}: {(pack.priceEuros / (pack.tokens + pack.bonusTokens) * 10).toFixed(2)} Fcfa / 10 {t('payment.tokens')}
                                                 </div> */}
 
                                                 <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">

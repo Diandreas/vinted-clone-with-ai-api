@@ -205,7 +205,7 @@ class ProductController extends Controller
                 'user_id' => Auth::id(),
                 'platform_fee_id' => $listingFee->id,
                 'amount' => $amount,
-                'currency' => 'EUR',
+                'currency' => 'XAF',
                 'status' => 'pending',
                 'meta' => [
                     'reason' => 'product_listing',

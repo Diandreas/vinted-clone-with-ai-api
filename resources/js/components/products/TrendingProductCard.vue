@@ -104,7 +104,7 @@ const isLiked = computed(() => props.product.is_liked_by_user)
 const formatPrice = (price) => {
   return new Intl.NumberFormat('fr-FR', {
     style: 'currency',
-    currency: 'EUR'
+                            currency: 'XAF'
   }).format(price)
 }
 

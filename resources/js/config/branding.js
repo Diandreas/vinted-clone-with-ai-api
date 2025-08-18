@@ -8,13 +8,13 @@ export const RIKEAA_BRAND = {
   name: 'RIKEAA',
   slogan: 'Donnez une seconde vie à vos objets',
   description: 'Plateforme de vente et d\'achat d\'articles de seconde main',
-  currency: 'Fcfa',
-  
+  currency: 'XAF',
+
   // Couleurs principales
   colors: {
     primary: {
       50: '#f0fdf4',
-      100: '#dcfce7', 
+      100: '#dcfce7',
       200: '#bbf7d0',
       300: '#86efac',
       400: '#4ade80',
@@ -35,18 +35,18 @@ export const RIKEAA_BRAND = {
       900: '#0f172a',
     }
   },
-  
+
   // Typographie
   fonts: {
     primary: ['Inter', 'system-ui', 'sans-serif'],
     secondary: ['Instrument Sans', 'system-ui', 'sans-serif'],
   },
-  
+
   // Valeurs de design
   design: {
     borderRadius: {
       sm: '0.5rem',
-      md: '0.75rem', 
+      md: '0.75rem',
       lg: '1rem',
       xl: '1.5rem',
     },
@@ -58,23 +58,23 @@ export const RIKEAA_BRAND = {
     spacing: {
       mobile: {
         xs: '0.75rem',
-        sm: '1rem', 
+        sm: '1rem',
         md: '1.5rem',
         lg: '2rem',
       },
       desktop: {
         xs: '1rem',
         sm: '1.5rem',
-        md: '2rem', 
+        md: '2rem',
         lg: '3rem',
       }
     }
   },
-  
+
   // Breakpoints responsive
   breakpoints: {
     mobile: '0px',
-    tablet: '768px', 
+    tablet: '768px',
     desktop: '1024px',
     wide: '1280px',
   }
@@ -88,23 +88,23 @@ export const RIKEAA_CLASSES = {
     secondary: 'bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 font-medium px-4 py-2 rounded-xl transition-all duration-200 shadow-soft hover:shadow-medium',
     outline: 'border-2 border-primary-500 text-primary-600 hover:bg-primary-50 font-medium px-4 py-2 rounded-xl transition-all duration-200',
   },
-  
+
   // Cartes
   card: {
     default: 'bg-white rounded-xl shadow-soft hover:shadow-medium transition-all duration-200 border border-gray-100',
     elevated: 'bg-white rounded-xl shadow-medium hover:shadow-strong transition-all duration-200 border border-gray-100',
   },
-  
+
   // Formulaires
   input: {
     default: 'w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 bg-white',
     error: 'w-full px-4 py-3 border border-red-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 bg-red-50',
   },
-  
+
   // Texte
   text: {
     heading: 'font-bold text-gray-900',
-    subheading: 'font-semibold text-gray-800', 
+    subheading: 'font-semibold text-gray-800',
     body: 'text-gray-600',
     caption: 'text-sm text-gray-500',
     link: 'text-primary-600 hover:text-primary-700 transition-colors duration-200',

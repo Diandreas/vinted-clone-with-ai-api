@@ -128,10 +128,10 @@
             </h3>
             
             <div class="flex items-center justify-between mb-2">
-              <span class="text-lg font-bold text-indigo-600">{{ product.price }}€</span>
-              <span v-if="product.original_price" class="text-sm text-gray-500 line-through">
-                {{ product.original_price }}€
-              </span>
+                                      <span class="text-lg font-bold text-indigo-600">{{ product.price }} Fcfa</span>
+                        <span v-if="product.original_price" class="text-sm text-gray-500 line-through">
+                          {{ product.original_price }} Fcfa
+                        </span>
             </div>
 
             <div class="flex items-center text-sm text-gray-500 mb-3">

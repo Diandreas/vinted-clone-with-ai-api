@@ -89,7 +89,7 @@ const chartOptions = {
             // Sales data - format as currency
             label += new Intl.NumberFormat('fr-FR', {
               style: 'currency',
-              currency: 'EUR'
+              currency: 'XAF'
             }).format(context.parsed.y);
           } else {
             // Orders data - format as number
@@ -126,11 +126,11 @@ const chartOptions = {
         },
         color: '#6b7280',
         callback: function(value) {
-          return new Intl.NumberFormat('fr-FR', {
-            style: 'currency',
-            currency: 'EUR',
-            minimumFractionDigits: 0
-          }).format(value);
+                      return new Intl.NumberFormat('fr-FR', {
+              style: 'currency',
+              currency: 'XAF',
+              minimumFractionDigits: 0
+            }).format(value);
         }
       }
     },

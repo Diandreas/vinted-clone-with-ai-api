@@ -30,7 +30,7 @@
               class="border border-gray-200 rounded-lg p-4"
             >
               <h4 class="font-semibold">{{ product.title }}</h4>
-              <p class="text-gray-600">{{ product.price }}€</p>
+                              <p class="text-gray-600">{{ product.price }} Fcfa</p>
               <p class="text-sm text-gray-500">{{ product.category?.name }}</p>
             </div>
           </div>

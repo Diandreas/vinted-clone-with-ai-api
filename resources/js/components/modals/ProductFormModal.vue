@@ -134,7 +134,7 @@
                   <!-- Prix -->
                   <div>
                     <label for="price" class="block text-sm font-medium text-gray-700">
-                      Prix (€) *
+                      Prix (Fcfa) *
                     </label>
                     <div class="mt-1">
                       <input
@@ -153,7 +153,7 @@
                   <!-- Prix original -->
                   <div>
                     <label for="original_price" class="block text-sm font-medium text-gray-700">
-                      Prix original (€)
+                      Prix original (Fcfa)
                     </label>
                     <div class="mt-1">
                       <input

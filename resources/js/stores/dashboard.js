@@ -93,7 +93,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
         labels: data.map(item => item.date),
         datasets: [
           {
-            label: 'Ventes (€)',
+            label: 'Ventes (Fcfa)',
             data: data.map(item => item.sales),
             borderColor: 'rgb(59, 130, 246)',
             backgroundColor: 'rgba(59, 130, 246, 0.1)',

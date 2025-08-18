@@ -4,9 +4,12 @@
     <NavBar v-if="!isAuthPage" />
     
     <!-- Main Content -->
-    <main class="flex-1">
+    <main class="flex-1" :class="{ 'pb-20': !isAuthPage }">
       <RouterView />
     </main>
+    
+    <!-- Mobile Tab Bar -->
+    <MobileTabBar v-if="!isAuthPage" />
     
     <!-- Toast Notifications -->
     <NotificationToast />
@@ -17,6 +20,7 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import NavBar from '@/components/layout/NavBar.vue'
+import MobileTabBar from '@/components/layout/MobileTabBar.vue'
 import NotificationToast from '@/components/ui/NotificationToast.vue'
 
 const route = useRoute()

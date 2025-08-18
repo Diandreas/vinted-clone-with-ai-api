@@ -5,19 +5,19 @@
 export const CURRENCY_CONFIG = {
     // Code de devise ISO 4217
     code: 'XAF',
-    
+
     // Symbole de la devise
     symbol: 'Fcfa',
-    
+
     // Nom complet de la devise
     name: 'Franc CFA',
-    
+
     // Configuration de formatage
     locale: 'fr-FR',
-    
+
     // Nombre de décimales
     decimals: 2,
-    
+
     // Formatage pour l'affichage
     format: {
         style: 'currency',
@@ -30,7 +30,7 @@ export const CURRENCY_CONFIG = {
 // Fonction utilitaire pour formater les prix selon la configuration
 export const formatCurrency = (amount) => {
     if (amount === null || amount === undefined) return '0 Fcfa'
-    
+
     return new Intl.NumberFormat(CURRENCY_CONFIG.locale, CURRENCY_CONFIG.format).format(amount)
 }
 

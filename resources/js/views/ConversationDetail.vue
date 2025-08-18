@@ -111,7 +111,6 @@
       </div>
     </div>
   </div>
-</template>
 
 <script setup>
 import { ref, onMounted, computed, nextTick } from 'vue'
@@ -214,7 +213,7 @@ const formatPrice = (price) => {
   if (!price) return ''
   return new Intl.NumberFormat('fr-FR', {
     style: 'currency',
-    currency: 'EUR'
+    currency: 'XAF'
   }).format(price)
 }
 

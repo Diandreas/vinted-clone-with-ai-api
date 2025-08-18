@@ -194,7 +194,7 @@ class Order extends Model
      */
     public function getFormattedTotalAttribute()
     {
-        return '€' . number_format($this->total_amount, 2);
+        return 'Fcfa ' . number_format($this->total_amount, 2);
     }
 
     // Methods
