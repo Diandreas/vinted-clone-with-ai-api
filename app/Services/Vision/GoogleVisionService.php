@@ -22,78 +22,22 @@ class GoogleVisionService
     private function initializeClient()
     {
         try {
+            Log::info('GoogleVision: Initializing client with putenv method');
+            
             $credentialsPath = storage_path('app/google/service-account.json');
+            putenv('GOOGLE_APPLICATION_CREDENTIALS=' . $credentialsPath);
             
-            Log::info('GoogleVision: Initializing client with credentials', [
-                'credentials_path' => $credentialsPath,
-                'file_exists' => file_exists($credentialsPath),
-                'file_readable' => is_readable($credentialsPath),
-                'project_id' => env('GOOGLE_CLOUD_PROJECT_ID', 'yatou-440701')
-            ]);
-
-            // Méthode 1: Utiliser les credentials depuis l'environnement JSON (PRIORITÉ)
-            $credentialsJson = env('GOOGLE_CLOUD_KEY_JSON');
+            $this->client = new ImageAnnotatorClient();
             
-            if (!empty($credentialsJson)) {
-                Log::info('GoogleVision: Using credentials from environment JSON');
-                
-                $credentials = json_decode($credentialsJson, true);
-                
-                if (json_last_error() !== JSON_ERROR_NONE) {
-                    throw new Exception('Invalid JSON in GOOGLE_CLOUD_KEY_JSON: ' . json_last_error_msg());
-                }
-                
-                $this->client = new ImageAnnotatorClient([
-                    'credentials' => $credentials
-                ]);
-                
-                Log::info('GoogleVision: Client initialized successfully with JSON credentials');
-                return;
-            }
-
-            // Méthode 2: Utiliser putenv si fichier existe
-            if (file_exists($credentialsPath) && is_readable($credentialsPath)) {
-                Log::info('GoogleVision: Using putenv with credentials file');
-                
-                putenv('GOOGLE_APPLICATION_CREDENTIALS=' . $credentialsPath);
-                
-                $this->client = new ImageAnnotatorClient();
-                
-                Log::info('GoogleVision: Client initialized successfully with putenv');
-                return;
-            }
-
-            // Méthode 3: Fallback - lire le fichier directement
-            if (file_exists($credentialsPath)) {
-                Log::info('GoogleVision: Using direct file read');
-                
-                $credentials = json_decode(file_get_contents($credentialsPath), true);
-                
-                if (json_last_error() !== JSON_ERROR_NONE) {
-                    throw new Exception('Invalid JSON in credentials file: ' . json_last_error_msg());
-                }
-                
-                $this->client = new ImageAnnotatorClient([
-                    'credentials' => $credentials
-                ]);
-                
-                Log::info('GoogleVision: Client initialized successfully with direct file read');
-                return;
-            }
-
-            throw new Exception('No valid Google Cloud credentials found');
-
+            Log::info('GoogleVision: Client initialized successfully');
+            
         } catch (Exception $e) {
             Log::error('GoogleVision: Failed to initialize client', [
-                'error' => $e->getMessage(),
-                'code' => $e->getCode(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine()
+                'error' => $e->getMessage()
             ]);
             throw $e;
         }
     }
-
     public function analyzeImage($imagePath, $productId = null)
     {
         try {
