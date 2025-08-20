@@ -13,15 +13,13 @@
           <div class="flex items-center space-x-3">
             <!-- Product Image - Compact -->
             <div class="w-12 h-12 sm:w-14 sm:h-14 bg-gray-100 rounded-lg overflow-hidden">
-              <img 
-                v-if="conversation.product?.main_image_url"
-                :src="conversation.product.main_image_url" 
-                :alt="conversation.product.title"
-                class="w-full h-full object-cover"
+              <ProductImage
+                :src="conversation.product?.main_image_url || conversation.product?.main_image"
+                :alt="conversation.product?.title || 'Produit'"
+                :product-id="conversation.product?.id"
+                fallback="/placeholder-product.jpg"
+                image-classes="w-full h-full object-cover rounded-lg"
               />
-              <div v-else class="flex items-center justify-center h-full">
-                <ImageIcon class="w-5 h-5 text-gray-400" />
-              </div>
             </div>
             
             <!-- Product & Participant Info - Compact -->
@@ -120,6 +118,7 @@ import { useAuthStore } from '@/stores/auth'
 import api from '@/services/api'
 import { ImageIcon, AlertTriangleIcon } from 'lucide-vue-next'
 import { extractMessageContent } from '@/utils/messageUtils'
+import ProductImage from '@/components/ui/ProductImage.vue'
 
 const route = useRoute()
 const router = useRouter()

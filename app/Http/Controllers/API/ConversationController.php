@@ -136,6 +136,17 @@ class ConversationController extends Controller
     {
         $user = Auth::user();
         $conversations = Conversation::getProductConversationsForBuyer($user);
+        
+        // Ajouter les accesseurs d'images pour chaque produit dans les conversations
+        $conversations = $conversations->map(function ($conversation) {
+            if ($conversation->product) {
+                $productData = $conversation->product->toArray();
+                $productData['main_image_url'] = $conversation->product->main_image_url;
+                $productData['image_urls'] = $conversation->product->image_urls;
+                $conversation->product = (object) $productData;
+            }
+            return $conversation;
+        });
 
         return response()->json([
             'success' => true,
@@ -157,8 +168,15 @@ class ConversationController extends Controller
         foreach ($conversationsByProduct as $productId => $conversations) {
             $firstConversation = $conversations->first();
             if ($firstConversation && $firstConversation->product) {
+                $product = $firstConversation->product;
+                
+                // Ajouter les accesseurs d'images (les relations sont déjà chargées par la requête)
+                $productData = $product->toArray();
+                $productData['main_image_url'] = $product->main_image_url;
+                $productData['image_urls'] = $product->image_urls;
+                
                 $productsWithConversations[] = [
-                    'product' => $firstConversation->product,
+                    'product' => $productData,
                     'conversations' => $conversations,
                     'conversation_count' => $conversations->count(),
                     'unread_count' => $conversations->sum(function($conv) use ($user) {

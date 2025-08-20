@@ -234,7 +234,7 @@ class Conversation extends Model
      */
     public static function getProductConversationsForSeller(User $seller)
     {
-        return static::with(['product', 'buyer', 'lastMessage'])
+        return static::with(['product.mainImage', 'product.images', 'buyer', 'lastMessage'])
             ->where('seller_id', $seller->id)
             ->whereHas('product', function($q) {
                 $q->whereNotNull('id');
@@ -249,7 +249,7 @@ class Conversation extends Model
      */
     public static function getProductConversationsForBuyer(User $buyer)
     {
-        return static::with(['product', 'seller', 'lastMessage'])
+        return static::with(['product.mainImage', 'product.images', 'seller', 'lastMessage'])
             ->where('buyer_id', $buyer->id)
             ->whereHas('product', function($q) {
                 $q->whereNotNull('id');

@@ -181,13 +181,21 @@
                 {{ showProductConversations ? 'Masquer' : 'Voir' }} conversations ({{ productConversations.length }})
               </button>
 
-              <div class="grid grid-cols-2 gap-2">
+              <div class="grid gap-2" :class="canEditProduct ? 'grid-cols-2' : 'grid-cols-1'">
                 <button
+                  v-if="canEditProduct"
                   @click="editProduct"
                   class="bg-primary-600 text-white px-3 py-2 rounded-lg font-medium hover:bg-primary-700 transition-colors text-sm"
                 >
                   Modifier
                 </button>
+                <div
+                  v-else-if="isProductOwner"
+                  class="bg-gray-100 text-gray-500 px-3 py-2 rounded-lg text-sm text-center border border-gray-200 mb-2"
+                  title="La modification n'est plus possible après 30 minutes"
+                >
+                  ⏰ Modification expirée (30min dépassées)
+                </div>
                 <button
                   @click="toggleProductStatus"
                   class="bg-gray-600 text-white px-3 py-2 rounded-lg font-medium hover:bg-gray-700 transition-colors text-sm"
@@ -541,6 +549,21 @@ const isAuthenticated = computed(() => authStore.isAuthenticated)
 const currentUserId = computed(() => authStore.user?.id)
 const isProductOwner = computed(() => {
   return currentUserId.value === product.value?.user_id
+})
+
+const canEditProduct = computed(() => {
+  if (!isProductOwner.value) return false
+  
+  // Vérifier si le produit a été créé il y a moins de 30 minutes
+  if (product.value?.created_at) {
+    const createdAt = new Date(product.value.created_at)
+    const now = new Date()
+    const diffInMinutes = (now - createdAt) / (1000 * 60) // différence en minutes
+    
+    return diffInMinutes <= 30
+  }
+  
+  return false
 })
 
 // Methods

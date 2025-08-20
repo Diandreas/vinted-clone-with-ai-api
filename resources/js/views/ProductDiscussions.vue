@@ -33,9 +33,10 @@
         <!-- Product Image -->
         <div class="product-image">
           <img 
-            :src="conversation.product.main_image_url" 
+            :src="getProductImage(conversation.product)" 
             :alt="conversation.product.title"
             loading="lazy"
+            @error="onImageError"
           />
           <div v-if="getUnreadCount(conversation)" class="unread-badge">
             {{ getUnreadCount(conversation) }}
@@ -214,6 +215,16 @@ export default {
       }
     }
 
+    const getProductImage = (product) => {
+      return product.main_image_url || product.main_image || '/placeholder-product.jpg'
+    }
+
+    const onImageError = (event) => {
+      if (event.target.src !== '/placeholder-product.jpg') {
+        event.target.src = '/placeholder-product.jpg'
+      }
+    }
+
     onMounted(() => {
       fetchConversations()
     })
@@ -228,7 +239,10 @@ export default {
       getStatusClass,
       getStatusText,
       formatTime,
-      toggleFavorite
+      toggleFavorite,
+      getProductImage,
+      onImageError,
+      extractMessageContent
     }
   }
 }

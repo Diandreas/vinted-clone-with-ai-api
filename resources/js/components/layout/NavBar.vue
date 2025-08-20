@@ -70,6 +70,16 @@
             <span class="text-sm lg:text-base font-semibold">Vendre</span>
           </RouterLink>
 
+          <!-- Bouton Vendre Mobile -->
+          <RouterLink
+            v-if="isAuthenticated"
+            to="/products/create"
+            class="md:hidden bg-primary-500 hover:bg-primary-600 text-white px-3 py-2 rounded-lg transition-all duration-150 shadow-soft hover:shadow-medium transform hover:scale-105 active:scale-95 text-sm font-medium"
+            title="Vendre"
+          >
+            Vendre
+          </RouterLink>
+
           <!-- Mobile Search Toggle -->
           <button
             @click="showMobileSearch = !showMobileSearch"
@@ -80,14 +90,6 @@
 
           <!-- Authenticated User Actions -->
           <template v-if="isAuthenticated">
-            <!-- Wallet Balance - Visible sur desktop seulement -->
-            <RouterLink
-              to="/wallet"
-              class="hidden md:flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all duration-200"
-            >
-              <WalletIcon class="w-4 h-4" />
-              <span class="font-semibold">{{ walletBalance }}</span>
-            </RouterLink>
 
             <!-- Admin Dropdown - Visible sur desktop seulement -->
             <div v-if="authStore.isAdmin || authStore.hasPermission('dashboard:view')" class="relative hidden md:block">
@@ -255,7 +257,6 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useDashboardStore } from '@/stores/dashboard'
-import { useWalletStore } from '@/stores/wallet'
 import {
   SearchIcon,
   BellIcon,
@@ -265,7 +266,6 @@ import {
   UsersIcon,
   TagIcon,
   BarChart3Icon,
-  WalletIcon
 } from 'lucide-vue-next'
 
 // Components
@@ -313,7 +313,6 @@ const generateUserColor = (name) => {
 // Stores
 const authStore = useAuthStore()
 const dashboardStore = useDashboardStore()
-const walletStore = useWalletStore()
 const router = useRouter()
 
 // Reactive data
@@ -327,7 +326,6 @@ const showAdminMenu = ref(false)
 const isAuthenticated = computed(() => authStore.isAuthenticated)
 const user = computed(() => authStore.user)
 const unreadNotifications = computed(() => dashboardStore.unreadNotifications)
-const walletBalance = computed(() => walletStore.balanceFormatted)
 
 // Methods
 const performSearch = () => {
@@ -372,7 +370,6 @@ onMounted(() => {
   // Load notification counts and wallet balance if authenticated
   if (isAuthenticated.value) {
     dashboardStore.fetchStats()
-    walletStore.fetchBalance()
   }
 })
 

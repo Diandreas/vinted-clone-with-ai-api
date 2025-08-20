@@ -48,10 +48,12 @@
         <!-- Product Header -->
         <div class="product-header" @click="toggleProduct(productData.product.id)">
           <div class="product-main-info">
-            <img 
-              :src="productData.product.main_image_url" 
+            <ProductImage
+              :src="productData.product.main_image_url || productData.product.main_image"
               :alt="productData.product.title"
-              class="product-image"
+              :product-id="productData.product.id"
+              fallback="/placeholder-product.jpg"
+              image-classes="product-image"
             />
             <div class="product-details">
               <h3 class="product-title">{{ productData.product.title }}</h3>
@@ -225,6 +227,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '@/services/api'
 import { extractMessageContent } from '@/utils/messageUtils'
+import ProductImage from '@/components/ui/ProductImage.vue'
 
 // Fonctions de génération d'avatar dynamique
 const generateDefaultAvatar = (name, id) => {
@@ -266,6 +269,9 @@ const generateUserColor = (name) => {
 
 export default {
   name: 'SellerProductConversations',
+  components: {
+    ProductImage
+  },
   setup() {
     const router = useRouter()
     

@@ -173,10 +173,18 @@ class UserController extends Controller
     public function userProducts(User $user)
     {
         $products = $user->products()
-            ->with(['images', 'category', 'brand', 'condition'])
+            ->with(['images', 'mainImage', 'category', 'brand', 'condition'])
             ->active()
             ->latest()
             ->paginate(20);
+
+        // Ajouter les accesseurs d'images pour chaque produit
+        $products->getCollection()->transform(function ($product) {
+            $productData = $product->toArray();
+            $productData['main_image_url'] = $product->main_image_url;
+            $productData['image_urls'] = $product->image_urls;
+            return (object) $productData;
+        });
 
         return response()->json([
             'success' => true,

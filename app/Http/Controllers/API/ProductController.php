@@ -316,6 +316,21 @@ class ProductController extends Controller
             ], 403);
         }
 
+        // Vérifier si le produit peut encore être modifié (30 minutes après création)
+        $createdAt = $product->created_at;
+        $now = now();
+        $diffInMinutes = $createdAt->diffInMinutes($now);
+        
+        if ($diffInMinutes > 30) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Product can only be edited within 30 minutes of creation',
+                'created_at' => $createdAt,
+                'current_time' => $now,
+                'minutes_elapsed' => $diffInMinutes
+            ], 422);
+        }
+
         $request->validate([
             'title' => 'sometimes|string|max:255',
             'description' => 'sometimes|string',
@@ -606,13 +621,13 @@ class ProductController extends Controller
     public function myProducts(Request $request)
     {
         $products = Auth::user()->products()
-                        ->with(['user', 'category', 'brand', 'condition', 'images', 'mainImage'])
+                        ->with(['user', 'images', 'mainImage'])
                         ->latest()
                         ->paginate($request->per_page ?? 20);
 
         return response()->json([
             'success' => true,
-            'data' => $products
+            'data' => ProductResource::collection($products)
         ]);
     }
 
@@ -629,7 +644,7 @@ class ProductController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $favorites
+            'data' => ProductResource::collection($favorites)
         ]);
     }
 
@@ -646,7 +661,7 @@ class ProductController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $likes
+            'data' => ProductResource::collection($likes)
         ]);
     }
 
@@ -663,7 +678,7 @@ class ProductController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $products
+            'data' => ProductResource::collection($products)
         ]);
     }
 
@@ -680,7 +695,7 @@ class ProductController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $products
+            'data' => ProductResource::collection($products)
         ]);
     }
 
@@ -722,7 +737,7 @@ class ProductController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $products
+            'data' => ProductResource::collection($products)
         ]);
     }
 
