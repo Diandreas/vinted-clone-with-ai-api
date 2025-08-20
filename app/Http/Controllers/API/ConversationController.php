@@ -94,7 +94,7 @@ class ConversationController extends Controller
             ], 403);
         }
 
-        $conversation->load(['buyer', 'seller', 'product', 'messages' => function($query) {
+        $conversation->load(['buyer', 'seller', 'product.mainImage', 'product.images', 'messages' => function($query) {
             $query->with('sender')->latest()->limit(50);
         }]);
 
@@ -103,6 +103,23 @@ class ConversationController extends Controller
             ->where('sender_id', '!=', Auth::id())
             ->whereNull('read_at')
             ->update(['read_at' => now()]);
+
+        // Ajouter les accesseurs d'images pour le produit
+        if ($conversation->product) {
+            // Create a clean product data array without relations
+            $productData = $conversation->product->makeHidden(['mainImage', 'images'])->toArray();
+            $productData['main_image_url'] = $conversation->product->main_image_url;
+            $productData['image_urls'] = $conversation->product->image_urls;
+            
+            // Replace the product with clean data
+            $conversationData = $conversation->toArray();
+            $conversationData['product'] = $productData;
+            
+            return response()->json([
+                'success' => true,
+                'data' => $conversationData
+            ]);
+        }
 
         return response()->json([
             'success' => true,
@@ -140,7 +157,8 @@ class ConversationController extends Controller
         // Ajouter les accesseurs d'images pour chaque produit dans les conversations
         $conversations = $conversations->map(function ($conversation) {
             if ($conversation->product) {
-                $productData = $conversation->product->toArray();
+                // Create a clean product data array without relations
+                $productData = $conversation->product->makeHidden(['mainImage', 'images'])->toArray();
                 $productData['main_image_url'] = $conversation->product->main_image_url;
                 $productData['image_urls'] = $conversation->product->image_urls;
                 $conversation->product = (object) $productData;

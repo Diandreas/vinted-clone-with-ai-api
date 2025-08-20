@@ -38,62 +38,36 @@
         <div class="space-y-3">
           <!-- Main Image -->
           <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden relative">
-            <!-- Debug info -->
-            <div v-if="product" class="absolute top-2 left-2 bg-black bg-opacity-50 text-white text-xs p-1 rounded z-10">
-              Debug: main_image_url = {{ product.main_image_url || 'null' }}
-            </div>
-
             <img
               v-if="product.main_image_url"
               :src="product.main_image_url"
               :alt="product.title"
               class="w-full h-full object-cover"
-              @load="console.log('✅ Image principale chargée:', product.main_image_url)"
-              @error="console.error('❌ Erreur chargement image principale:', product.main_image_url)"
             />
             <div v-else class="flex items-center justify-center h-full">
               <ImageIcon class="w-16 h-16 sm:w-24 sm:h-24 text-gray-400" />
               <div class="text-center text-gray-500 mt-2">
-                <p class="text-sm">Aucune image principale</p>
-                <p class="text-xs">main_image_url: {{ product?.main_image_url || 'null' }}</p>
+                <p class="text-sm">Aucune image disponible</p>
               </div>
             </div>
           </div>
 
           <!-- Image Gallery (if multiple images) - Compact -->
           <div v-if="product.images && product.images.length > 1" class="grid grid-cols-4 gap-2">
-            <!-- Debug info -->
-            <div class="col-span-4 bg-gray-100 text-gray-800 text-xs p-2 rounded mb-1">
-              Galerie: {{ product.images.length }} images trouvées
-            </div>
-
             <div
               v-for="image in product.images"
               :key="image.id"
-              class="aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover:opacity-80 transition-opacity relative"
+              class="aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover:opacity-80 transition-opacity"
               @click="selectMainImage(image)"
             >
               <img
                 :src="image.url"
                 :alt="image.alt_text || product.title"
                 class="w-full h-full object-cover"
-                @error="console.error('❌ Erreur chargement image galerie:', image.url)"
               />
-              <!-- Debug info sur chaque image -->
-              <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-0.5">
-                {{ image.filename }}
-              </div>
             </div>
           </div>
 
-          <!-- Debug: Aucune image -->
-          <div v-else-if="product.images && product.images.length === 1" class="bg-primary-100 text-primary-800 text-xs p-1.5 rounded">
-            Une seule image trouvée (pas de galerie)
-          </div>
-
-          <div v-else class="bg-gray-100 text-gray-900 text-xs p-1.5 rounded">
-            Aucune image trouvée dans product.images
-          </div>
         </div>
 
         <!-- Product Info - Compact -->

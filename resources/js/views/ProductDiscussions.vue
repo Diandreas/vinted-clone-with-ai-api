@@ -216,7 +216,25 @@ export default {
     }
 
     const getProductImage = (product) => {
-      return product.main_image_url || product.main_image || '/placeholder-product.jpg'
+      if (!product) return '/placeholder-product.jpg'
+      
+      // If main_image_url is a string, use it
+      if (typeof product.main_image_url === 'string') {
+        return product.main_image_url
+      }
+      
+      // If main_image is an object with filename, construct URL
+      if (product.main_image && typeof product.main_image === 'object' && product.main_image.filename) {
+        return `http://localhost:8000/api/v1/files/products/${product.main_image.filename}`
+      }
+      
+      // If main_image is a string (filename), construct URL
+      if (typeof product.main_image === 'string') {
+        return `http://localhost:8000/api/v1/files/products/${product.main_image}`
+      }
+      
+      // Fallback to placeholder
+      return '/placeholder-product.jpg'
     }
 
     const onImageError = (event) => {
