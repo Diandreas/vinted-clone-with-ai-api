@@ -163,6 +163,7 @@
                 :show-actions="true"
                 @edit="editProduct"
                 @delete="deleteProduct"
+                @share="shareProduct"
               />
             </div>
             
@@ -353,7 +354,10 @@ const recentActivity = ref([])
 
 // Computed
 const user = computed(() => authStore.user)
-const stats = computed(() => dashboardStore.stats)
+const stats = computed(() => {
+  console.log('📊 Stats computed:', dashboardStore.stats.value)
+  return dashboardStore.stats.value
+})
 
 // Tabs configuration
 const tabs = [
@@ -442,6 +446,45 @@ const deleteProduct = async (product) => {
     } catch (error) {
       console.error('Error deleting product:', error)
       alert('Erreur lors de la suppression du produit')
+    }
+  }
+}
+
+const shareProduct = async (product) => {
+  try {
+    const productUrl = `${window.location.origin}/products/${product.id}`
+    
+    if (navigator.share) {
+      // Utiliser l'API Web Share si disponible (mobile)
+      await navigator.share({
+        title: product.title,
+        text: `Découvrez ce produit : ${product.title} - ${product.formatted_price || product.price + ' Fcfa'}`,
+        url: productUrl
+      })
+    } else {
+      // Fallback : copier le lien dans le presse-papiers
+      await navigator.clipboard.writeText(productUrl)
+      
+      // Notification temporaire
+      const notification = document.createElement('div')
+      notification.textContent = 'Lien copié dans le presse-papiers !'
+      notification.className = 'fixed bottom-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50'
+      document.body.appendChild(notification)
+      
+      setTimeout(() => {
+        document.body.removeChild(notification)
+      }, 3000)
+    }
+  } catch (error) {
+    console.error('Error sharing product:', error)
+    // En cas d'erreur, toujours essayer de copier le lien
+    try {
+      const productUrl = `${window.location.origin}/products/${product.id}`
+      await navigator.clipboard.writeText(productUrl)
+      alert('Lien copié dans le presse-papiers !')
+    } catch (clipboardError) {
+      console.error('Clipboard error:', clipboardError)
+      alert('Impossible de partager le produit')
     }
   }
 }

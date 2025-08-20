@@ -36,15 +36,19 @@
       <!-- Action Buttons - Ultra Compact mobile -->
       <div v-if="showActions" class="absolute top-0.5 sm:top-1 right-0.5 sm:right-1 flex space-x-0.5 sm:space-x-1">
         <button
+          v-if="canEditProduct"
           @click.stop="$emit('edit', product)"
+          class="bg-white bg-opacity-90 hover:bg-opacity-100 p-0.5 sm:p-1 rounded-full shadow-sm transition-all"
+          title="Modifier (disponible 30 min après création)"
         >
           <EditIcon class="w-3 h-3 sm:w-4 sm:h-4 text-gray-600" />
         </button>
         <button
           @click.stop="$emit('delete', product)"
           class="bg-white bg-opacity-90 hover:bg-opacity-100 p-0.5 sm:p-1 rounded-full shadow-sm transition-all"
+          title="Supprimer"
         >
-          <TrashIcon class="w-3 h-3 sm:w-4 sm:h-4 text-gray-700" />
+          <TrashIcon class="w-3 h-3 sm:w-4 sm:h-4 text-red-600" />
         </button>
       </div>
 
@@ -220,6 +224,17 @@ const favoritingProduct = ref(false)
 // Computed
 const isLiked = computed(() => props.product.is_liked_by_user)
 const isFavorite = computed(() => props.product.is_favorited_by_user)
+
+// Check if product can be edited (only within 30 minutes of creation)
+const canEditProduct = computed(() => {
+  if (!props.product.created_at) return false
+  
+  const createdAt = new Date(props.product.created_at)
+  const now = new Date()
+  const diffInMinutes = (now - createdAt) / (1000 * 60)
+  
+  return diffInMinutes <= 30
+})
 
 // Methods
 
