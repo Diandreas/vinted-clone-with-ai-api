@@ -140,6 +140,13 @@
       <!-- Action Buttons for Own Products -->
       <div v-if="showActions" class="mt-2 sm:mt-3 lg:mt-4 flex space-x-1 sm:space-x-1.5 lg:space-x-2">
         <button
+          @click.stop="$emit('view', product)"
+          class="flex-1 bg-blue-50 text-blue-700 text-xs sm:text-sm py-1 sm:py-1.5 lg:py-2 px-1.5 sm:px-2 lg:px-3 rounded-lg hover:bg-blue-100 transition-colors font-medium"
+        >
+          <EyeIcon class="w-3 h-3 sm:w-4 sm:h-4 mr-1 inline" />
+          Voir
+        </button>
+        <button
           @click.stop="$emit('share', product)"
           class="flex-1 bg-gray-50 text-gray-600 text-xs sm:text-sm py-1 sm:py-1.5 lg:py-2 px-1.5 sm:px-2 lg:px-3 rounded-lg hover:bg-gray-100 transition-colors"
         >
@@ -213,7 +220,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['like', 'favorite', 'edit', 'delete', 'boost', 'share'])
+const emit = defineEmits(['like', 'favorite', 'edit', 'delete', 'boost', 'share', 'view'])
 
 const authStore = useAuthStore()
 

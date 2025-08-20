@@ -6,9 +6,9 @@
     </div>
 
     <!-- Product Detail -->
-    <div v-else-if="product" class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-6">
-      <!-- Breadcrumb - Compact -->
-      <nav class="flex mb-3 sm:mb-6" aria-label="Breadcrumb">
+    <div v-else-if="product" class="max-w-7xl mx-auto px-1 sm:px-6 lg:px-8 py-1 sm:py-6">
+      <!-- Breadcrumb - Ultra Compact mobile -->
+      <nav class="hidden sm:flex mb-3 sm:mb-6" aria-label="Breadcrumb">
         <ol class="inline-flex items-center space-x-1 md:space-x-2">
           <li class="inline-flex items-center">
             <RouterLink to="/" class="inline-flex items-center text-xs sm:text-sm font-medium text-gray-700 hover:text-primary-600">
@@ -33,11 +33,11 @@
         </ol>
       </nav>
 
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-        <!-- Product Images - Compact -->
-        <div class="space-y-3">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-1 sm:gap-6">
+        <!-- Product Images - Ultra Compact mobile -->
+        <div class="space-y-0.5 sm:space-y-3">
           <!-- Main Image -->
-          <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden relative">
+          <div class="aspect-square bg-gray-100 rounded sm:rounded-lg overflow-hidden relative">
             <img
               v-if="product.main_image_url"
               :src="product.main_image_url"
@@ -88,11 +88,11 @@
             </div>
           </div>
 
-          <!-- Price Section - Compact -->
-          <div class="bg-gray-50 rounded-lg p-4 sm:p-6">
+          <!-- Price Section - Ultra Compact mobile -->
+          <div class="bg-gray-50 rounded sm:rounded-lg p-1.5 sm:p-6">
             <div class="flex items-baseline space-x-2 sm:space-x-3">
-              <span class="text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-600">{{ formatPrice(product.price) }}</span>
-              <span v-if="product.original_price && product.original_price !== product.price" class="text-lg sm:text-xl text-gray-500 line-through">
+              <span class="text-lg sm:text-3xl lg:text-4xl font-bold text-primary-600">{{ formatPrice(product.price) }}</span>
+              <span v-if="product.original_price && product.original_price !== product.price" class="text-xs sm:text-xl text-gray-500 line-through">
                 {{ formatPrice(product.original_price) }}
               </span>
             </div>
@@ -108,40 +108,48 @@
             </div>
           </div>
 
-          <!-- Action Buttons - Compact -->
-          <div class="flex space-x-3">
+          <!-- Action Buttons - Ultra Compact mobile -->
+          <div class="flex space-x-0.5 sm:space-x-2">
             <button
               @click="toggleLike"
               :class="isLiked ? 'bg-gray-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
-              class="flex-1 flex items-center justify-center px-4 py-2.5 rounded-lg font-medium transition-colors text-sm"
+              class="flex-1 flex items-center justify-center px-1.5 sm:px-3 py-1 sm:py-2.5 rounded sm:rounded-lg font-medium transition-colors text-xs sm:text-sm"
             >
-              <HeartIcon :class="isLiked ? 'w-4 h-4' : 'w-4 h-4'" class="mr-2" />
+              <HeartIcon class="w-3 h-3 sm:w-4 sm:h-4 mr-0.5 sm:mr-2" />
               {{ isLiked ? 'Aimé' : 'J\'aime' }}
             </button>
 
             <button
               @click="toggleFavorite"
               :class="isFavorited ? 'bg-gray-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
-              class="flex-1 flex items-center justify-center px-6 py-3 rounded-lg font-medium transition-colors"
+              class="flex-1 flex items-center justify-center px-1.5 sm:px-3 py-1 sm:py-2.5 rounded sm:rounded-lg font-medium transition-colors text-xs sm:text-sm"
             >
-              <StarIcon :class="isFavorited ? 'w-5 h-5' : 'w-5 h-5'" class="mr-2" />
-              {{ isFavorited ? 'Favori' : 'Favoris' }}
+              <StarIcon class="w-3 h-3 sm:w-5 sm:h-5 mr-0.5 sm:mr-2" />
+              Favori
+            </button>
+
+            <button
+              @click="shareProduct"
+              class="flex-1 bg-gray-100 text-gray-700 hover:bg-gray-200 flex items-center justify-center px-1.5 sm:px-3 py-1 sm:py-2.5 rounded sm:rounded-lg font-medium transition-colors text-xs sm:text-sm"
+            >
+              <ShareIcon class="w-3 h-3 sm:w-4 sm:h-4 mr-0.5 sm:mr-2" />
+              Partager
             </button>
           </div>
 
-          <!-- Contact Seller / Product Owner Actions -->
-          <div class="bg-white rounded-xl border border-gray-200 p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">
-              {{ isProductOwner ? 'Gestion du produit' : 'Contacter le vendeur' }}
+          <!-- Contact Seller / Product Owner Actions - Ultra Compact mobile -->
+          <div class="bg-white rounded sm:rounded-xl border border-gray-200 p-2 sm:p-6">
+            <h3 class="text-sm sm:text-lg font-semibold text-gray-900 mb-1.5 sm:mb-4">
+              {{ isProductOwner ? 'Gestion' : 'Vendeur' }}
             </h3>
-            <div class="flex items-center space-x-4 mb-4">
+            <div class="flex items-center space-x-2 sm:space-x-4 mb-2 sm:mb-4">
               <!-- Avatar avec initiales -->
-              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-semibold text-lg">
+              <div class="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-semibold text-xs sm:text-lg">
                 {{ getUserInitials(product.user?.name) }}
               </div>
               <div>
-                <p class="font-medium text-gray-900">{{ product.user?.name }}</p>
-                <p class="text-sm text-gray-500">Membre depuis {{ formatDate(product.user?.created_at) }}</p>
+                <p class="text-sm sm:text-base font-medium text-gray-900">{{ product.user?.name }}</p>
+                <p class="text-xs sm:text-sm text-gray-500">{{ formatDate(product.user?.created_at) }}</p>
               </div>
             </div>
 
@@ -489,6 +497,7 @@ import {
   ImageIcon,
   HeartIcon,
   StarIcon,
+  ShareIcon,
   MessageCircleIcon,
   UserIcon,
   AlertTriangleIcon
@@ -939,6 +948,36 @@ const getStatusText = (status) => {
     reserved: 'Réservé'
   }
   return texts[status] || 'Inconnu'
+}
+
+const shareProduct = async () => {
+  try {
+    const productUrl = `${window.location.origin}/products/${product.value.id}`
+    
+    if (navigator.share) {
+      // Utiliser l'API Web Share si disponible (mobile)
+      await navigator.share({
+        title: product.value.title,
+        text: `Découvrez ce produit : ${product.value.title} - ${formatPrice(product.value.price)}`,
+        url: productUrl
+      })
+    } else {
+      // Fallback : copier le lien dans le presse-papiers
+      await navigator.clipboard.writeText(productUrl)
+      
+      // Notification temporaire
+      const notification = document.createElement('div')
+      notification.textContent = 'Lien copié dans le presse-papiers !'
+      notification.className = 'fixed bottom-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50'
+      document.body.appendChild(notification)
+      
+      setTimeout(() => {
+        document.body.removeChild(notification)
+      }, 3000)
+    }
+  } catch (error) {
+    console.error('Error sharing product:', error)
+  }
 }
 
 // Lifecycle

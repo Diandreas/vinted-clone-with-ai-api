@@ -164,6 +164,7 @@
                 @edit="editProduct"
                 @delete="deleteProduct"
                 @share="shareProduct"
+                @view="viewProduct"
               />
             </div>
             
@@ -433,6 +434,10 @@ const loadActivity = async () => {
 
 const editProduct = (product) => {
   router.push(`/products/${product.id}/edit`)
+}
+
+const viewProduct = (product) => {
+  router.push(`/products/${product.id}`)
 }
 
 const deleteProduct = async (product) => {
