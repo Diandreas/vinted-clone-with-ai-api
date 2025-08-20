@@ -16,6 +16,9 @@
     
     <!-- PWA Install Prompt -->
     <PWAInstallPrompt />
+    
+    <!-- PWA Notification -->
+    <PWANotification />
   </div>
 </template>
 
@@ -26,6 +29,7 @@ import NavBar from '@/components/layout/NavBar.vue'
 import MobileTabBar from '@/components/layout/MobileTabBar.vue'
 import NotificationToast from '@/components/ui/NotificationToast.vue'
 import PWAInstallPrompt from '@/components/ui/PWAInstallPrompt.vue'
+import PWANotification from '@/components/ui/PWANotification.vue'
 
 const route = useRoute()
 

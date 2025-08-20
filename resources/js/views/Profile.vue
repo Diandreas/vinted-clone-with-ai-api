@@ -367,10 +367,15 @@ const tabs = [
 const loadProducts = async () => {
   loadingProducts.value = true
   try {
+    console.log('🔵 Loading user products...')
     const response = await window.axios.get('/products/my-products', {
       params: { per_page: 20 }
     })
-    products.value = response.data.data?.data || []
+    console.log('📦 Products API response:', response.data)
+    console.log('📦 Products data structure:', response.data.data)
+    
+    products.value = response.data.data || []
+    console.log('✅ Products loaded:', products.value.length, 'products')
   } catch (error) {
     console.error('Error loading products:', error)
     products.value = []
@@ -500,14 +505,39 @@ watch(activeTab, (newTab) => {
 // Load user stats
 const loadUserStats = async () => {
   try {
+    console.log('🔵 Loading user stats...')
+    console.log('🔍 Dashboard store stats before:', dashboardStore.stats)
+    
     const response = await window.axios.get('/me/stats')
+    console.log('📊 Stats API response:', response.data)
+    
     if (response.data.success) {
       // Mettre à jour les stats locales
       const userStats = response.data.data
-      dashboardStore.stats.products_count = userStats.products?.total || 0
-      dashboardStore.stats.followers_count = userStats.social?.followers_count || 0
-      dashboardStore.stats.following_count = userStats.social?.following_count || 0
-      dashboardStore.stats.total_sales = userStats.sales?.total_earnings || 0
+      console.log('📈 User stats data:', userStats)
+      
+      // S'assurer que le store stats existe et l'initialiser si nécessaire
+      if (!dashboardStore.stats.value) {
+        console.log('⚠️ Initializing dashboard stats...')
+        dashboardStore.stats.value = {
+          products_count: 0,
+          total_sales: 0,
+          followers_count: 0,
+          following_count: 0,
+          monthly_views: 0,
+          products_trend: 0,
+          sales_trend: 0,
+          followers_trend: 0,
+          views_trend: 0
+        }
+      }
+      
+      dashboardStore.stats.value.products_count = userStats.products?.total || 0
+      dashboardStore.stats.value.followers_count = userStats.social?.followers_count || 0
+      dashboardStore.stats.value.following_count = userStats.social?.following_count || 0
+      dashboardStore.stats.value.total_sales = userStats.sales?.total_earnings || 0
+      
+      console.log('✅ Stats updated:', dashboardStore.stats.value)
     }
   } catch (error) {
     console.error('Error loading user stats:', error)

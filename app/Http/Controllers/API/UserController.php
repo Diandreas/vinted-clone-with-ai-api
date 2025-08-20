@@ -180,7 +180,7 @@ class UserController extends Controller
 
         // Ajouter les accesseurs d'images pour chaque produit
         $products->getCollection()->transform(function ($product) {
-            $productData = $product->toArray();
+            $productData = $product->makeHidden(['mainImage', 'images'])->toArray();
             $productData['main_image_url'] = $product->main_image_url;
             $productData['image_urls'] = $product->image_urls;
             return (object) $productData;
@@ -301,12 +301,26 @@ class UserController extends Controller
     {
         $user = Auth::user();
         
+        \Log::info('🔵 Stats called for user: ' . $user->id);
+        
+        $productsTotal = $user->products()->count();
+        $productsActive = $user->products()->where('status', 'active')->count();
+        $followersCount = $user->followers()->count();
+        $followingCount = $user->following()->count();
+        
+        \Log::info('📊 User stats:', [
+            'products_total' => $productsTotal,
+            'products_active' => $productsActive,
+            'followers_count' => $followersCount,
+            'following_count' => $followingCount
+        ]);
+        
         return response()->json([
             'success' => true,
             'data' => [
                 'products' => [
-                    'total' => $user->products()->count(),
-                    'active' => $user->products()->where('status', 'active')->count(),
+                    'total' => $productsTotal,
+                    'active' => $productsActive,
                     'sold' => $user->products()->where('status', 'sold')->count(),
                     'draft' => $user->products()->where('status', 'draft')->count(),
                 ],
@@ -317,8 +331,8 @@ class UserController extends Controller
                     'pending_orders' => $user->sales()->where('status', 'pending')->count(),
                 ],
                 'social' => [
-                    'followers_count' => $user->followers()->count(),
-                    'following_count' => $user->following()->count(),
+                    'followers_count' => $followersCount,
+                    'following_count' => $followingCount,
                     'average_rating' => 5.0, // TODO: Calculer la vraie moyenne
                     'total_reviews' => 0, // TODO: Implémenter le système de reviews
                 ]

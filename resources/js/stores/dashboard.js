@@ -8,6 +8,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
     products_count: 0,
     total_sales: 0,
     followers_count: 0,
+    following_count: 0,
     monthly_views: 0,
     products_trend: 0,
     sales_trend: 0,
