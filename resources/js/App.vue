@@ -13,6 +13,9 @@
     
     <!-- Toast Notifications -->
     <NotificationToast />
+    
+    <!-- PWA Install Prompt -->
+    <PWAInstallPrompt />
   </div>
 </template>
 
@@ -22,6 +25,7 @@ import { useRoute } from 'vue-router'
 import NavBar from '@/components/layout/NavBar.vue'
 import MobileTabBar from '@/components/layout/MobileTabBar.vue'
 import NotificationToast from '@/components/ui/NotificationToast.vue'
+import PWAInstallPrompt from '@/components/ui/PWAInstallPrompt.vue'
 
 const route = useRoute()
 

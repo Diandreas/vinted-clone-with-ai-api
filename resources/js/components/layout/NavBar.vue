@@ -5,8 +5,8 @@
         <!-- Logo and Brand -->
         <div class="flex items-center space-x-4 sm:space-x-8">
           <RouterLink to="/" class="flex items-center space-x-2 sm:space-x-3 group">
-            <div class="w-8 h-8 sm:w-10 sm:h-10 bg-primary-500 rounded-lg flex items-center justify-center shadow-soft group-hover:shadow-medium transition-all duration-150 group-hover:scale-105">
-              <span class="text-white font-bold text-sm sm:text-lg">R</span>
+            <div class="w-8 h-8 sm:w-10 sm:h-10 bg-white rounded-lg flex items-center justify-center shadow-soft group-hover:shadow-medium transition-all duration-150 group-hover:scale-105 overflow-hidden">
+              <img src="/logo.png" alt="RIKEAA" class="w-full h-full object-cover rounded-lg" />
             </div>
             <span class="text-lg sm:text-xl font-bold text-primary-600">RIKEAA</span>
           </RouterLink>
@@ -79,6 +79,9 @@
           >
             Vendre
           </RouterLink>
+
+          <!-- PWA Install Button -->
+          <InstallPWAButton />
 
           <!-- Mobile Search Toggle -->
           <button
@@ -271,6 +274,7 @@ import {
 // Components
 import NotificationDropdown from '@/components/layout/NotificationDropdown.vue'
 import UserDropdown from '@/components/layout/UserDropdown.vue'
+import InstallPWAButton from '@/components/ui/InstallPWAButton.vue'
 
 // Fonctions de génération d'avatar dynamique
 const generateDefaultAvatar = (name, id) => {

@@ -152,16 +152,27 @@ class ConversationController extends Controller
     public function myProductDiscussions()
     {
         $user = Auth::user();
+        \Log::info('🔵 myProductDiscussions called for user: ' . $user->id);
         $conversations = Conversation::getProductConversationsForBuyer($user);
+        \Log::info('🔍 Found ' . $conversations->count() . ' conversations');
         
         // Ajouter les accesseurs d'images pour chaque produit dans les conversations
         $conversations = $conversations->map(function ($conversation) {
             if ($conversation->product) {
+                // Forcer le chargement des relations d'images
+                $conversation->product->load(['mainImage', 'images']);
+                
                 // Create a clean product data array without relations
                 $productData = $conversation->product->makeHidden(['mainImage', 'images'])->toArray();
                 $productData['main_image_url'] = $conversation->product->main_image_url;
                 $productData['image_urls'] = $conversation->product->image_urls;
-                $conversation->product = (object) $productData;
+                
+                \Log::info('🔍 Product ' . $conversation->product->id . ' main_image_url: ' . $productData['main_image_url']);
+                
+                // Replace product data
+                $conversationArray = $conversation->toArray();
+                $conversationArray['product'] = $productData;
+                return (object) $conversationArray;
             }
             return $conversation;
         });
@@ -189,7 +200,7 @@ class ConversationController extends Controller
                 $product = $firstConversation->product;
                 
                 // Ajouter les accesseurs d'images (les relations sont déjà chargées par la requête)
-                $productData = $product->toArray();
+                $productData = $product->makeHidden(['mainImage', 'images'])->toArray();
                 $productData['main_image_url'] = $product->main_image_url;
                 $productData['image_urls'] = $product->image_urls;
                 

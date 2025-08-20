@@ -37,6 +37,8 @@
             :alt="conversation.product.title"
             loading="lazy"
             @error="onImageError"
+            @load="onImageLoad"
+            :style="{ backgroundColor: '#f0f0f0', border: '1px solid red' }"
           />
           <div v-if="getUnreadCount(conversation)" class="unread-badge">
             {{ getUnreadCount(conversation) }}
@@ -155,6 +157,8 @@ export default {
         loading.value = true
         const response = await api.get('/conversations/my-product-discussions')
         conversations.value = response.data.data || []
+        console.log('🔍 Debug fetchConversations - API response:', response.data)
+        console.log('🔍 Debug fetchConversations - conversations:', conversations.value)
       } catch (error) {
         console.error('Erreur lors du chargement des conversations:', error)
       } finally {
@@ -216,31 +220,47 @@ export default {
     }
 
     const getProductImage = (product) => {
-      if (!product) return '/placeholder-product.jpg'
+      console.log('🔍 Debug getProductImage - product:', product)
+      
+      if (!product) {
+        console.log('❌ No product provided')
+        return '/placeholder-product.jpg'
+      }
       
       // If main_image_url is a string, use it
       if (typeof product.main_image_url === 'string') {
+        console.log('✅ Using main_image_url:', product.main_image_url)
         return product.main_image_url
       }
       
       // If main_image is an object with filename, construct URL
       if (product.main_image && typeof product.main_image === 'object' && product.main_image.filename) {
-        return `http://localhost:8000/api/v1/files/products/${product.main_image.filename}`
+        const url = `http://localhost:8000/api/v1/files/products/${product.main_image.filename}`
+        console.log('✅ Using main_image object:', url)
+        return url
       }
       
       // If main_image is a string (filename), construct URL
       if (typeof product.main_image === 'string') {
-        return `http://localhost:8000/api/v1/files/products/${product.main_image}`
+        const url = `http://localhost:8000/api/v1/files/products/${product.main_image}`
+        console.log('✅ Using main_image string:', url)
+        return url
       }
       
       // Fallback to placeholder
+      console.log('❌ Fallback to placeholder')
       return '/placeholder-product.jpg'
     }
 
     const onImageError = (event) => {
+      console.log('❌ Image failed to load:', event.target.src)
       if (event.target.src !== '/placeholder-product.jpg') {
         event.target.src = '/placeholder-product.jpg'
       }
+    }
+
+    const onImageLoad = (event) => {
+      console.log('✅ Image loaded successfully:', event.target.src)
     }
 
     onMounted(() => {
@@ -260,6 +280,7 @@ export default {
       toggleFavorite,
       getProductImage,
       onImageError,
+      onImageLoad,
       extractMessageContent
     }
   }
