@@ -125,7 +125,11 @@
                 </span>
               </div>
               <div class="text-sm text-gray-500">
-                Par {{ product.user?.name }}
+                Par <VerifiedSellerName 
+                  :seller-name="product.user?.name" 
+                  :is-verified="product.user?.is_verified"
+                  text-class="text-gray-500"
+                />
               </div>
             </div>
           </div>
@@ -177,6 +181,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { debounce } from 'lodash'
+import VerifiedSellerName from '@/components/ui/VerifiedSellerName.vue'
 import {
   PackageIcon,
   SearchIcon,

@@ -4,21 +4,21 @@
     <div class="bg-white/90 backdrop-blur-sm shadow-sm border-b border-green-200/50 sticky top-0 z-10">
       <div class="max-w-4xl mx-auto px-2 py-1.5 sm:px-4 sm:py-4">
         <div class="flex items-center justify-between">
-          <button
-            @click="router.back()"
+        <button
+          @click="router.back()"
             class="p-1 sm:p-2 rounded-lg bg-green-100 text-green-700 hover:bg-green-200 transition-colors"
-          >
+        >
             <ArrowLeftIcon class="w-3.5 h-3.5 sm:w-5 sm:h-5" />
-          </button>
-          
+        </button>
+        
           <h1 class="text-sm sm:text-lg font-semibold text-green-900">Profil</h1>
           
-          <RouterLink
-            to="/profile/edit"
+        <RouterLink
+          to="/profile/edit"
             class="p-1 sm:p-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition-colors"
-          >
+        >
             <EditIcon class="w-3.5 h-3.5 sm:w-5 sm:h-5" />
-          </RouterLink>
+        </RouterLink>
         </div>
       </div>
     </div>
@@ -32,38 +32,38 @@
         <div class="text-center mb-3 sm:mb-6">
           <div class="relative inline-block mb-2 sm:mb-4">
             <div class="w-14 h-14 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-full bg-gradient-to-br from-green-500 via-emerald-500 to-teal-600 flex items-center justify-center text-white text-lg sm:text-2xl lg:text-3xl font-bold border-2 sm:border-4 border-white shadow-lg">
-              {{ user?.name?.charAt(0)?.toUpperCase() || 'U' }}
-            </div>
+                  {{ user?.name?.charAt(0)?.toUpperCase() || 'U' }}
+                </div>
             <div class="absolute -bottom-0.5 sm:-bottom-1 -right-0.5 sm:-right-1 w-3 h-3 sm:w-5 sm:h-5 lg:w-6 lg:h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
               <div class="w-1 h-1 sm:w-2 sm:h-2 lg:w-2.5 lg:h-2.5 bg-white rounded-full"></div>
-            </div>
-          </div>
-          
+                </div>
+              </div>
+              
           <h2 class="text-lg sm:text-2xl lg:text-3xl font-bold text-green-900 mb-1 sm:mb-2">{{ user?.name || 'Utilisateur' }}</h2>
           <p v-if="user?.username" class="text-green-600 text-sm sm:text-lg mb-1.5 sm:mb-3">@{{ user.username }}</p>
           <p v-if="user?.bio" class="text-gray-600 text-xs sm:text-sm max-w-md mx-auto">{{ user.bio }}</p>
           
           <div v-if="user?.is_verified" class="inline-flex items-center px-1.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-xs sm:text-sm font-medium bg-green-100 text-green-800 mt-1.5 sm:mt-3">
             <svg class="w-2.5 h-2.5 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-            </svg>
-            Vérifié
+                      <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    </svg>
+                    Vérifié
           </div>
-        </div>
+                </div>
         
         <!-- Infos supplémentaires - Ultra Compact mobile -->
         <div v-if="user?.location || user?.website" class="flex flex-col sm:flex-row justify-center items-center space-y-1 sm:space-y-0 sm:space-x-6 text-xs sm:text-sm text-gray-600 mb-3 sm:mb-6">
           <span v-if="user?.location" class="flex items-center">
             <MapPinIcon class="w-2.5 h-2.5 sm:w-4 sm:h-4 mr-1 sm:mr-2 text-green-600" />
-            {{ user.location }}
-          </span>
+                    {{ user.location }}
+                  </span>
           <span v-if="user?.website" class="flex items-center">
             <LinkIcon class="w-2.5 h-2.5 sm:w-4 sm:h-4 mr-1 sm:mr-2 text-green-600" />
             <a :href="user.website" target="_blank" class="text-green-600 hover:text-green-700 transition-colors">
-              Site web
-            </a>
-          </span>
-        </div>
+                      Site web
+                    </a>
+                  </span>
+                </div>
         
         <!-- Actions rapides - Ultra Compact mobile -->
         <div class="flex flex-col sm:flex-row space-y-1.5 sm:space-y-0 sm:space-x-4 justify-center">
@@ -75,13 +75,13 @@
             Vendre un article
           </RouterLink>
           
-          <RouterLink
-            to="/profile/edit"
+              <RouterLink
+                to="/profile/edit"
             class="inline-flex items-center justify-center px-3 py-2 sm:px-6 sm:py-3 bg-white text-green-700 border-2 border-green-300 font-semibold rounded-lg sm:rounded-xl hover:bg-green-50 hover:border-green-400 transition-all duration-200 shadow-md hover:shadow-lg text-xs sm:text-base"
-          >
+              >
             <EditIcon class="w-3.5 h-3.5 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
             Modifier profil
-          </RouterLink>
+              </RouterLink>
           
           <!-- Bouton de déconnexion -->
           <button
@@ -91,23 +91,23 @@
             <LogOutIcon class="w-3.5 h-3.5 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
             Se déconnecter
           </button>
-        </div>
       </div>
+    </div>
 
       <!-- Stats principales - Ultra Compact mobile -->
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-4 mb-3 sm:mb-6">
         <div class="bg-white/80 backdrop-blur-sm rounded-lg sm:rounded-xl shadow-lg border border-green-200/50 p-2 sm:p-4 text-center hover:shadow-xl transition-all duration-200">
           <div class="text-base sm:text-xl lg:text-2xl font-bold text-green-600 mb-0.5 sm:mb-1">{{ stats?.products_count || 0 }}</div>
           <div class="text-xs sm:text-sm text-gray-600">Produits</div>
-        </div>
+            </div>
         <div class="bg-white/80 backdrop-blur-sm rounded-lg sm:rounded-xl shadow-lg border border-green-200/50 p-2 sm:p-4 text-center hover:shadow-xl transition-all duration-200">
           <div class="text-base sm:text-xl lg:text-2xl font-bold text-green-600 mb-0.5 sm:mb-1">{{ stats?.followers_count || 0 }}</div>
           <div class="text-xs sm:text-sm text-gray-600">Followers</div>
-        </div>
+            </div>
         <div class="bg-white/80 backdrop-blur-sm rounded-lg sm:rounded-xl shadow-lg border border-green-200/50 p-2 sm:p-4 text-center hover:shadow-xl transition-all duration-200">
           <div class="text-base sm:text-xl lg:text-2xl font-bold text-green-600 mb-0.5 sm:mb-1">{{ stats?.following_count || 0 }}</div>
           <div class="text-xs sm:text-sm text-gray-600">Following</div>
-        </div>
+            </div>
         <div class="bg-white/80 backdrop-blur-sm rounded-lg sm:rounded-xl shadow-lg border border-green-200/50 p-2 sm:p-4 text-center hover:shadow-xl transition-all duration-200">
           <div class="text-base sm:text-xl lg:text-2xl font-bold text-green-600 mb-0.5 sm:mb-1">{{ stats?.total_sales || 0 }}</div>
           <div class="text-xs sm:text-sm text-gray-600">Ventes</div>
@@ -132,17 +132,17 @@
             <div class="flex items-center justify-center space-x-1 sm:space-x-2">
               <component :is="tab.icon" class="w-3 h-3 sm:w-4 sm:h-4" />
               <span class="hidden sm:inline">{{ tab.label }}</span>
-            </div>
+        </div>
           </button>
         </div>
-        
+
         <!-- Tab content - Ultra Compact mobile -->
         <div class="p-2.5 sm:p-4 lg:p-6">
           <!-- Produits -->
           <div v-if="activeTab === 'products'" class="space-y-2.5 sm:space-y-4">
             <div class="flex items-center justify-between mb-2.5 sm:mb-4">
               <h3 class="text-sm sm:text-lg font-semibold text-green-900">Mes Produits</h3>
-              <RouterLink 
+              <RouterLink
                 to="/products/create"
                 class="inline-flex items-center px-2 py-1 sm:px-3 sm:py-2 bg-green-600 text-white text-xs sm:text-sm rounded-lg hover:bg-green-700 transition-colors"
               >
@@ -202,10 +202,10 @@
                 :key="follower.id"
                 class="flex items-center justify-between p-2.5 sm:p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
               >
-                <div class="flex items-center space-x-2 sm:space-x-3">
+                  <div class="flex items-center space-x-2 sm:space-x-3">
                   <div class="w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center text-white font-semibold text-xs sm:text-base">
                     {{ follower.name?.charAt(0)?.toUpperCase() || 'U' }}
-                  </div>
+                    </div>
                   <div>
                     <div class="font-medium text-gray-900 text-xs sm:text-base">{{ follower.name }}</div>
                     <div class="text-xs sm:text-sm text-gray-600">@{{ follower.username }}</div>
@@ -247,10 +247,10 @@
                 :key="followed.id"
                 class="flex items-center justify-between p-2.5 sm:p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
               >
-                <div class="flex items-center space-x-2 sm:space-x-3">
+                  <div class="flex items-center space-x-2 sm:space-x-3">
                   <div class="w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center text-white font-semibold text-xs sm:text-base">
                     {{ followed.name?.charAt(0)?.toUpperCase() || 'U' }}
-                  </div>
+                    </div>
                   <div>
                     <div class="font-medium text-gray-900 text-xs sm:text-base">{{ followed.name }}</div>
                     <div class="text-xs sm:text-sm text-gray-600">@{{ followed.username }}</div>

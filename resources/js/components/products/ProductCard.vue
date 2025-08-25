@@ -118,10 +118,11 @@
             class="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 rounded-full object-cover"
             @error="handleAvatarError"
           />
-          <span class="text-xs sm:text-sm text-gray-600">{{ product.user?.name }}</span>
-          <div v-if="product.user?.is_verified" class="text-primary-500">
-            <CheckCircleIcon class="w-2.5 h-2.5 sm:w-3 sm:h-3 lg:w-4 lg:h-4" />
-          </div>
+          <VerifiedSellerName 
+            :seller-name="product.user?.name" 
+            :is-verified="product.user?.is_verified"
+            text-class="text-xs sm:text-sm text-gray-600"
+          />
         </div>
 
         <!-- Stats -->
@@ -162,13 +163,13 @@ import { ref, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { formatPrice } from '@/utils/currency'
 import ProductImage from '@/components/ui/ProductImage.vue'
+import VerifiedSellerName from '@/components/ui/VerifiedSellerName.vue'
 import {
   HeartIcon,
   BookmarkIcon,
   EyeIcon,
   EditIcon,
-  TrashIcon,
-  CheckCircleIcon
+  TrashIcon
 } from 'lucide-vue-next'
 
 // Fonctions de génération d'avatar dynamique

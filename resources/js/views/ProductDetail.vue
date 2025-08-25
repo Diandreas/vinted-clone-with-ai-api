@@ -148,7 +148,10 @@
                 {{ getUserInitials(product.user?.name) }}
               </div>
               <div>
-                <p class="text-sm sm:text-base font-medium text-gray-900">{{ product.user?.name }}</p>
+                <VerifiedSellerName 
+                  :seller-name="product.user?.name" 
+                  :is-verified="product.user?.is_verified" 
+                />
                 <p class="text-xs sm:text-sm text-gray-500">{{ formatDate(product.user?.created_at) }}</p>
               </div>
             </div>
@@ -160,8 +163,72 @@
                 class="w-full bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 transition-colors"
               >
                 <MessageCircleIcon class="w-4 h-4 mr-2 inline" />
-                {{ showProductConversations ? 'Masquer' : 'Voir' }} conversations ({{ productConversations.length }})
+                Rafraîchir mes messages ({{ productConversations.length }})
               </button>
+
+              <!-- Liste des conversations - Visible directement sous le bouton -->
+              <div v-if="isProductOwner" class="mt-4">
+                <div class="bg-white rounded-xl border border-gray-200 p-4">
+                  <h4 class="text-lg font-semibold text-gray-900 mb-3">
+                    Personnes intéressées par ce produit
+                  </h4>
+
+                  <!-- Loading conversations -->
+                  <div v-if="loadingConversations" class="flex items-center justify-center py-6">
+                    <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600"></div>
+                    <span class="ml-2 text-gray-600 text-sm">Chargement...</span>
+                  </div>
+
+                  <!-- No conversations -->
+                  <div v-else-if="productConversations.length === 0" class="text-center py-6">
+                    <MessageCircleIcon class="mx-auto h-8 w-8 text-gray-400 mb-3" />
+                    <p class="text-gray-500 text-sm">Aucune personne ne s'est encore manifestée pour ce produit.</p>
+                  </div>
+
+                  <!-- Conversations list -->
+                  <div v-else class="space-y-3">
+                    <div
+                      v-for="conversation in productConversations"
+                      :key="conversation.id"
+                      class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                    >
+                      <div class="flex items-center space-x-3">
+                        <!-- Buyer avatar -->
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-semibold text-sm">
+                          {{ getUserInitials(conversation.buyer?.name) }}
+                        </div>
+
+                        <!-- Buyer info & last message -->
+                        <div class="min-w-0 flex-1">
+                          <p class="font-medium text-gray-900 text-sm">{{ conversation.buyer?.name }}</p>
+                          <p class="text-xs text-gray-500 truncate" v-if="conversation.last_message">
+                            "{{ extractMessageContent(conversation.last_message.content, 40) }}..."
+                          </p>
+                          <p class="text-xs text-gray-400">
+                            {{ formatMessageDate(conversation.last_message_at) }}
+                          </p>
+                        </div>
+                      </div>
+
+                      <!-- Actions -->
+                      <div class="flex items-center space-x-2">
+                        <span
+                          v-if="conversation.unread_count > 0"
+                          class="bg-red-500 text-white text-xs px-2 py-1 rounded-full"
+                        >
+                          {{ conversation.unread_count }} nouveau{{ conversation.unread_count > 1 ? 'x' : '' }}
+                        </span>
+                        <button
+                          @click="openConversation(conversation)"
+                          class="px-3 py-1 bg-primary-600 text-white text-xs rounded hover:bg-primary-700 transition-colors"
+                        >
+                          Répondre
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
               <div class="grid gap-2" :class="canEditProduct ? 'grid-cols-2' : 'grid-cols-1'">
                 <button
@@ -315,69 +382,7 @@
         </div>
       </div>
 
-      <!-- Product Conversations (for owner) -->
-      <div v-if="isProductOwner && showProductConversations" class="mt-8">
-        <div class="bg-white rounded-xl border border-gray-200 p-6">
-          <h3 class="text-xl font-semibold text-gray-900 mb-4">
-            Personnes intéressées par ce produit
-          </h3>
 
-          <!-- Loading conversations -->
-          <div v-if="loadingConversations" class="flex items-center justify-center py-8">
-            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
-            <span class="ml-2 text-gray-600">Chargement des conversations...</span>
-          </div>
-
-          <!-- No conversations -->
-          <div v-else-if="productConversations.length === 0" class="text-center py-8">
-            <MessageCircleIcon class="mx-auto h-12 w-12 text-gray-400 mb-4" />
-            <p class="text-gray-500">Aucune personne ne s'est encore manifestée pour ce produit.</p>
-          </div>
-
-          <!-- Conversations list -->
-          <div v-else class="space-y-4">
-            <div
-              v-for="conversation in productConversations"
-              :key="conversation.id"
-              class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              <div class="flex items-center space-x-4">
-                <!-- Buyer avatar -->
-                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-semibold">
-                  {{ getUserInitials(conversation.buyer?.name) }}
-                </div>
-
-                <!-- Buyer info & last message -->
-                <div>
-                  <p class="font-medium text-gray-900">{{ conversation.buyer?.name }}</p>
-                  <p class="text-sm text-gray-500" v-if="conversation.last_message">
-                    "{{ extractMessageContent(conversation.last_message.content, 50) }}..."
-                  </p>
-                  <p class="text-xs text-gray-400">
-                    {{ formatMessageDate(conversation.last_message_at) }}
-                  </p>
-                </div>
-              </div>
-
-              <!-- Actions -->
-              <div class="flex items-center space-x-2">
-                <span
-                  v-if="conversation.unread_count > 0"
-                  class="bg-gray-500 text-white text-xs px-2 py-1 rounded-full"
-                >
-                  {{ conversation.unread_count }} nouveau{{ conversation.unread_count > 1 ? 'x' : '' }}
-                </span>
-                <button
-                  @click="openConversation(conversation)"
-                  class="px-3 py-1 bg-primary-600 text-white text-sm rounded hover:bg-primary-700 transition-colors"
-                >
-                  Répondre
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- Error State -->
@@ -436,7 +441,10 @@
               {{ getUserInitials(product?.user?.name) }}
             </div>
             <div>
-              <p class="text-sm font-medium text-gray-900">{{ product?.user?.name }}</p>
+              <VerifiedSellerName 
+                :seller-name="product?.user?.name" 
+                :is-verified="product?.user?.is_verified" 
+              />
               <p class="text-xs text-gray-500">Vendeur</p>
             </div>
           </div>
@@ -491,6 +499,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import api from '@/services/api'
 import { extractMessageContent } from '@/utils/messageUtils'
+import VerifiedSellerName from '@/components/ui/VerifiedSellerName.vue'
 import {
   HomeIcon,
   ChevronRightIcon,
@@ -523,7 +532,6 @@ const sendingMessage = ref(false)
 const messageError = ref('')
 
 // Product Conversations State (for owner)
-const showProductConversations = ref(false)
 const productConversations = ref([])
 const loadingConversations = ref(false)
 
@@ -810,13 +818,6 @@ const viewMyProductConversations = () => {
 }
 
 const loadProductConversations = async () => {
-  if (showProductConversations.value) {
-    // Si déjà ouvert, fermer
-    showProductConversations.value = false
-    return
-  }
-
-  showProductConversations.value = true
   loadingConversations.value = true
 
   console.log('🔵 Chargement conversations pour produit:', product.value.id)
@@ -832,7 +833,7 @@ const loadProductConversations = async () => {
       console.log('✅ Conversations chargées:', {
         product: response.data.data.product?.title,
         conversations_count: productConversations.value.length,
-        unread_total: response.data.data.unread_count
+        unread_count: response.data.data.unread_count
       })
     }
   } catch (error) {
@@ -981,7 +982,7 @@ const shareProduct = async () => {
 }
 
 // Lifecycle
-onMounted(() => {
+onMounted(async () => {
   console.log('🔵 ProductDetail onMounted')
   console.log('Route params:', route.params)
   console.log('Auth store state:', {
@@ -989,7 +990,14 @@ onMounted(() => {
     user: authStore.user,
     token: authStore.token?.substring(0, 20) + '...'
   })
-  loadProduct()
+  
+  await loadProduct()
+  
+  // Charger automatiquement les conversations si l'utilisateur est le propriétaire
+  if (isProductOwner.value && product.value) {
+    console.log('🔵 Chargement automatique des conversations pour le propriétaire')
+    await loadProductConversations()
+  }
 })
 </script>
 

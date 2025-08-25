@@ -57,7 +57,11 @@
             class="w-5 h-5 rounded-full object-cover"
             @error="handleAvatarError"
           />
-          <span class="text-xs text-gray-600">{{ product.user?.name }}</span>
+          <VerifiedSellerName 
+            :seller-name="product.user?.name" 
+            :is-verified="product.user?.is_verified"
+            text-class="text-xs text-gray-600"
+          />
         </div>
         
         <div class="flex items-center space-x-2 text-xs text-gray-500">
@@ -78,6 +82,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import VerifiedSellerName from '@/components/ui/VerifiedSellerName.vue'
 import {
   HeartIcon,
   EyeIcon,

@@ -84,6 +84,11 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/profile/:id',
+    name: 'profile-redirect',
+    redirect: to => ({ name: 'user-profile', params: { id: to.params.id } })
+  },
+  {
     path: '/profile/edit',
     name: 'edit-profile',
     component: EditProfile,
