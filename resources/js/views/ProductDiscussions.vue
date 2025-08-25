@@ -28,6 +28,10 @@
         v-for="conversation in conversations" 
         :key="conversation.id"
         class="conversation-card"
+        :class="{
+          'opacity-60 grayscale': isProductUnavailable(conversation.product),
+          'cursor-not-allowed': isProductUnavailable(conversation.product)
+        }"
         @click="openConversation(conversation)"
       >
         <!-- Product Image -->
@@ -39,9 +43,21 @@
             @error="onImageError"
             @load="onImageLoad"
             :style="{ backgroundColor: '#f0f0f0', border: '1px solid red' }"
+            :class="{ 'grayscale': isProductUnavailable(conversation.product) }"
           />
           <div v-if="getUnreadCount(conversation)" class="unread-badge">
             {{ getUnreadCount(conversation) }}
+          </div>
+          
+          <!-- Unavailable Overlay -->
+          <div 
+            v-if="isProductUnavailable(conversation.product)" 
+            class="product-unavailable-overlay"
+          >
+            <div class="unavailable-content">
+              <div class="unavailable-text">{{ getUnavailableText(conversation.product) }}</div>
+              <div class="unavailable-description">{{ getUnavailableDescription(conversation.product) }}</div>
+            </div>
           </div>
         </div>
 
@@ -52,6 +68,13 @@
             <div class="seller-info">
               <span class="seller-name">avec @{{ conversation.seller.name }}</span>
               <span class="product-price">{{ conversation.product.formatted_price }}</span>
+            </div>
+            
+            <!-- Product Status Badge -->
+            <div v-if="isProductUnavailable(conversation.product)" class="product-status-badge">
+              <span :class="['status-indicator', getProductStatusClass(conversation.product)]">
+                {{ getProductStatusText(conversation.product) }}
+              </span>
             </div>
           </div>
 
@@ -263,6 +286,38 @@ export default {
       console.log('✅ Image loaded successfully:', event.target.src)
     }
 
+    const isProductUnavailable = (product) => {
+      return product.is_sold || product.is_deleted || !product.is_active
+    }
+
+    const getUnavailableText = (product) => {
+      if (product.is_sold) return 'Vendu'
+      if (product.is_deleted) return 'Supprimé'
+      if (!product.is_active) return 'Désactivé'
+      return 'Indisponible'
+    }
+
+    const getUnavailableDescription = (product) => {
+      if (product.is_sold) return 'Ce produit a été vendu.'
+      if (product.is_deleted) return 'Ce produit a été supprimé.'
+      if (!product.is_active) return 'Ce produit est actuellement désactivé.'
+      return 'Ce produit est actuellement indisponible.'
+    }
+
+    const getProductStatusClass = (product) => {
+      if (product.is_sold) return 'status-sold'
+      if (product.is_deleted) return 'status-deleted'
+      if (!product.is_active) return 'status-inactive'
+      return 'status-active'
+    }
+
+    const getProductStatusText = (product) => {
+      if (product.is_sold) return 'Vendu'
+      if (product.is_deleted) return 'Supprimé'
+      if (!product.is_active) return 'Désactivé'
+      return 'Actif'
+    }
+
     onMounted(() => {
       fetchConversations()
     })
@@ -281,7 +336,12 @@ export default {
       getProductImage,
       onImageError,
       onImageLoad,
-      extractMessageContent
+      extractMessageContent,
+      isProductUnavailable,
+      getUnavailableText,
+      getUnavailableDescription,
+      getProductStatusClass,
+      getProductStatusText
     }
   }
 }
@@ -583,6 +643,112 @@ export default {
 
 .btn-primary:hover {
   background: #0056b3;
+}
+
+.product-unavailable-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  z-index: 1;
+}
+
+.unavailable-content {
+  text-align: center;
+}
+
+.unavailable-text {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.unavailable-description {
+  font-size: 14px;
+  color: #ccc;
+}
+
+.status-indicator {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-sold {
+  background: #ffebee;
+  color: #f44336;
+}
+
+.status-deleted {
+  background: #ffebee;
+  color: #f44336;
+}
+
+.status-inactive {
+  background: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.status-active {
+  background: #e8f5e8;
+  color: #4caf50;
+}
+
+/* Grisage des conversations avec produits indisponibles */
+.conversation-card.opacity-60 {
+  opacity: 0.6;
+}
+
+.conversation-card.grayscale {
+  filter: grayscale(100%);
+}
+
+.conversation-card.cursor-not-allowed {
+  cursor: not-allowed;
+}
+
+.product-image.grayscale {
+  filter: grayscale(100%);
+}
+
+.product-status-badge {
+  margin-top: 8px;
+}
+
+.status-indicator {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-sold {
+  background: #ffebee;
+  color: #f44336;
+}
+
+.status-deleted {
+  background: #ffebee;
+  color: #f44336;
+}
+
+.status-inactive {
+  background: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.status-active {
+  background: #e8f5e8;
+  color: #4caf50;
 }
 
 @media (max-width: 768px) {

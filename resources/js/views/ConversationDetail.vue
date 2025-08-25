@@ -12,23 +12,43 @@
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-3">
             <!-- Product Image - Compact -->
-            <div class="w-12 h-12 sm:w-14 sm:h-14 bg-gray-100 rounded-lg overflow-hidden">
+            <div class="w-12 h-12 sm:w-14 sm:h-14 bg-gray-100 rounded-lg overflow-hidden relative">
               <ProductImage
                 :src="getProductImageUrl(conversation.product)"
                 :alt="conversation.product?.title || 'Produit'"
                 :product-id="conversation.product?.id"
                 fallback="/placeholder-product.jpg"
                 image-classes="w-full h-full object-cover rounded-lg"
+                :class="{ 'grayscale': isProductUnavailable }"
               />
+              
+              <!-- Unavailable Overlay -->
+              <div 
+                v-if="isProductUnavailable" 
+                class="absolute inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center rounded-lg"
+              >
+                <div class="text-center text-white">
+                  <div class="text-xs font-semibold">{{ getUnavailableText() }}</div>
+                </div>
+              </div>
             </div>
             
             <!-- Product & Participant Info - Compact -->
             <div>
-              <h1 class="text-lg sm:text-xl font-semibold text-gray-900 truncate max-w-48 sm:max-w-none">{{ conversation.product?.title }}</h1>
+              <h1 class="text-lg sm:text-xl font-semibold text-gray-900 truncate max-w-48 sm:max-w-none">
+                {{ conversation.product?.title }}
+              </h1>
               <p class="text-sm text-gray-500">
                 Conversation avec {{ otherParticipant?.name }}
               </p>
               <p class="text-xs text-gray-400">{{ formatPrice(conversation.product?.price) }}</p>
+              
+              <!-- Product Status Badge -->
+              <div v-if="isProductUnavailable" class="mt-1">
+                <span :class="['inline-block px-2 py-1 text-xs font-medium rounded-full', getProductStatusClass()]">
+                  {{ getProductStatusText() }}
+                </span>
+              </div>
             </div>
           </div>
           
@@ -267,6 +287,59 @@ const getProductImageUrl = (product) => {
   // Fallback to placeholder
   return '/placeholder-product.jpg'
 }
+
+// Computed property for product unavailability
+const isProductUnavailable = computed(() => {
+  if (!conversation.value || !conversation.value.product) {
+    return false
+  }
+  return conversation.value.product.is_sold || conversation.value.product.is_deleted || conversation.value.product.is_inactive
+})
+
+// Computed property for product status text
+const getUnavailableText = computed(() => {
+  if (!conversation.value || !conversation.value.product) {
+    return ''
+  }
+  if (conversation.value.product.is_sold) {
+    return 'Vendu'
+  } else if (conversation.value.product.is_deleted) {
+    return 'Supprimé'
+  } else if (conversation.value.product.is_inactive) {
+    return 'Désactivé'
+  }
+  return ''
+})
+
+// Computed property for product status class
+const getProductStatusClass = computed(() => {
+  if (!conversation.value || !conversation.value.product) {
+    return ''
+  }
+  if (conversation.value.product.is_sold) {
+    return 'bg-green-100 text-green-800'
+  } else if (conversation.value.product.is_deleted) {
+    return 'bg-red-100 text-red-800'
+  } else if (conversation.value.product.is_inactive) {
+    return 'bg-yellow-100 text-yellow-800'
+  }
+  return ''
+})
+
+// Computed property for product status text
+const getProductStatusText = computed(() => {
+  if (!conversation.value || !conversation.value.product) {
+    return ''
+  }
+  if (conversation.value.product.is_sold) {
+    return 'Vendu'
+  } else if (conversation.value.product.is_deleted) {
+    return 'Supprimé'
+  } else if (conversation.value.product.is_inactive) {
+    return 'Désactivé'
+  }
+  return ''
+})
 
 // Lifecycle
 onMounted(() => {

@@ -44,22 +44,48 @@
         v-for="productData in productsWithConversations" 
         :key="productData.product.id"
         class="product-conversations-card"
+        :class="{
+          'opacity-60 grayscale': isProductUnavailable(productData.product),
+          'cursor-not-allowed': isProductUnavailable(productData.product)
+        }"
       >
         <!-- Product Header -->
         <div class="product-header" @click="toggleProduct(productData.product.id)">
           <div class="product-main-info">
-            <ProductImage
-              :src="productData.product.main_image_url || productData.product.main_image"
-              :alt="productData.product.title"
-              :product-id="productData.product.id"
-              fallback="/placeholder-product.jpg"
-              image-classes="product-image"
-            />
+            <div class="product-image-container relative">
+              <ProductImage
+                :src="productData.product.main_image_url || productData.product.main_image"
+                :alt="productData.product.title"
+                :product-id="productData.product.id"
+                fallback="/placeholder-product.jpg"
+                image-classes="product-image"
+                :class="{ 'grayscale': isProductUnavailable(productData.product) }"
+              />
+              
+              <!-- Unavailable Overlay -->
+              <div 
+                v-if="isProductUnavailable(productData.product)" 
+                class="product-unavailable-overlay"
+              >
+                <div class="unavailable-content">
+                  <div class="unavailable-text">{{ getUnavailableText(productData.product) }}</div>
+                  <div class="unavailable-description">{{ getUnavailableDescription(productData.product) }}</div>
+                </div>
+              </div>
+            </div>
+            
             <div class="product-details">
               <h3 class="product-title">{{ productData.product.title }}</h3>
               <div class="product-meta">
                 <span class="product-price">{{ productData.product.formatted_price }}</span>
                 <span class="product-status" :class="getProductStatusClass(productData.product)">
+                  {{ getProductStatusText(productData.product) }}
+                </span>
+              </div>
+              
+              <!-- Product Status Badge -->
+              <div v-if="isProductUnavailable(productData.product)" class="mt-2">
+                <span :class="['inline-block px-2 py-1 text-xs font-medium rounded-full', getProductStatusClass(productData.product)]">
                   {{ getProductStatusText(productData.product) }}
                 </span>
               </div>
@@ -108,30 +134,43 @@
               :key="conversation.id"
               class="buyer-conversation"
               :class="{ 'has-unread': getConversationUnreadCount(conversation) > 0 }"
-              @click="openConversation(conversation)"
             >
-              <!-- Buyer Info -->
-              <div class="buyer-info">
-                <img 
-                  :src="conversation.buyer.avatar || generateDefaultAvatar(conversation.buyer.name, conversation.buyer.id)" 
-                  :alt="conversation.buyer.name"
-                  class="buyer-avatar"
-                  @error="handleBuyerAvatarError($event, conversation.buyer)"
-                />
-                <div class="buyer-details">
-                  <div class="buyer-name">@{{ conversation.buyer.name }}</div>
-                  <div class="buyer-meta">
-                    <span class="join-date">
-                      Membre depuis {{ formatJoinDate(conversation.buyer.created_at) }}
-                    </span>
-                    <span class="rating" v-if="conversation.buyer.rating">
-                      ⭐ {{ conversation.buyer.rating }}/5
-                    </span>
+              <!-- Buyer Header - Clickable to expand conversation details -->
+              <div class="buyer-header" @click="toggleConversationDetails(conversation.id)">
+                <!-- Buyer Info -->
+                <div class="buyer-info">
+                  <img 
+                    :src="conversation.buyer.avatar || generateDefaultAvatar(conversation.buyer.name, conversation.buyer.id)" 
+                    :alt="conversation.buyer.name"
+                    class="buyer-avatar"
+                    @error="handleBuyerAvatarError($event, conversation.buyer)"
+                  />
+                  <div class="buyer-details">
+                    <div class="buyer-name">@{{ conversation.buyer.name }}</div>
+                    <div class="buyer-meta">
+                      <span class="join-date">
+                        Membre depuis {{ formatJoinDate(conversation.buyer.created_at) }}
+                      </span>
+                      <span class="rating" v-if="conversation.buyer.rating">
+                        ⭐ {{ conversation.buyer.rating }}/5
+                      </span>
+                    </div>
                   </div>
                 </div>
+
+                <!-- Expand/Collapse Button -->
+                <button 
+                  class="expand-conversation-btn"
+                  :class="{ expanded: expandedConversations.includes(conversation.id) }"
+                  @click.stop="toggleConversationDetails(conversation.id)"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                  </svg>
+                </button>
               </div>
 
-              <!-- Last Message -->
+              <!-- Last Message Preview (Always visible) -->
               <div class="last-exchange" v-if="conversation.last_message">
                 <div class="message-preview">
                   <span class="sender-indicator" :class="{ 'from-buyer': conversation.last_message.sender_id === conversation.buyer_id }">
@@ -144,7 +183,77 @@
                 </div>
               </div>
 
-              <!-- Conversation Actions -->
+              <!-- Expanded Conversation Details (Dropdown) -->
+              <div 
+                v-if="expandedConversations.includes(conversation.id)"
+                class="conversation-details-expanded"
+              >
+                <!-- Conversation Statistics -->
+                <div class="conversation-stats">
+                  <div class="stat-item">
+                    <span class="stat-label">Messages</span>
+                    <span class="stat-value">{{ conversation.message_count || 0 }}</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-label">Dernière activité</span>
+                    <span class="stat-value">{{ formatLastActivity(conversation.last_message?.created_at) }}</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-label">Statut</span>
+                    <span class="stat-value" :class="getConversationStatusClass(conversation)">
+                      {{ getConversationStatusText(conversation) }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions-expanded">
+                  <button 
+                    class="btn btn-primary btn-small"
+                    @click="openConversation(conversation)"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="mr-2">
+                      <path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/>
+                    </svg>
+                    Répondre
+                  </button>
+                  
+                  <button 
+                    class="btn btn-secondary btn-small"
+                    @click="viewBuyerProfile(conversation.buyer)"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="mr-2">
+                      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                    Profil
+                  </button>
+
+                  <button 
+                    class="btn btn-outline btn-small"
+                    @click="showQuickActions(conversation)"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="mr-2">
+                      <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                    </svg>
+                    Actions
+                  </button>
+                </div>
+
+                <!-- Unread Messages Info -->
+                <div v-if="getConversationUnreadCount(conversation) > 0" class="unread-info">
+                  <div class="unread-badge">
+                    {{ getConversationUnreadCount(conversation) }} message(s) non lu(s)
+                  </div>
+                  <button 
+                    class="btn btn-text btn-small"
+                    @click="markConversationAsRead(conversation.id)"
+                  >
+                    Marquer comme lu
+                  </button>
+                </div>
+              </div>
+
+              <!-- Conversation Actions (Compact - Always visible) -->
               <div class="conversation-actions">
                 <div class="status-info">
                   <span 
@@ -184,7 +293,7 @@
                     title="Plus d'actions"
                   >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                      <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
                     </svg>
                   </button>
                 </div>
@@ -278,6 +387,7 @@ export default {
     const loading = ref(true)
     const productsWithConversations = ref([])
     const expandedProducts = ref([])
+    const expandedConversations = ref([]) // New state for expanded conversations
     const showQuickActionsModal = ref(false)
     const selectedConversation = ref(null)
 
@@ -320,6 +430,15 @@ export default {
         expandedProducts.value.splice(index, 1)
       } else {
         expandedProducts.value.push(productId)
+      }
+    }
+
+    const toggleConversationDetails = (conversationId) => {
+      const index = expandedConversations.value.indexOf(conversationId)
+      if (index > -1) {
+        expandedConversations.value.splice(index, 1)
+      } else {
+        expandedConversations.value.push(conversationId)
       }
     }
 
@@ -392,12 +511,48 @@ export default {
       return date.toLocaleDateString('fr-FR', options)
     }
 
+    const formatLastActivity = (timestamp) => {
+      if (!timestamp) return 'Aucune activité'
+      const date = new Date(timestamp)
+      const now = new Date()
+      const diffInHours = (now - date) / (1000 * 60 * 60)
+
+      if (diffInHours < 1) {
+        return 'À l\'instant'
+      } else if (diffInHours < 24) {
+        return `il y a ${Math.floor(diffInHours)}h`
+      } else {
+        return `il y a ${Math.floor(diffInHours / 24)}j`
+      }
+    }
+
     const markAllAsRead = async (productId) => {
       try {
         // Implementation to mark all messages as read for this product
         console.log('Marking all as read for product:', productId)
       } catch (error) {
         console.error('Erreur:', error)
+      }
+    }
+
+    const markConversationAsRead = async (conversationId) => {
+      try {
+        await api.post(`/conversations/${conversationId}/mark-as-read`)
+        // Refresh the conversation data to update unread count
+        const productIndex = productsWithConversations.value.findIndex(
+          (product) => product.conversations.some((conv) => conv.id === conversationId)
+        )
+        if (productIndex !== -1) {
+          const productData = productsWithConversations.value[productIndex]
+          const conversationIndex = productData.conversations.findIndex(
+            (conv) => conv.id === conversationId
+          )
+          if (conversationIndex !== -1) {
+            productData.conversations[conversationIndex].unread_count = 0
+          }
+        }
+      } catch (error) {
+        console.error('Erreur lors du marquage comme lu:', error)
       }
     }
 
@@ -422,6 +577,24 @@ export default {
       closeQuickActions()
     }
 
+    const isProductUnavailable = (product) => {
+      return product.status === 'sold' || product.status === 'reserved' || product.status === 'inactive'
+    }
+
+    const getUnavailableText = (product) => {
+      if (product.status === 'sold') return 'Vendu'
+      if (product.status === 'reserved') return 'Réservé'
+      if (product.status === 'inactive') return 'Désactivé'
+      return 'Indisponible'
+    }
+
+    const getUnavailableDescription = (product) => {
+      if (product.status === 'sold') return 'Ce produit a déjà été vendu.'
+      if (product.status === 'reserved') return 'Ce produit est déjà réservé.'
+      if (product.status === 'inactive') return 'Ce produit est actuellement désactivé.'
+      return 'Ce produit est actuellement indisponible.'
+    }
+
     onMounted(() => {
       fetchProductsWithConversations()
     })
@@ -430,12 +603,14 @@ export default {
       loading,
       productsWithConversations,
       expandedProducts,
+      expandedConversations, // Expose expandedConversations
       showQuickActionsModal,
       selectedConversation,
       totalConversations,
       totalUnreadMessages,
       activeProducts,
       toggleProduct,
+      toggleConversationDetails, // Add toggleConversationDetails to return
       openConversation,
       viewBuyerProfile,
       showQuickActions,
@@ -447,7 +622,9 @@ export default {
       getConversationUnreadCount,
       formatTime,
       formatJoinDate,
+      formatLastActivity, // Add formatLastActivity to return
       markAllAsRead,
+      markConversationAsRead, // Add markConversationAsRead to return
       markAsSold,
       updatePrice,
       sendOffer,
@@ -457,7 +634,10 @@ export default {
         if (event.target.src !== generateDefaultAvatar(buyer.name, buyer.id)) {
           event.target.src = generateDefaultAvatar(buyer.name, buyer.id)
         }
-      }
+      },
+      isProductUnavailable,
+      getUnavailableText,
+      getUnavailableDescription
     }
   }
 }
@@ -579,12 +759,49 @@ export default {
   flex: 1;
 }
 
-.product-image {
+.product-image-container {
+  position: relative;
   width: 60px;
   height: 60px;
   border-radius: 8px;
-  object-fit: cover;
+  overflow: hidden;
   margin-right: 16px;
+}
+
+.product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-unavailable-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  border-radius: 8px;
+  z-index: 1;
+}
+
+.unavailable-content {
+  text-align: center;
+}
+
+.unavailable-text {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.unavailable-description {
+  font-size: 14px;
+  color: #ccc;
 }
 
 .product-details {
@@ -721,10 +938,237 @@ export default {
   background: #e3f2fd;
 }
 
+/* Styles pour le système de dropdown */
+.buyer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.buyer-header:hover {
+  background-color: #f8f9fa;
+  border-color: #e9ecef;
+}
+
+.expand-conversation-btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: #f8f9fa;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #666;
+  flex-shrink: 0;
+  border: 1px solid #e9ecef;
+}
+
+.expand-conversation-btn:hover {
+  background: #e9ecef;
+  color: #495057;
+  transform: scale(1.1);
+}
+
+.expand-conversation-btn.expanded {
+  transform: rotate(180deg);
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.conversation-details-expanded {
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-top: 12px;
+  border-left: 3px solid #007bff;
+  animation: slideDown 0.3s ease-out;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    max-height: 500px;
+  }
+}
+
+.conversation-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 12px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.stat-label {
+  display: block;
+  font-size: 11px;
+  color: #6c757d;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  display: block;
+  font-size: 18px;
+  font-weight: 700;
+  color: #212529;
+}
+
+.quick-actions-expanded {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  min-height: 36px;
+}
+
+.btn-primary {
+  background: #007bff;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #0056b3;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #545b62;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(108, 117, 125, 0.3);
+}
+
+.btn-outline {
+  border: 1px solid #007bff;
+  color: #007bff;
+  background: white;
+}
+
+.btn-outline:hover {
+  background: #007bff;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
+}
+
+.btn-text {
+  color: #007bff;
+  background: none;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: underline;
+}
+
+.btn-text:hover {
+  color: #0056b3;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.btn-small {
+  padding: 6px 12px;
+  font-size: 13px;
+  min-height: 32px;
+}
+
+.unread-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.unread-badge {
+  background: #fff3cd;
+  color: #856404;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid #ffeaa7;
+}
+
+/* Amélioration de l'apparence générale */
+.buyer-conversation {
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  background: white;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.buyer-conversation:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.buyer-conversation.has-unread {
+  border-left: 4px solid #ffc107;
+  background: #fffbf0;
+}
+
+/* Styles pour les éléments de base */
 .buyer-info {
   display: flex;
   align-items: center;
   margin-right: 16px;
+  flex: 1;
 }
 
 .buyer-avatar {
@@ -756,6 +1200,14 @@ export default {
 .last-exchange {
   flex: 1;
   margin-right: 16px;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.last-exchange:hover {
+  background-color: #f8f9fa;
 }
 
 .message-preview {
@@ -781,6 +1233,7 @@ export default {
   color: #999;
 }
 
+/* Styles pour les actions de conversation */
 .conversation-actions {
   display: flex;
   align-items: center;
@@ -813,7 +1266,7 @@ export default {
   width: 36px;
   height: 36px;
   border: none;
-  background: white;
+  background: #f8f9fa;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -829,93 +1282,7 @@ export default {
   color: white;
 }
 
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.quick-actions-modal {
-  background: white;
-  border-radius: 12px;
-  padding: 24px;
-  max-width: 400px;
-  width: 90%;
-}
-
-.quick-actions-modal h4 {
-  margin-bottom: 20px;
-  color: #1a1a1a;
-}
-
-.action-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.action-btn {
-  display: flex;
-  align-items: center;
-  padding: 12px 16px;
-  border: none;
-  background: #f8f9fa;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-align: left;
-}
-
-.action-btn:hover {
-  background: #e9ecef;
-}
-
-.action-btn.danger {
-  color: #f44336;
-}
-
-.action-btn.danger:hover {
-  background: #ffebee;
-}
-
-.action-icon {
-  margin-right: 12px;
-  font-size: 18px;
-}
-
-.btn {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  text-decoration: none;
-  display: inline-block;
-}
-
-.btn-primary {
-  background: #007bff;
-  color: white;
-}
-
-.btn-secondary {
-  background: #6c757d;
-  color: white;
-}
-
-.btn-small {
-  padding: 6px 12px;
-  font-size: 14px;
-}
-
+/* Responsive design */
 @media (max-width: 768px) {
   .product-header {
     flex-direction: column;
@@ -935,6 +1302,36 @@ export default {
   .conversation-actions {
     margin-top: 12px;
     justify-content: space-between;
+  }
+
+  .conversation-stats {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .quick-actions-expanded {
+    flex-direction: column;
+  }
+  
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .unread-info {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+  
+  .buyer-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .expand-conversation-btn {
+    align-self: flex-end;
   }
 }
 </style>

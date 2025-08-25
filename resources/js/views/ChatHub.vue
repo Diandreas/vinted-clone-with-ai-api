@@ -78,37 +78,49 @@
               v-for="conversation in buyerConversations"
               :key="conversation.id"
               class="bg-white/80 backdrop-blur-sm rounded-md shadow-md border border-white/50 p-2 sm:p-3 hover:shadow-lg transition-shadow cursor-pointer"
+              :class="{
+                'opacity-60 grayscale': isProductUnavailable(conversation.product),
+                'cursor-not-allowed': isProductUnavailable(conversation.product)
+              }"
               @click="openConversation(conversation.id)"
             >
               <div class="flex items-center space-x-2 sm:space-x-3">
                 <!-- Product Image - Ultra Compact -->
-                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gray-100 rounded-md overflow-hidden flex-shrink-0">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gray-100 rounded-md overflow-hidden flex-shrink-0 relative">
                   <img 
                     v-if="conversation.product?.main_image_url"
                     :src="conversation.product.main_image_url" 
                     :alt="conversation.product.title"
                     class="w-full h-full object-cover"
+                    :class="{ 'grayscale': isProductUnavailable(conversation.product) }"
                   />
                   <div v-else class="flex items-center justify-center h-full">
                     <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                     </svg>
                   </div>
+                  
+                  <!-- Unavailable Overlay -->
+                  <div 
+                    v-if="isProductUnavailable(conversation.product)" 
+                    class="absolute inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center rounded-md"
+                  >
+                    <div class="text-center text-white">
+                      <div class="text-xs font-semibold">{{ getUnavailableText(conversation.product) }}</div>
+                    </div>
+                  </div>
                 </div>
                 
                 <!-- Product Info - Ultra Compact -->
                 <div class="flex-1 min-w-0">
-                  <div class="flex items-center justify-between">
-                    <h3 class="text-sm font-semibold text-gray-900 truncate">{{ conversation.product?.title }}</h3>
-                    <span class="text-sm font-bold text-primary-600">{{ formatPrice(conversation.product?.price) }}</span>
-                  </div>
-                  <p class="text-xs text-gray-500">{{ conversation.seller?.name }}</p>
-                  <div v-if="conversation.last_message" class="mt-1">
-                    <p class="text-xs text-gray-700 truncate">
-                      {{ conversation.last_message.sender_id === conversation.seller_id ? 'Vendeur: ' : 'Vous: ' }}
-                      {{ extractMessageContent(conversation.last_message.content) }}
-                    </p>
-                    <p class="text-xs text-gray-400">{{ formatDate(conversation.last_message.created_at) }}</p>
+                  <h3 class="text-sm font-semibold text-gray-900 truncate">{{ conversation.product?.title }}</h3>
+                  <p class="text-xs text-gray-500">{{ formatPrice(conversation.product?.price) }}</p>
+                  
+                  <!-- Product Status Badge -->
+                  <div v-if="isProductUnavailable(conversation.product)" class="mt-1">
+                    <span :class="['inline-block px-1.5 py-0.5 text-xs font-medium rounded-full', getProductStatusClass(conversation.product)]">
+                      {{ getProductStatusText(conversation.product) }}
+                    </span>
                   </div>
                 </div>
                 
@@ -152,8 +164,8 @@
               :key="productData.product.id"
               class="bg-white/80 backdrop-blur-sm rounded-md shadow-md border border-white/50 p-2 sm:p-3"
             >
-              <!-- Product Header - Ultra Compact -->
-              <div class="flex items-center justify-between mb-2">
+              <!-- Product Header with Dropdown Toggle -->
+              <div class="product-header-dropdown" @click="toggleProductDropdown(productData.product.id)">
                 <div class="flex items-center space-x-2">
                   <!-- Product Image - Ultra Compact -->
                   <div class="w-8 h-8 sm:w-10 sm:h-10 bg-gray-100 rounded-md overflow-hidden flex-shrink-0">
@@ -169,34 +181,75 @@
                     <p class="text-xs text-gray-500">{{ formatPrice(productData.product.price) }}</p>
                   </div>
                 </div>
-                <span class="text-xs text-gray-500">{{ productData.conversations.length }} intéressé(s)</span>
+                
+                <div class="flex items-center space-x-2">
+                  <span class="text-xs text-gray-500">{{ productData.conversations.length }} intéressé(s)</span>
+                  
+                  <!-- Expand/Collapse Button for Product -->
+                  <button 
+                    class="product-expand-btn"
+                    :class="{ expanded: expandedProducts.includes(productData.product.id) }"
+                    @click.stop="toggleProductDropdown(productData.product.id)"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                    </svg>
+                  </button>
+                </div>
               </div>
               
-              <!-- Conversations List - Ultra Compact -->
-              <div class="space-y-1.5">
-                <div
-                  v-for="conversation in productData.conversations"
-                  :key="conversation.id"
-                  class="flex items-center justify-between p-2 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors cursor-pointer"
-                  @click="openConversation(conversation.id)"
-                >
-                  <div class="flex items-center space-x-2">
-                    <!-- Buyer Avatar - Ultra Compact -->
-                    <div class="w-6 h-6 bg-primary-600 rounded-full flex items-center justify-center text-white text-xs font-semibold">
-                      {{ getInitials(conversation.buyer?.name) }}
-                    </div>
-                    <div>
-                      <p class="text-xs font-medium text-gray-900">{{ conversation.buyer?.name }}</p>
-                      <div v-if="conversation.last_message" class="text-xs text-gray-500 truncate max-w-[150px]">
-                        {{ extractMessageContent(conversation.last_message.content, 30) }}...
-                        <span class="text-xs text-gray-400 ml-1">{{ formatDate(conversation.last_message.created_at) }}</span>
+              <!-- Expanded Product Conversations (Dropdown) -->
+              <div 
+                v-if="expandedProducts.includes(productData.product.id)"
+                class="product-conversations-expanded"
+              >
+                <!-- Conversations List -->
+                <div class="space-y-2">
+                  <div
+                    v-for="conversation in productData.conversations"
+                    :key="conversation.id"
+                    class="conversation-item"
+                    @click="openConversation(conversation.id)"
+                  >
+                    <div class="flex items-center justify-between p-2 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors cursor-pointer">
+                      <div class="flex items-center space-x-2">
+                        <!-- Buyer Avatar -->
+                        <div class="w-6 h-6 bg-primary-600 rounded-full flex items-center justify-center text-white text-xs font-semibold">
+                          {{ getInitials(conversation.buyer?.name) }}
+                        </div>
+                        <div>
+                          <p class="text-xs font-medium text-gray-900">{{ conversation.buyer?.name }}</p>
+                          <div v-if="conversation.last_message" class="text-xs text-gray-500 truncate max-w-[200px]">
+                            {{ extractMessageContent(conversation.last_message.content, 40) }}
+                            <span class="text-xs text-gray-400 ml-1">{{ formatDate(conversation.last_message.created_at) }}</span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Unread indicator -->
+                      <div v-if="getUnreadCount(conversation) > 0" class="bg-gray-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold min-w-[20px] h-5 flex items-center justify-center">
+                        {{ getUnreadCount(conversation) }}
                       </div>
                     </div>
                   </div>
-                  
-                  <!-- Unread indicator - Ultra Compact -->
-                  <div v-if="getUnreadCount(conversation) > 0" class="bg-gray-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold min-w-[20px] h-5 flex items-center justify-center">
-                    {{ getUnreadCount(conversation) }}
+                </div>
+                
+                <!-- Product Summary Actions -->
+                <div class="product-actions mt-3 pt-3 border-t border-gray-200">
+                  <div class="flex justify-between items-center">
+                    <span class="text-xs text-gray-600">
+                      {{ productData.conversations.length }} conversation(s) active(s)
+                    </span>
+                    <button 
+                      class="btn btn-primary btn-small"
+                      @click="viewProductDetails(productData.product)"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" class="mr-2">
+                        <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                      </svg>
+                      Voir le produit
+                    </button>
                   </div>
                 </div>
               </div>
@@ -223,6 +276,8 @@ const loading = ref(true)
 const activeTab = ref('buyer')
 const buyerConversations = ref([])
 const sellerProducts = ref([])
+const expandedConversations = ref([]) // New state for expanded conversations
+const expandedProducts = ref([]) // New state for expanded products
 
 // Computed
 const buyerUnreadCount = computed(() => {
@@ -271,6 +326,22 @@ const openConversation = (conversationId) => {
   router.push(`/conversations/${conversationId}`)
 }
 
+const toggleConversationDetails = (conversationId) => {
+  if (expandedConversations.value.includes(conversationId)) {
+    expandedConversations.value = expandedConversations.value.filter(id => id !== conversationId)
+  } else {
+    expandedConversations.value.push(conversationId)
+  }
+}
+
+const toggleProductDropdown = (productId) => {
+  if (expandedProducts.value.includes(productId)) {
+    expandedProducts.value = expandedProducts.value.filter(id => id !== productId)
+  } else {
+    expandedProducts.value.push(productId)
+  }
+}
+
 const getUnreadCount = (conversation) => {
   return conversation.unread_count || 0
 }
@@ -306,8 +377,383 @@ const formatDate = (dateString) => {
   }
 }
 
+const formatLastActivity = (dateString) => {
+  if (!dateString) return 'Aucune activité'
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffTime = now - date
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+
+  if (diffDays === 0) {
+    return date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+  } else if (diffDays === 1) {
+    return 'Hier'
+  } else if (diffDays < 7) {
+    return `Il y a ${diffDays} jours`
+  } else {
+    return date.toLocaleDateString('fr-FR')
+  }
+}
+
+const isProductUnavailable = (product) => {
+  return product?.is_sold || product?.is_deleted || product?.is_inactive
+}
+
+const getUnavailableText = (product) => {
+  if (product?.is_sold) return 'Vendu'
+  if (product?.is_deleted) return 'Supprimé'
+  if (product?.is_inactive) return 'Désactivé'
+  return 'Indisponible'
+}
+
+const getProductStatusClass = (product) => {
+  if (product?.is_sold) return 'bg-green-100 text-green-800'
+  if (product?.is_deleted) return 'bg-red-100 text-red-800'
+  if (product?.is_inactive) return 'bg-yellow-100 text-yellow-800'
+  return 'bg-gray-100 text-gray-800'
+}
+
+const getProductStatusText = (product) => {
+  if (product?.is_sold) return 'Vendu'
+  if (product?.is_deleted) return 'Supprimé'
+  if (product?.is_inactive) return 'Désactivé'
+  return 'Indisponible'
+}
+
+const viewBuyerProfile = (buyer) => {
+  if (buyer) {
+    router.push(`/users/${buyer.id}`)
+  }
+}
+
+const viewProductDetails = (product) => {
+  router.push(`/products/${product.id}`)
+}
+
+const markConversationAsRead = async (conversationId) => {
+  try {
+    await api.post(`/conversations/${conversationId}/mark-as-read`)
+    // Update unread count in the UI
+    const conversation = sellerProducts.value.find(p => p.conversations.some(c => c.id === conversationId))?.conversations.find(c => c.id === conversationId)
+    if (conversation) {
+      conversation.unread_count = 0
+    }
+  } catch (error) {
+    console.error('Error marking conversation as read:', error)
+  }
+}
+
 // Lifecycle
 onMounted(() => {
   loadData()
 })
 </script>
+
+<style scoped>
+/* Styles pour le système de dropdown */
+.buyer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.buyer-header:hover {
+  background-color: #f1f5f9;
+  border-color: #e2e8f0;
+}
+
+.expand-conversation-btn {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: #f8fafc;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #64748b;
+  flex-shrink: 0;
+  border: 1px solid #e2e8f0;
+}
+
+.expand-conversation-btn:hover {
+  background: #e2e8f0;
+  color: #475569;
+  transform: scale(1.1);
+}
+
+.expand-conversation-btn.expanded {
+  transform: rotate(180deg);
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+
+.conversation-details-expanded {
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 6px;
+  margin: 8px;
+  border-left: 3px solid #3b82f6;
+  animation: slideDown 0.3s ease-out;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    max-height: 300px;
+  }
+}
+
+.conversation-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 8px;
+  background: white;
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.stat-label {
+  display: block;
+  font-size: 10px;
+  color: #64748b;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.quick-actions-expanded {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  min-height: 28px;
+}
+
+.btn-primary {
+  background: #3b82f6;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+.btn-secondary {
+  background: #64748b;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #475569;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(100, 116, 139, 0.3);
+}
+
+.btn-small {
+  padding: 4px 8px;
+  font-size: 11px;
+  min-height: 24px;
+}
+
+.unread-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: white;
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.unread-badge {
+  background: #fef3c7;
+  color: #92400e;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 600;
+  border: 1px solid #fde68a;
+}
+
+.btn-text {
+  color: #3b82f6;
+  background: none;
+  border: none;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 500;
+  text-decoration: underline;
+}
+
+.btn-text:hover {
+  color: #2563eb;
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+/* Styles for product dropdown */
+.product-header-dropdown {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.product-header-dropdown:hover {
+  background-color: #f1f5f9;
+  border-color: #e2e8f0;
+}
+
+.product-expand-btn {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: #f8fafc;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #64748b;
+  flex-shrink: 0;
+  border: 1px solid #e2e8f0;
+}
+
+.product-expand-btn:hover {
+  background: #e2e8f0;
+  color: #475569;
+  transform: scale(1.1);
+}
+
+.product-expand-btn.expanded {
+  transform: rotate(180deg);
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+
+.product-conversations-expanded {
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 6px;
+  margin: 8px;
+  border-left: 3px solid #3b82f6;
+  animation: slideDown 0.3s ease-out;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    max-height: 300px;
+  }
+}
+
+.conversation-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.conversation-item:hover {
+  background-color: #f1f5f9;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .conversation-stats {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .quick-actions-expanded {
+    flex-direction: column;
+  }
+  
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .unread-info {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+  
+  .buyer-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .expand-conversation-btn {
+    align-self: flex-end;
+  }
+}
+</style>

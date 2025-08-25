@@ -1,5 +1,11 @@
 <template>
-  <div class="bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow duration-200">
+  <div 
+    class="bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow duration-200"
+    :class="{
+      'opacity-60 grayscale': isProductUnavailable,
+      'cursor-not-allowed': isProductUnavailable
+    }"
+  >
     <!-- Product Image -->
     <div class="relative aspect-square overflow-hidden rounded-t-lg">
       <ProductImage
@@ -9,19 +15,26 @@
         :product-id="product.id"
         fallback="/placeholder-product.jpg"
         image-classes="w-full h-full object-cover"
+        :class="{ 'grayscale': isProductUnavailable }"
       />
 
       <!-- Status Badge - Ultra Compact mobile -->
       <div class="absolute top-0.5 sm:top-1 left-0.5 sm:left-1">
         <span
           v-if="product.status === 'sold'"
-          class="bg-gray-100 text-gray-800 text-xs font-medium px-1 py-0.5 sm:px-1.5 sm:py-0.5 rounded-full"
+          class="bg-red-100 text-red-800 text-xs font-medium px-1 py-0.5 sm:px-1.5 sm:py-0.5 rounded-full"
         >
           Vendu
         </span>
         <span
-          v-else-if="product.status === 'reserved'"
+          v-else-if="product.status === 'removed'"
           class="bg-gray-100 text-gray-800 text-xs font-medium px-1 py-0.5 sm:px-1.5 sm:py-0.5 rounded-full"
+        >
+          Supprimé
+        </span>
+        <span
+          v-else-if="product.status === 'reserved'"
+          class="bg-yellow-100 text-yellow-800 text-xs font-medium px-1 py-0.5 sm:px-1.5 sm:py-0.5 rounded-full"
         >
           Réservé
         </span>
@@ -31,6 +44,21 @@
         >
           Boosté
         </span>
+      </div>
+
+      <!-- Unavailable Overlay -->
+      <div 
+        v-if="isProductUnavailable" 
+        class="absolute inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center"
+      >
+        <div class="text-center text-white">
+          <div class="text-lg font-semibold mb-1">
+            {{ getUnavailableText() }}
+          </div>
+          <div class="text-sm opacity-90">
+            {{ getUnavailableDescription() }}
+          </div>
+        </div>
       </div>
 
       <!-- Action Buttons - Ultra Compact mobile -->
@@ -233,6 +261,11 @@ const favoritingProduct = ref(false)
 const isLiked = computed(() => props.product.is_liked_by_user)
 const isFavorite = computed(() => props.product.is_favorited_by_user)
 
+// Check if product is unavailable (sold, removed, or disabled)
+const isProductUnavailable = computed(() => {
+  return ['sold', 'removed'].includes(props.product.status)
+})
+
 // Check if product can be edited (only within 30 minutes of creation)
 const canEditProduct = computed(() => {
   if (!props.product.created_at) return false
@@ -245,6 +278,28 @@ const canEditProduct = computed(() => {
 })
 
 // Methods
+
+const getUnavailableText = () => {
+  switch (props.product.status) {
+    case 'sold':
+      return 'Vendu'
+    case 'removed':
+      return 'Supprimé'
+    default:
+      return 'Indisponible'
+  }
+}
+
+const getUnavailableDescription = () => {
+  switch (props.product.status) {
+    case 'sold':
+      return 'Ce produit a été vendu'
+    case 'removed':
+      return 'Ce produit a été supprimé'
+    default:
+      return 'Ce produit n\'est plus disponible'
+  }
+}
 
 const handleImageError = (event) => {
   event.target.src = '/placeholder-product.jpg'
