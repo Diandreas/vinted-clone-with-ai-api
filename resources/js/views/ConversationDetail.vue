@@ -84,7 +84,7 @@
             >
               <p class="text-sm">{{ extractMessageContent(message.content) }}</p>
               <p class="text-xs opacity-75 mt-1">
-                {{ formatMessageDate(message.created_at) }}
+                {{ formatMessageTime(message.created_at) }}
               </p>
             </div>
           </div>
@@ -132,12 +132,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, nextTick } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import api from '@/services/api'
 import { ImageIcon, AlertTriangleIcon } from 'lucide-vue-next'
 import { extractMessageContent } from '@/utils/messageUtils'
+import { formatMessageTime } from '@/utils/timeUtils'
 import ProductImage from '@/components/ui/ProductImage.vue'
 
 const route = useRoute()
@@ -244,26 +245,6 @@ const formatPrice = (price) => {
     style: 'currency',
     currency: 'XAF'
   }).format(price)
-}
-
-const formatMessageDate = (dateString) => {
-  if (!dateString) return ''
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffInHours = (now - date) / (1000 * 60 * 60)
-  
-  if (diffInHours < 1) {
-    return 'À l\'instant'
-  } else if (diffInHours < 24) {
-    return `il y a ${Math.floor(diffInHours)}h`
-  } else {
-    return date.toLocaleDateString('fr-FR', {
-      day: 'numeric',
-      month: 'short',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-  }
 }
 
 const getProductImageUrl = (product) => {

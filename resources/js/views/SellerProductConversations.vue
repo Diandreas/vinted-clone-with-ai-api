@@ -194,10 +194,10 @@
                     <span class="stat-label">Messages</span>
                     <span class="stat-value">{{ conversation.message_count || 0 }}</span>
                   </div>
-                  <div class="stat-item">
-                    <span class="stat-label">Dernière activité</span>
-                    <span class="stat-value">{{ formatLastActivity(conversation.last_message?.created_at) }}</span>
-                  </div>
+                                         <div class="stat-item">
+                         <span class="stat-label">Dernière activité</span>
+                         <span class="stat-value">{{ formatMessageTime(conversation.last_message?.created_at) }}</span>
+                       </div>
                   <div class="stat-item">
                     <span class="stat-label">Statut</span>
                     <span class="stat-value" :class="getConversationStatusClass(conversation)">
@@ -334,8 +334,10 @@
 <script>
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import api from '@/services/api'
 import { extractMessageContent } from '@/utils/messageUtils'
+import { formatMessageTime } from '@/utils/timeUtils'
 import ProductImage from '@/components/ui/ProductImage.vue'
 
 // Fonctions de génération d'avatar dynamique
@@ -511,20 +513,7 @@ export default {
       return date.toLocaleDateString('fr-FR', options)
     }
 
-    const formatLastActivity = (timestamp) => {
-      if (!timestamp) return 'Aucune activité'
-      const date = new Date(timestamp)
-      const now = new Date()
-      const diffInHours = (now - date) / (1000 * 60 * 60)
 
-      if (diffInHours < 1) {
-        return 'À l\'instant'
-      } else if (diffInHours < 24) {
-        return `il y a ${Math.floor(diffInHours)}h`
-      } else {
-        return `il y a ${Math.floor(diffInHours / 24)}j`
-      }
-    }
 
     const markAllAsRead = async (productId) => {
       try {
@@ -622,7 +611,7 @@ export default {
       getConversationUnreadCount,
       formatTime,
       formatJoinDate,
-      formatLastActivity, // Add formatLastActivity to return
+
       markAllAsRead,
       markConversationAsRead, // Add markConversationAsRead to return
       markAsSold,

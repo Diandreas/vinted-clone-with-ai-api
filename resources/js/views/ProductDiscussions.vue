@@ -84,7 +84,7 @@
                                 {{ extractMessageContent(conversation.last_message.content) }}
             </p>
             <span class="message-time">
-              {{ formatTime(conversation.last_message.created_at) }}
+              {{ formatMessageTime(conversation.last_message.created_at) }}
             </span>
           </div>
 
@@ -147,6 +147,7 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import api from '@/services/api'
 import { extractMessageContent } from '@/utils/messageUtils'
+import { formatMessageTime } from '@/utils/timeUtils'
 
 export default {
   name: 'ProductDiscussions',
@@ -217,20 +218,6 @@ export default {
         cancelled: 'Annulé'
       }
       return statusMap[status] || 'Intéressé'
-    }
-
-    const formatTime = (timestamp) => {
-      const date = new Date(timestamp)
-      const now = new Date()
-      const diffInHours = (now - date) / (1000 * 60 * 60)
-      
-      if (diffInHours < 1) {
-        return 'À l\'instant'
-      } else if (diffInHours < 24) {
-        return `il y a ${Math.floor(diffInHours)}h`
-      } else {
-        return `il y a ${Math.floor(diffInHours / 24)}j`
-      }
     }
 
     const toggleFavorite = async (product) => {
@@ -331,7 +318,7 @@ export default {
       getUnreadCount,
       getStatusClass,
       getStatusText,
-      formatTime,
+      formatMessageTime,
       toggleFavorite,
       getProductImage,
       onImageError,

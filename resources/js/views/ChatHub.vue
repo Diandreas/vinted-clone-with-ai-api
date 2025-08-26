@@ -221,7 +221,7 @@
                           <p class="text-xs font-medium text-gray-900">{{ conversation.buyer?.name }}</p>
                           <div v-if="conversation.last_message" class="text-xs text-gray-500 truncate max-w-[200px]">
                             {{ extractMessageContent(conversation.last_message.content, 40) }}
-                            <span class="text-xs text-gray-400 ml-1">{{ formatDate(conversation.last_message.created_at) }}</span>
+                            <span class="text-xs text-gray-400 ml-1">{{ formatMessageTime(conversation.last_message.created_at) }}</span>
                           </div>
                         </div>
                       </div>
@@ -267,6 +267,7 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import api from '@/services/api'
 import { extractMessageContent } from '@/utils/messageUtils'
+import { formatMessageTime } from '@/utils/timeUtils'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -357,42 +358,6 @@ const formatPrice = (price) => {
     style: 'currency',
     currency: 'XAF'
   }).format(price)
-}
-
-const formatDate = (dateString) => {
-  if (!dateString) return ''
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffTime = now - date
-  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
-  
-  if (diffDays === 0) {
-    return date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-  } else if (diffDays === 1) {
-    return 'Hier'
-  } else if (diffDays < 7) {
-    return `Il y a ${diffDays} jours`
-  } else {
-    return date.toLocaleDateString('fr-FR')
-  }
-}
-
-const formatLastActivity = (dateString) => {
-  if (!dateString) return 'Aucune activité'
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffTime = now - date
-  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
-
-  if (diffDays === 0) {
-    return date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-  } else if (diffDays === 1) {
-    return 'Hier'
-  } else if (diffDays < 7) {
-    return `Il y a ${diffDays} jours`
-  } else {
-    return date.toLocaleDateString('fr-FR')
-  }
 }
 
 const isProductUnavailable = (product) => {
