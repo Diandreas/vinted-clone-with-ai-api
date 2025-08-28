@@ -265,12 +265,15 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useRealtime } from '@/composables/useRealtime'
+import smartUpdateService from '@/services/smartUpdateService'
 import api from '@/services/api'
 import { extractMessageContent } from '@/utils/messageUtils'
 import { formatMessageTime } from '@/utils/timeUtils'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const { subscribeToRealtime, forceRealtimeUpdate } = useRealtime()
 
 // State
 const loading = ref(true)
@@ -296,7 +299,52 @@ const loadBuyerConversations = async () => {
   try {
     const response = await api.get('/conversations/my-product-discussions')
     if (response.data.success) {
-      buyerConversations.value = response.data.data
+      const newData = response.data.data
+      
+      // Utiliser le service de mise à jour intelligente
+      smartUpdateService.smartUpdate(
+        'buyer-conversations',
+        newData,
+        (newItems, updatedItems, removedItems, unchangedItems) => {
+          // Mettre à jour l'interface intelligemment
+          if (newItems.length > 0) {
+            // Ajouter les nouvelles conversations
+            buyerConversations.value.unshift(...newItems)
+          }
+          
+          if (updatedItems.length > 0) {
+            // Mettre à jour les conversations modifiées
+            updatedItems.forEach(({ old, new: updated }) => {
+              const index = buyerConversations.value.findIndex(c => c.id === updated.id)
+              if (index !== -1) {
+                buyerConversations.value[index] = updated
+              }
+            })
+          }
+          
+          if (removedItems.length > 0) {
+            // Supprimer les conversations supprimées
+            removedItems.forEach(removed => {
+              const index = buyerConversations.value.findIndex(c => c.id === removed.id)
+              if (index !== -1) {
+                buyerConversations.value.splice(index, 1)
+              }
+            })
+          }
+          
+          // Les éléments inchangés restent en place
+        },
+        (changeType, items) => {
+          // Callback pour les animations
+          if (changeType === 'new') {
+            console.log('🆕 Nouvelles conversations:', items.length)
+          } else if (changeType === 'updated') {
+            console.log('🔄 Conversations mises à jour:', items.length)
+          } else if (changeType === 'removed') {
+            console.log('🗑️ Conversations supprimées:', items.length)
+          }
+        }
+      )
     }
   } catch (error) {
     console.error('Error loading buyer conversations:', error)
@@ -307,7 +355,52 @@ const loadSellerProducts = async () => {
   try {
     const response = await api.get('/conversations/my-products-with-buyers')
     if (response.data.success) {
-      sellerProducts.value = response.data.data
+      const newData = response.data.data
+      
+      // Utiliser le service de mise à jour intelligente
+      smartUpdateService.smartUpdate(
+        'seller-products',
+        newData,
+        (newItems, updatedItems, removedItems, unchangedItems) => {
+          // Mettre à jour l'interface intelligemment
+          if (newItems.length > 0) {
+            // Ajouter les nouveaux produits
+            sellerProducts.value.unshift(...newItems)
+          }
+          
+          if (updatedItems.length > 0) {
+            // Mettre à jour les produits modifiés
+            updatedItems.forEach(({ old, new: updated }) => {
+              const index = sellerProducts.value.findIndex(p => p.product.id === updated.product.id)
+              if (index !== -1) {
+                sellerProducts.value[index] = updated
+              }
+            })
+          }
+          
+          if (removedItems.length > 0) {
+            // Supprimer les produits supprimés
+            removedItems.forEach(removed => {
+              const index = sellerProducts.value.findIndex(p => p.product.id === removed.product.id)
+              if (index !== -1) {
+                sellerProducts.value.splice(index, 1)
+              }
+            })
+          }
+          
+          // Les éléments inchangés restent en place
+        },
+        (changeType, items) => {
+          // Callback pour les animations
+          if (changeType === 'new') {
+            console.log('🆕 Nouveaux produits:', items.length)
+          } else if (changeType === 'updated') {
+            console.log('🔄 Produits mis à jour:', items.length)
+          } else if (changeType === 'removed') {
+            console.log('🗑️ Produits supprimés:', items.length)
+          }
+        }
+      )
     }
   } catch (error) {
     console.error('Error loading seller products:', error)
@@ -411,6 +504,19 @@ const markConversationAsRead = async (conversationId) => {
 // Lifecycle
 onMounted(() => {
   loadData()
+  
+  // S'abonner aux mises à jour temps réel
+  subscribeToRealtime('messages', async () => {
+    // Utiliser le service intelligent au lieu de recharger tout
+    await loadBuyerConversations()
+    await loadSellerProducts()
+  })
+  
+  // S'abonner aux mises à jour des likes/vues (moins fréquent)
+  subscribeToRealtime('likes', async () => {
+    // Utiliser le service intelligent au lieu de recharger tout
+    await loadSellerProducts()
+  })
 })
 </script>
 
@@ -462,197 +568,6 @@ onMounted(() => {
   border-color: #3b82f6;
 }
 
-.conversation-details-expanded {
-  padding: 12px;
-  background: #f8fafc;
-  border-radius: 6px;
-  margin: 8px;
-  border-left: 3px solid #3b82f6;
-  animation: slideDown 0.3s ease-out;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-    max-height: 0;
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-    max-height: 300px;
-  }
-}
-
-.conversation-stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.stat-item {
-  text-align: center;
-  padding: 8px;
-  background: white;
-  border-radius: 4px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.stat-label {
-  display: block;
-  font-size: 10px;
-  color: #64748b;
-  margin-bottom: 4px;
-  text-transform: uppercase;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-}
-
-.stat-value {
-  display: block;
-  font-size: 14px;
-  font-weight: 700;
-  color: #1e293b;
-}
-
-.quick-actions-expanded {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
-  flex-wrap: wrap;
-}
-
-.btn {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  min-height: 28px;
-}
-
-.btn-primary {
-  background: #3b82f6;
-  color: white;
-}
-
-.btn-primary:hover {
-  background: #2563eb;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
-}
-
-.btn-secondary {
-  background: #64748b;
-  color: white;
-}
-
-.btn-secondary:hover {
-  background: #475569;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(100, 116, 139, 0.3);
-}
-
-.btn-small {
-  padding: 4px 8px;
-  font-size: 11px;
-  min-height: 24px;
-}
-
-.unread-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 12px;
-  background: white;
-  border-radius: 4px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.unread-badge {
-  background: #fef3c7;
-  color: #92400e;
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 10px;
-  font-weight: 600;
-  border: 1px solid #fde68a;
-}
-
-.btn-text {
-  color: #3b82f6;
-  background: none;
-  border: none;
-  padding: 4px 8px;
-  cursor: pointer;
-  font-size: 11px;
-  font-weight: 500;
-  text-decoration: underline;
-}
-
-.btn-text:hover {
-  color: #2563eb;
-  background: #f1f5f9;
-  border-radius: 4px;
-}
-
-/* Styles for product dropdown */
-.product-header-dropdown {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: 8px 12px;
-  border-radius: 6px;
-  transition: background-color 0.2s ease;
-  cursor: pointer;
-  border: 1px solid transparent;
-}
-
-.product-header-dropdown:hover {
-  background-color: #f1f5f9;
-  border-color: #e2e8f0;
-}
-
-.product-expand-btn {
-  width: 24px;
-  height: 24px;
-  border: none;
-  background: #f8fafc;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  color: #64748b;
-  flex-shrink: 0;
-  border: 1px solid #e2e8f0;
-}
-
-.product-expand-btn:hover {
-  background: #e2e8f0;
-  color: #475569;
-  transform: scale(1.1);
-}
-
-.product-expand-btn.expanded {
-  transform: rotate(180deg);
-  background: #3b82f6;
-  color: white;
-  border-color: #3b82f6;
-}
-
 .product-conversations-expanded {
   padding: 12px;
   background: #f8fafc;
@@ -689,6 +604,58 @@ onMounted(() => {
   background-color: #f1f5f9;
 }
 
+/* Animations pour les mises à jour intelligentes */
+.conversation-update-new {
+  animation: slideInFromTop 0.3s ease-out;
+}
+
+.conversation-update-modified {
+  animation: highlightUpdate 0.5s ease-out;
+}
+
+.conversation-update-removed {
+  animation: slideOutToRight 0.3s ease-out;
+}
+
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    max-height: 200px;
+  }
+}
+
+@keyframes highlightUpdate {
+  0% {
+    background-color: transparent;
+  }
+  50% {
+    background-color: #fef3c7;
+    border-left: 3px solid #f59e0b;
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+@keyframes slideOutToRight {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+    max-height: 200px;
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+    max-height: 0;
+  }
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .conversation-stats {
@@ -698,27 +665,12 @@ onMounted(() => {
   
   .quick-actions-expanded {
     flex-direction: column;
-  }
-  
-  .btn {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .unread-info {
-    flex-direction: column;
-    gap: 8px;
-    text-align: center;
-  }
-  
-  .buyer-header {
-    flex-direction: column;
-    align-items: flex-start;
     gap: 8px;
   }
   
-  .expand-conversation-btn {
-    align-self: flex-end;
+  .product-conversations-expanded {
+    margin: 4px;
+    padding: 8px;
   }
 }
 </style>
