@@ -274,10 +274,10 @@
               class="flex items-center justify-between bg-white rounded-md shadow-soft px-2 py-1 sm:px-3 sm:py-2"
             >
               <div class="flex items-center space-x-2">
-                <ProfileIcon :src="follower.avatar" :alt="follower.name" :user-id="follower.id" size="sm" class="w-6 h-6 sm:w-8 sm:h-8" />
+                <ProfileIcon :src="follower.avatar" :alt="follower.name || 'Utilisateur'" :user-id="follower.id" size="sm" class="w-6 h-6 sm:w-8 sm:h-8" />
                 <div>
-                  <h4 class="font-semibold text-gray-900 text-xs sm:text-sm truncate">{{ follower.name }}</h4>
-                  <p class="text-xs text-gray-500 truncate">@{{ follower.username }}</p>
+                  <h4 class="font-semibold text-gray-900 text-xs sm:text-sm truncate">{{ follower.name || 'Utilisateur' }}</h4>
+                  <p class="text-xs text-gray-500 truncate">@{{ follower.username || 'username' }}</p>
                 </div>
               </div>
               <button
@@ -302,10 +302,10 @@
               class="flex items-center justify-between bg-white rounded-md shadow-soft px-2 py-1 sm:px-3 sm:py-2"
             >
               <div class="flex items-center space-x-2">
-                <ProfileIcon :src="followed.avatar" :alt="followed.name" :user-id="followed.id" size="sm" class="w-6 h-6 sm:w-8 sm:h-8" />
+                <ProfileIcon :src="followed.avatar" :alt="followed.name || 'Utilisateur'" :user-id="followed.id" size="sm" class="w-6 h-6 sm:w-8 sm:h-8" />
                 <div>
-                  <h4 class="font-semibold text-gray-900 text-xs sm:text-sm truncate">{{ followed.name }}</h4>
-                  <p class="text-xs text-gray-500 truncate">@{{ followed.username }}</p>
+                  <h4 class="font-semibold text-gray-900 text-xs sm:text-sm truncate">{{ followed.name || 'Utilisateur' }}</h4>
+                  <p class="text-xs text-gray-500 truncate">@{{ followed.username || 'username' }}</p>
                 </div>
               </div>
               <button
@@ -326,7 +326,8 @@
             </div>
             <div
               v-for="review in reviews"
-              :key="review.id"
+              :key="review?.id || Math.random()"
+              v-if="review && review.id"
               class="bg-white rounded-lg shadow-soft p-3 sm:p-4"
             >
               <div class="flex items-start space-x-3">
@@ -461,7 +462,17 @@ async function fetchProducts(page = 1) {
 async function fetchFollowers() {
   try {
     const resp = await window.axios.get(`/users/${route.params.id}/followers`)
-    followers.value = resp.data?.data || []
+    
+    // Gestion correcte de la pagination Laravel
+    if (resp.data?.data?.data) {
+      // Structure paginée Laravel
+      followers.value = resp.data.data.data
+    } else if (Array.isArray(resp.data?.data)) {
+      // Structure simple
+      followers.value = resp.data.data
+    } else {
+      followers.value = []
+    }
   } catch (err) {
     console.error('Failed to fetch followers:', err)
     error.value = 'Impossible de charger les abonnés.'
@@ -471,7 +482,17 @@ async function fetchFollowers() {
 async function fetchFollowing() {
   try {
     const resp = await window.axios.get(`/users/${route.params.id}/following`)
-    following.value = resp.data?.data || []
+    
+    // Gestion correcte de la pagination Laravel
+    if (resp.data?.data?.data) {
+      // Structure paginée Laravel
+      following.value = resp.data.data.data
+    } else if (Array.isArray(resp.data?.data)) {
+      // Structure simple
+      following.value = resp.data.data
+    } else {
+      following.value = []
+    }
   } catch (err) {
     console.error('Failed to fetch following:', err)
     error.value = 'Impossible de charger les abonnements.'
@@ -481,7 +502,17 @@ async function fetchFollowing() {
 async function fetchReviews() {
   try {
     const resp = await window.axios.get(`/users/${route.params.id}/reviews`)
-    reviews.value = resp.data?.data || []
+    
+    // Gestion correcte de la pagination Laravel
+    if (resp.data?.data?.data) {
+      // Structure paginée Laravel
+      reviews.value = resp.data.data.data
+    } else if (Array.isArray(resp.data?.data)) {
+      // Structure simple
+      reviews.value = resp.data.data
+    } else {
+      reviews.value = []
+    }
   } catch (err) {
     console.error('Failed to fetch reviews:', err)
     error.value = 'Impossible de charger les évaluations.'

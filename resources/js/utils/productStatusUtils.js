@@ -188,3 +188,4 @@ export const formatProductStatus = (product) => {
     isUnavailable: isProductUnavailable(product)
   }
 }
+

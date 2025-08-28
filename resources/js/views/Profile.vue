@@ -356,7 +356,6 @@ const recentActivity = ref([])
 // Computed
 const user = computed(() => authStore.user)
 const stats = computed(() => {
-  console.log('📊 Stats computed:', dashboardStore.stats.value)
   return dashboardStore.stats.value
 })
 
@@ -372,15 +371,11 @@ const tabs = [
 const loadProducts = async () => {
   loadingProducts.value = true
   try {
-    console.log('🔵 Loading user products...')
     const response = await window.axios.get('/products/my-products', {
       params: { per_page: 20 }
     })
-    console.log('📦 Products API response:', response.data)
-    console.log('📦 Products data structure:', response.data.data)
     
     products.value = response.data.data || []
-    console.log('✅ Products loaded:', products.value.length, 'products')
   } catch (error) {
     console.error('Error loading products:', error)
     products.value = []
@@ -393,10 +388,25 @@ const loadFollowers = async () => {
   loadingFollowers.value = true
   try {
     const response = await window.axios.get('/users/my-followers')
-    // Les followers sont directement les utilisateurs dans la relation many-to-many
-    followers.value = response.data.data?.data || []
+    
+    // Vérifier la structure de la réponse
+    if (response.data.success && response.data.data) {
+      // Si c'est une pagination, prendre les données
+      if (response.data.data.data) {
+        followers.value = response.data.data.data
+      } else {
+        // Sinon, prendre directement les données
+        followers.value = response.data.data
+      }
+    } else {
+      console.warn('⚠️ Followers response structure unexpected:', response.data)
+      // Utiliser les données de test en cas d'échec
+      followers.value = [] // Clear followers on unexpected response
+    }
   } catch (error) {
-    console.error('Error loading followers:', error)
+    console.error('❌ Error loading followers:', error)
+    console.error('Error details:', error.response?.data)
+    // Utiliser les données de test en cas d'erreur
     followers.value = []
   } finally {
     loadingFollowers.value = false
@@ -407,10 +417,25 @@ const loadFollowing = async () => {
   loadingFollowing.value = true
   try {
     const response = await window.axios.get('/users/my-following')
-    // Les following sont directement les utilisateurs dans la relation many-to-many
-    following.value = response.data.data?.data || []
+    
+    // Vérifier la structure de la réponse
+    if (response.data.success && response.data.data) {
+      // Si c'est une pagination, prendre les données
+      if (response.data.data.data) {
+        following.value = response.data.data.data
+      } else {
+        // Sinon, prendre directement les données
+        following.value = response.data.data
+      }
+    } else {
+      console.warn('⚠️ Following response structure unexpected:', response.data)
+      // Utiliser les données de test en cas d'échec
+      following.value = [] // Clear following on unexpected response
+    }
   } catch (error) {
-    console.error('Error loading following:', error)
+    console.error('❌ Error loading following:', error)
+    console.error('Error details:', error.response?.data)
+    // Utiliser les données de test en cas d'erreur
     following.value = []
   } finally {
     loadingFollowing.value = false
@@ -423,9 +448,28 @@ const loadActivity = async () => {
     const response = await window.axios.get('/me/activity', {
       params: { limit: 10 }
     })
-    recentActivity.value = response.data.data?.recent_actions || []
+    
+    // Vérifier la structure de la réponse
+    if (response.data.success && response.data.data) {
+      // Essayer différentes structures possibles
+      if (response.data.data.recent_actions) {
+        recentActivity.value = response.data.data.recent_actions
+      } else if (response.data.data.activities) {
+        recentActivity.value = response.data.data.activities
+      } else if (Array.isArray(response.data.data)) {
+        recentActivity.value = response.data.data
+      } else {
+        recentActivity.value = []
+      }
+    } else {
+      console.warn('⚠️ Activity response structure unexpected:', response.data)
+      // Utiliser les données de test en cas d'échec
+      recentActivity.value = []
+    }
   } catch (error) {
-    console.error('Error loading activity:', error)
+    console.error('❌ Error loading activity:', error)
+    console.error('Error details:', error.response?.data)
+    // Utiliser les données de test en cas d'erreur
     recentActivity.value = []
   } finally {
     loadingActivity.value = false
@@ -536,16 +580,18 @@ const formatDate = (date) => {
 watch(activeTab, (newTab) => {
   switch (newTab) {
     case 'products':
-      if (products.value.length === 0) loadProducts()
+      if (products.value.length === 0) {
+        loadProducts()
+      }
       break
     case 'followers':
-      if (followers.value.length === 0) loadFollowers()
+      loadFollowers()
       break
     case 'following':
-      if (following.value.length === 0) loadFollowing()
+      loadFollowing()
       break
     case 'activity':
-      if (recentActivity.value.length === 0) loadActivity()
+      loadActivity()
       break
   }
 })
@@ -553,20 +599,14 @@ watch(activeTab, (newTab) => {
 // Load user stats
 const loadUserStats = async () => {
   try {
-    console.log('🔵 Loading user stats...')
-    console.log('🔍 Dashboard store stats before:', dashboardStore.stats)
-    
     const response = await window.axios.get('/me/stats')
-    console.log('📊 Stats API response:', response.data)
     
     if (response.data.success) {
       // Mettre à jour les stats locales
       const userStats = response.data.data
-      console.log('📈 User stats data:', userStats)
       
       // S'assurer que le store stats existe et l'initialiser si nécessaire
       if (!dashboardStore.stats.value) {
-        console.log('⚠️ Initializing dashboard stats...')
         dashboardStore.stats.value = {
           products_count: 0,
           total_sales: 0,
@@ -584,8 +624,6 @@ const loadUserStats = async () => {
       dashboardStore.stats.value.followers_count = userStats.social?.followers_count || 0
       dashboardStore.stats.value.following_count = userStats.social?.following_count || 0
       dashboardStore.stats.value.total_sales = userStats.sales?.total_earnings || 0
-      
-      console.log('✅ Stats updated:', dashboardStore.stats.value)
     }
   } catch (error) {
     console.error('Error loading user stats:', error)

@@ -84,6 +84,7 @@ Route::prefix('v1')->group(function () {
         Route::get('users/{user}/products', [UserController::class, 'userProducts'])->where('user', '[0-9]+');
         Route::get('users/{user}/followers', [UserController::class, 'followers'])->where('user', '[0-9]+');
         Route::get('users/{user}/following', [UserController::class, 'following'])->where('user', '[0-9]+');
+        Route::get('users/{user}/reviews', [UserController::class, 'reviews'])->where('user', '[0-9]+');
 
         // Lives publics
         Route::get('lives', [LiveController::class, 'index']);

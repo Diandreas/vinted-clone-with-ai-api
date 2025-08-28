@@ -118,8 +118,9 @@ class UserController extends Controller
 
     public function followers(User $user)
     {
+        // Récupérer les followers de l'utilisateur spécifié
         $followers = $user->followers()
-            ->with('follower')
+            ->select('users.*')
             ->latest()
             ->paginate(20);
 
@@ -131,8 +132,9 @@ class UserController extends Controller
 
     public function following(User $user)
     {
+        // Récupérer les utilisateurs que l'utilisateur spécifié suit
         $following = $user->following()
-            ->with('following')
+            ->select('users.*')
             ->latest()
             ->paginate(20);
 
@@ -142,14 +144,26 @@ class UserController extends Controller
         ]);
     }
 
+    public function reviews(User $user)
+    {
+        // Récupérer les avis reçus par l'utilisateur
+        $reviews = $user->receivedReviews()
+            ->with(['reviewer'])
+            ->latest()
+            ->paginate(20);
+
+        return response()->json([
+            'success' => true,
+            'data' => $reviews
+        ]);
+    }
+
     public function myFollowers()
     {
         $user = Auth::user();
         
-        $followers = $user->followers()
-            ->latest()
-            ->paginate(20);
-
+        $followers = $user->followers()->latest()->paginate(20);
+        
         return response()->json([
             'success' => true,
             'data' => $followers
@@ -160,10 +174,8 @@ class UserController extends Controller
     {
         $user = Auth::user();
         
-        $following = $user->following()
-            ->latest()
-            ->paginate(20);
-
+        $following = $user->following()->latest()->paginate(20);
+        
         return response()->json([
             'success' => true,
             'data' => $following
@@ -344,13 +356,119 @@ class UserController extends Controller
     {
         $user = Auth::user();
         
-        // This would typically come from an activity log
+        // Récupérer les activités récentes de l'utilisateur
+        $recentActions = collect();
+        
+        try {
+            // Activités de produits (création, modification, vente)
+            $productActivities = $user->products()
+                ->with(['category', 'brand'])
+                ->latest()
+                ->limit(5)
+                ->get()
+                ->map(function ($product) {
+                    return [
+                        'id' => 'product_' . $product->id,
+                        'type' => 'product',
+                        'description' => "Produit \"{$product->title}\" créé",
+                        'created_at' => $product->created_at,
+                        'icon' => 'package',
+                        'data' => $product
+                    ];
+                });
+            
+            $recentActions = $recentActions->concat($productActivities);
+            
+            // Activités de followers (vérifier qu'il y en a)
+            $followers = $user->followers()->latest()->limit(3)->get();
+            if ($followers->count() > 0) {
+                $followerActivities = $followers->map(function ($follower) {
+                    return [
+                        'id' => 'follower_' . $follower->id,
+                        'type' => 'follower',
+                        'description' => "@{$follower->username} vous suit maintenant",
+                        'created_at' => $follower->pivot->created_at ?? now(),
+                        'icon' => 'user-plus',
+                        'data' => $follower
+                    ];
+                });
+                
+                $recentActions = $recentActions->concat($followerActivities);
+            }
+            
+            // Activités de likes reçus (vérifier qu'il y en a)
+            $productsWithLikes = $user->products()
+                ->withCount('likes')
+                ->where('likes_count', '>', 0)
+                ->latest()
+                ->limit(3)
+                ->get();
+                
+            if ($productsWithLikes->count() > 0) {
+                $likeActivities = $productsWithLikes->map(function ($product) {
+                    return [
+                        'id' => 'like_' . $product->id,
+                        'type' => 'like',
+                        'description' => "Votre produit \"{$product->title}\" a reçu {$product->likes_count} like(s)",
+                        'created_at' => $product->updated_at,
+                        'icon' => 'heart',
+                        'data' => $product
+                    ];
+                });
+                
+                $recentActions = $recentActions->concat($likeActivities);
+            }
+            
+            // Activités de vues (vérifier qu'il y en a)
+            $productsWithViews = $user->products()
+                ->where('views_count', '>', 0)
+                ->latest()
+                ->limit(3)
+                ->get();
+                
+            if ($productsWithViews->count() > 0) {
+                $viewActivities = $productsWithViews->map(function ($product) {
+                    return [
+                        'id' => 'view_' . $product->id,
+                        'type' => 'view',
+                        'description' => "Votre produit \"{$product->title}\" a été vu {$product->views_count} fois",
+                        'created_at' => $product->updated_at,
+                        'icon' => 'eye',
+                        'data' => $product
+                    ];
+                });
+                
+                $recentActions = $recentActions->concat($viewActivities);
+            }
+            
+            // Trier par date et limiter
+            $recentActions = $recentActions
+                ->sortByDesc('created_at')
+                ->take(10)
+                ->values();
+                
+        } catch (\Exception $e) {
+            \Log::error('Error in activity method: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            
+            // En cas d'erreur, retourner des activités de base
+            $recentActions = collect([
+                [
+                    'id' => 'welcome',
+                    'type' => 'welcome',
+                    'description' => 'Bienvenue sur votre profil !',
+                    'created_at' => now(),
+                    'icon' => 'star'
+                ]
+            ]);
+        }
+        
         return response()->json([
             'success' => true,
             'data' => [
-                'recent_logins' => [],
-                'recent_actions' => [],
-                'recent_views' => [],
+                'recent_actions' => $recentActions,
+                'total_actions' => $recentActions->count(),
+                'last_activity' => $recentActions->isNotEmpty() ? $recentActions->first()['created_at'] : null
             ]
         ]);
     }
