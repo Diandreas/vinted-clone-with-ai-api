@@ -83,6 +83,18 @@
             Modifier profil
               </RouterLink>
           
+          <!-- Bouton activer tous les produits en attente -->
+          <button
+            v-if="stats?.pending_payment_products > 0"
+            @click="activateAllPendingProducts"
+            :disabled="isActivatingAll"
+            class="inline-flex items-center justify-center px-3 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold rounded-lg sm:rounded-xl transition-all duration-200 shadow-md hover:shadow-lg text-xs sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <PlayIcon v-if="!isActivatingAll" class="w-3.5 h-3.5 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
+            <div v-else class="w-3.5 h-3.5 sm:w-5 sm:h-5 mr-1 sm:mr-2 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+            {{ isActivatingAll ? 'Activation...' : `Activer tout (${stats.pending_payment_products})` }}
+          </button>
+
           <!-- Bouton de déconnexion -->
           <button
             @click="logout"
@@ -95,7 +107,7 @@
     </div>
 
       <!-- Stats principales - Ultra Compact mobile -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-4 mb-3 sm:mb-6">
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-1.5 sm:gap-4 mb-3 sm:mb-6">
         <div class="bg-white/80 backdrop-blur-sm rounded-lg sm:rounded-xl shadow-lg border border-green-200/50 p-2 sm:p-4 text-center hover:shadow-xl transition-all duration-200">
           <div class="text-base sm:text-xl lg:text-2xl font-bold text-green-600 mb-0.5 sm:mb-1">{{ stats?.products_count || 0 }}</div>
           <div class="text-xs sm:text-sm text-gray-600">Produits</div>
@@ -111,6 +123,14 @@
         <div class="bg-white/80 backdrop-blur-sm rounded-lg sm:rounded-xl shadow-lg border border-green-200/50 p-2 sm:p-4 text-center hover:shadow-xl transition-all duration-200">
           <div class="text-base sm:text-xl lg:text-2xl font-bold text-green-600 mb-0.5 sm:mb-1">{{ stats?.total_sales || 0 }}</div>
           <div class="text-xs sm:text-sm text-gray-600">Ventes</div>
+        </div>
+        <div 
+          v-if="stats?.pending_payment_products > 0"
+          @click="activeTab = 'pending'"
+          class="bg-white/80 backdrop-blur-sm rounded-lg sm:rounded-xl shadow-lg border border-orange-200/50 p-2 sm:p-4 text-center hover:shadow-xl transition-all duration-200 cursor-pointer hover:bg-orange-50/50"
+        >
+          <div class="text-base sm:text-xl lg:text-2xl font-bold text-orange-600 mb-0.5 sm:mb-1">{{ stats?.pending_payment_products || 0 }}</div>
+          <div class="text-xs sm:text-sm text-orange-600">En attente</div>
         </div>
       </div>
 
@@ -330,11 +350,11 @@ import {
   MapPinIcon,
   LinkIcon,
   HeartIcon,
-
   ShoppingCartIcon,
   StarIcon,
   EyeIcon,
-  LogOutIcon
+  LogOutIcon,
+  PlayIcon
 } from 'lucide-vue-next'
 
 const router = useRouter()
@@ -348,6 +368,7 @@ const loadingProducts = ref(false)
 const loadingFollowers = ref(false)
 const loadingFollowing = ref(false)
 const loadingActivity = ref(false)
+const isActivatingAll = ref(false)
 const products = ref([])
 const followers = ref([])
 const following = ref([])
@@ -576,6 +597,65 @@ const formatDate = (date) => {
   })
 }
 
+// Payer et activer tous les produits en attente via Lygos
+const activateAllPendingProducts = async () => {
+  if (isActivatingAll.value) return
+  
+  isActivatingAll.value = true
+  
+  try {
+    // D'abord, créer une gateway de paiement NotchPay pour tous les produits en attente
+    const response = await window.axios.post('/products/create-bulk-payment')
+    
+    if (response.data.success) {
+      const paymentData = response.data.data
+      
+      if (paymentData.payment_required && paymentData.notchpay_payment_link) {
+        // Rediriger vers NotchPay pour paiement
+        console.log('🚀 Redirection vers NotchPay pour paiement en masse:', paymentData.notchpay_payment_link)
+        
+        // Stocker les informations de paiement en masse dans localStorage pour le callback
+        localStorage.setItem('bulk_payment_info', JSON.stringify({
+            reference: paymentData.notchpay_reference,
+            total_amount: paymentData.total_amount,
+            product_count: paymentData.product_count
+        }))
+        
+        window.location.href = paymentData.notchpay_payment_link
+      } else {
+        // Aucun paiement requis - activer directement
+        const activateResponse = await window.axios.post('/products/activate-all-pending')
+        
+        if (activateResponse.data.success) {
+          const result = activateResponse.data
+          alert(`🎉 ${result.summary.activated} produit(s) activé(s) avec succès !`)
+          
+          // Recharger les données
+          await Promise.all([
+            loadProducts(),
+            loadUserStats()
+          ])
+        }
+      }
+    } else {
+      alert('❌ Erreur lors de la création du paiement')
+    }
+    
+  } catch (error) {
+    console.error('Error creating bulk payment:', error)
+    
+    if (error.response?.status === 404) {
+      alert('ℹ️ Aucun produit en attente de paiement trouvé')
+    } else if (error.response?.data?.message) {
+      alert(`❌ ${error.response.data.message}`)
+    } else {
+      alert('❌ Erreur lors de la création du paiement')
+    }
+  } finally {
+    isActivatingAll.value = false
+  }
+}
+
 // Watchers
 watch(activeTab, (newTab) => {
   switch (newTab) {
@@ -599,6 +679,7 @@ watch(activeTab, (newTab) => {
 // Load user stats
 const loadUserStats = async () => {
   try {
+    // Charger les stats utilisateur
     const response = await window.axios.get('/me/stats')
     
     if (response.data.success) {
@@ -616,7 +697,8 @@ const loadUserStats = async () => {
           products_trend: 0,
           sales_trend: 0,
           followers_trend: 0,
-          views_trend: 0
+          views_trend: 0,
+          pending_payment_products: 0
         }
       }
       
@@ -625,6 +707,14 @@ const loadUserStats = async () => {
       dashboardStore.stats.value.following_count = userStats.social?.following_count || 0
       dashboardStore.stats.value.total_sales = userStats.sales?.total_earnings || 0
     }
+    
+    // Charger spécifiquement les stats de produits (qui incluent pending_payment_products)
+    const statsResponse = await window.axios.get('/products/stats')
+    if (statsResponse.data.success) {
+      const productStats = statsResponse.data.data
+      dashboardStore.stats.value.pending_payment_products = productStats.pending_payment_products || 0
+    }
+    
   } catch (error) {
     console.error('Error loading user stats:', error)
   }

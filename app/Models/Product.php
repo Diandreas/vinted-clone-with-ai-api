@@ -16,6 +16,10 @@ class Product extends Model
      */
     protected $fillable = [
         'user_id',
+        'publishing_package_id',
+        'requires_publishing_fee',
+        'publishing_fee_paid',
+        'publishing_fee_paid_at',
         'category_id',
         'brand_id',
         'condition_id',
@@ -55,6 +59,9 @@ class Product extends Model
         return [
             'price' => 'decimal:2',
             'original_price' => 'decimal:2',
+            'publishing_fee_paid' => 'decimal:2',
+            'requires_publishing_fee' => 'boolean',
+            'publishing_fee_paid_at' => 'datetime',
             'followers_only' => 'boolean',
             'is_spot' => 'boolean',
             'spot_starts_at' => 'datetime',
@@ -73,6 +80,7 @@ class Product extends Model
 
     // Status constants
     const STATUS_DRAFT = 'draft';
+    const STATUS_PENDING_PAYMENT = 'pending_payment';
     const STATUS_ACTIVE = 'active';
     const STATUS_SOLD = 'sold';
     const STATUS_RESERVED = 'reserved';
@@ -86,6 +94,14 @@ class Product extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the publishing package used for this product.
+     */
+    public function publishingPackage()
+    {
+        return $this->belongsTo(ProductPublishingPackage::class);
     }
 
     /**
@@ -214,6 +230,14 @@ class Product extends Model
     public function conversations()
     {
         return $this->hasMany(Conversation::class);
+    }
+
+    /**
+     * Get the fee charges for this product.
+     */
+    public function feeCharges()
+    {
+        return $this->hasMany(ProductFeeCharge::class);
     }
 
     /**
@@ -634,5 +658,88 @@ class Product extends Model
     public function shouldBeSearchable()
     {
         return $this->status === self::STATUS_ACTIVE;
+    }
+
+    // Publishing Fee Methods
+
+    /**
+     * Check if the product requires a publishing fee.
+     */
+    public function requiresPublishingFee()
+    {
+        return $this->requires_publishing_fee;
+    }
+
+    /**
+     * Check if the publishing fee has been paid.
+     */
+    public function isPublishingFeePaid()
+    {
+        return !is_null($this->publishing_fee_paid_at);
+    }
+
+    /**
+     * Get the formatted publishing fee paid.
+     */
+    public function getFormattedPublishingFeePaidAttribute()
+    {
+        if ($this->publishing_fee_paid === null) {
+            return null;
+        }
+        return number_format($this->publishing_fee_paid, 0, ',', ' ') . ' FCFA';
+    }
+
+    /**
+     * Mark the publishing fee as paid.
+     */
+    public function markPublishingFeePaid(float $amount, ?ProductPublishingPackage $package = null)
+    {
+        $this->update([
+            'publishing_fee_paid' => $amount,
+            'publishing_fee_paid_at' => now(),
+            'publishing_package_id' => $package?->id,
+        ]);
+    }
+
+    /**
+     * Check if product can be published without additional fees.
+     */
+    public function canBePublishedWithoutFee()
+    {
+        return !$this->requires_publishing_fee || $this->isPublishingFeePaid();
+    }
+
+    /**
+     * Get publishing status information.
+     */
+    public function getPublishingStatusAttribute()
+    {
+        if (!$this->requires_publishing_fee) {
+            return 'fee_not_required';
+        }
+
+        if ($this->isPublishingFeePaid()) {
+            return 'fee_paid';
+        }
+
+        return 'fee_pending';
+    }
+
+    /**
+     * Activate product after payment of listing fee.
+     */
+    public function activateAfterPayment()
+    {
+        $this->update([
+            'status' => self::STATUS_ACTIVE,
+        ]);
+    }
+
+    /**
+     * Check if the product is pending payment.
+     */
+    public function isPendingPayment()
+    {
+        return $this->status === self::STATUS_PENDING_PAYMENT;
     }
 }

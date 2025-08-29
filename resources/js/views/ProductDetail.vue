@@ -246,10 +246,24 @@
                   ⏰ Modification expirée (30min dépassées)
                 </div>
                 <button
-                  @click="toggleProductStatus"
-                  class="bg-gray-600 text-white px-3 py-2 rounded-lg font-medium hover:bg-gray-700 transition-colors text-sm"
+                  v-if="product?.status === 'pending_payment'"
+                  @click="showPaymentModal = true"
+                  class="px-3 py-2 rounded-lg font-medium transition-colors text-sm bg-orange-600 text-white hover:bg-orange-700"
                 >
-                  {{ product?.status === 'active' ? 'Suspendre' : 'Activer' }}
+                  💳 Payer pour activer
+                </button>
+                <button
+                  v-else
+                  @click="toggleProductStatus"
+                  :class="[
+                    'px-3 py-2 rounded-lg font-medium transition-colors text-sm',
+                    product?.status === 'active' 
+                      ? 'bg-gray-600 text-white hover:bg-gray-700' 
+                      : 'bg-green-600 text-white hover:bg-green-700'
+                  ]"
+                >
+                  <span v-if="product?.status === 'active'">Suspendre</span>
+                  <span v-else>Activer</span>
                 </button>
               </div>
             </div>
@@ -490,6 +504,75 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal de paiement -->
+    <div v-if="showPaymentModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-xl shadow-xl max-w-md w-full" @click.stop>
+        <!-- Header du modal -->
+        <div class="p-6 border-b border-gray-200">
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-semibold text-gray-900">Paiement des frais de publication</h3>
+            <button
+              @click="showPaymentModal = false"
+              class="text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Body du modal -->
+        <div class="p-6">
+          <!-- Info produit -->
+          <div class="flex items-center space-x-3 mb-4 p-3 bg-gray-50 rounded-lg">
+            <img
+              :src="product?.main_image_url"
+              :alt="product?.title"
+              class="w-12 h-12 object-cover rounded-lg"
+            />
+            <div>
+              <p class="font-medium text-gray-900 text-sm">{{ product?.title }}</p>
+              <p class="text-sm text-gray-500">{{ formatPrice(product?.price) }}</p>
+            </div>
+          </div>
+
+          <!-- Frais de publication -->
+          <div class="mb-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+            <div class="flex justify-between items-center">
+              <span class="text-sm font-medium text-orange-800">Frais de publication</span>
+              <span class="text-lg font-bold text-orange-600">{{ formatPrice(Math.round(product?.price * 0.05)) }}</span>
+            </div>
+            <p class="text-xs text-orange-600 mt-1">5% du prix de vente</p>
+          </div>
+
+          <!-- Erreur de paiement -->
+          <div v-if="paymentError" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <p class="text-sm text-red-700">{{ paymentError }}</p>
+          </div>
+        </div>
+
+        <!-- Footer du modal -->
+        <div class="p-6 border-t border-gray-200 flex space-x-3">
+          <button
+            @click="showPaymentModal = false"
+            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+            :disabled="paymentLoading"
+          >
+            Annuler
+          </button>
+          <button
+            @click="handleProductPayment"
+            class="flex-1 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            :disabled="paymentLoading"
+          >
+            <span v-if="paymentLoading">Traitement...</span>
+            <span v-else>Payer avec Mobile Money</span>
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -530,6 +613,11 @@ const showMessageModal = ref(false)
 const messageContent = ref('')
 const sendingMessage = ref(false)
 const messageError = ref('')
+
+// Payment Modal State
+const showPaymentModal = ref(false)
+const paymentLoading = ref(false)
+const paymentError = ref('')
 
 // Product Conversations State (for owner)
 const productConversations = ref([])
@@ -862,9 +950,36 @@ const toggleProductStatus = async () => {
 
     if (response.data.success) {
       product.value.status = newStatus
+      
+      // Message de succès
+      if (newStatus === 'active') {
+        alert('✅ Produit activé avec succès !')
+      } else {
+        alert('✅ Produit suspendu avec succès !')
+      }
     }
   } catch (error) {
     console.error('Erreur changement statut:', error)
+    
+    // Gestion spécifique de l'erreur de paiement requis
+    if (error.response?.status === 400 && error.response?.data?.payment_required) {
+      const paymentInfo = error.response.data.payment_required
+      const confirmPayment = confirm(
+        `💳 Paiement requis pour activer ce produit\n\n` +
+        `Montant à payer : ${paymentInfo.amount} ${paymentInfo.currency}\n` +
+        `Statut actuel : ${paymentInfo.status}\n\n` +
+        `Voulez-vous aller à la page de paiement ?`
+      )
+      
+      if (confirmPayment) {
+        // Rediriger vers la page de paiement ou profile
+        router.push('/profile')
+      }
+    } else if (error.response?.data?.message) {
+      alert(`❌ ${error.response.data.message}`)
+    } else {
+      alert('❌ Erreur lors du changement de statut')
+    }
   }
 }
 
@@ -934,6 +1049,7 @@ const getUserInitials = (fullName) => {
 const getStatusBadgeClass = (status) => {
   const classes = {
     active: 'bg-green-100 text-green-800',
+    pending_payment: 'bg-orange-100 text-orange-800',
     draft: 'bg-gray-100 text-gray-800',
     sold: 'bg-primary-100 text-primary-800',
     reserved: 'bg-gray-100 text-gray-800'
@@ -944,6 +1060,7 @@ const getStatusBadgeClass = (status) => {
 const getStatusText = (status) => {
   const texts = {
     active: 'Actif',
+    pending_payment: '💳 En attente de paiement',
     draft: 'Brouillon',
     sold: 'Vendu',
     reserved: 'Réservé'
@@ -978,6 +1095,64 @@ const shareProduct = async () => {
     }
   } catch (error) {
     console.error('Error sharing product:', error)
+  }
+}
+
+const handleProductPayment = async () => {
+  try {
+    paymentLoading.value = true
+    paymentError.value = ''
+
+    // Debug: vérifier l'état de l'authentification
+    console.log('🔐 État de l\'authentification:', {
+      isAuthenticated: authStore.isAuthenticated,
+      user: authStore.user,
+      token: authStore.token?.substring(0, 20) + '...'
+    })
+
+    // Vérifier que l'utilisateur est connecté
+    if (!authStore.isAuthenticated) {
+      throw new Error('Vous devez être connecté pour effectuer un paiement')
+    }
+
+    // Calculer les frais de publication (exemple : 5% du prix)
+    const listingFee = Math.round(product.value.price * 0.05)
+    
+    console.log('💳 Tentative de paiement:', {
+      product_id: product.value.id,
+      amount: listingFee,
+      email: authStore.user?.email
+    })
+    
+    // Utiliser l'instance API configurée qui gère l'authentification
+    const response = await api.post('/notchpay/initialize', {
+      product_id: product.value.id,
+      amount: listingFee,
+      email: authStore.user?.email || 'user@example.com'
+    })
+
+    if (response.data.success && response.data.authorization_url) {
+      // Rediriger vers NotchPay
+      window.location.href = response.data.authorization_url
+    } else {
+      throw new Error('Réponse invalide du serveur de paiement')
+    }
+
+  } catch (error) {
+    console.error('Erreur de paiement:', error)
+    
+    // Gestion spécifique des erreurs d'authentification
+    if (error.response?.status === 401) {
+      paymentError.value = 'Vous devez être connecté pour effectuer un paiement'
+      // Rediriger vers la page de connexion
+      router.push('/login')
+    } else if (error.response?.data?.message) {
+      paymentError.value = error.response.data.message
+    } else {
+      paymentError.value = "Une erreur s'est produite lors du traitement du paiement"
+    }
+  } finally {
+    paymentLoading.value = false
   }
 }
 

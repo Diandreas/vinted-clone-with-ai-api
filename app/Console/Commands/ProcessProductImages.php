@@ -45,6 +45,13 @@ class ProcessProductImages extends Command
     {
         $this->info('🔍 Starting product image processing...');
 
+        // Check if Google Vision service is enabled
+        if (!$this->visionService->isEnabled()) {
+            $this->error('❌ Google Vision service is not properly configured');
+            $this->warn('Please ensure the Google Cloud credentials file exists and is valid');
+            return self::FAILURE;
+        }
+
         $limit = $this->option('limit');
         $force = $this->option('force');
         $productId = $this->option('product-id');

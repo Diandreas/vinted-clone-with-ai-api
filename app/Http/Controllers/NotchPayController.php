@@ -5,14 +5,120 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Payment;
-use App\Models\Referral;
-use App\Models\ReferralEarning;
+use App\Models\Product;
 use App\Models\User;
 use Exception;
 
 class NotchPayController extends Controller
 {
+    /**
+     * Initialize a new payment with NotchPay for product listing fee
+     */
+    public function initializePayment(Request $request)
+    {
+        Log::info('Starting NotchPay payment initialization for product', [
+            'user_id' => auth()->id(),
+            'request_data' => $request->all()
+        ]);
+
+        try {
+            // 1. Validate request
+            $validated = $request->validate([
+                'product_id' => 'required|integer|exists:products,id',
+                'amount' => 'required|numeric|min:100',
+                'email' => 'required|email',
+            ]);
+
+            $user = auth()->user();
+            if (!$user) {
+                throw new Exception('User not authenticated');
+            }
+
+            // 2. Verify product ownership and status
+            $product = \App\Models\Product::findOrFail($validated['product_id']);
+            if ($product->user_id !== $user->id) {
+                throw new Exception('Unauthorized access to product');
+            }
+
+            if ($product->status !== \App\Models\Product::STATUS_PENDING_PAYMENT) {
+                throw new Exception('Product is not pending payment');
+            }
+
+            // 3. Initialize payment with NotchPay API
+            $fields = [
+                'email' => $validated['email'],
+                'amount' => (string)$validated['amount'],
+                'currency' => 'XAF',
+                'description' => 'Frais de publication - ' . $product->name,
+                'reference' => 'prod_' . $product->id . '_' . uniqid(),
+                'callback' => route('payment.callback'),
+                'sandbox' => config('services.notchpay.sandbox', false) // Disable sandbox in production
+            ];
+
+            Log::info('Initiating NotchPay API request', [
+                'fields' => $fields,
+                'endpoint' => 'payments/initialize'
+            ]);
+
+            $response = $this->makeNotchPayRequest('payments/initialize', $fields);
+
+            if (!isset($response['authorization_url'])) {
+                throw new Exception('Invalid response from NotchPay');
+            }
+
+            Log::info('Creating payment record', [
+                'user_id' => $user->id,
+                'product_id' => $product->id,
+                'amount' => $validated['amount'],
+                'response' => $response
+            ]);
+
+            // 4. Create pending payment record
+            $payment = Payment::create([
+                'user_id' => $user->id,
+                'amount' => $validated['amount'],
+                'currency' => 'XAF',
+                'transaction_id' => $response['transaction']['reference'],
+                'status' => 'pending',
+                'payment_method' => 'notchpay',
+                'metadata' => [
+                    'product_id' => $product->id,
+                    'product_name' => $product->name,
+                    'authorization_url' => $response['authorization_url'],
+                    'notchpay_reference' => $response['transaction']['reference'],
+                    'email' => $validated['email']
+                ]
+            ]);
+
+            Log::info('NotchPay payment initialized for product', [
+                'payment_id' => $payment->id,
+                'product_id' => $product->id,
+                'transaction_id' => $payment->transaction_id
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'authorization_url' => $response['authorization_url']
+            ]);
+
+        } catch (Exception $e) {
+            Log::error('NotchPay payment initialization failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Payment initialization failed: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Handle NotchPay callback after payment
+     */
     public function handleCallback(Request $request)
     {
         Log::info('NotchPay callback received', [
@@ -24,29 +130,16 @@ class NotchPayController extends Controller
         ]);
 
         try {
-            // Handle different payment statuses
-            if ($request->status === 'canceled') {
-                Log::info('Payment was canceled by user', [
-                    'reference' => $request->reference,
-                    'status' => $request->status
-                ]);
-                return redirect('/wallet')
-                    ->with('warning', 'Paiement annulé. Vous pouvez réessayer à tout moment.');
-            }
-
-            if ($request->status === 'failed') {
-                Log::warning('Payment failed', [
-                    'reference' => $request->reference,
-                    'status' => $request->status
-                ]);
-                return redirect('/wallet')
-                    ->with('error', 'Le paiement a échoué. Veuillez réessayer.');
-            }
-
+            // Verify the payment status
             if ($request->status !== 'complete') {
-                Log::warning('Unknown payment status', ['status' => $request->status]);
-                return redirect('/wallet')
-                    ->with('error', 'Statut de paiement inconnu: ' . $request->status);
+                Log::warning('Payment not complete', ['status' => $request->status]);
+                throw new Exception('Payment was not completed');
+            }
+
+            // Vérifier que nous avons au moins une référence valide
+            if (!$request->notchpay_trxref && !$request->reference && !$request->trxref) {
+                Log::warning('No valid reference found in callback');
+                throw new Exception('Aucune référence de paiement valide trouvée');
             }
 
             DB::beginTransaction();
@@ -70,46 +163,45 @@ class NotchPayController extends Controller
             ]);
 
             if (!$payment) {
-                Log::warning('Payment not found', [
-                    'searched_refs' => [
-                        'notchpay_trxref' => $request->notchpay_trxref,
-                        'reference' => $request->reference,
-                        'trxref' => $request->trxref
-                    ]
-                ]);
-                return redirect('/wallet')
-                    ->with('error', 'Paiement introuvable ou déjà traité.');
+                throw new Exception('Payment not found or already processed');
             }
 
-            $metadata = json_decode($payment->metadata, true);
-            $tokens = $metadata['tokens'];
+            // Vérifier que le paiement a bien les métadonnées nécessaires
+            if (!isset($payment->metadata['product_id'])) {
+                throw new Exception('Métadonnées de paiement invalides');
+            }
 
-            // Update user balance
-            $user = $payment->user;
-            $oldBalance = $user->wallet_balance;
-            $user->wallet_balance += $tokens;
-            $user->save();
+            $metadata = $payment->metadata;
+            $productId = $metadata['product_id'];
 
+            // Get the product
+            $product = \App\Models\Product::findOrFail($productId);
+            
+            // Vérifier que le produit est toujours en attente de paiement
+            if ($product->status !== 'pending_payment') {
+                throw new Exception('Le produit n\'est plus en attente de paiement');
+            }
+            
             // Update payment status
-            $payment->status = 'completed';
-            $payment->save();
+            $payment->markAsCompleted();
 
-            // Process referral commission if the user was referred
-            $this->processReferralCommission($user, $payment->amount);
+            // Activate the specific product
+            $this->activateProductAfterPayment($product);
+
+
 
             Log::info('Payment completed successfully', [
                 'payment_id' => $payment->id,
-                'user_id' => $user->id,
-                'old_balance' => $oldBalance,
-                'new_balance' => $user->wallet_balance,
-                'tokens_added' => $tokens
+                'product_id' => $product->id,
+                'user_id' => $product->user->id,
+                'product_name' => $product->name
             ]);
 
             DB::commit();
 
-            // Redirect to wallet page with success message
-            return redirect('/wallet')
-                ->with('success', 'Paiement réussi ! ' . $tokens . ' jetons ont été ajoutés à votre compte.');
+            // Store success message in session and redirect to public result page
+            session()->flash('payment_success', 'Paiement réussi ! Le produit "' . $product->name . '" a été activé avec succès.');
+            return redirect()->route('payment.result');
 
         } catch (Exception $e) {
             DB::rollBack();
@@ -119,101 +211,15 @@ class NotchPayController extends Controller
                 'request_data' => $request->all()
             ]);
 
-            // Redirect to wallet page with error message
-            return redirect('/wallet')
-                ->with('error', 'Erreur lors du traitement du paiement : ' . $e->getMessage());
+            // Store error message in session and redirect to public result page
+            session()->flash('payment_error', 'Erreur lors du traitement du paiement : ' . $e->getMessage());
+            return redirect()->route('payment.result');
         }
     }
 
-    public function initializePayment(Request $request)
-    {
-        Log::info('Starting NotchPay payment initialization', [
-            'user_id' => auth()->id(),
-            'request_data' => $request->all()
-        ]);
-
-        try {
-            // 1. Validate request
-            $validated = $request->validate([
-                'tokens' => 'required|integer|min:1',
-                'amount' => 'required|numeric|min:100',
-                'email' => 'required|email'
-            ]);
-
-            $user = auth()->user();
-            if (!$user) {
-                throw new Exception('User not authenticated');
-            }
-
-            // 2. Use amount from request
-            $amount = $validated['amount'];
-
-            // 3. Initialize payment with NotchPay API
-            $reference = 'tok_' . uniqid() . '_' . time();
-            $fields = [
-                'email' => $validated['email'],
-                'amount' => (string)$amount,
-                'currency' => 'XAF',
-                'description' => $validated['tokens'] . ' tokens purchase',
-                'reference' => $reference,
-                'callback' => config('services.notchpay.callback_url'),
-                'sandbox' => config('services.notchpay.sandbox', true)
-            ];
-
-            Log::info('Initiating NotchPay API request', [
-                'fields' => $fields,
-                'endpoint' => 'payments/initialize'
-            ]);
-
-            $response = $this->makeNotchPayRequest('payments/initialize', $fields);
-
-            if (!isset($response['authorization_url'])) {
-                throw new Exception('Invalid response from NotchPay: ' . json_encode($response));
-            }
-
-            Log::info('Creating payment record', [
-                'user_id' => $user->id,
-                'amount' => $amount,
-                'response' => $response
-            ]);
-
-            // 4. Create pending payment record
-            $payment = Payment::create([
-                'user_id' => $user->id,
-                'amount' => $amount,
-                'transaction_id' => $reference,
-                'status' => 'pending',
-                'payment_method' => 'notchpay',
-                'metadata' => json_encode([
-                    'tokens' => $validated['tokens'],
-                    'authorization_url' => $response['authorization_url'],
-                    'notchpay_reference' => $response['transaction']['reference'] ?? $reference
-                ])
-            ]);
-
-            Log::info('NotchPay payment initialized', [
-                'payment_id' => $payment->id,
-                'transaction_id' => $payment->transaction_id
-            ]);
-
-            return response()->json([
-                'success' => true,
-                'authorization_url' => $response['authorization_url']
-            ]);
-
-        } catch (Exception $e) {
-            Log::error('NotchPay payment initialization failed', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Payment initialization failed: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
+    /**
+     * Handle NotchPay webhook for real-time updates
+     */
     public function handleWebhook(Request $request)
     {
         Log::info('Received NotchPay webhook', [
@@ -222,46 +228,42 @@ class NotchPayController extends Controller
         ]);
 
         try {
-            // Process webhook data
+            // 1. Verify webhook signature
+            $signature = $request->header('x-notch-signature');
+            $hash = hash('sha256', config('services.notchpay.webhook_secret'));
+
+            if (!hash_equals($hash, $signature)) {
+                throw new Exception('Invalid webhook signature');
+            }
+
+            // 2. Process webhook data
             $payload = $request->all();
 
-            if (!isset($payload['event']) || $payload['event'] !== 'payment.complete') {
-                Log::info('Webhook ignored', ['event' => $payload['event'] ?? 'unknown']);
+            if ($payload['event'] !== 'payment.complete') {
                 return response()->json(['status' => 'ignored']);
             }
 
             DB::beginTransaction();
 
             try {
-                // Find payment record
-                $reference = $payload['data']['reference'] ?? null;
-                if (!$reference) {
-                    throw new Exception('No reference found in webhook data');
-                }
-
-                $payment = Payment::where('transaction_id', $reference)
+                // 3. Update payment record
+                $payment = Payment::where('transaction_id', $payload['data']['reference'])
                     ->where('status', 'pending')
-                    ->first();
+                    ->firstOrFail();
 
-                if (!$payment) {
-                    throw new Exception('Payment not found or already processed');
-                }
+                $metadata = $payment->metadata;
+                $productId = $metadata['product_id'];
 
-                $metadata = json_decode($payment->metadata, true);
-                $tokens = $metadata['tokens'];
+                // 4. Get the product
+                $product = \App\Models\Product::findOrFail($productId);
 
-                // Update user balance
-                $user = $payment->user;
-                $oldBalance = $user->wallet_balance;
-                $user->wallet_balance += $tokens;
-                $user->save();
+                // 5. Update payment status
+                $payment->markAsCompleted();
 
-                // Update payment status
-                $payment->status = 'completed';
-                $payment->save();
+                // 6. Activate the specific product
+                $this->activateProductAfterPayment($product);
 
-                // Process referral commission if the user was referred
-                $this->processReferralCommission($user, $payment->amount);
+                
 
                 DB::commit();
 
@@ -293,113 +295,72 @@ class NotchPayController extends Controller
     }
 
     /**
-     * Process referral commission when a referred user makes a purchase
+     * Activate a specific product after successful payment
      */
-    private function processReferralCommission($user, $amount)
+    private function activateProductAfterPayment(Product $product): void
     {
         try {
-            // Check if user was referred by someone
-            $referral = Referral::where('referred_id', $user->id)->first();
-
-            if (!$referral) {
-                return; // No referral found, exit
-            }
-
-            // Get the referrer
-            $referrer = User::find($referral->referrer_id);
-
-            if (!$referrer) {
-                Log::error('Referrer not found during commission processing', [
-                    'referrer_id' => $referral->referrer_id,
-                    'referred_id' => $user->id
-                ]);
-                return;
-            }
-
-            // Get referrer's level to determine commission percentage
-            $level = $referrer->referralLevel();
-
-            // Get commission rate based on level
-            $commissionRates = [
-                'ARGENT' => 0.10, // 10%
-                'OR' => 0.15,     // 15%
-                'DIAMANT' => 0.20 // 20%
-            ];
-
-            $commissionRate = $commissionRates[$level] ?? 0.10;
-
-            // Calculate commission amount
-            $commissionAmount = $amount * $commissionRate;
-
-            // Record the earning
-            $earning = ReferralEarning::create([
-                'user_id' => $referrer->id,
-                'referral_id' => $referral->id,
-                'amount' => $commissionAmount,
-                'status' => 'pending'
+            // Update product status to active
+            $product->update([
+                'status' => 'active',
+                'activated_at' => now(),
             ]);
 
-            // Directly add to referrer's wallet balance (immediate payout)
-            $referrer->wallet_balance += $commissionAmount;
-            $referrer->save();
+            // Create or update ProductFeeCharge record
+            $feeCharge = \App\Models\ProductFeeCharge::updateOrCreate(
+                [
+                    'product_id' => $product->id,
+                    'fee_id' => \App\Models\PlatformFee::where('code', 'listing_fee')->first()->id ?? 1
+                ],
+                [
+                    'amount' => $product->listing_fee ?? 0,
+                    'status' => 'paid',
+                    'paid_at' => now(),
+                    'payment_method' => 'notchpay'
+                ]
+            );
 
-            // Update earning status to paid
-            $earning->status = 'paid';
-            $earning->save();
-
-            Log::info('Referral commission processed', [
-                'referrer_id' => $referrer->id,
-                'referred_id' => $user->id,
-                'purchase_amount' => $amount,
-                'commission_rate' => $commissionRate,
-                'commission_amount' => $commissionAmount
+            Log::info('Product activated after payment', [
+                'product_id' => $product->id,
+                'user_id' => $product->user_id,
+                'product_name' => $product->name,
+                'fee_charge_id' => $feeCharge->id
             ]);
 
         } catch (Exception $e) {
-            Log::error('Error processing referral commission', [
-                'error' => $e->getMessage(),
-                'user_id' => $user->id,
-                'amount' => $amount
+            Log::error('Error activating product after payment', [
+                'product_id' => $product->id,
+                'error' => $e->getMessage()
             ]);
+            throw $e;
         }
     }
 
-    private function makeNotchPayRequest($endpoint, $data)
+
+
+    /**
+     * Make API request to NotchPay
+     */
+    private function makeNotchPayRequest(string $endpoint, array $data): array
     {
         $ch = curl_init();
-
-        // Fixed: Proper Authorization header format for NotchPay (no Bearer prefix)
-        $headers = [
-            'Authorization: ' . config('services.notchpay.public_key'),
-            'Content-Type: application/json',
-            'Accept: application/json',
-            'Cache-Control: no-cache',
-        ];
 
         curl_setopt_array($ch, [
             CURLOPT_URL => config('services.notchpay.base_url') . '/' . $endpoint,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => json_encode($data),
-            CURLOPT_HTTPHEADER => $headers,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_CONNECTTIMEOUT => 10,
-            CURLOPT_SSL_VERIFYPEER => false, // For sandbox mode
-            CURLOPT_VERBOSE => true
+            CURLOPT_HTTPHEADER => [
+                'Authorization: ' . config('services.notchpay.public_key'),
+                'Content-Type: application/json',
+                'Accept: application/json',
+                'Cache-Control: no-cache',
+            ]
         ]);
 
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $err = curl_error($ch);
-        
-        Log::info('NotchPay API Request', [
-            'url' => config('services.notchpay.base_url') . '/' . $endpoint,
-            'headers' => $headers,
-            'data' => $data,
-            'response' => $response,
-            'http_code' => $httpCode
-        ]);
-        
         curl_close($ch);
 
         if ($err) {
@@ -420,17 +381,14 @@ class NotchPayController extends Controller
         return $decodedResponse;
     }
 
-    private function calculateAmount($tokens)
+    /**
+     * Show payment result page (public)
+     */
+    public function showPaymentResult()
     {
-        // This should match your frontend TOKEN_PACKS logic
-        $tokenPacks = [
-            10 => 600,
-            25 => 1200,
-            60 => 3000,
-            130 => 6000,
-            400 => 18000
-        ];
-
-        return $tokenPacks[$tokens] ?? ($tokens * 100); // Default to 100 XAF per token
+        $success = session('payment_success');
+        $error = session('payment_error');
+        
+        return view('payment.result', compact('success', 'error'));
     }
 }

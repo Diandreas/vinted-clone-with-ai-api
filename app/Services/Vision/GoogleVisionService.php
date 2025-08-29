@@ -13,6 +13,7 @@ use Exception;
 class GoogleVisionService
 {
     private $client;
+    private $isEnabled = false;
 
     public function __construct()
     {
@@ -22,20 +23,31 @@ class GoogleVisionService
     private function initializeClient()
     {
         try {
-            Log::info('GoogleVision: Initializing client with putenv method');
+            // Log::info('GoogleVision: Initializing client with putenv method');
             
             $credentialsPath = storage_path('app/google/service-account.json');
+            
+            // Check if credentials file exists
+            if (!file_exists($credentialsPath)) {
+                Log::warning('GoogleVision: Credentials file not found, service will be disabled', [
+                    'expected_path' => $credentialsPath
+                ]);
+                $this->isEnabled = false;
+                return;
+            }
+            
             putenv('GOOGLE_APPLICATION_CREDENTIALS=' . $credentialsPath);
             
             $this->client = new ImageAnnotatorClient();
+            $this->isEnabled = true;
             
-            Log::info('GoogleVision: Client initialized successfully');
+            // Log::info('GoogleVision: Client initialized successfully');
             
         } catch (Exception $e) {
-            Log::error('GoogleVision: Failed to initialize client', [
+            Log::error('GoogleVision: Failed to initialize client, service will be disabled', [
                 'error' => $e->getMessage()
             ]);
-            throw $e;
+            $this->isEnabled = false;
         }
     }
     public function analyzeImage($imagePath, $productId = null)
@@ -44,9 +56,20 @@ class GoogleVisionService
             Log::info('GoogleVision: Starting image analysis', [
                 'image_path' => $imagePath,
                 'product_id' => $productId,
+                'service_enabled' => $this->isEnabled,
                 'file_exists' => file_exists($imagePath),
                 'file_size' => file_exists($imagePath) ? filesize($imagePath) : null
             ]);
+
+            if (!$this->isEnabled) {
+                Log::warning('GoogleVision: Service not enabled, returning default result');
+                return [
+                    'labels' => [],
+                    'objects' => [],
+                    'text' => [],
+                    'confidence' => 0
+                ];
+            }
 
             if (!file_exists($imagePath)) {
                 throw new Exception("Image file not found: " . $imagePath);
@@ -150,8 +173,19 @@ class GoogleVisionService
         try {
             Log::info('GoogleVision: Starting similarity search', [
                 'image_path' => $imagePath,
-                'limit' => $limit
+                'limit' => $limit,
+                'service_enabled' => $this->isEnabled
             ]);
+
+            if (!$this->isEnabled) {
+                Log::warning('GoogleVision: Service not enabled, returning empty results');
+                return [
+                    'labels' => [],
+                    'objects' => [],
+                    'text' => [],
+                    'confidence' => 0
+                ];
+            }
 
             // Analyser l'image uploadée
             $searchResults = $this->analyzeImage($imagePath);
@@ -175,5 +209,13 @@ class GoogleVisionService
                 'confidence' => 0
             ];
         }
+    }
+    
+    /**
+     * Check if the Google Vision service is properly configured and enabled
+     */
+    public function isEnabled(): bool
+    {
+        return $this->isEnabled;
     }
 }

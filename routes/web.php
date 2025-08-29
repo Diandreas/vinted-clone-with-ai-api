@@ -20,7 +20,10 @@ Route::get('wallet', [WalletController::class, 'index'])->name('wallet.index');
 Route::get('payment/redirect', [PaymentController::class, 'handlePaymentRedirect'])->name('payment.redirect');
 
 // NotchPay callback route (PUBLIC - must be before catch-all)
-Route::get('payment/callback', [\App\Http\Controllers\NotchPayController::class, 'handleCallback'])->name('payment.callback.web');
+Route::get('payment/callback', [\App\Http\Controllers\NotchPayController::class, 'handleCallback'])->name('payment.callback');
+
+// Payment result page (PUBLIC - for displaying payment results)
+Route::get('payment/result', [\App\Http\Controllers\NotchPayController::class, 'showPaymentResult'])->name('payment.result');
 
 // All other routes are handled by Vue Router (EXCEPT API routes)
 Route::get('{any}', function () {

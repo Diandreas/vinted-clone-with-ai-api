@@ -24,6 +24,8 @@ use App\Http\Controllers\API\ReportController;
 use App\Http\Controllers\API\PaymentController;
 use App\Http\Controllers\API\WalletController;
 use App\Http\Controllers\API\AnalyticsController;
+use App\Http\Controllers\ProductPublishingController;
+use App\Http\Controllers\NotchPayController;
 
 // Admin Controllers - Specific imports
 use App\Http\Controllers\Admin\UserController as AdminUserController;
@@ -121,6 +123,18 @@ Route::prefix('v1')->group(function () {
         });
     });
 
+    // Payment callbacks (public routes)
+    Route::prefix('payment')->group(function () {
+        Route::get('publishing/success', [ProductPublishingController::class, 'paymentSuccess']);
+        Route::get('publishing/failure', [ProductPublishingController::class, 'paymentFailure']);
+    });
+
+    // Bulk payment callbacks (public routes)
+    Route::prefix('products')->group(function () {
+        Route::post('bulk-payment-callback', [ProductController::class, 'bulkPaymentCallback']);
+        Route::get('bulk-payment-callback', [ProductController::class, 'bulkPaymentCallback']);
+    });
+
     // Routes authentifiées
     Route::middleware('auth:sanctum')->group(function () {
 
@@ -131,6 +145,11 @@ Route::prefix('v1')->group(function () {
             Route::put('update-profile', [AuthController::class, 'updateProfile']);
             Route::post('change-password', [AuthController::class, 'changePassword']);
             Route::delete('delete-account', [AuthController::class, 'deleteAccount']);
+        });
+
+        // NotchPay Payment Routes
+        Route::prefix('notchpay')->group(function () {
+            Route::post('initialize', [NotchPayController::class, 'initializePayment']);
         });
 
         // User Routes
@@ -154,11 +173,17 @@ Route::prefix('v1')->group(function () {
             Route::get('my-favorites', [ProductController::class, 'myFavorites']);
             Route::get('my-likes', [ProductController::class, 'myLikes']);
             Route::get('draft', [ProductController::class, 'draft']);
+            Route::get('pending-payment', [ProductController::class, 'pendingPayment']);
+            Route::post('activate-all-pending', [ProductController::class, 'activateAllPendingProducts']);
+            Route::post('create-bulk-payment', [ProductController::class, 'createBulkPayment']);
             Route::get('sold', [ProductController::class, 'sold']);
             Route::get('stats', [ProductController::class, 'stats']);
             // Parameterized routes come after
             Route::put('{product}', [ProductController::class, 'update']);
+            Route::put('{product}/status', [ProductController::class, 'updateStatus']);
             Route::delete('{product}', [ProductController::class, 'destroy']);
+            Route::get('{product}/payment-details', [ProductController::class, 'getPaymentDetails']);
+            Route::post('{product}/activate', [ProductController::class, 'activateAfterPayment']);
             Route::post('{product}/like', [ProductController::class, 'like']);
             Route::post('{product}/favorite', [ProductController::class, 'favorite']);
             Route::get('{product}/like-status', [ProductController::class, 'getLikeStatus']);
@@ -172,6 +197,21 @@ Route::prefix('v1')->group(function () {
         });
         // Appointment management
         Route::put('appointments/{appointment}', [ProductController::class, 'updateAppointmentStatus']);
+
+        // Product Publishing Fee Routes
+        Route::prefix('publishing')->group(function () {
+            Route::get('fee-structure', [ProductPublishingController::class, 'getFeeStructure']);
+            Route::post('calculate-single-fee', [ProductPublishingController::class, 'calculateSingleFee']);
+            Route::post('calculate-estimated-package-fee', [ProductPublishingController::class, 'calculateEstimatedPackageFee']);
+            Route::post('calculate-exact-package-fee', [ProductPublishingController::class, 'calculateExactPackageFee']);
+            Route::post('create-estimated-package', [ProductPublishingController::class, 'createEstimatedPackage']);
+            Route::post('create-exact-package', [ProductPublishingController::class, 'createExactPackage']);
+            Route::get('packages', [ProductPublishingController::class, 'getUserPackages']);
+            Route::get('packages/{packageId}', [ProductPublishingController::class, 'getPackageDetails']);
+            Route::delete('packages/{packageId}', [ProductPublishingController::class, 'cancelPackage']);
+            Route::post('use-package-slot', [ProductPublishingController::class, 'usePackageSlot']);
+            Route::get('available-packages', [ProductPublishingController::class, 'getAvailablePackagesForPublishing']);
+        });
 
         // Live Routes
         Route::prefix('lives')->group(function () {

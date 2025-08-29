@@ -27,6 +27,15 @@ class ImageSearchController extends Controller
      */
     public function searchByImage(Request $request)
     {
+        // Check if Google Vision service is enabled
+        if (!$this->visionService->isEnabled()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Image search service is not available',
+                'error' => 'Google Vision service is not properly configured'
+            ], 503);
+        }
+
         $validator = Validator::make($request->all(), [
             'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:10240', // 10MB max
             'limit' => 'integer|min:1|max:50',

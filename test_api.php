@@ -2,39 +2,39 @@
 
 require_once 'vendor/autoload.php';
 
-use Illuminate\Http\Request;
-use App\Http\Controllers\API\ProductController;
+// Test simple de l'API NotchPay
+echo "🧪 Test de l'API NotchPay\n";
+echo "========================\n\n";
 
-// Simuler une requête
-$request = new Request();
-$request->merge(['limit' => 30]);
-
-// Créer le contrôleur
-$controller = new ProductController();
-
-// Appeler la méthode index
+// Test 1: Vérifier que la route existe
+echo "1. Test de la route /api/v1/notchpay/initialize\n";
 try {
-    $response = $controller->index($request);
-    $data = $response->getData();
+    $response = file_get_contents('http://localhost:8000/api/v1/notchpay/initialize', false, stream_context_create([
+        'http' => [
+            'method' => 'POST',
+            'header' => [
+                'Content-Type: application/json',
+                'Accept: application/json',
+            ],
+            'content' => json_encode([
+                'product_id' => 1,
+                'amount' => 1000,
+                'email' => 'test@example.com'
+            ])
+        ]
+    ]));
     
-    echo "API Response:\n";
-    echo "Success: " . ($data->success ? 'true' : 'false') . "\n";
-    echo "Total products: " . $data->data->total . "\n";
-    echo "Current page: " . $data->data->current_page . "\n";
-    echo "Per page: " . $data->data->per_page . "\n";
-    echo "Products count: " . count($data->data->data) . "\n";
-    
-    if (count($data->data->data) > 0) {
-        $firstProduct = $data->data->data[0];
-        echo "\nFirst product:\n";
-        echo "ID: " . $firstProduct->id . "\n";
-        echo "Title: " . $firstProduct->title . "\n";
-        echo "Main image type: " . gettype($firstProduct->main_image) . "\n";
-        echo "Main image value: " . $firstProduct->main_image . "\n";
-    }
-    
+    echo "✅ Réponse reçue: " . $response . "\n";
 } catch (Exception $e) {
-    echo "Error: " . $e->getMessage() . "\n";
-    echo "File: " . $e->getFile() . "\n";
-    echo "Line: " . $e->getLine() . "\n";
+    echo "❌ Erreur: " . $e->getMessage() . "\n";
 }
+
+echo "\n2. Test de la route /payment/callback\n";
+try {
+    $response = file_get_contents('http://localhost:8000/payment/callback?status=complete&reference=test123');
+    echo "✅ Réponse reçue: " . $response . "\n";
+} catch (Exception $e) {
+    echo "❌ Erreur: " . $e->getMessage() . "\n";
+}
+
+echo "\n🎉 Test terminé !\n";

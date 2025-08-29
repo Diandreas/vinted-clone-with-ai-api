@@ -19,6 +19,7 @@ use App\Notifications\FollowerOnlyProductPosted;
 use App\Models\PlatformFee;
 use App\Models\ProductFeeCharge;
 use App\Http\Resources\ProductResource;
+use App\Services\Payment\NotchPayService;
 
 class ProductController extends Controller
 {
@@ -163,6 +164,10 @@ class ProductController extends Controller
             'spot_ends_at' => 'nullable|date|after:spot_starts_at',
         ]);
 
+        // Check if listing fee is required
+        $listingFee = PlatformFee::where('code', 'listing_fee')->where('active', true)->first();
+        $initialStatus = $listingFee ? Product::STATUS_PENDING_PAYMENT : Product::STATUS_ACTIVE;
+        
         $product = Product::create([
             'user_id' => Auth::id(),
             'title' => $request->title,
@@ -181,7 +186,7 @@ class ProductController extends Controller
             'minimum_offer' => $request->minimum_offer,
             'tags' => $request->tags,
             'measurements' => $request->measurements,
-            'status' => Product::STATUS_ACTIVE,
+            'status' => $initialStatus,
             'followers_only' => (bool) ($request->followers_only ?? false),
             'is_spot' => (bool) ($request->is_spot ?? false),
             'spot_starts_at' => $request->spot_starts_at,
@@ -194,8 +199,7 @@ class ProductController extends Controller
             $job->handle();
         }
 
-        // Charge listing fee (if configured)
-        $listingFee = PlatformFee::where('code', 'listing_fee')->where('active', true)->first();
+        // Create listing fee charge (if required)
         if ($listingFee) {
             $amount = $listingFee->type === 'percentage'
                 ? round(($listingFee->percentage / 100) * (float) $product->price, 2)
@@ -203,13 +207,9 @@ class ProductController extends Controller
             ProductFeeCharge::create([
                 'product_id' => $product->id,
                 'user_id' => Auth::id(),
-                'platform_fee_id' => $listingFee->id,
+                'fee_id' => $listingFee->id,
                 'amount' => $amount,
-                'currency' => 'XAF',
                 'status' => 'pending',
-                'meta' => [
-                    'reason' => 'product_listing',
-                ],
             ]);
         }
 
@@ -238,11 +238,49 @@ class ProductController extends Controller
             ];
         });
 
-        return response()->json([
+        // Prepare response message based on status
+        if ($product->status === Product::STATUS_PENDING_PAYMENT) {
+            $message = '🚀 Produit créé avec succès ! Pour le publier et le rendre visible aux acheteurs, veuillez payer les frais de publication.';
+        } else {
+            $message = '✅ Produit créé et publié avec succès !';
+        }
+            
+        $responseData = [
             'success' => true,
             'data' => $productData,
-            'message' => 'Product created successfully'
-        ], 201);
+            'message' => $message,
+        ];
+        
+        // Add payment info if required
+        if ($product->status === Product::STATUS_PENDING_PAYMENT && $listingFee) {
+            $amount = $listingFee->type === 'percentage'
+                ? round(($listingFee->percentage / 100) * (float) $product->price, 2)
+                : (float) $listingFee->amount;
+                
+            $responseData['payment_required'] = [
+                'amount' => $amount,
+                'currency' => 'XAF',
+                'fee_type' => 'listing_fee',
+                'product_status' => 'pending_payment',
+                'instructions' => [
+                    'title' => '💳 Paiement requis pour publication',
+                    'message' => "Votre produit '{$product->title}' a été créé mais nécessite un paiement de {$amount} XAF pour être publié.",
+                    'steps' => [
+                        '1️⃣ Cliquez sur "Payer maintenant" ci-dessous',
+                        '2️⃣ Choisissez votre mode de paiement (Mobile Money, Carte bancaire...)',
+                        '3️⃣ Confirmez le paiement de ' . number_format($amount, 0, ',', ' ') . ' FCFA',
+                        '4️⃣ Votre produit sera automatiquement publié après paiement'
+                    ],
+                    'actions' => [
+                        'pay_now_url' => url("/api/v1/publishing/calculate-single-fee"),
+                        'view_pending_products_url' => url("/api/v1/products/pending-payment"),
+                        'product_details_url' => url("/api/v1/products/{$product->id}")
+                    ]
+                ]
+            ];
+        }
+        
+        return response()->json($responseData, 201);
     }
 
     /**
@@ -683,6 +721,45 @@ class ProductController extends Controller
     }
 
     /**
+     * Get products pending payment.
+     */
+    public function pendingPayment(Request $request)
+    {
+        $products = Auth::user()->products()
+                        ->with(['category', 'brand', 'condition', 'mainImage'])
+                        ->where('status', Product::STATUS_PENDING_PAYMENT)
+                        ->latest()
+                        ->paginate($request->per_page ?? 20);
+
+        // Calculate total fees pending
+        $totalFeesPending = ProductFeeCharge::whereHas('product', function($query) {
+                $query->where('user_id', Auth::id())
+                      ->where('status', Product::STATUS_PENDING_PAYMENT);
+            })
+            ->where('status', 'pending')
+            ->sum('amount');
+
+        return response()->json([
+            'success' => true,
+            'data' => ProductResource::collection($products),
+            'meta' => [
+                'total_pending_products' => $products->total(),
+                'total_fees_pending' => $totalFeesPending,
+                'currency' => 'XAF',
+                'instructions' => [
+                    'title' => '📋 Vos produits en attente de publication',
+                    'message' => 'Ces produits nécessitent un paiement pour être publiés et visibles aux acheteurs.',
+                    'total_to_pay' => number_format($totalFeesPending, 0, ',', ' ') . ' FCFA',
+                    'actions' => [
+                        'pay_all_url' => url('/api/v1/publishing/create-exact-package'),
+                        'individual_payment_info' => 'Cliquez sur chaque produit pour payer individuellement'
+                    ]
+                ]
+            ]
+        ]);
+    }
+
+    /**
      * Get sold products.
      */
     public function sold(Request $request)
@@ -709,6 +786,7 @@ class ProductController extends Controller
         $stats = [
             'total_products' => $user->products()->count(),
             'active_products' => $user->products()->where('status', 'active')->count(),
+            'pending_payment_products' => $user->products()->where('status', 'pending_payment')->count(),
             'draft_products' => $user->products()->where('status', 'draft')->count(),
             'sold_products' => $user->products()->where('status', 'sold')->count(),
             'reserved_products' => $user->products()->where('status', 'reserved')->count(),
@@ -752,5 +830,623 @@ class ProductController extends Controller
             'success' => true,
             'data' => $similar
         ]);
+    }
+
+    /**
+     * Update product status.
+     */
+    public function updateStatus(Product $product, Request $request)
+    {
+        // Verify user owns the product
+        if ($product->user_id !== Auth::id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized access'
+            ], 403);
+        }
+
+        $request->validate([
+            'status' => 'required|string|in:draft,pending_payment,active,sold,reserved,removed'
+        ]);
+
+        $newStatus = $request->status;
+
+        // Business rules for status changes
+        if ($newStatus === Product::STATUS_ACTIVE && $product->isPendingPayment()) {
+            // Check if listing fee is paid before allowing activation
+            $feeCharge = ProductFeeCharge::where('product_id', $product->id)
+                ->whereHas('fee', function($query) {
+                    $query->where('code', 'listing_fee');
+                })
+                ->first();
+
+            if ($feeCharge && $feeCharge->status !== 'paid') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cannot activate product: listing fee must be paid first',
+                    'payment_required' => [
+                        'amount' => $feeCharge->amount,
+                        'currency' => $feeCharge->currency,
+                        'status' => $feeCharge->status
+                    ]
+                ], 400);
+            }
+        }
+
+        // Special handling for marking as sold
+        if ($newStatus === Product::STATUS_SOLD) {
+            $product->markAsSold();
+        } else {
+            $product->update(['status' => $newStatus]);
+        }
+
+        // Handle notifications and indexing based on new status
+        if ($newStatus === Product::STATUS_ACTIVE && $product->wasChanged('status')) {
+            // Notify followers if followers-only and newly activated
+            if ($product->followers_only) {
+                $seller = $product->user()->first();
+                if ($seller) {
+                    $followers = $seller->followers()->get();
+                    foreach ($followers as $follower) {
+                        $follower->notify(new FollowerOnlyProductPosted($product));
+                    }
+                }
+            }
+            
+            // Index for search when activated
+            IndexProductForSearch::dispatch($product);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Product status updated successfully',
+            'data' => [
+                'id' => $product->id,
+                'status' => $product->status,
+                'previous_status' => $product->getOriginal('status')
+            ]
+        ]);
+    }
+
+    /**
+     * Get payment details for a pending product.
+     */
+    public function getPaymentDetails(Product $product)
+    {
+        // Verify user owns the product
+        if ($product->user_id !== Auth::id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized access'
+            ], 403);
+        }
+
+        // Check if product is pending payment
+        if (!$product->isPendingPayment()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Product is not pending payment'
+            ], 400);
+        }
+
+        // Get fee charge details
+        $feeCharge = ProductFeeCharge::where('product_id', $product->id)
+            ->with('fee')
+            ->whereHas('fee', function($query) {
+                $query->where('code', 'listing_fee');
+            })
+            ->first();
+
+        if (!$feeCharge) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No fee charge found for this product'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'product' => [
+                    'id' => $product->id,
+                    'title' => $product->title,
+                    'price' => $product->price,
+                    'status' => $product->status,
+                    'main_image' => $product->mainImage?->url,
+                ],
+                'payment' => [
+                    'amount' => $feeCharge->amount,
+                    'currency' => $feeCharge->currency,
+                    'fee_name' => $feeCharge->fee->name,
+                    'status' => $feeCharge->status,
+                    'formatted_amount' => number_format($feeCharge->amount, 0, ',', ' ') . ' FCFA',
+                ],
+                'instructions' => [
+                    'title' => '💳 Paiement des frais de publication',
+                    'message' => "Payez {$feeCharge->amount} FCFA pour publier votre produit '{$product->title}'",
+                    'steps' => [
+                        '1️⃣ Cliquez sur "Payer maintenant"',
+                        '2️⃣ Choisissez Mobile Money ou Carte bancaire',
+                        '3️⃣ Suivez les instructions de paiement',
+                        '4️⃣ Votre produit sera publié automatiquement'
+                    ],
+                    'actions' => [
+                        'pay_now_url' => url("/api/v1/publishing/calculate-single-fee"),
+                        'back_to_pending_url' => url("/api/v1/products/pending-payment")
+                    ]
+                ]
+            ]
+        ]);
+    }
+
+    /**
+     * Activate a product after listing fee payment.
+     */
+    public function activateAfterPayment(Product $product)
+    {
+        // Verify user owns the product
+        if ($product->user_id !== Auth::id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized access'
+            ], 403);
+        }
+
+        // Check if product is pending payment
+        if (!$product->isPendingPayment()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Product is not pending payment'
+            ], 400);
+        }
+
+        // Check if listing fee is paid
+        $feeCharge = ProductFeeCharge::where('product_id', $product->id)
+            ->whereHas('fee', function($query) {
+                $query->where('code', 'listing_fee');
+            })
+            ->first();
+
+        if (!$feeCharge || $feeCharge->status !== 'paid') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Listing fee must be paid before activation'
+            ], 400);
+        }
+
+        // Activate the product
+        $product->activateAfterPayment();
+
+        // Notify followers if followers-only (now that it's active)
+        if ($product->followers_only) {
+            $seller = $product->user()->first();
+            if ($seller) {
+                $followers = $seller->followers()->get();
+                foreach ($followers as $follower) {
+                    $follower->notify(new FollowerOnlyProductPosted($product));
+                }
+            }
+        }
+
+        // Index for search (now that it's active)
+        IndexProductForSearch::dispatch($product);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Product activated successfully',
+            'data' => [
+                'id' => $product->id,
+                'status' => $product->status,
+            ]
+        ]);
+    }
+
+    /**
+     * Activate all user's products that are pending payment and have paid fees.
+     */
+    public function activateAllPendingProducts(Request $request)
+    {
+        $user = Auth::user();
+        
+        // Get all pending products for this user
+        $pendingProducts = $user->products()
+            ->where('status', Product::STATUS_PENDING_PAYMENT)
+            ->get();
+
+        if ($pendingProducts->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No products pending payment found'
+            ], 404);
+        }
+
+        $activated = [];
+        $failed = [];
+        $paymentRequired = [];
+
+        foreach ($pendingProducts as $product) {
+            // Check if listing fee is paid for this product
+            $feeCharge = ProductFeeCharge::where('product_id', $product->id)
+                ->whereHas('fee', function($query) {
+                    $query->where('code', 'listing_fee');
+                })
+                ->first();
+
+            if (!$feeCharge) {
+                $failed[] = [
+                    'id' => $product->id,
+                    'title' => $product->title,
+                    'reason' => 'No fee charge found'
+                ];
+                continue;
+            }
+
+            if ($feeCharge->status !== 'paid') {
+                $paymentRequired[] = [
+                    'id' => $product->id,
+                    'title' => $product->title,
+                    'amount' => $feeCharge->amount,
+                    'currency' => $feeCharge->currency,
+                    'fee_status' => $feeCharge->status
+                ];
+                continue;
+            }
+
+            // Activate the product
+            try {
+                $product->activateAfterPayment();
+                
+                // Notify followers if followers-only
+                if ($product->followers_only) {
+                    $seller = $product->user()->first();
+                    if ($seller) {
+                        $followers = $seller->followers()->get();
+                        foreach ($followers as $follower) {
+                            $follower->notify(new FollowerOnlyProductPosted($product));
+                        }
+                    }
+                }
+
+                // Index for search
+                IndexProductForSearch::dispatch($product);
+
+                $activated[] = [
+                    'id' => $product->id,
+                    'title' => $product->title,
+                    'status' => $product->status
+                ];
+
+            } catch (\Exception $e) {
+                $failed[] = [
+                    'id' => $product->id,
+                    'title' => $product->title,
+                    'reason' => $e->getMessage()
+                ];
+            }
+        }
+
+        $response = [
+            'success' => true,
+            'message' => count($activated) > 0 
+                ? count($activated) . ' produit(s) activé(s) avec succès'
+                : 'Aucun produit n\'a pu être activé',
+            'summary' => [
+                'total_pending' => $pendingProducts->count(),
+                'activated' => count($activated),
+                'payment_required' => count($paymentRequired),
+                'failed' => count($failed)
+            ],
+            'results' => [
+                'activated' => $activated,
+                'payment_required' => $paymentRequired,
+                'failed' => $failed
+            ]
+        ];
+
+        // Add instructions if there are products requiring payment
+        if (!empty($paymentRequired)) {
+            $totalToPay = collect($paymentRequired)->sum('amount');
+            $response['payment_instructions'] = [
+                'title' => '💳 Paiement requis pour certains produits',
+                'message' => count($paymentRequired) . ' produit(s) nécessitent encore un paiement',
+                'total_amount' => $totalToPay,
+                'currency' => 'XAF',
+                'formatted_total' => number_format($totalToPay, 0, ',', ' ') . ' FCFA',
+                'actions' => [
+                    'pay_all_url' => url('/api/v1/publishing/create-exact-package'),
+                    'view_pending_url' => url('/api/v1/products/pending-payment')
+                ]
+            ];
+        }
+
+        return response()->json($response);
+    }
+
+    /**
+     * Create bulk payment gateway for all pending products via Lygos.
+     */
+    public function createBulkPayment(Request $request)
+    {
+        $user = Auth::user();
+        
+        // Get all pending products for this user
+        $pendingProducts = $user->products()
+            ->where('status', Product::STATUS_PENDING_PAYMENT)
+            ->get();
+
+        if ($pendingProducts->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Aucun produit en attente de paiement trouvé'
+            ], 404);
+        }
+
+        // Calculate total amount to pay
+        $totalAmount = 0;
+        $productsRequiringPayment = [];
+        
+        foreach ($pendingProducts as $product) {
+            $feeCharge = ProductFeeCharge::where('product_id', $product->id)
+                ->whereHas('fee', function($query) {
+                    $query->where('code', 'listing_fee');
+                })
+                ->where('status', 'pending')
+                ->first();
+                
+            if ($feeCharge) {
+                $totalAmount += $feeCharge->amount;
+                $productsRequiringPayment[] = [
+                    'product_id' => $product->id,
+                    'title' => $product->title,
+                    'fee_charge_id' => $feeCharge->id,
+                    'amount' => $feeCharge->amount
+                ];
+            }
+        }
+
+        if (empty($productsRequiringPayment)) {
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'payment_required' => false,
+                    'message' => 'Tous les produits peuvent être activés gratuitement'
+                ]
+            ]);
+        }
+
+        try {
+            // Check if NotchPay is configured
+            if (!config('services.notchpay.public_key')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'NotchPay payment service is not configured. Please add NOTCHPAY_PUBLIC_KEY and NOTCHPAY_SECRET_KEY to your .env file.',
+                    'debug_info' => [
+                        'notchpay_public_key_set' => !empty(config('services.notchpay.public_key')),
+                        'notchpay_base_url' => config('services.notchpay.base_url'),
+                        'total_amount' => $totalAmount,
+                        'products_count' => count($productsRequiringPayment)
+                    ]
+                ], 400);
+            }
+
+            // Production mode with NotchPay
+            $notchPayService = app(NotchPayService::class);
+            
+            $reference = 'bulk_activation_' . $user->id . '_' . time();
+            $paymentData = [
+                'email' => $user->email,
+                'amount' => (int) ($totalAmount * 100), // NotchPay expects amount in centimes
+                'currency' => config('services.notchpay.currency', 'XAF'),
+                'reference' => $reference,
+                'description' => 'Paiement pour activation de ' . count($productsRequiringPayment) . ' produit(s)',
+                'callback' => url('/api/v1/products/bulk-payment-callback'),
+            ];
+
+            $notchPayResponse = $notchPayService->initializePayment($paymentData);
+
+            // Check if payment initialization was successful
+            // NotchPay returns different response structures, check for success indicators
+            $isSuccessful = false;
+            $paymentUrl = null;
+            
+            if (isset($notchPayResponse['authorization_url'])) {
+                $isSuccessful = true;
+                $paymentUrl = $notchPayResponse['authorization_url'];
+            } elseif (isset($notchPayResponse['redirect_url'])) {
+                $isSuccessful = true;
+                $paymentUrl = $notchPayResponse['redirect_url'];
+            } elseif (isset($notchPayResponse['status']) && $notchPayResponse['status'] === 'success') {
+                $isSuccessful = true;
+                $paymentUrl = $notchPayResponse['data']['authorization_url'] ?? null;
+            }
+            
+            if (!$isSuccessful || !$paymentUrl) {
+                throw new \Exception('NotchPay payment initialization failed: ' . json_encode($notchPayResponse));
+            }
+
+            // Store payment reference for callback handling
+            $cacheKey = 'bulk_payment_' . $reference;
+            cache()->put(
+                $cacheKey, 
+                [
+                    'user_id' => $user->id,
+                    'products' => $productsRequiringPayment,
+                    'total_amount' => $totalAmount,
+                    'notchpay_reference' => $reference
+                ],
+                now()->addHours(24) // Cache for 24 hours
+            );
+            
+            // Log cache storage
+            Log::info('Bulk payment cache stored', [
+                'cache_key' => $cacheKey,
+                'reference' => $reference,
+                'user_id' => $user->id,
+                'products_count' => count($productsRequiringPayment),
+                'total_amount' => $totalAmount
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'payment_required' => true,
+                    'total_amount' => $totalAmount,
+                    'formatted_amount' => number_format($totalAmount, 0, ',', ' ') . ' FCFA',
+                    'product_count' => count($productsRequiringPayment),
+                    'notchpay_payment_link' => $paymentUrl,
+                    'notchpay_reference' => $reference,
+                    'products' => $productsRequiringPayment
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Failed to create bulk payment gateway', [
+                'user_id' => $user->id,
+                'products_count' => count($productsRequiringPayment),
+                'total_amount' => $totalAmount,
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la création du paiement',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Handle bulk payment callback from NotchPay.
+     */
+    public function bulkPaymentCallback(Request $request)
+    {
+        try {
+            // NotchPay sends reference in different fields, try them in order of priority
+            $reference = $request->input('notchpay_trxref') ?? 
+                        $request->query('notchpay_trxref') ?? 
+                        $request->input('trxref') ?? 
+                        $request->query('trxref') ?? 
+                        $request->input('reference') ?? 
+                        $request->query('reference');
+            
+            if (!$reference) {
+                Log::error('NotchPay callback received without reference', $request->all());
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Référence de paiement manquante'
+                ], 400);
+            }
+            
+            // Log the reference being used
+            Log::info('Bulk payment callback received', [
+                'reference' => $reference,
+                'all_params' => $request->all(),
+                'query_params' => $request->query()
+            ]);
+
+            // Get payment data from cache
+            $cacheKey = 'bulk_payment_' . $reference;
+            $paymentData = cache()->get($cacheKey);
+
+            if (!$paymentData) {
+                Log::error('Payment data not found in cache', [
+                    'reference' => $reference,
+                    'cache_key' => $cacheKey,
+                    'all_params' => $request->all()
+                ]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Données de paiement non trouvées'
+                ], 404);
+            }
+            
+            Log::info('Payment data found in cache', [
+                'cache_key' => $cacheKey,
+                'reference' => $reference,
+                'user_id' => $paymentData['user_id'] ?? 'unknown',
+                'products_count' => count($paymentData['products'] ?? [])
+            ]);
+
+            // Verify payment with NotchPay
+            $notchPayService = app(NotchPayService::class);
+            $paymentVerification = $notchPayService->verifyPayment($reference);
+
+            // Check if payment is successful
+            $isSuccessful = isset($paymentVerification['transaction']['status']) && 
+                           in_array($paymentVerification['transaction']['status'], ['complete', 'completed', 'success']);
+
+            if ($isSuccessful) {
+                // Mark all fee charges as paid
+                $activatedProducts = [];
+                foreach ($paymentData['products'] as $productData) {
+                    $feeCharge = ProductFeeCharge::where('product_id', $productData['product_id'])
+                        ->whereHas('fee', function($query) {
+                            $query->where('code', 'listing_fee');
+                        })
+                        ->where('status', 'pending')
+                        ->first();
+                        
+                    if ($feeCharge) {
+                        $feeCharge->update([
+                            'status' => 'paid',
+                            'meta' => [
+                                'reason' => 'bulk_payment',
+                                'notchpay_reference' => $reference,
+                                'payment_verification' => $paymentVerification,
+                                'paid_at' => now()
+                            ]
+                        ]);
+
+                        // Activate the product
+                        $product = Product::find($productData['product_id']);
+                        if ($product && $product->isPendingPayment()) {
+                            $product->activateAfterPayment();
+                            
+                            // Index for search
+                            IndexProductForSearch::dispatch($product);
+                            
+                            $activatedProducts[] = $product->title;
+                        }
+                    }
+                }
+
+                // Clear cache
+                cache()->forget('bulk_payment_' . $reference);
+
+                // Store success message in session and redirect to payment result page
+                session()->flash('payment_success', count($activatedProducts) . ' produit(s) activé(s) avec succès ! Montant payé : ' . number_format($paymentData['total_amount'], 0, ',', ' ') . ' FCFA');
+                
+                return response()->json([
+                    'success' => true,
+                    'redirect' => route('payment.result'),
+                    'message' => count($activatedProducts) . ' produit(s) activé(s) avec succès',
+                    'data' => [
+                        'activated_products' => $activatedProducts,
+                        'total_amount_paid' => $paymentData['total_amount']
+                    ]
+                ]);
+            } else {
+                Log::warning('NotchPay payment not successful', [
+                    'reference' => $reference,
+                    'verification' => $paymentVerification
+                ]);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Paiement non confirmé'
+                ], 400);
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Bulk payment callback error', [
+                'error' => $e->getMessage(),
+                'request_data' => $request->all()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors du traitement du paiement'
+            ], 500);
+        }
     }
 }

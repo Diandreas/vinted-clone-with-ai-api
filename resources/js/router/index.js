@@ -26,6 +26,7 @@ const Search = () => import('@/views/Search.vue')
 const ImageSearch = () => import('@/views/ImageSearch.vue')
 const UserProfile = () => import('@/views/UserProfile.vue')
 const Wallet = () => import('@/views/Wallet.vue')
+const PublishingPackages = () => import('@/views/PublishingPackages.vue')
 const CategoryManagement = () => import('@/views/admin/CategoryManagement.vue')
 
 const routes = [
@@ -205,6 +206,12 @@ const routes = [
     path: '/wallet',
     name: 'wallet',
     component: Wallet,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/publishing-packages',
+    name: 'publishing-packages',
+    component: PublishingPackages,
     meta: { requiresAuth: true }
   },
   {

@@ -81,6 +81,13 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URL', env('APP_URL') . '/api/v1/auth/social/google/callback'),
     ],
 
+    'lygos' => [
+        'base_url' => env('LYGOS_BASE_URL', 'https://api.lygosapp.com/v1'),
+        'api_key' => env('LYGOS_API_KEY'),
+        'currency' => env('LYGOS_CURRENCY', 'XAF'),
+        'shop_name' => env('LYGOS_SHOP_NAME', 'Vinted Clone'),
+    ],
+
     // Mobile Money providers (placeholders for environment configuration)
     'mobile_money' => [
         'mtn_momo' => [

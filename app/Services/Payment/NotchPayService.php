@@ -18,15 +18,6 @@ class NotchPayService
         $this->publicKey = config('services.notchpay.public_key');
         $this->secretKey = config('services.notchpay.secret_key');
         $this->sandbox = config('services.notchpay.sandbox', true);
-        
-        // Validate required configuration
-        if (empty($this->publicKey)) {
-            throw new \InvalidArgumentException('NotchPay public key is not configured. Please set NOTCHPAY_PUBLIC_KEY in your .env file.');
-        }
-        
-        if (empty($this->secretKey)) {
-            throw new \InvalidArgumentException('NotchPay secret key is not configured. Please set NOTCHPAY_SECRET_KEY in your .env file.');
-        }
     }
 
     private function headers(): array
@@ -41,6 +32,10 @@ class NotchPayService
 
     public function initializePayment(array $payload): array
     {
+        if (empty($this->publicKey) || empty($this->secretKey)) {
+            throw new \InvalidArgumentException('NotchPay credentials are not configured. Please set NOTCHPAY_PUBLIC_KEY and NOTCHPAY_SECRET_KEY in your .env file.');
+        }
+        
         $this->validatePayload($payload);
         
         $response = Http::withHeaders($this->headers())
@@ -51,6 +46,10 @@ class NotchPayService
 
     public function verifyPayment(string $reference): array
     {
+        if (empty($this->publicKey) || empty($this->secretKey)) {
+            throw new \InvalidArgumentException('NotchPay credentials are not configured.');
+        }
+        
         $response = Http::withHeaders($this->headers())
             ->get(rtrim($this->baseUrl, '/') . '/payments/' . $reference);
             

@@ -9,11 +9,11 @@ class ProductFeeCharge extends Model
     protected $fillable = [
         'product_id',
         'user_id',
-        'platform_fee_id',
+        'fee_id',
         'amount',
-        'currency',
         'status',
-        'meta',
+        'paid_at',
+        'payment_method',
     ];
 
     protected function casts(): array
@@ -35,7 +35,7 @@ class ProductFeeCharge extends Model
 
     public function fee()
     {
-        return $this->belongsTo(PlatformFee::class, 'platform_fee_id');
+        return $this->belongsTo(PlatformFee::class, 'fee_id');
     }
 }
 
