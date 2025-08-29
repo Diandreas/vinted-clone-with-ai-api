@@ -39,6 +39,7 @@ class NotchPayService
         $this->validatePayload($payload);
         
         $response = Http::withHeaders($this->headers())
+            ->timeout(30) // Increase timeout to 30 seconds
             ->post(rtrim($this->baseUrl, '/') . '/payments/initialize', $payload);
             
         return $this->responseToArray($response);
@@ -51,6 +52,7 @@ class NotchPayService
         }
         
         $response = Http::withHeaders($this->headers())
+            ->timeout(30) // Increase timeout to 30 seconds
             ->get(rtrim($this->baseUrl, '/') . '/payments/' . $reference);
             
         return $this->responseToArray($response);

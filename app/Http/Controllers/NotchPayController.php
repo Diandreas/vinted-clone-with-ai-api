@@ -384,11 +384,44 @@ class NotchPayController extends Controller
     /**
      * Show payment result page (public)
      */
-    public function showPaymentResult()
+    public function showPaymentResult(Request $request)
     {
         $success = session('payment_success');
         $error = session('payment_error');
+        $activatedProducts = session('activated_products');
         
-        return view('payment.result', compact('success', 'error'));
+        // Check cache for bulk payment results (success or error)
+        if ($request->has('result')) {
+            $cacheKey = $request->get('result');
+            $cachedResult = cache()->get($cacheKey);
+            
+            if ($cachedResult) {
+                if (isset($cachedResult['success']) && $cachedResult['success']) {
+                    // Success case
+                    $success = $cachedResult['message'];
+                    $activatedProducts = $cachedResult['activated_products'];
+                } else {
+                    // Error case
+                    $error = $cachedResult['message'];
+                    $activatedProducts = $cachedResult['affected_products'] ?? [];
+                }
+                
+                // Clean up cache after use
+                cache()->forget($cacheKey);
+            }
+        }
+        
+        Log::info('Payment result page accessed', [
+            'session_id' => session()->getId(),
+            'has_success' => !empty($success),
+            'has_error' => !empty($error),
+            'has_activated_products' => !empty($activatedProducts),
+            'success_message' => $success,
+            'error_message' => $error,
+            'activated_products' => $activatedProducts,
+            'cache_key' => $request->get('result')
+        ]);
+        
+        return view('payment.result', compact('success', 'error', 'activatedProducts'));
     }
 }

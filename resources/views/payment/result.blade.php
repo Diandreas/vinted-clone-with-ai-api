@@ -30,16 +30,32 @@
                             </svg>
                         </div>
                         <h2 class="text-xl font-semibold text-gray-900 mb-2">Paiement Réussi !</h2>
-                        <p class="text-gray-600 mb-6">{{ session('payment_success') }}</p>
+                        <p class="text-gray-600 mb-6">{{ $success ?? session('payment_success') }}</p>
                         
-                        <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-                            <div class="flex items-center">
-                                <svg class="h-5 w-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                                <span class="text-green-800 text-sm">Votre produit a été activé avec succès</span>
+                        @if($activatedProducts || session('activated_products'))
+                            <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                                <div class="flex items-center mb-3">
+                                    <svg class="h-5 w-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <span class="text-green-800 text-sm font-medium">Produits activés :</span>
+                                </div>
+                                <ul class="list-disc list-inside text-green-800 text-sm space-y-1">
+                                    @foreach(($activatedProducts ?? session('activated_products')) as $product)
+                                        <li>{{ $product }}</li>
+                                    @endforeach
+                                </ul>
                             </div>
-                        </div>
+                        @else
+                            <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                                <div class="flex items-center">
+                                    <svg class="h-5 w-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <span class="text-green-800 text-sm">Vos produits ont été activés avec succès</span>
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 @elseif(session('payment_error'))
                     <!-- Error State -->
@@ -50,16 +66,32 @@
                             </svg>
                         </div>
                         <h2 class="text-xl font-semibold text-gray-900 mb-2">Erreur de Paiement</h2>
-                        <p class="text-gray-600 mb-6">{{ session('payment_error') }}</p>
+                        <p class="text-gray-600 mb-6">{{ $error ?? session('payment_error') }}</p>
                         
-                        <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-                            <div class="flex items-center">
-                                <svg class="h-5 w-5 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-                                </svg>
-                                <span class="text-red-800 text-sm">Le paiement n'a pas pu être traité</span>
+                        @if($activatedProducts || session('affected_products'))
+                            <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                                <div class="flex items-center mb-3">
+                                    <svg class="h-5 w-5 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                                    </svg>
+                                    <span class="text-red-800 text-sm font-medium">Produits concernés :</span>
+                                </div>
+                                <ul class="list-disc list-inside text-red-800 text-sm space-y-1">
+                                    @foreach(($activatedProducts ?? session('affected_products')) as $product)
+                                        <li>{{ $product }}</li>
+                                    @endforeach
+                                </ul>
                             </div>
-                        </div>
+                        @else
+                            <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                                <div class="flex items-center">
+                                    <svg class="h-5 w-5 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                                    </svg>
+                                    <span class="text-red-800 text-sm">Le paiement n'a pas pu être traité</span>
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 @else
                     <!-- No Result State -->
@@ -83,6 +115,10 @@
                     @if(session('payment_success'))
                         <a href="/profile" class="w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors text-center">
                             Voir Mes Produits
+                        </a>
+                    @elseif(session('payment_error') || $error)
+                        <a href="/profile?tab=pending" class="w-full bg-orange-100 text-orange-700 py-3 px-4 rounded-lg font-medium hover:bg-orange-200 transition-colors text-center">
+                            Réessayer le Paiement
                         </a>
                     @else
                         <a href="/products" class="w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors text-center">
