@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Dropdown Discussions - Session Ventes</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #007bff;
+        }
+        
+        .header h1 {
+            color: #007bff;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .demo-section {
+            margin-bottom: 32px;
+        }
+        
+        .demo-section h3 {
+            color: #007bff;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .demo-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .demo-title {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+        }
+        
+        .demo-description {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .code-example {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 16px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin-top: 12px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .btn:hover {
+            background: #0056b3;
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        
+        .action-buttons {
+            text-align: center;
+            margin-top: 32px;
+        }
+        
+        .action-buttons .btn {
+            margin: 0 8px;
+        }
+        
+        .feature-list {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+        
+        .feature-list h3 {
+            color: #495057;
+            margin-bottom: 16px;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 12px;
+            background: white;
+            border-radius: 6px;
+            border-left: 4px solid #28a745;
+        }
+        
+        .feature-icon {
+            width: 24px;
+            height: 24px;
+            background: #28a745;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-right: 12px;
+            font-weight: bold;
+        }
+        
+        .feature-text {
+            flex: 1;
+            color: #495057;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+                margin: 10px;
+            }
+            
+            .action-buttons .btn {
+                display: block;
+                margin: 8px auto;
+                max-width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Système de Dropdown pour Discussions - Session Ventes</h1>
+            <p>Chaque discussion sur un produit est maintenant une liste déroulante individuelle</p>
+        </div>
+
+        <div class="feature-list">
+            <h3>✨ Nouvelles Fonctionnalités Dropdown</h3>
+            
+            <div class="feature-item">
+                <div class="feature-icon">1</div>
+                <div class="feature-text">
+                    <strong>Dropdown individuel</strong> - Chaque conversation peut être développée/réduite indépendamment
+                </div>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">2</div>
+                <div class="feature-text">
+                    <strong>En-tête cliquable</strong> - Cliquez sur l'en-tête d'une conversation pour l'expandre
+                </div>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">3</div>
+                <div class="feature-text">
+                    <strong>Bouton d'expansion</strong> - Indicateur visuel avec rotation pour l'état ouvert/fermé
+                </div>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">4</div>
+                <div class="feature-text">
+                    <strong>Contenu étendu</strong> - Statistiques, actions rapides et gestion des messages non lus
+                </div>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">5</div>
+                <div class="feature-text">
+                    <strong>Interface responsive</strong> - Optimisé pour mobile et desktop
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h3>🎯 Comment Utiliser le Système Dropdown</h3>
+            
+            <div class="demo-card">
+                <div class="demo-title">1. Expansion d'une Conversation</div>
+                <div class="demo-description">
+                    Pour voir plus de détails sur une conversation :
+                    <ul>
+                        <li>Cliquez sur l'en-tête de la conversation (nom + avatar de l'acheteur)</li>
+                        <li>Ou cliquez sur le bouton d'expansion (flèche)</li>
+                        <li>La conversation se développe pour afficher plus d'informations</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="demo-card">
+                <div class="demo-title">2. Contenu du Dropdown</div>
+                <div class="demo-description">
+                    Chaque dropdown contient :
+                    <ul>
+                        <li><strong>Statistiques</strong> - Nombre de messages, dernière activité, statut</li>
+                        <li><strong>Actions rapides</strong> - Répondre, voir profil, plus d'actions</li>
+                        <li><strong>Gestion des messages</strong> - Indicateurs et actions pour les messages non lus</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="demo-card">
+                <div class="demo-title">3. Gestion Multiple</div>
+                <div class="demo-description">
+                    Avantages du système :
+                    <ul>
+                        <li>Plusieurs conversations peuvent être ouvertes simultanément</li>
+                        <li>Chaque conversation est indépendante</li>
+                        <li>Interface plus organisée et lisible</li>
+                        <li>Accès rapide aux informations importantes</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h3>💻 Code Implémenté</h3>
+            
+            <div class="demo-card">
+                <div class="demo-title">État de Gestion des Dropdowns</div>
+                <div class="code-example">
+const expandedConversations = ref([]) // Gestion de l'expansion des conversations
+
+const toggleConversationDetails = (conversationId) => {
+  const index = expandedConversations.value.indexOf(conversationId)
+  if (index > -1) {
+    expandedConversations.value.splice(index, 1)
+  } else {
+    expandedConversations.value.push(conversationId)
+  }
+}
+                </div>
+            </div>
+            
+            <div class="demo-card">
+                <div class="demo-title">Structure HTML du Dropdown</div>
+                <div class="code-example">
+&lt;div class="buyer-header" @click="toggleConversationDetails(conversation.id)"&gt;
+  &lt;div class="buyer-info"&gt;...&lt;/div&gt;
+  &lt;button class="expand-conversation-btn" 
+          :class="{ expanded: expandedConversations.includes(conversation.id) }"&gt;
+    &lt;svg&gt;...&lt;/svg&gt;
+  &lt;/button&gt;
+&lt;/div&gt;
+
+&lt;div v-if="expandedConversations.includes(conversation.id)" 
+     class="conversation-details-expanded"&gt;
+  &lt;div class="conversation-stats"&gt;...&lt;/div&gt;
+  &lt;div class="quick-actions-expanded"&gt;...&lt;/div&gt;
+  &lt;div class="unread-info"&gt;...&lt;/div&gt;
+&lt;/div&gt;
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h3>🎨 Améliorations Visuelles</h3>
+            
+            <div class="demo-card">
+                <div class="demo-title">Design et Interactions</div>
+                <div class="demo-description">
+                    <ul>
+                        <li><strong>En-têtes cliquables</strong> avec effet de survol</li>
+                        <li><strong>Boutons d'expansion</strong> avec rotation et changement de couleur</li>
+                        <li><strong>Contenu étendu</strong> avec bordures et espacement</li>
+                        <li><strong>Actions rapides</strong> avec boutons colorés et icônes</li>
+                        <li><strong>Responsive design</strong> qui s'adapte aux écrans mobiles</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <a href="/discussions" class="btn">🚀 Tester les Dropdowns</a>
+            <a href="/profile" class="btn btn-secondary">👤 Retour au Profil</a>
+        </div>
+    </div>
+
+    <script>
+        // Animation d'entrée pour les éléments
+        document.addEventListener('DOMContentLoaded', function() {
+            const elements = document.querySelectorAll('.feature-item, .demo-card');
+            
+            elements.forEach((element, index) => {
+                element.style.opacity = '0';
+                element.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    element.style.transition = 'all 0.6s ease';
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+
+        // Interaction avec les cartes de démo
+        document.querySelectorAll('.demo-card').forEach(card => {
+            card.addEventListener('click', function() {
+                this.style.transform = 'scale(1.02)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 200);
+            });
+        });
+    </script>
+</body>
+</html>
+

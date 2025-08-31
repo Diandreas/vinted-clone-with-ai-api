@@ -25,10 +25,17 @@ Route::get('payment/callback', [\App\Http\Controllers\NotchPayController::class,
 // Payment result page (PUBLIC - for displaying payment results)
 Route::get('payment/result', [\App\Http\Controllers\NotchPayController::class, 'showPaymentResult'])->name('payment.result');
 
-// All other routes are handled by Vue Router (EXCEPT API routes)
+// All other GET routes are handled by Vue Router (EXCEPT API routes)
 Route::get('{any}', function () {
-    // Skip API routes
-    if (str_starts_with(request()->path(), 'api/')) {
+    // Skip API routes - more comprehensive check
+    $path = request()->path();
+    $method = request()->method();
+    
+    // Only handle GET requests, and exclude API routes
+    if ($method !== 'GET' || 
+        str_starts_with($path, 'api/') || 
+        str_starts_with($path, 'sanctum/') || 
+        str_starts_with($path, 'up')) {
         abort(404);
     }
     
