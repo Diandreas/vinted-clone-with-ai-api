@@ -234,7 +234,7 @@ export default {
       
       if (!product) {
         console.log('❌ No product provided')
-        return '/placeholder-product.jpg'
+        return '/images/placeholder-product.png'
       }
       
       // If main_image_url is a string, use it
@@ -245,27 +245,27 @@ export default {
       
       // If main_image is an object with filename, construct URL
       if (product.main_image && typeof product.main_image === 'object' && product.main_image.filename) {
-        const url = `http://localhost:8000/api/v1/files/products/${product.main_image.filename}`
+        const url = `http://localhost:8000/storage/products/${product.main_image.filename}`
         console.log('✅ Using main_image object:', url)
         return url
       }
       
       // If main_image is a string (filename), construct URL
       if (typeof product.main_image === 'string') {
-        const url = `http://localhost:8000/api/v1/files/products/${product.main_image}`
+        const url = `http://localhost:8000/storage/products/${product.main_image}`
         console.log('✅ Using main_image string:', url)
         return url
       }
       
       // Fallback to placeholder
       console.log('❌ Fallback to placeholder')
-      return '/placeholder-product.jpg'
+      return '/images/placeholder-product.png'
     }
 
     const onImageError = (event) => {
       console.log('❌ Image failed to load:', event.target.src)
-      if (event.target.src !== '/placeholder-product.jpg') {
-        event.target.src = '/placeholder-product.jpg'
+      if (event.target.src !== '/images/placeholder-product.png') {
+        event.target.src = '/images/placeholder-product.png'
       }
     }
 

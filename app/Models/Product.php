@@ -387,8 +387,8 @@ class Product extends Model
     {
         $mainImage = $this->mainImage;
         return $mainImage 
-            ? url('api/v1/files/products/' . $mainImage->filename)
-            : asset('placeholder-product.jpg');
+            ? url('storage/products/' . $mainImage->filename)
+            : asset('images/placeholder-product.png');
     }
 
     /**
@@ -397,7 +397,7 @@ class Product extends Model
     public function getImageUrlsAttribute()
     {
         return $this->images->map(function($image) {
-            return url('api/v1/files/products/' . $image->filename);
+            return url('storage/products/' . $image->filename);
         });
     }
 

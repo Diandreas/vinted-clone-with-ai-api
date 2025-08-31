@@ -14,7 +14,7 @@
             :src="product.main_image_url || product.main_image"
             :alt="product.title"
             :product-id="product.id"
-            fallback="/placeholder-product.jpg"
+            fallback="/images/placeholder-product.png"
             image-classes="w-full h-48 object-cover"
           />
 
@@ -59,7 +59,11 @@
                 {{ product.user?.name?.charAt(0)?.toUpperCase() || 'U' }}
               </span>
             </div>
-            <span class="text-xs text-gray-600">{{ product.user?.name || 'Utilisateur' }}</span>
+            <VerifiedSellerName 
+              :seller-name="product.user?.name || 'Utilisateur'"
+              :is-verified="product.user?.is_verified"
+              text-class="text-xs text-gray-600"
+            />
           </div>
 
           <!-- Action Buttons -->
@@ -149,6 +153,7 @@ import FacebookProductCard from './FacebookProductCard.vue'
 import FacebookProductSkeleton from '../skeletons/FacebookProductSkeleton.vue'
 import ProductImage from '../ui/ProductImage.vue'
 import { formatPrice } from '../../utils/currency.js'
+import VerifiedSellerName from '../ui/VerifiedSellerName.vue'
 
 export default {
   name: 'FacebookProductGridLayout',
@@ -158,7 +163,8 @@ export default {
     ProductImage,
     CubeIcon,
     HeartIcon,
-    ShareIcon
+    ShareIcon,
+    VerifiedSellerName
   },
   props: {
     products: {

@@ -148,9 +148,9 @@
                 {{ getUserInitials(product.user?.name) }}
               </div>
               <div>
-                <VerifiedSellerName 
-                  :seller-name="product.user?.name" 
-                  :is-verified="product.user?.is_verified" 
+                <VerifiedSellerName
+                  :seller-name="product.user?.name"
+                  :is-verified="product.user?.is_verified"
                 />
                 <p class="text-xs sm:text-sm text-gray-500">{{ formatDate(product.user?.created_at) }}</p>
               </div>
@@ -257,8 +257,8 @@
                   @click="toggleProductStatus"
                   :class="[
                     'px-3 py-2 rounded-lg font-medium transition-colors text-sm',
-                    product?.status === 'active' 
-                      ? 'bg-gray-600 text-white hover:bg-gray-700' 
+                    product?.status === 'active'
+                      ? 'bg-gray-600 text-white hover:bg-gray-700'
                       : 'bg-green-600 text-white hover:bg-green-700'
                   ]"
                 >
@@ -345,7 +345,7 @@
           <!-- Stats -->
           <div class="bg-white rounded-xl border border-gray-200 p-6">
             <h3 class="text-lg font-semibold text-gray-900 mb-4">Statistiques</h3>
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-3 gap-4">
               <div class="text-center">
                 <div class="text-2xl font-bold text-primary-600">{{ product.views_count }}</div>
                 <div class="text-sm text-gray-500">Vues</div>
@@ -357,10 +357,6 @@
               <div class="text-center">
                 <div class="text-2xl font-bold text-gray-500">{{ product.favorites_count }}</div>
                 <div class="text-sm text-gray-500">Favoris</div>
-              </div>
-              <div class="text-center">
-                <div class="text-2xl font-bold text-green-500">{{ product.comments_count }}</div>
-                <div class="text-sm text-gray-500">Commentaires</div>
               </div>
             </div>
           </div>
@@ -455,9 +451,9 @@
               {{ getUserInitials(product?.user?.name) }}
             </div>
             <div>
-              <VerifiedSellerName 
-                :seller-name="product?.user?.name" 
-                :is-verified="product?.user?.is_verified" 
+              <VerifiedSellerName
+                :seller-name="product?.user?.name"
+                :is-verified="product?.user?.is_verified"
               />
               <p class="text-xs text-gray-500">Vendeur</p>
             </div>
@@ -632,16 +628,16 @@ const isProductOwner = computed(() => {
 
 const canEditProduct = computed(() => {
   if (!isProductOwner.value) return false
-  
+
   // Vérifier si le produit a été créé il y a moins de 30 minutes
   if (product.value?.created_at) {
     const createdAt = new Date(product.value.created_at)
     const now = new Date()
     const diffInMinutes = (now - createdAt) / (1000 * 60) // différence en minutes
-    
+
     return diffInMinutes <= 30
   }
-  
+
   return false
 })
 
@@ -950,7 +946,7 @@ const toggleProductStatus = async () => {
 
     if (response.data.success) {
       product.value.status = newStatus
-      
+
       // Message de succès
       if (newStatus === 'active') {
         alert('✅ Produit activé avec succès !')
@@ -960,7 +956,7 @@ const toggleProductStatus = async () => {
     }
   } catch (error) {
     console.error('Erreur changement statut:', error)
-    
+
     // Gestion spécifique de l'erreur de paiement requis
     if (error.response?.status === 400 && error.response?.data?.payment_required) {
       const paymentInfo = error.response.data.payment_required
@@ -970,7 +966,7 @@ const toggleProductStatus = async () => {
         `Statut actuel : ${paymentInfo.status}\n\n` +
         `Voulez-vous aller à la page de paiement ?`
       )
-      
+
       if (confirmPayment) {
         // Rediriger vers la page de paiement ou profile
         router.push('/profile')
@@ -1071,7 +1067,7 @@ const getStatusText = (status) => {
 const shareProduct = async () => {
   try {
     const productUrl = `${window.location.origin}/products/${product.value.id}`
-    
+
     if (navigator.share) {
       // Utiliser l'API Web Share si disponible (mobile)
       await navigator.share({
@@ -1082,13 +1078,13 @@ const shareProduct = async () => {
     } else {
       // Fallback : copier le lien dans le presse-papiers
       await navigator.clipboard.writeText(productUrl)
-      
+
       // Notification temporaire
       const notification = document.createElement('div')
       notification.textContent = 'Lien copié dans le presse-papiers !'
       notification.className = 'fixed bottom-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50'
       document.body.appendChild(notification)
-      
+
       setTimeout(() => {
         document.body.removeChild(notification)
       }, 3000)
@@ -1117,13 +1113,13 @@ const handleProductPayment = async () => {
 
     // Calculer les frais de publication (exemple : 5% du prix)
     const listingFee = Math.round(product.value.price * 0.05)
-    
+
     console.log('💳 Tentative de paiement:', {
       product_id: product.value.id,
       amount: listingFee,
       email: authStore.user?.email
     })
-    
+
     // Utiliser l'instance API configurée qui gère l'authentification
     const response = await api.post('/notchpay/initialize', {
       product_id: product.value.id,
@@ -1140,7 +1136,7 @@ const handleProductPayment = async () => {
 
   } catch (error) {
     console.error('Erreur de paiement:', error)
-    
+
     // Gestion spécifique des erreurs d'authentification
     if (error.response?.status === 401) {
       paymentError.value = 'Vous devez être connecté pour effectuer un paiement'
@@ -1165,9 +1161,9 @@ onMounted(async () => {
     user: authStore.user,
     token: authStore.token?.substring(0, 20) + '...'
   })
-  
+
   await loadProduct()
-  
+
   // Charger automatiquement les conversations si l'utilisateur est le propriétaire
   if (isProductOwner.value && product.value) {
     console.log('🔵 Chargement automatique des conversations pour le propriétaire')

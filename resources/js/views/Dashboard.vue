@@ -384,7 +384,7 @@ const loadRecentActivity = async () => {
 
 const onChartPeriodChange = async () => {
   if (chartPeriod.value) {
-    await dashboardStore.fetchSalesChartData(chartPeriod.value)
+    await dashboardStore.fetchSalesChart(chartPeriod.value)
   }
 }
 
@@ -401,7 +401,8 @@ onMounted(async () => {
   await Promise.all([
     loadStats(),
     loadRecentProducts(),
-    loadRecentActivity()
+    loadRecentActivity(),
+    dashboardStore.fetchSalesChart(chartPeriod.value)
   ])
 })
 </script>

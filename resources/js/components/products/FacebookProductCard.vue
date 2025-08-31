@@ -8,7 +8,11 @@
         </span>
       </div>
       <div class="flex-1">
-        <div class="font-semibold text-gray-900 text-sm">{{ product.user?.name || 'Utilisateur' }}</div>
+        <VerifiedSellerName 
+          :seller-name="product.user?.name || 'Utilisateur'"
+          :is-verified="product.user?.is_verified"
+          text-class="font-semibold text-gray-900 text-sm"
+        />
         <div class="text-xs text-gray-500">{{ formatDate(product.created_at) }}</div>
       </div>
 
@@ -66,7 +70,7 @@
         :src="product.main_image_url || product.main_image"
         :alt="product.title"
         :product-id="product.id"
-        fallback="/placeholder-product.jpg"
+        fallback="/images/placeholder-product.png"
         image-classes="w-full h-64 object-cover"
       />
 
@@ -178,6 +182,7 @@
 import { ref } from 'vue'
 import { HeartIcon, ShareIcon } from '@heroicons/vue/24/outline'
 import ProductImage from '../ui/ProductImage.vue'
+import VerifiedSellerName from '../ui/VerifiedSellerName.vue'
 import { formatPrice } from '../../utils/currency.js'
 
 export default {
@@ -185,7 +190,8 @@ export default {
   components: {
     HeartIcon,
     ShareIcon,
-    ProductImage
+    ProductImage,
+    VerifiedSellerName
   },
   props: {
     product: {

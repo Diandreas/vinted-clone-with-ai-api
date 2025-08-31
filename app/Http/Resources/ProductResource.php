@@ -46,7 +46,7 @@ class ProductResource extends JsonResource
             'location' => $this->location,
             'is_negotiable' => (bool) $this->is_negotiable,
             'minimum_offer' => $this->minimum_offer,
-            'main_image' => $this->mainImage ? url('api/v1/files/products/' . $this->mainImage->filename) : asset('placeholder-product.jpg'),
+            'main_image' => $this->mainImage ? url('storage/products/' . $this->mainImage->filename) : asset('images/placeholder-product.png'),
             'main_image_url' => $this->main_image_url,
             'image_url' => $this->image_url,
             'uploaded_image' => $this->uploaded_image,

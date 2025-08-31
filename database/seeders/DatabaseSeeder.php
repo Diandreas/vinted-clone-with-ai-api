@@ -23,6 +23,8 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             PlatformFeeSeeder::class,
+            TestUsersSeeder::class,
+            BenoitUserSeeder::class,
         ]);
     }
 }

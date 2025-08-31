@@ -3,7 +3,7 @@
     <!-- Product Image -->
     <div class="relative aspect-square overflow-hidden rounded-t-lg">
       <img
-        :src="product.main_image || '/placeholder-product.jpg'"
+        :src="product.main_image || '/images/placeholder-product.png'"
         :alt="product.title"
         class="w-full h-full object-cover"
         @error="handleImageError"
@@ -160,7 +160,7 @@ const formatCount = (count) => {
 }
 
 const handleImageError = (event) => {
-  event.target.src = '/placeholder-product.jpg'
+  event.target.src = '/images/placeholder-product.png'
 }
 
 const handleAvatarError = (event) => {

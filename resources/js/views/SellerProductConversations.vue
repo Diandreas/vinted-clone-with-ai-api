@@ -57,7 +57,7 @@
                 :src="productData.product.main_image_url || productData.product.main_image"
                 :alt="productData.product.title"
                 :product-id="productData.product.id"
-                fallback="/placeholder-product.jpg"
+                fallback="/images/placeholder-product.png"
                 image-classes="product-image"
                 :class="{ 'grayscale': isProductUnavailable(productData.product) }"
               />

@@ -2,8 +2,8 @@
   <div class="min-h-screen bg-white">
     <!-- Header avec image de couverture -->
     <div class="relative">
-      <!-- Cover Image -->
-      <div class="h-32 sm:h-40 md:h-48 lg:h-56 bg-gradient-to-br from-primary-500 via-primary-600 to-primary-700 relative overflow-hidden">
+              <!-- Cover Image -->
+        <div class="h-32 sm:h-40 md:h-48 lg:h-56 bg-gradient-to-br from-green-600 via-emerald-600 to-teal-700 relative overflow-hidden">
         <img
           v-if="user?.cover_image"
           :src="user.cover_image"
@@ -72,18 +72,18 @@
               <!-- User Info -->
               <div class="text-center sm:text-left mb-3 sm:mb-2">
                 <div class="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-3 mb-2">
-                  <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">{{ user?.name || 'Utilisateur' }}</h1>
-                  <span v-if="user?.username" class="text-gray-500 text-sm sm:text-base">@{{ user.username }}</span>
+                  <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-white drop-shadow-lg">{{ user?.name || 'Utilisateur' }}</h1>
+                  <span v-if="user?.username" class="text-green-100 text-sm sm:text-base font-medium">@{{ user.username }}</span>
                 </div>
-                <p v-if="user?.bio" class="text-gray-600 text-sm max-w-md mb-2">{{ user.bio }}</p>
-                <div class="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-4 text-xs sm:text-sm text-gray-500">
+                <p v-if="user?.bio" class="text-green-50 text-sm max-w-md mb-2 leading-relaxed">{{ user.bio }}</p>
+                <div class="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-4 text-xs sm:text-sm text-green-100">
                   <span v-if="user?.location" class="flex items-center justify-center sm:justify-start">
-                    <MapPinIcon class="w-3 h-3 sm:w-4 h-4 mr-1 sm:mr-2" />
+                    <MapPinIcon class="w-3 h-3 sm:w-4 h-4 mr-1 sm:mr-2 text-green-200" />
                     {{ user.location }}
                   </span>
                   <span v-if="user?.website" class="flex items-center justify-center sm:justify-start">
-                    <LinkIcon class="w-3 h-3 sm:w-4 h-4 mr-1 sm:mr-2" />
-                    <a :href="user.website" target="_blank" class="text-primary-600 hover:text-primary-700 transition-colors">
+                    <LinkIcon class="w-3 h-3 sm:w-4 h-4 mr-1 sm:mr-2 text-green-200" />
+                    <a :href="user.website" target="_blank" class="text-green-200 hover:text-white transition-colors font-medium underline">
                       Site web
                     </a>
                   </span>
@@ -100,8 +100,8 @@
                   @click="toggleFollow"
                   class="w-full sm:w-auto px-3 py-1.5 rounded-lg transition-all flex items-center justify-center space-x-1 shadow-soft text-xs font-medium"
                   :class="isFollowing 
-                    ? 'bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-200' 
-                    : 'bg-primary-500 hover:bg-primary-600 text-white'"
+                    ? 'bg-white/90 hover:bg-white text-green-800 border border-white/20 backdrop-blur-sm' 
+                    : 'bg-green-500 hover:bg-green-600 text-white shadow-lg'"
                 >
                   <template v-if="followBusy">
                     <Loader2Icon class="w-3 h-3 animate-spin" />
@@ -110,25 +110,18 @@
                   <template v-else>
                     <UsersIcon v-if="!isFollowing" class="w-3 h-3" />
                     <CheckIcon v-else class="w-3 h-3" />
-                    <span>{{ isFollowing ? 'Abonné' : 'Suivre' }}</span>
+                    <span>{{ isFollowing ? 'Abonné' : 'Suivre' }} ({{ isFollowing ? 'OUI' : 'NON' }})</span>
                   </template>
                 </button>
                 
-                <!-- Message Button -->
-                <button
-                  @click="goToMessages"
-                  class="w-full sm:w-auto px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors flex items-center justify-center space-x-1 shadow-soft text-xs font-medium border border-gray-200"
-                >
-                  <MessageCircleIcon class="w-3 h-3" />
-                  <span>Message</span>
-                </button>
+
               </div>
               
               <!-- Bouton de déconnexion pour son propre profil -->
               <div v-if="isSelf" class="flex flex-col sm:flex-row items-center space-y-1 sm:space-y-0 sm:space-x-2">
                 <button
                   @click="logout"
-                  class="w-full sm:w-auto px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors flex items-center justify-center space-x-1 shadow-soft text-xs font-medium"
+                  class="w-full sm:w-auto px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-all duration-200 flex items-center justify-center space-x-1 shadow-lg hover:shadow-xl text-xs font-medium backdrop-blur-sm"
                 >
                   <LogOutIcon class="w-3 h-3" />
                   <span>Se déconnecter</span>
@@ -143,36 +136,36 @@
     <!-- Main Content -->
     <div class="pt-12 sm:pt-16 md:pt-20">
       <!-- Stats Bar - Design compact mobile -->
-      <div class="bg-gray-50 border-b border-gray-100">
+      <div class="bg-white/95 backdrop-blur-md border-b border-green-200/60 shadow-sm">
         <div class="max-w-4xl mx-auto px-4 py-3 sm:py-4">
           <div class="grid grid-cols-4 gap-2 sm:gap-4 text-center">
             <div 
-              class="cursor-pointer hover:bg-white rounded-lg p-2 sm:p-3 transition-all duration-200 hover:shadow-soft" 
+              class="cursor-pointer hover:bg-green-50 rounded-lg p-2 sm:p-3 transition-all duration-200 hover:shadow-md group" 
               @click="activeTab = 'products'"
             >
-              <div class="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-1">{{ stats?.products_count ?? 0 }}</div>
-              <div class="text-xs text-gray-500">Produits</div>
+              <div class="text-lg sm:text-xl md:text-2xl font-bold text-green-600 mb-1 group-hover:text-green-700">{{ stats?.products_count ?? 0 }}</div>
+              <div class="text-xs text-green-700">Produits</div>
             </div>
             <div 
-              class="cursor-pointer hover:bg-white rounded-lg p-2 sm:p-3 transition-all duration-200 hover:shadow-soft" 
+              class="cursor-pointer hover:bg-green-50 rounded-lg p-2 sm:p-3 transition-all duration-200 hover:shadow-md group" 
               @click="activeTab = 'followers'"
             >
-              <div class="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-1">{{ stats?.followers_count ?? 0 }}</div>
-              <div class="text-xs text-gray-500">Abonnés</div>
+              <div class="text-lg sm:text-xl md:text-2xl font-bold text-green-600 mb-1 group-hover:text-green-700">{{ stats?.followers_count ?? 0 }}</div>
+              <div class="text-xs text-green-700">Abonnés</div>
             </div>
             <div 
-              class="cursor-pointer hover:bg-white rounded-lg p-2 sm:p-3 transition-all duration-200 hover:shadow-soft" 
+              class="cursor-pointer hover:bg-green-50 rounded-lg p-2 sm:p-3 transition-all duration-200 hover:shadow-md group" 
               @click="activeTab = 'following'"
             >
-              <div class="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-1">{{ stats?.following_count ?? 0 }}</div>
-              <div class="text-xs text-gray-500">Abonnements</div>
+              <div class="text-lg sm:text-xl md:text-2xl font-bold text-green-600 mb-1 group-hover:text-green-700">{{ stats?.following_count ?? 0 }}</div>
+              <div class="text-xs text-green-700">Abonnements</div>
             </div>
             <div 
-              class="cursor-pointer hover:bg-white rounded-lg p-2 sm:p-3 transition-all duration-200 hover:shadow-soft" 
+              class="cursor-pointer hover:bg-green-50 rounded-lg p-2 sm:p-3 transition-all duration-200 hover:shadow-md group" 
               @click="activeTab = 'reviews'"
             >
-              <div class="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-1">{{ (stats?.average_rating ?? 0).toFixed(1) }}</div>
-              <div class="text-xs text-gray-500">Note</div>
+              <div class="text-lg sm:text-xl md:text-2xl font-bold text-green-600 mb-1 group-hover:text-green-700">{{ (stats?.average_rating ?? 0).toFixed(1) }}</div>
+              <div class="text-xs text-green-700">Note</div>
             </div>
           </div>
         </div>
@@ -181,18 +174,18 @@
       <!-- Content Tabs -->
       <div class="max-w-4xl mx-auto px-4 py-4 sm:py-6">
         <!-- Tab Navigation - Design compact mobile -->
-        <div class="flex overflow-x-auto space-x-1 sm:space-x-4 border-b border-gray-200 mb-4 sm:mb-6 pb-2">
+        <div class="flex overflow-x-auto space-x-1 sm:space-x-4 border-b border-green-200 mb-4 sm:mb-6 pb-2">
           <button
             v-for="tab in tabs"
             :key="tab.id"
             @click="activeTab = tab.id"
-            class="flex-shrink-0 pb-2 sm:pb-3 px-2 sm:px-4 relative transition-colors whitespace-nowrap text-sm sm:text-base font-medium"
-            :class="activeTab === tab.id ? 'text-primary-600' : 'text-gray-500 hover:text-gray-700'"
+            class="flex-shrink-0 pb-2 sm:pb-3 px-2 sm:px-4 relative transition-all duration-200 whitespace-nowrap text-sm sm:text-base font-medium"
+            :class="activeTab === tab.id ? 'text-green-600' : 'text-green-500 hover:text-green-700'"
           >
             {{ tab.label }}
             <div
               v-if="activeTab === tab.id"
-              class="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-500 rounded-full"
+              class="absolute bottom-0 left-0 right-0 h-0.5 bg-green-500 rounded-full"
             ></div>
           </button>
         </div>
@@ -200,18 +193,18 @@
         <!-- Loading State -->
         <div v-if="loading" class="flex items-center justify-center py-8 sm:py-12">
           <div class="text-center">
-            <Loader2Icon class="h-8 w-8 sm:h-12 sm:w-12 animate-spin text-primary-500 mx-auto mb-3 sm:mb-4" />
-            <span class="text-gray-500 text-sm sm:text-base">Chargement...</span>
+            <Loader2Icon class="h-8 w-8 sm:h-12 sm:w-12 animate-spin text-green-500 mx-auto mb-3 sm:mb-4" />
+            <span class="text-green-600 text-sm sm:text-base font-medium">Chargement...</span>
           </div>
         </div>
 
         <!-- Error State -->
         <div v-else-if="error" class="text-center py-8 sm:py-12">
           <AlertTriangleIcon class="h-12 w-12 sm:h-16 sm:w-16 text-red-500 mx-auto mb-3 sm:mb-4" />
-          <p class="text-red-600 mb-3 sm:mb-4 text-sm sm:text-base">{{ error }}</p>
+          <p class="text-red-600 mb-3 sm:mb-4 text-sm sm:text-base font-medium">{{ error }}</p>
           <button
             @click="retryLoad"
-            class="px-4 sm:px-6 py-2 sm:py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl transition-colors shadow-soft text-sm sm:text-base font-medium"
+            class="px-4 sm:px-6 py-2 sm:py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl text-sm sm:text-base font-medium"
           >
             Réessayer
           </button>
@@ -371,6 +364,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import TikTokProductCard from '@/components/products/TikTokProductCard.vue'
 import ProfileIcon from '@/components/ui/ProfileIcon.vue'
+import api from '@/services/api'
 
 import {
   ArrowLeftIcon,
@@ -431,20 +425,23 @@ const isSelf = computed(() => {
 // Methods
 async function fetchUser() {
   try {
-    const resp = await window.axios.get(`/users/${route.params.id}`)
+    const resp = await api.get(`/users/${route.params.id}`)
     const payload = resp.data?.data
     user.value = payload?.user || null
     stats.value = payload?.stats || null
-    isFollowing.value = Boolean(payload?.is_following)
+    
+    // Mise à jour explicite de l'état de suivi
+    const followingStatus = Boolean(payload?.is_following)
+    isFollowing.value = followingStatus
+
   } catch (err) {
-    console.error('Failed to fetch user:', err)
     error.value = 'Impossible de charger ce profil.'
   }
 }
 
 async function fetchProducts(page = 1) {
   try {
-    const resp = await window.axios.get(`/users/${route.params.id}/products`, { params: { page } })
+    const resp = await api.get(`/users/${route.params.id}/products`, { params: { page } })
     const pageData = resp.data?.data
     products.value = Array.isArray(pageData?.data) ? pageData.data : []
     pagination.value = {
@@ -454,14 +451,13 @@ async function fetchProducts(page = 1) {
       perPage: Number(pageData?.per_page || 20)
     }
   } catch (err) {
-    console.error('Failed to fetch user products:', err)
     error.value = 'Impossible de charger les produits.'
   }
 }
 
 async function fetchFollowers() {
   try {
-    const resp = await window.axios.get(`/users/${route.params.id}/followers`)
+    const resp = await api.get(`/users/${route.params.id}/followers`)
     
     // Gestion correcte de la pagination Laravel
     if (resp.data?.data?.data) {
@@ -474,14 +470,13 @@ async function fetchFollowers() {
       followers.value = []
     }
   } catch (err) {
-    console.error('Failed to fetch followers:', err)
     error.value = 'Impossible de charger les abonnés.'
   }
 }
 
 async function fetchFollowing() {
   try {
-    const resp = await window.axios.get(`/users/${route.params.id}/following`)
+    const resp = await api.get(`/users/${route.params.id}/following`)
     
     // Gestion correcte de la pagination Laravel
     if (resp.data?.data?.data) {
@@ -494,14 +489,13 @@ async function fetchFollowing() {
       following.value = []
     }
   } catch (err) {
-    console.error('Failed to fetch following:', err)
     error.value = 'Impossible de charger les abonnements.'
   }
 }
 
 async function fetchReviews() {
   try {
-    const resp = await window.axios.get(`/users/${route.params.id}/reviews`)
+    const resp = await api.get(`/users/${route.params.id}/reviews`)
     
     // Gestion correcte de la pagination Laravel
     if (resp.data?.data?.data) {
@@ -514,7 +508,6 @@ async function fetchReviews() {
       reviews.value = []
     }
   } catch (err) {
-    console.error('Failed to fetch reviews:', err)
     error.value = 'Impossible de charger les évaluations.'
   }
 }
@@ -546,17 +539,23 @@ async function toggleFollow() {
   followBusy.value = true
   try {
     if (isFollowing.value) {
-      await window.axios.delete(`/users/${route.params.id}/unfollow`)
-      isFollowing.value = false
-      if (stats.value) stats.value.followers_count = Math.max((stats.value.followers_count || 1) - 1, 0)
-    } else {
-      const resp = await window.axios.post(`/users/${route.params.id}/follow`)
+      // L'utilisateur est déjà abonné, on le désabonne
+      const resp = await api.delete(`/users/${route.params.id}/unfollow`)
       const data = resp.data?.data
-      isFollowing.value = Boolean(data?.is_following ?? true)
-      if (stats.value) stats.value.followers_count = (stats.value.followers_count || 0) + 1
+      isFollowing.value = data.is_following
+      if (stats.value) stats.value.followers_count = data.followers_count
+
+    } else {
+      // L'utilisateur n'est pas abonné, on l'abonne
+      const resp = await api.post(`/users/${route.params.id}/follow`)
+      const data = resp.data?.data
+      isFollowing.value = data.is_following
+      if (stats.value) stats.value.followers_count = data.followers_count
+
     }
   } catch (err) {
-    console.error('Failed to toggle follow:', err)
+    // En cas d'erreur, on peut essayer de recharger l'état
+    await fetchUser()
   } finally {
     followBusy.value = false
   }
@@ -564,7 +563,6 @@ async function toggleFollow() {
 
 async function toggleFollowUser(userId) {
   // Implementation for following/unfollowing other users
-  console.log('Toggle follow user:', userId)
 }
 
 function goToPage(page) {
@@ -572,15 +570,7 @@ function goToPage(page) {
   fetchProducts(page)
 }
 
-function goToMessages() {
-  if (!isAuthenticated.value) {
-    router.push({ name: 'login', query: { redirect: route.fullPath } })
-    return
-  }
-  const q = { user: user.value?.id }
-  if (route.query.product) q.product = route.query.product
-  router.push({ name: 'messages', query: q })
-}
+
 
 function logout() {
   authStore.logout()
@@ -590,13 +580,11 @@ function logout() {
 function reportUser() {
   showMoreOptions.value = false
   // Implementation for reporting user
-  console.log('Report user:', user.value?.id)
 }
 
 function blockUser() {
   showMoreOptions.value = false
   // Implementation for blocking user
-  console.log('Block user:', user.value?.id)
 }
 
 function retryLoad() {
@@ -621,7 +609,7 @@ async function loadInitialData() {
       fetchProducts()
     ])
   } catch (err) {
-    console.error('Failed to load initial data:', err)
+    // Gestion silencieuse des erreurs
   } finally {
     loading.value = false
   }
@@ -636,6 +624,8 @@ watch(() => route.params.id, async () => {
   loading.value = true
   await loadInitialData()
 })
+
+
 
 // Lifecycle
 onMounted(async () => {

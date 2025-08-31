@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import axios from 'axios'
+import api from '@/services/api'
 import router from '@/router'
 
 export const useAuthStore = defineStore('auth', () => {
@@ -40,18 +40,26 @@ export const useAuthStore = defineStore('auth', () => {
   const setAuthToken = (authToken) => {
     token.value = authToken
     localStorage.setItem('auth_token', authToken)
-    axios.defaults.headers.common['Authorization'] = `Bearer ${authToken}`
+    api.defaults.headers.common['Authorization'] = `Bearer ${authToken}`
+    // Also update the global axios instance for compatibility
+    if (window.axios) {
+      window.axios.defaults.headers.common['Authorization'] = `Bearer ${authToken}`
+    }
   }
   
   const clearAuthToken = () => {
     token.value = null
     localStorage.removeItem('auth_token')
-    delete axios.defaults.headers.common['Authorization']
+    delete api.defaults.headers.common['Authorization']
+    // Also clear the global axios instance for compatibility
+    if (window.axios) {
+      delete window.axios.defaults.headers.common['Authorization']
+    }
   }
   
   const fetchUser = async () => {
     try {
-      const response = await axios.get('/auth/user')
+      const response = await api.get('/auth/user')
       user.value = response.data.user
       return response.data.user
     } catch (error) {
@@ -63,7 +71,7 @@ export const useAuthStore = defineStore('auth', () => {
   const login = async (credentials) => {
     loading.value = true
     try {
-      const response = await axios.post('/auth/login', credentials)
+      const response = await api.post('/auth/login', credentials)
       
       setAuthToken(response.data.token)
       user.value = response.data.user
@@ -84,7 +92,7 @@ export const useAuthStore = defineStore('auth', () => {
   const register = async (userData) => {
     loading.value = true
     try {
-      const response = await axios.post('/auth/register', userData)
+      const response = await api.post('/auth/register', userData)
       
       setAuthToken(response.data.token)
       user.value = response.data.user
@@ -104,7 +112,7 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = true
     try {
       if (token.value) {
-        await axios.post('/auth/logout')
+        await api.post('/auth/logout')
       }
     } catch (error) {
       console.error('Logout error:', error)
@@ -119,7 +127,7 @@ export const useAuthStore = defineStore('auth', () => {
   const forgotPassword = async (email) => {
     loading.value = true
     try {
-      const response = await axios.post('/auth/forgot-password', { email })
+      const response = await api.post('/auth/forgot-password', { email })
       return response.data
     } catch (error) {
       console.error('Forgot password failed:', error)
@@ -132,7 +140,7 @@ export const useAuthStore = defineStore('auth', () => {
   const resetPassword = async (data) => {
     loading.value = true
     try {
-      const response = await axios.post('/auth/reset-password', data)
+      const response = await api.post('/auth/reset-password', data)
       return response.data
     } catch (error) {
       console.error('Reset password failed:', error)
@@ -145,7 +153,7 @@ export const useAuthStore = defineStore('auth', () => {
   const updateProfile = async (profileData) => {
     loading.value = true
     try {
-      const response = await axios.put('/auth/update-profile', profileData)
+      const response = await api.put('/auth/update-profile', profileData)
       user.value = { ...user.value, ...response.data.user }
       return response.data
     } catch (error) {
@@ -159,7 +167,7 @@ export const useAuthStore = defineStore('auth', () => {
   const changePassword = async (passwordData) => {
     loading.value = true
     try {
-      const response = await axios.post('/auth/change-password', passwordData)
+      const response = await api.post('/auth/change-password', passwordData)
       return response.data
     } catch (error) {
       console.error('Password change failed:', error)
@@ -172,7 +180,7 @@ export const useAuthStore = defineStore('auth', () => {
   const deleteAccount = async () => {
     loading.value = true
     try {
-      await axios.delete('/auth/delete-account')
+      await api.delete('/auth/delete-account')
       logout()
     } catch (error) {
       console.error('Account deletion failed:', error)

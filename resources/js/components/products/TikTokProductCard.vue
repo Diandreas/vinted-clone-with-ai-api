@@ -143,7 +143,7 @@ const favoritingProduct = ref(false)
 
 // Computed properties mémorisées
 const imageSrc = computed(() => {
-  return props.product.main_image_url || props.product.main_image || '/placeholder-product.jpg'
+  return props.product.main_image_url || props.product.main_image || '/images/placeholder-product.png'
 })
 
 const formattedPrice = computed(() => {
@@ -199,8 +199,8 @@ function goToProduct() {
 
 function onImageError(event) {
   // Éviter les rechargements en boucle
-  if (event.target.src !== '/placeholder-product.jpg') {
-    event.target.src = '/placeholder-product.jpg'
+  if (event.target.src !== '/images/placeholder-product.png') {
+    event.target.src = '/images/placeholder-product.png'
   }
 }
 

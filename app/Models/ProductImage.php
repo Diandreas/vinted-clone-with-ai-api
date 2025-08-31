@@ -64,7 +64,7 @@ class ProductImage extends Model
      */
     public function getUrlAttribute()
     {
-        return url('api/v1/files/products/' . $this->filename);
+        return url('storage/products/' . $this->filename);
     }
 
     /**
@@ -78,7 +78,7 @@ class ProductImage extends Model
         }
         $pathInfo = pathinfo($this->filename);
         $thumbnailFilename = $pathInfo['filename'] . '_thumb.' . ($pathInfo['extension'] ?? 'jpg');
-        return url('api/v1/files/products/thumbnails/' . $thumbnailFilename);
+        return url('storage/products/thumbnails/' . $thumbnailFilename);
     }
 
     /**

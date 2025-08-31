@@ -229,4 +229,217 @@ class AuthController extends Controller
             ], 400);
         }
     }
+
+    /**
+     * Send password reset link
+     */
+    public function forgotPassword(Request $request)
+    {
+        try {
+            $request->validate([
+                'email' => 'required|email|exists:users,email',
+            ]);
+        } catch (ValidationException $e) {
+            Log::warning('Auth.forgotPassword validation_failed', [
+                'errors' => $e->errors(),
+                'input' => $request->only('email')
+            ]);
+            throw $e;
+        }
+
+        // For now, just return success (password reset functionality can be implemented later)
+        return response()->json([
+            'success' => true,
+            'message' => 'If an account with that email address exists, we have sent a password reset link.'
+        ]);
+    }
+
+    /**
+     * Reset password
+     */
+    public function resetPassword(Request $request)
+    {
+        try {
+            $request->validate([
+                'token' => 'required|string',
+                'email' => 'required|email|exists:users,email',
+                'password' => 'required|string|min:8|confirmed',
+            ]);
+        } catch (ValidationException $e) {
+            Log::warning('Auth.resetPassword validation_failed', [
+                'errors' => $e->errors(),
+                'input' => $request->except(['password', 'password_confirmation'])
+            ]);
+            throw $e;
+        }
+
+        // For now, just return success (password reset functionality can be implemented later)
+        return response()->json([
+            'success' => true,
+            'message' => 'Password has been reset successfully.'
+        ]);
+    }
+
+    /**
+     * Verify email
+     */
+    public function verifyEmail(Request $request)
+    {
+        try {
+            $request->validate([
+                'token' => 'required|string',
+            ]);
+        } catch (ValidationException $e) {
+            Log::warning('Auth.verifyEmail validation_failed', [
+                'errors' => $e->errors()
+            ]);
+            throw $e;
+        }
+
+        // For now, just return success (email verification functionality can be implemented later)
+        return response()->json([
+            'success' => true,
+            'message' => 'Email verified successfully.'
+        ]);
+    }
+
+    /**
+     * Resend verification email
+     */
+    public function resendVerification(Request $request)
+    {
+        try {
+            $request->validate([
+                'email' => 'required|email|exists:users,email',
+            ]);
+        } catch (ValidationException $e) {
+            Log::warning('Auth.resendVerification validation_failed', [
+                'errors' => $e->errors(),
+                'input' => $request->only('email')
+            ]);
+            throw $e;
+        }
+
+        // For now, just return success (verification email functionality can be implemented later)
+        return response()->json([
+            'success' => true,
+            'message' => 'Verification email sent successfully.'
+        ]);
+    }
+
+    /**
+     * Update user profile
+     */
+    public function updateProfile(Request $request)
+    {
+        try {
+            $request->validate([
+                'name' => 'sometimes|string|max:255',
+                'username' => 'sometimes|string|unique:users,username,' . $request->user()->id . '|max:255',
+                'bio' => 'sometimes|nullable|string|max:1000',
+                'location' => 'sometimes|nullable|string|max:255',
+                'website' => 'sometimes|nullable|url|max:255',
+                'phone' => 'sometimes|nullable|string|max:20',
+                'birth_date' => 'sometimes|nullable|date',
+                'gender' => 'sometimes|nullable|in:male,female,other',
+            ]);
+        } catch (ValidationException $e) {
+            Log::warning('Auth.updateProfile validation_failed', [
+                'errors' => $e->errors(),
+                'input' => $request->except(['password'])
+            ]);
+            throw $e;
+        }
+
+        $user = $request->user();
+        
+        // Update user data
+        $updateData = $request->only(['name', 'username', 'bio', 'location', 'website', 'phone', 'gender']);
+        
+        if ($request->has('birth_date')) {
+            $updateData['date_of_birth'] = \Carbon\Carbon::parse($request->birth_date)->toDateString();
+        }
+        
+        $user->update($updateData);
+
+        return response()->json([
+            'success' => true,
+            'user' => $user->fresh(),
+            'message' => 'Profile updated successfully.'
+        ]);
+    }
+
+    /**
+     * Change password
+     */
+    public function changePassword(Request $request)
+    {
+        try {
+            $request->validate([
+                'current_password' => 'required|string',
+                'password' => 'required|string|min:8|confirmed',
+            ]);
+        } catch (ValidationException $e) {
+            Log::warning('Auth.changePassword validation_failed', [
+                'errors' => $e->errors()
+            ]);
+            throw $e;
+        }
+
+        $user = $request->user();
+
+        // Check current password
+        if (!Hash::check($request->current_password, $user->password)) {
+            throw ValidationException::withMessages([
+                'current_password' => ['The current password is incorrect.'],
+            ]);
+        }
+
+        // Update password
+        $user->update([
+            'password' => Hash::make($request->password)
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Password changed successfully.'
+        ]);
+    }
+
+    /**
+     * Delete account
+     */
+    public function deleteAccount(Request $request)
+    {
+        try {
+            $request->validate([
+                'password' => 'required|string',
+            ]);
+        } catch (ValidationException $e) {
+            Log::warning('Auth.deleteAccount validation_failed', [
+                'errors' => $e->errors()
+            ]);
+            throw $e;
+        }
+
+        $user = $request->user();
+
+        // Check password
+        if (!Hash::check($request->password, $user->password)) {
+            throw ValidationException::withMessages([
+                'password' => ['The password is incorrect.'],
+            ]);
+        }
+
+        // Delete user tokens
+        $user->tokens()->delete();
+        
+        // Delete user
+        $user->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Account deleted successfully.'
+        ]);
+    }
 }

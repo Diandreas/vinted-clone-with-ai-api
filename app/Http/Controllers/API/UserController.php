@@ -49,7 +49,7 @@ class UserController extends Controller
                     'following_count' => $user->following_count,
                     'average_rating' => $user->average_rating,
                 ],
-                'is_following' => Auth::check() ? $user->isFollowing(Auth::user()) : false,
+                'is_following' => Auth::check() ? Auth::user()->isFollowing($user) : false,
             ]
         ]);
     }
@@ -90,10 +90,14 @@ class UserController extends Controller
 
         $result = $currentUser->follow($user);
         
+        // Si le follow a réussi, l'utilisateur suit maintenant l'autre
+        // Si le follow a échoué (déjà abonné), on vérifie l'état actuel
+        $isFollowing = $result ? true : $currentUser->isFollowing($user);
+        
         return response()->json([
             'success' => true,
             'data' => [
-                'is_following' => $result,
+                'is_following' => $isFollowing,
                 'followers_count' => $user->fresh()->followers_count
             ],
             'message' => $result ? 'User followed successfully' : 'Already following this user'
@@ -106,13 +110,17 @@ class UserController extends Controller
         
         $result = $currentUser->unfollow($user);
         
+        // Après un unfollow réussi, l'utilisateur ne suit plus l'autre
+        // Si l'unfollow a échoué (pas abonné), on vérifie l'état actuel
+        $isFollowing = $result ? false : $currentUser->isFollowing($user);
+        
         return response()->json([
             'success' => true,
             'data' => [
-                'is_following' => false,
+                'is_following' => $isFollowing,
                 'followers_count' => $user->fresh()->followers_count
             ],
-            'message' => 'User unfollowed successfully'
+            'message' => $result ? 'User unfollowed successfully' : 'User was not being followed'
         ]);
     }
 

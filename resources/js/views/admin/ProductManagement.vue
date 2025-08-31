@@ -106,7 +106,7 @@
         <div v-if="loading" class="p-6">
           <ProductTableSkeleton />
         </div>
-        
+
         <div v-else-if="products.length === 0" class="text-center py-12">
           <PackageIcon class="mx-auto h-12 w-12 text-gray-400" />
           <h3 class="mt-2 text-sm font-medium text-gray-900">Aucun produit</h3>
@@ -129,7 +129,7 @@
                 <div class="flex-shrink-0 h-16 w-16">
                   <img
                     class="h-16 w-16 rounded-lg object-cover"
-                    :src="product.images?.[0]?.url || '/placeholder-product.jpg'"
+                    :src="product.images?.[0]?.url || '/images/placeholder-product.png'"
                     :alt="product.title"
                   />
                 </div>
@@ -146,7 +146,7 @@
                   <div class="text-sm text-gray-500">
                     Par {{ product.user?.name }} • {{ formatDate(product.created_at) }}
                   </div>
-                  <div class="flex items-center space-x-4 text-xs text-gray-500 mt-1">
+                  <div class="flex items-center space-x-4 text-sm text-gray-500">
                     <span class="flex items-center">
                       <EyeIcon class="h-4 w-4 mr-1" />
                       {{ product.views_count }}
@@ -155,14 +155,10 @@
                       <HeartIcon class="h-4 w-4 mr-1" />
                       {{ product.likes_count }}
                     </span>
-                    <span class="flex items-center">
-                      <MessageCircleIcon class="h-4 w-4 mr-1" />
-                      {{ product.comments_count }}
-                    </span>
                   </div>
                 </div>
               </div>
-              
+
               <div class="flex items-center space-x-2">
                 <button
                   @click="viewProduct(product)"
@@ -189,7 +185,7 @@
             </div>
           </li>
         </ul>
-        
+
         <!-- Message quand aucun produit -->
         <div v-else-if="!loading && (!Array.isArray(products) || products.length === 0)" class="text-center py-12">
           <PackageIcon class="mx-auto h-12 w-12 text-gray-400" />
@@ -198,7 +194,7 @@
             {{ Array.isArray(products) ? 'Aucun produit ne correspond à vos critères.' : 'Erreur lors du chargement des produits.' }}
           </p>
         </div>
-        
+
         <!-- État d'erreur -->
         <div v-else-if="!loading && !Array.isArray(products)" class="text-center py-12">
           <AlertTriangleIcon class="mx-auto h-12 w-12 text-gray-400" />
@@ -247,7 +243,7 @@
                 >
                   <ChevronLeftIcon class="h-5 w-5" />
                 </button>
-                
+
                 <template v-for="page in visiblePages" :key="page">
                   <button
                     v-if="page !== '...'"
@@ -268,7 +264,7 @@
                     ...
                   </span>
                 </template>
-                
+
                 <button
                   @click="loadProducts(pagination.current_page + 1)"
                   :disabled="pagination.current_page === pagination.last_page"
@@ -374,7 +370,7 @@ const visiblePages = computed(() => {
   const pages = []
   const currentPage = pagination.current_page
   const lastPage = pagination.last_page
-  
+
   if (lastPage <= 7) {
     for (let i = 1; i <= lastPage; i++) {
       pages.push(i)
@@ -402,7 +398,7 @@ const visiblePages = computed(() => {
       pages.push(lastPage)
     }
   }
-  
+
   return pages
 })
 
@@ -581,10 +577,10 @@ const formatPrice = (price) => {
 
 const formatDate = (date) => {
   if (!date) return '-'
-  
+
   const dateObj = new Date(date)
   if (isNaN(dateObj.getTime())) return '-'
-  
+
   return formatDistanceToNow(dateObj, {
     addSuffix: true,
     locale: fr

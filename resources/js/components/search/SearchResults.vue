@@ -393,7 +393,7 @@ export default {
       }
       
       // En dernier recours, afficher le placeholder par défaut
-      event.target.src = '/placeholder-product.jpg';
+      event.target.src = '/images/placeholder-product.png';
     },
 
     hasValidImage(product) {

@@ -612,12 +612,12 @@ const getProductImage = (product) => {
   }
   
   // Return placeholder
-  return '/placeholder-product.jpg'
+  return '/images/placeholder-product.png'
 }
 
 // Handle image loading errors
 const handleImageError = (event) => {
-  event.target.src = '/placeholder-product.jpg'
+  event.target.src = '/images/placeholder-product.png'
 }
 
 // Load initial data
