@@ -160,13 +160,7 @@
               <div class="text-lg sm:text-xl md:text-2xl font-bold text-green-600 mb-1 group-hover:text-green-700">{{ stats?.following_count ?? 0 }}</div>
               <div class="text-xs text-green-700">Abonnements</div>
             </div>
-            <div 
-              class="cursor-pointer hover:bg-green-50 rounded-lg p-2 sm:p-3 transition-all duration-200 hover:shadow-md group" 
-              @click="activeTab = 'reviews'"
-            >
-              <div class="text-lg sm:text-xl md:text-2xl font-bold text-green-600 mb-1 group-hover:text-green-700">{{ (stats?.average_rating ?? 0).toFixed(1) }}</div>
-              <div class="text-xs text-green-700">Note</div>
-            </div>
+
           </div>
         </div>
       </div>
@@ -310,48 +304,7 @@
             </div>
           </div>
 
-          <!-- Reviews Tab -->
-          <div v-if="activeTab === 'reviews'" class="space-y-3 sm:space-y-4">
-            <div v-if="reviews.length === 0" class="text-center py-6 sm:py-8">
-              <StarIcon class="mx-auto h-7 w-7 sm:h-10 sm:w-10 text-gray-300 mb-2 sm:mb-3" />
-              <h3 class="text-base sm:text-lg font-medium text-gray-900 mb-1">Aucune évaluation</h3>
-              <p class="text-gray-600 text-xs sm:text-sm">Cet utilisateur n'a pas encore d'évaluations</p>
-            </div>
-            <div
-              v-for="review in reviews"
-              :key="review?.id || Math.random()"
-              v-if="review && review.id"
-              class="bg-white rounded-lg shadow-soft p-3 sm:p-4"
-            >
-              <div class="flex items-start space-x-3">
-                <ProfileIcon 
-                  :src="review.user?.avatar" 
-                  :alt="review.user?.name" 
-                  :user-id="review.user?.id" 
-                  size="sm"
-                  class="w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0" 
-                />
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center justify-between mb-2">
-                    <div>
-                      <h4 class="font-semibold text-gray-900 text-sm sm:text-base">{{ review.user?.name }}</h4>
-                      <p class="text-xs sm:text-sm text-gray-500">{{ formatDate(review.created_at) }}</p>
-                    </div>
-                    <div class="flex items-center space-x-1">
-                      <StarIcon
-                        v-for="star in 5"
-                        :key="star"
-                        class="w-3 h-3 sm:w-4 h-4"
-                        :class="star <= review.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'"
-                      />
-                      <span class="text-xs sm:text-sm text-gray-500 ml-1">{{ review.rating }}/5</span>
-                    </div>
-                  </div>
-                  <p class="text-gray-700 text-sm sm:text-base">{{ review.comment }}</p>
-                </div>
-              </div>
-            </div>
-          </div>
+
         </div>
       </div>
     </div>
@@ -375,7 +328,6 @@ import {
   PackageIcon,
   UsersIcon,
   UserIcon,
-  StarIcon,
   LinkIcon,
   MapPinIcon,
   MessageCircleIcon,
@@ -401,7 +353,6 @@ const isFollowing = ref(false)
 const products = ref([])
 const followers = ref([])
 const following = ref([])
-const reviews = ref([])
 
 const pagination = ref({ current: 1, last: 1, total: 0, perPage: 20 })
 
@@ -411,8 +362,7 @@ const activeTab = ref('products')
 const tabs = [
   { id: 'products', label: 'Produits' },
   { id: 'followers', label: 'Abonnés' },
-  { id: 'following', label: 'Abonnements' },
-  { id: 'reviews', label: 'Évaluations' }
+  { id: 'following', label: 'Abonnements' }
 ]
 
 // Computed
@@ -493,24 +443,7 @@ async function fetchFollowing() {
   }
 }
 
-async function fetchReviews() {
-  try {
-    const resp = await api.get(`/users/${route.params.id}/reviews`)
-    
-    // Gestion correcte de la pagination Laravel
-    if (resp.data?.data?.data) {
-      // Structure paginée Laravel
-      reviews.value = resp.data.data.data
-    } else if (Array.isArray(resp.data?.data)) {
-      // Structure simple
-      reviews.value = resp.data.data
-    } else {
-      reviews.value = []
-    }
-  } catch (err) {
-    error.value = 'Impossible de charger les évaluations.'
-  }
-}
+
 
 async function loadTabContent() {
   switch (activeTab.value) {
@@ -522,9 +455,6 @@ async function loadTabContent() {
       break
     case 'following':
       await fetchFollowing()
-      break
-    case 'reviews':
-      await fetchReviews()
       break
   }
 }

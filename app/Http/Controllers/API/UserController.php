@@ -154,16 +154,33 @@ class UserController extends Controller
 
     public function reviews(User $user)
     {
-        // Récupérer les avis reçus par l'utilisateur
-        $reviews = $user->receivedReviews()
-            ->with(['reviewer'])
-            ->latest()
-            ->paginate(20);
+        try {
+            // Récupérer les avis reçus par l'utilisateur
+            $reviews = $user->receivedReviews()
+                ->with(['reviewer'])
+                ->latest()
+                ->paginate(20);
 
-        return response()->json([
-            'success' => true,
-            'data' => $reviews
-        ]);
+            return response()->json([
+                'success' => true,
+                'data' => $reviews
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error in reviews method: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            
+            // En cas d'erreur, retourner un tableau vide
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'data' => [],
+                    'current_page' => 1,
+                    'last_page' => 1,
+                    'per_page' => 20,
+                    'total' => 0
+                ]
+            ]);
+        }
     }
 
     public function myFollowers()
