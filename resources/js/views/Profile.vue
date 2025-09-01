@@ -1,21 +1,21 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+  <div class="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
     <!-- Header avec navigation - Ultra Compact mobile -->
-    <div class="bg-white/95 backdrop-blur-md shadow-lg border-b border-slate-200/60 sticky top-0 z-10">
+    <div class="bg-white/95 backdrop-blur-md shadow-lg border-b border-green-200/60 sticky top-0 z-10">
       <div class="max-w-4xl mx-auto px-2 py-1.5 sm:px-4 sm:py-4">
         <div class="flex items-center justify-between">
         <button
           @click="router.back()"
-            class="p-1 sm:p-2 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition-all duration-200 hover:shadow-md"
+            class="p-1 sm:p-2 rounded-lg bg-green-100 text-green-700 hover:bg-green-200 transition-all duration-200 hover:shadow-md"
         >
             <ArrowLeftIcon class="w-3.5 h-3.5 sm:w-5 sm:h-5" />
         </button>
         
-          <h1 class="text-sm sm:text-lg font-semibold text-slate-800">Profil</h1>
+          <h1 class="text-sm sm:text-lg font-semibold text-green-800">Profil</h1>
           
         <RouterLink
           to="/profile/edit"
-            class="p-1 sm:p-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+            class="p-1 sm:p-2 rounded-lg bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
         >
             <EditIcon class="w-3.5 h-3.5 sm:w-5 sm:h-5" />
         </RouterLink>
@@ -39,20 +39,20 @@
                 </div>
               </div>
               
-          <h2 class="text-lg sm:text-2xl lg:text-3xl font-bold text-slate-800 mb-1 sm:mb-2">{{ user?.name || 'Utilisateur' }}</h2>
-          <p v-if="user?.username" class="text-blue-600 text-sm sm:text-lg mb-1.5 sm:mb-3 font-medium">@{{ user.username }}</p>
-          <p v-if="user?.bio" class="text-slate-600 text-xs sm:text-sm max-w-md mx-auto leading-relaxed">{{ user.bio }}</p>
+          <h2 class="text-lg sm:text-2xl lg:text-3xl font-bold text-green-800 mb-1 sm:mb-2">{{ user?.name || 'Utilisateur' }}</h2>
+          <p v-if="user?.username" class="text-green-600 text-sm sm:text-lg mb-1.5 sm:mb-3 font-medium">@{{ user.username }}</p>
+          <p v-if="user?.bio" class="text-green-700 text-xs sm:text-sm max-w-md mx-auto leading-relaxed">{{ user.bio }}</p>
                 </div>
         
         <!-- Infos supplémentaires - Ultra Compact mobile -->
-        <div v-if="user?.location || user?.website" class="flex flex-col sm:flex-row justify-center items-center space-y-1 sm:space-y-0 sm:space-x-6 text-xs sm:text-sm text-slate-600 mb-3 sm:mb-6">
+        <div v-if="user?.location || user?.website" class="flex flex-col sm:flex-row justify-center items-center space-y-1 sm:space-y-0 sm:space-x-6 text-xs sm:text-sm text-green-700 mb-3 sm:mb-6">
           <span v-if="user?.location" class="flex items-center">
-            <MapPinIcon class="w-2.5 h-2.5 sm:w-4 sm:h-4 mr-1 sm:mr-2 text-blue-600" />
+            <MapPinIcon class="w-2.5 h-2.5 sm:w-4 sm:h-4 mr-1 sm:mr-2 text-green-600" />
                     {{ user.location }}
                   </span>
           <span v-if="user?.website" class="flex items-center">
-            <LinkIcon class="w-2.5 h-2.5 sm:w-4 sm:h-4 mr-1 sm:mr-2 text-blue-600" />
-            <a :href="user.website" target="_blank" class="text-blue-600 hover:text-blue-700 transition-colors font-medium">
+            <LinkIcon class="w-2.5 h-2.5 sm:w-4 sm:h-4 mr-1 sm:mr-2 text-green-600" />
+            <a :href="user.website" target="_blank" class="text-green-600 hover:text-green-700 transition-colors font-medium">
                       Site web
                     </a>
                   </span>
@@ -62,7 +62,7 @@
         <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 justify-center">
           <RouterLink
             to="/products/create"
-            class="inline-flex items-center justify-center px-3 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl sm:rounded-2xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 text-xs sm:text-base"
+            class="inline-flex items-center justify-center px-3 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-xl sm:rounded-2xl hover:from-green-700 hover:to-emerald-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 text-xs sm:text-base"
           >
             <PlusIcon class="w-3.5 h-3.5 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
             Vendre un article
@@ -70,7 +70,7 @@
           
               <RouterLink
                 to="/profile/edit"
-            class="inline-flex items-center justify-center px-3 py-2 sm:px-6 sm:py-3 bg-white text-slate-700 border-2 border-slate-300 font-semibold rounded-xl sm:rounded-2xl hover:bg-slate-50 hover:border-slate-400 transition-all duration-300 shadow-md hover:shadow-lg text-xs sm:text-base"
+            class="inline-flex items-center justify-center px-3 py-2 sm:px-6 sm:py-3 bg-white text-green-700 border-2 border-green-300 font-semibold rounded-xl sm:rounded-2xl hover:bg-green-50 hover:border-green-400 transition-all duration-300 shadow-md hover:shadow-lg text-xs sm:text-base"
               >
             <EditIcon class="w-3.5 h-3.5 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
             Modifier profil
@@ -101,21 +101,21 @@
 
       <!-- Stats principales - Ultra Compact mobile -->
       <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-4 mb-3 sm:mb-6">
-        <div class="bg-white/90 backdrop-blur-md rounded-xl sm:rounded-2xl shadow-lg border border-slate-200/60 p-2 sm:p-4 text-center hover:shadow-xl transition-all duration-300 hover:bg-blue-50/50 group">
-          <div class="text-base sm:text-xl lg:text-2xl font-bold text-blue-600 mb-0.5 sm:mb-1 group-hover:text-blue-700">{{ stats?.products_count || 0 }}</div>
-          <div class="text-xs sm:text-sm text-slate-600">Produits</div>
+        <div class="bg-white/90 backdrop-blur-md rounded-xl sm:rounded-2xl shadow-lg border border-green-200/60 p-2 sm:p-4 text-center hover:shadow-xl transition-all duration-300 hover:bg-green-50/50 group">
+          <div class="text-base sm:text-xl lg:text-2xl font-bold text-green-600 mb-0.5 sm:mb-1 group-hover:text-green-700">{{ stats?.products_count || 0 }}</div>
+          <div class="text-xs sm:text-sm text-green-700">Produits</div>
             </div>
-        <div class="bg-white/90 backdrop-blur-md rounded-xl sm:rounded-2xl shadow-lg border border-slate-200/60 p-2 sm:p-4 text-center hover:shadow-xl transition-all duration-300 hover:bg-indigo-50/50 group">
-          <div class="text-base sm:text-xl lg:text-2xl font-bold text-indigo-600 mb-0.5 sm:mb-1 group-hover:text-indigo-700">{{ stats?.followers_count || 0 }}</div>
-          <div class="text-xs sm:text-sm text-slate-600">Followers</div>
+        <div class="bg-white/90 backdrop-blur-md rounded-xl sm:rounded-2xl shadow-lg border border-green-200/60 p-2 sm:p-4 text-center hover:shadow-xl transition-all duration-300 hover:bg-green-50/50 group">
+          <div class="text-base sm:text-xl lg:text-2xl font-bold text-green-600 mb-0.5 sm:mb-1 group-hover:text-green-700">{{ stats?.followers_count || 0 }}</div>
+          <div class="text-xs sm:text-sm text-green-700">Followers</div>
             </div>
-        <div class="bg-white/90 backdrop-blur-md rounded-xl sm:rounded-2xl shadow-lg border border-slate-200/60 p-2 sm:p-4 text-center hover:shadow-xl transition-all duration-300 hover:bg-purple-50/50 group">
-          <div class="text-base sm:text-xl lg:text-2xl font-bold text-purple-600 mb-0.5 sm:mb-1 group-hover:text-purple-700">{{ stats?.following_count || 0 }}</div>
-          <div class="text-xs sm:text-sm text-slate-600">Following</div>
+        <div class="bg-white/90 backdrop-blur-md rounded-xl sm:rounded-2xl shadow-lg border border-green-200/60 p-2 sm:p-4 text-center hover:shadow-xl transition-all duration-300 hover:bg-green-50/50 group">
+          <div class="text-base sm:text-xl lg:text-2xl font-bold text-green-600 mb-0.5 sm:mb-1 group-hover:text-green-700">{{ stats?.following_count || 0 }}</div>
+          <div class="text-xs sm:text-sm text-green-700">Following</div>
             </div>
-        <div class="bg-white/90 backdrop-blur-md rounded-xl sm:rounded-2xl shadow-lg border border-slate-200/60 p-2 sm:p-4 text-center hover:shadow-xl transition-all duration-300 hover:bg-emerald-50/50 group">
-          <div class="text-base sm:text-xl lg:text-2xl font-bold text-emerald-600 mb-0.5 sm:mb-1 group-hover:text-emerald-700">{{ stats?.total_sales || 0 }}</div>
-          <div class="text-xs sm:text-sm text-slate-600">Ventes</div>
+        <div class="bg-white/90 backdrop-blur-md rounded-xl sm:rounded-2xl shadow-lg border border-green-200/60 p-2 sm:p-4 text-center hover:shadow-xl transition-all duration-300 hover:bg-green-50/50 group">
+          <div class="text-base sm:text-xl lg:text-2xl font-bold text-green-600 mb-0.5 sm:mb-1 group-hover:text-green-700">{{ stats?.total_sales || 0 }}</div>
+          <div class="text-xs sm:text-sm text-green-700">Ventes</div>
         </div>
         <div 
           v-if="stats?.pending_payment_products > 0"
@@ -128,9 +128,9 @@
       </div>
 
       <!-- Navigation par onglets - Ultra Compact mobile -->
-      <div class="bg-white/90 backdrop-blur-md rounded-xl sm:rounded-2xl shadow-xl sm:shadow-2xl border border-slate-200/60 mb-3 sm:mb-6">
+      <div class="bg-white/90 backdrop-blur-md rounded-xl sm:rounded-2xl shadow-xl sm:shadow-2xl border border-green-200/60 mb-3 sm:mb-6">
         <!-- Tabs navigation - Ultra Compact mobile -->
-        <div class="flex border-b border-slate-200/60">
+        <div class="flex border-b border-green-200/60">
           <button
             v-for="tab in tabs"
             :key="tab.id"
@@ -138,8 +138,8 @@
             :class="[
               'flex-1 px-1.5 sm:px-4 py-1.5 sm:py-3 text-xs sm:text-sm font-medium transition-all duration-300',
               activeTab === tab.id
-                ? 'text-blue-700 border-b-2 border-blue-600 bg-blue-50/50'
-                : 'text-slate-600 hover:text-blue-600 hover:bg-blue-50/30'
+                ? 'text-green-700 border-b-2 border-green-600 bg-green-50/50'
+                : 'text-green-600 hover:text-green-700 hover:bg-green-50/30'
             ]"
           >
             <div class="flex items-center justify-center space-x-1 sm:space-x-2">
@@ -154,7 +154,7 @@
           <!-- Produits -->
           <div v-if="activeTab === 'products'" class="space-y-2.5 sm:space-y-4">
             <div class="flex items-center justify-between mb-2.5 sm:mb-4">
-              <h3 class="text-sm sm:text-lg font-semibold text-slate-800">Mes Produits</h3>
+              <h3 class="text-sm sm:text-lg font-semibold text-green-800">Mes Produits</h3>
               <RouterLink
                 to="/products/create"
                 class="inline-flex items-center px-2 py-1 sm:px-3 sm:py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs sm:text-sm rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-md hover:shadow-lg"
@@ -183,11 +183,11 @@
             
             <div v-else class="text-center py-5 sm:py-8">
               <PackageIcon class="mx-auto h-8 w-8 sm:h-12 sm:w-12 text-slate-400 mb-2.5 sm:mb-4" />
-              <h3 class="text-sm sm:text-lg font-medium text-slate-800 mb-1.5 sm:mb-2">Aucun produit</h3>
+              <h3 class="text-sm sm:text-lg font-medium text-green-800 mb-1.5 sm:mb-2">Aucun produit</h3>
               <p class="text-slate-600 mb-2.5 sm:mb-4 text-xs sm:text-base">Commencez par créer votre premier produit</p>
               <RouterLink 
                 to="/products/create"
-                class="inline-flex items-center px-3 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl text-xs sm:text-base"
+                class="inline-flex items-center px-3 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all duration-200 shadow-lg hover:shadow-xl text-xs sm:text-base"
               >
                 <PlusIcon class="w-3.5 h-3.5 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
                 Créer un produit
@@ -197,7 +197,7 @@
 
           <!-- Followers -->
           <div v-if="activeTab === 'followers'" class="space-y-1.5 sm:space-y-4">
-            <h3 class="text-sm sm:text-lg font-semibold text-slate-800 mb-2.5 sm:mb-4">Mes Followers</h3>
+            <h3 class="text-sm sm:text-lg font-semibold text-green-800 mb-2.5 sm:mb-4">Mes Followers</h3>
             
             <div v-if="loadingFollowers" class="space-y-1.5 sm:space-y-4">
               <div v-for="i in 3" :key="i" class="flex items-center space-x-2.5 sm:space-x-3 p-2.5 sm:p-4 bg-slate-50 rounded-lg animate-pulse">
@@ -220,7 +220,7 @@
                     {{ follower.name?.charAt(0)?.toUpperCase() || 'U' }}
                     </div>
                   <div>
-                    <div class="font-medium text-slate-800 text-xs sm:text-base">{{ follower.name }}</div>
+                    <div class="font-medium text-green-800 text-xs sm:text-base">{{ follower.name }}</div>
                     <div class="text-xs sm:text-sm text-slate-600">@{{ follower.username }}</div>
                   </div>
                 </div>
@@ -235,14 +235,14 @@
             
             <div v-else class="text-center py-5 sm:py-8">
               <UsersIcon class="mx-auto h-8 w-8 sm:h-12 sm:w-12 text-slate-400 mb-2.5 sm:mb-4" />
-              <h3 class="text-sm sm:text-lg font-medium text-slate-800 mb-1.5 sm:mb-2">Aucun follower</h3>
+              <h3 class="text-sm sm:text-lg font-medium text-green-800 mb-1.5 sm:mb-2">Aucun follower</h3>
               <p class="text-slate-600 text-xs sm:text-base">Partagez vos produits pour attirer des followers</p>
             </div>
           </div>
 
           <!-- Following -->
           <div v-if="activeTab === 'following'" class="space-y-1.5 sm:space-y-4">
-            <h3 class="text-sm sm:text-lg font-semibold text-slate-800 mb-2.5 sm:mb-4">Mes Abonnements</h3>
+            <h3 class="text-sm sm:text-lg font-semibold text-green-800 mb-2.5 sm:mb-4">Mes Abonnements</h3>
             
             <div v-if="loadingFollowing" class="space-y-1.5 sm:space-y-4">
               <div v-for="i in 3" :key="i" class="flex items-center space-x-2.5 sm:space-x-3 p-2.5 sm:p-4 bg-slate-50 rounded-lg animate-pulse">
@@ -265,7 +265,7 @@
                     {{ followed.name?.charAt(0)?.toUpperCase() || 'U' }}
                     </div>
                   <div>
-                    <div class="font-medium text-slate-800 text-xs sm:text-base">{{ followed.name }}</div>
+                    <div class="font-medium text-green-800 text-xs sm:text-base">{{ followed.name }}</div>
                     <div class="text-xs sm:text-sm text-slate-600">@{{ followed.username }}</div>
                   </div>
                 </div>
@@ -280,14 +280,14 @@
             
             <div v-else class="text-center py-5 sm:py-8">
               <UsersIcon class="mx-auto h-8 w-8 sm:h-12 sm:w-12 text-slate-400 mb-2.5 sm:mb-4" />
-              <h3 class="text-sm sm:text-lg font-medium text-slate-800 mb-1.5 sm:mb-2">Aucun abonnement</h3>
+              <h3 class="text-sm sm:text-lg font-medium text-green-800 mb-1.5 sm:mb-2">Aucun abonnement</h3>
               <p class="text-slate-600 text-xs sm:text-base">Découvrez et suivez d'autres vendeurs</p>
             </div>
           </div>
 
           <!-- Activité -->
           <div v-if="activeTab === 'activity'" class="space-y-1.5 sm:space-y-4">
-            <h3 class="text-sm sm:text-lg font-semibold text-slate-800 mb-2.5 sm:mb-4">Mon Activité</h3>
+            <h3 class="text-sm sm:text-lg font-semibold text-green-800 mb-2.5 sm:mb-4">Mon Activité</h3>
             
             <div v-if="loadingActivity" class="space-y-1.5 sm:space-y-4">
               <div v-for="i in 3" :key="i" class="p-2.5 sm:p-4 bg-slate-50 rounded-lg animate-pulse">
@@ -307,7 +307,7 @@
                     <component :is="getActivityIcon(activity.type)" class="w-2.5 h-2.5 sm:w-4 sm:h-4 text-blue-600" />
                   </div>
                   <div class="flex-1">
-                    <div class="text-xs sm:text-sm text-slate-800">{{ activity.description }}</div>
+                    <div class="text-xs sm:text-sm text-green-800">{{ activity.description }}</div>
                     <div class="text-xs text-slate-500 mt-0.5 sm:mt-1">{{ formatDate(activity.created_at) }}</div>
                   </div>
                 </div>
@@ -316,7 +316,7 @@
             
             <div v-else class="text-center py-5 sm:py-8">
               <ActivityIcon class="mx-auto h-8 w-8 sm:h-12 sm:w-12 text-slate-400 mb-2.5 sm:mb-4" />
-              <h3 class="text-sm sm:text-lg font-medium text-slate-800 mb-1.5 sm:mb-2">Aucune activité</h3>
+              <h3 class="text-sm sm:text-lg font-medium text-green-800 mb-1.5 sm:mb-2">Aucune activité</h3>
               <p class="text-slate-600 text-xs sm:text-base">Vos actions apparaîtront ici</p>
             </div>
           </div>
