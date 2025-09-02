@@ -1,4 +1,4 @@
-// Configuration du thème monochrome vert inspiré de Vinted
+// Configuration du thème monochrome vert inspiré de RIKEAA
 export const theme = {
     colors: {
         primary: {
@@ -7,7 +7,7 @@ export const theme = {
             200: '#b8e4c8',
             300: '#8dd3a8',
             400: '#5bbd85',
-            500: '#3da066', // Vert principal Vinted
+            500: '#3da066', // Vert principal RIKEAA
             600: '#2f7f52',
             700: '#276543',
             800: '#225138',

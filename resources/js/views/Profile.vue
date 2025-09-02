@@ -99,6 +99,7 @@
       </div>
     </div>
 
+<<<<<<< Updated upstream
       <!-- Stats principales - Ultra Compact mobile -->
       <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-4 mb-3 sm:mb-6">
         <div class="bg-white/90 backdrop-blur-md rounded-xl sm:rounded-2xl shadow-lg border border-green-200/60 p-2 sm:p-4 text-center hover:shadow-xl transition-all duration-300 hover:bg-green-50/50 group">
@@ -126,6 +127,43 @@
           <div class="text-xs sm:text-sm text-amber-600">En attente</div>
         </div>
       </div>
+=======
+      <!-- Section des statistiques du profil -->
+<div class="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4 p-4 bg-white rounded-lg shadow-sm border">
+  <!-- Statistiques sur une ligne sur mobile -->
+  <div class="flex items-center justify-between w-full sm:w-auto gap-2 sm:gap-6 text-center">
+    <!-- Produits -->
+    <div class="flex flex-col items-center min-w-0">
+      <span class="text-lg sm:text-xl font-bold text-gray-900">26</span>
+      <span class="text-xs sm:text-sm text-gray-600 whitespace-nowrap">Produits</span>
+    </div>
+    
+    <!-- Followers -->
+    <div class="flex flex-col items-center min-w-0">
+      <span class="text-lg sm:text-xl font-bold text-gray-900">3</span>
+      <span class="text-xs sm:text-sm text-gray-600 whitespace-nowrap">Followers</span>
+    </div>
+    
+    <!-- Following -->
+    <div class="flex flex-col items-center min-w-0">
+      <span class="text-lg sm:text-xl font-bold text-gray-900">2</span>
+      <span class="text-xs sm:text-sm text-gray-600 whitespace-nowrap">Following</span>
+    </div>
+    
+    <!-- Ventes -->
+    <div class="flex flex-col items-center min-w-0">
+      <span class="text-lg sm:text-xl font-bold text-gray-900">62.00</span>
+      <span class="text-xs sm:text-sm text-gray-600 whitespace-nowrap">Ventes</span>
+    </div>
+    
+    <!-- En attente -->
+    <div class="flex flex-col items-center min-w-0">
+      <span class="text-lg sm:text-xl font-bold text-gray-900">1</span>
+      <span class="text-xs sm:text-sm text-gray-600 whitespace-nowrap">En attente</span>
+    </div>
+  </div>
+</div>
+>>>>>>> Stashed changes
 
       <!-- Navigation par onglets - Ultra Compact mobile -->
       <div class="bg-white/90 backdrop-blur-md rounded-xl sm:rounded-2xl shadow-xl sm:shadow-2xl border border-green-200/60 mb-3 sm:mb-6">

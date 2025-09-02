@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Résultat du Paiement - Vinted Clone</title>
+            <title>Résultat du Paiement - RIKEAA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -15,7 +15,7 @@
         <div class="max-w-md mx-auto">
             <!-- Logo/Header -->
             <div class="text-center mb-8">
-                <h1 class="text-2xl font-bold text-gray-900 mb-2">Vinted Clone</h1>
+                <h1 class="text-2xl font-bold text-gray-900 mb-2">RIKEAA</h1>
                 <p class="text-gray-600">Résultat du Paiement</p>
             </div>
 

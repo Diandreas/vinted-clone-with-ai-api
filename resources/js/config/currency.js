@@ -1,5 +1,5 @@
 /**
- * Configuration de devise pour l'application Vinted Clone
+ * Configuration de devise pour l'application RIKEAA
  */
 
 export const CURRENCY_CONFIG = {

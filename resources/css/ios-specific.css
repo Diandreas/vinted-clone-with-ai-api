@@ -1,0 +1,338 @@
+/* iOS Specific Styles for RIKEAA PWA */
+
+/* iOS Safe Area Support */
+@supports (padding: max(0px)) {
+    .ios-device {
+        padding-left: max(env(safe-area-inset-left), 0px);
+        padding-right: max(env(safe-area-inset-right), 0px);
+        padding-top: max(env(safe-area-inset-top), 0px);
+        padding-bottom: max(env(safe-area-inset-bottom), 0px);
+    }
+
+    .ios-device .fixed {
+        left: max(env(safe-area-inset-left), 0px);
+        right: max(env(safe-area-inset-right), 0px);
+    }
+
+    .ios-device .fixed.bottom-0 {
+        bottom: max(env(safe-area-inset-bottom), 0px);
+    }
+
+    .ios-device .fixed.top-0 {
+        top: max(env(safe-area-inset-top), 0px);
+    }
+}
+
+/* iOS Touch Optimizations */
+.ios-device * {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.ios-device input,
+.ios-device textarea,
+.ios-device [contenteditable] {
+    -webkit-user-select: text;
+    user-select: text;
+}
+
+/* iOS Scrollbar Styling */
+.ios-device ::-webkit-scrollbar {
+    width: 0;
+    background: transparent;
+}
+
+.ios-device ::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.ios-device ::-webkit-scrollbar-thumb {
+    background: transparent;
+}
+
+/* iOS Input Styling */
+.ios-device input[type="text"],
+.ios-device input[type="email"],
+.ios-device input[type="password"],
+.ios-device input[type="search"],
+.ios-device input[type="tel"],
+.ios-device input[type="url"],
+.ios-device input[type="number"],
+.ios-device textarea,
+.ios-device select {
+    -webkit-appearance: none;
+    appearance: none;
+    border-radius: 8px;
+    font-size: 16px;
+    /* Prevents zoom on iOS */
+    line-height: 1.4;
+}
+
+/* iOS Button Styling */
+.ios-device button {
+    -webkit-appearance: none;
+    appearance: none;
+    border-radius: 8px;
+    font-size: 16px;
+    line-height: 1.4;
+    transition: all 0.2s ease;
+}
+
+.ios-device button:active {
+    transform: scale(0.98);
+}
+
+/* iOS Modal and Overlay Styling */
+.ios-device .modal-overlay {
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+
+/* iOS Status Bar Styling */
+.ios-device .status-bar {
+    height: env(safe-area-inset-top);
+    background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+}
+
+/* iOS Navigation Bar Styling */
+.ios-device .nav-bar {
+    padding-top: env(safe-area-inset-top);
+}
+
+/* iOS Tab Bar Styling */
+.ios-device .tab-bar {
+    padding-bottom: env(safe-area-inset-bottom);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+/* iOS Card Styling */
+.ios-device .card {
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+/* iOS List Styling */
+.ios-device .list-item {
+    border-radius: 8px;
+    margin: 4px 0;
+    transition: all 0.2s ease;
+}
+
+.ios-device .list-item:active {
+    background-color: rgba(14, 165, 233, 0.1);
+    transform: scale(0.98);
+}
+
+/* iOS Form Styling */
+.ios-device .form-group {
+    margin-bottom: 20px;
+}
+
+.ios-device .form-label {
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: #374151;
+}
+
+.ios-device .form-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: all 0.2s ease;
+}
+
+.ios-device .form-input:focus {
+    outline: none;
+    border-color: #0ea5e9;
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+}
+
+/* iOS Loading States */
+.ios-device .loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.ios-device .loading-spinner {
+    width: 24px;
+    height: 24px;
+    border: 2px solid #e5e7eb;
+    border-top: 2px solid #0ea5e9;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* iOS Toast Notifications */
+.ios-device .toast {
+    position: fixed;
+    top: max(env(safe-area-inset-top), 20px);
+    left: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    z-index: 1000;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+/* iOS Pull to Refresh */
+.ios-device .pull-to-refresh {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+/* iOS Swipe Actions */
+.ios-device .swipe-actions {
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.ios-device .swipe-action {
+    padding: 0 16px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 500;
+    min-width: 80px;
+}
+
+.ios-device .swipe-action.edit {
+    background-color: #0ea5e9;
+}
+
+.ios-device .swipe-action.delete {
+    background-color: #ef4444;
+}
+
+/* iOS Haptic Feedback Support */
+.ios-device .haptic-feedback {
+    -webkit-tap-highlight-color: rgba(14, 165, 233, 0.2);
+}
+
+/* iOS Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    .ios-device {
+        color-scheme: dark;
+    }
+
+    .ios-device .card {
+        background: rgba(31, 41, 55, 0.95);
+        color: #f9fafb;
+    }
+
+    .ios-device .tab-bar {
+        background: rgba(31, 41, 55, 0.95);
+    }
+
+    .ios-device .form-input {
+        background-color: #374151;
+        border-color: #4b5563;
+        color: #f9fafb;
+    }
+
+    .ios-device .form-label {
+        color: #d1d5db;
+    }
+}
+
+/* iOS Landscape Orientation */
+@media (orientation: landscape) and (max-height: 500px) {
+    .ios-device .nav-bar {
+        padding-top: 0;
+    }
+
+    .ios-device .status-bar {
+        display: none;
+    }
+}
+
+/* iOS Notch Support */
+@supports (padding: max(0px)) {
+    .ios-device .notch-aware {
+        padding-top: max(env(safe-area-inset-top), 20px);
+        padding-bottom: max(env(safe-area-inset-bottom), 20px);
+    }
+}
+
+/* iOS Performance Optimizations */
+.ios-device * {
+    will-change: auto;
+}
+
+.ios-device .animated {
+    will-change: transform, opacity;
+}
+
+/* iOS Accessibility */
+.ios-device .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* iOS Focus Management */
+.ios-device .focus-visible:focus {
+    outline: 2px solid #0ea5e9;
+    outline-offset: 2px;
+}
+
+/* iOS Touch Feedback */
+.ios-device .touch-feedback {
+    position: relative;
+    overflow: hidden;
+}
+
+.ios-device .touch-feedback::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s;
+}
+
+.ios-device .touch-feedback:active::after {
+    width: 200px;
+    height: 200px;
+}

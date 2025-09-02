@@ -1,8 +1,8 @@
-/* RIKEAA Global Styles - Thème monochrome vert inspiré de Vinted */
+/* RIKEAA Global Styles - Thème monochrome vert */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  /* Couleurs monochrome vertes inspirées de Vinted */
+  /* Couleurs monochrome vertes */
   --rikeaa-primary-50: #f0f9f4;
   --rikeaa-primary-100: #dcf2e3;
   --rikeaa-primary-200: #b8e4c8;
@@ -21,7 +21,7 @@
   --rikeaa-space-lg: 2rem;
   --rikeaa-space-xl: 3rem;
 
-  /* Shadows simplifiés comme Vinted */
+  /* Shadows simplifiés */
   --rikeaa-shadow-soft: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
   --rikeaa-shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --rikeaa-shadow-strong: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
@@ -54,7 +54,7 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Classes utilitaires RIKEAA - Style Vinted */
+/* Classes utilitaires RIKEAA */
 .rikeaa-btn-primary {
   @apply bg-primary-500 hover:bg-primary-600 text-white font-medium px-4 py-2.5 rounded-lg transition-all duration-150 shadow-soft hover:shadow-medium focus:ring-2 focus:ring-primary-500 focus:ring-offset-1;
 }

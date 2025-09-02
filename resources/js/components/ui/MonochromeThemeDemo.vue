@@ -4,7 +4,7 @@
       <!-- Header -->
       <div class="text-center mb-8">
         <h1 class="text-3xl font-bold text-gray-900 mb-2">Thème Monochrome Total</h1>
-        <p class="text-gray-600">Application entièrement en tons de vert et de gris - Style Vinted</p>
+        <p class="text-gray-600">Application entièrement en tons de vert et de gris - Style RIKEAA</p>
       </div>
 
       <!-- Palette de couleurs monochrome -->

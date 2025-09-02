@@ -148,7 +148,7 @@ class ProductPublishingFeeService
         
         return [
             'amount' => (int) round($feeCalculation['total_fee']),
-            'shop_name' => config('services.lygos.shop_name', 'Vinted Clone'),
+            'shop_name' => config('services.lygos.shop_name', 'RIKEAA'),
             'order_id' => $orderId,
             'message' => 'Frais de publication pour ' . $feeCalculation['product_count'] . ' produit(s)',
             'success_url' => config('app.url') . '/api/v1/payment/publishing/success',

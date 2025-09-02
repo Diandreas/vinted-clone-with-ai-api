@@ -85,7 +85,7 @@ return [
         'base_url' => env('LYGOS_BASE_URL', 'https://api.lygosapp.com/v1'),
         'api_key' => env('LYGOS_API_KEY'),
         'currency' => env('LYGOS_CURRENCY', 'XAF'),
-        'shop_name' => env('LYGOS_SHOP_NAME', 'Vinted Clone'),
+        'shop_name' => env('LYGOS_SHOP_NAME', 'RIKEAA'),
     ],
 
     // Mobile Money providers (placeholders for environment configuration)

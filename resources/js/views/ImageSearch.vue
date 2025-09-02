@@ -16,7 +16,7 @@ export default {
   },
   mounted() {
     // SEO
-    document.title = 'Recherche par Image - Vinted Clone';
+            document.title = 'Recherche par Image - RIKEAA';
     
     // Meta description
     const metaDescription = document.querySelector('meta[name="description"]');

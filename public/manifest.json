@@ -9,7 +9,16 @@
   "orientation": "portrait-primary",
   "scope": "/",
   "lang": "fr",
-  "categories": ["shopping", "lifestyle", "business"],
+  "categories": [
+    "shopping",
+    "lifestyle",
+    "business"
+  ],
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
   "icons": [
     {
       "src": "/logo.png",
@@ -22,6 +31,24 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-touch-icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-touch-icon-167x167.png",
+      "sizes": "167x167",
+      "type": "image/png",
+      "purpose": "any"
     }
   ],
   "screenshots": [
@@ -30,6 +57,38 @@
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Vendre un produit",
+      "short_name": "Vendre",
+      "description": "Mettre en vente un nouveau produit",
+      "url": "/sell",
+      "icons": [
+        {
+          "src": "/logo.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Mes achats",
+      "short_name": "Achats",
+      "description": "Voir mes commandes",
+      "url": "/orders",
+      "icons": [
+        {
+          "src": "/logo.png",
+          "sizes": "96x96"
+        }
+      ]
     }
   ]
 }
