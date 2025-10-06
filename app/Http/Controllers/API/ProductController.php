@@ -29,107 +29,150 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Product::with(['user', 'category', 'brand', 'condition', 'mainImage'])
-                        ->active();
+        // Generate cache key based on request parameters
+        $cacheKey = 'products_list_' . md5(json_encode([
+            'page' => $request->page ?? 1,
+            'category_id' => $request->category_id,
+            'brand_id' => $request->brand_id,
+            'condition_id' => $request->condition_id,
+            'min_price' => $request->min_price,
+            'max_price' => $request->max_price,
+            'size' => $request->size,
+            'color' => $request->color,
+            'location' => $request->location,
+            'is_spot' => $request->is_spot,
+            'followers_only' => $request->followers_only,
+            'search' => $request->search,
+            'sort' => $request->sort,
+            'per_page' => $request->limit ?? $request->per_page ?? 20,
+            'user_id' => Auth::id(),
+        ]));
 
-        // Filters
-        if ($request->category_id) {
-            $query->where('category_id', $request->category_id);
-        }
+        // Try to get from cache (5 minutes for homepage, 2 minutes for filtered results)
+        $isHomepage = !$request->has('category_id') && !$request->has('search') && !$request->has('brand_id');
+        $cacheDuration = $isHomepage ? 300 : 120; // 5 min for homepage, 2 min for filtered
 
-        if ($request->brand_id) {
-            $query->where('brand_id', $request->brand_id);
-        }
+        $products = cache()->remember($cacheKey, $cacheDuration, function () use ($request) {
+            // Optimized eager loading with select() to load only needed columns
+            $query = Product::with([
+                'user:id,name,avatar,username',
+                'category:id,name,slug',
+                'brand:id,name,slug',
+                'condition:id,name',
+                'mainImage:id,product_id,filename,alt_text'
+            ])
+            ->select([
+                'id', 'user_id', 'category_id', 'brand_id', 'condition_id',
+                'title', 'price', 'original_price', 'location',
+                'is_featured', 'is_boosted', 'is_negotiable',
+                'likes_count', 'views_count', 'status',
+                'created_at', 'followers_only', 'is_spot'
+            ])
+            ->active();
 
-        if ($request->condition_id) {
-            $query->where('condition_id', $request->condition_id);
-        }
-
-        if ($request->min_price) {
-            $query->where('price', '>=', $request->min_price);
-        }
-
-        if ($request->max_price) {
-            $query->where('price', '<=', $request->max_price);
-        }
-
-        if ($request->size) {
-            $query->where('size', $request->size);
-        }
-
-        if ($request->color) {
-            $query->where('color', 'like', '%' . $request->color . '%');
-        }
-
-        if ($request->location) {
-            $query->where('location', 'like', '%' . $request->location . '%');
-        }
-
-        // Spots filter
-        if ($request->has('is_spot')) {
-            $isSpot = filter_var($request->get('is_spot'), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-            if (!is_null($isSpot)) {
-                $query->where('is_spot', $isSpot);
+            // Filters
+            if ($request->category_id) {
+                $query->where('category_id', $request->category_id);
             }
-        }
 
-        // Followers only filter (explicit)
-        if ($request->has('followers_only')) {
-            $followersOnly = filter_var($request->get('followers_only'), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-            if (!is_null($followersOnly)) {
-                $query->where('followers_only', $followersOnly);
+            if ($request->brand_id) {
+                $query->where('brand_id', $request->brand_id);
             }
-        }
 
-        // Followers-only filtering for non-followers
-        if (Auth::check()) {
-            $followingIds = Auth::user()->following()->pluck('following_id');
-            $query->where(function($q) use ($followingIds) {
-                $q->where('followers_only', false)
-                  ->orWhere(function($q2) use ($followingIds) {
-                      $q2->where('followers_only', true)
-                         ->whereIn('user_id', $followingIds);
-                  })
-                  ->orWhere('user_id', Auth::id());
-            });
-        } else {
-            $query->where('followers_only', false);
-        }
+            if ($request->condition_id) {
+                $query->where('condition_id', $request->condition_id);
+            }
 
-        // Search
-        if ($request->search) {
-            $query->where(function($q) use ($request) {
-                $q->where('title', 'like', '%' . $request->search . '%')
-                  ->orWhere('description', 'like', '%' . $request->search . '%');
-            });
-        }
+            if ($request->min_price) {
+                $query->where('price', '>=', $request->min_price);
+            }
 
-        // Sorting
-        switch ($request->sort) {
-            case 'price_low':
-                $query->orderBy('price', 'asc');
-                break;
-            case 'price_high':
-                $query->orderBy('price', 'desc');
-                break;
-            case 'popular':
-                $query->orderBy('likes_count', 'desc')
-                      ->orderBy('views_count', 'desc');
-                break;
-            case 'recent':
-                $query->latest();
-                break;
-            default:
-                $query->orderBy('is_featured', 'desc')
-                      ->orderBy('is_boosted', 'desc')
-                      ->latest();
-        }
+            if ($request->max_price) {
+                $query->where('price', '<=', $request->max_price);
+            }
 
-        $products = $query->paginate($request->limit ?? $request->per_page ?? 20);
+            if ($request->size) {
+                $query->where('size', $request->size);
+            }
+
+            if ($request->color) {
+                $query->where('color', 'like', '%' . $request->color . '%');
+            }
+
+            if ($request->location) {
+                $query->where('location', 'like', '%' . $request->location . '%');
+            }
+
+            // Spots filter
+            if ($request->has('is_spot')) {
+                $isSpot = filter_var($request->get('is_spot'), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                if (!is_null($isSpot)) {
+                    $query->where('is_spot', $isSpot);
+                }
+            }
+
+            // Followers only filter (explicit)
+            if ($request->has('followers_only')) {
+                $followersOnly = filter_var($request->get('followers_only'), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                if (!is_null($followersOnly)) {
+                    $query->where('followers_only', $followersOnly);
+                }
+            }
+
+            // Followers-only filtering for non-followers
+            if (Auth::check()) {
+                $followingIds = Auth::user()->following()->pluck('following_id');
+                $query->where(function($q) use ($followingIds) {
+                    $q->where('followers_only', false)
+                      ->orWhere(function($q2) use ($followingIds) {
+                          $q2->where('followers_only', true)
+                             ->whereIn('user_id', $followingIds);
+                      })
+                      ->orWhere('user_id', Auth::id());
+                });
+            } else {
+                $query->where('followers_only', false);
+            }
+
+            // Search
+            if ($request->search) {
+                $query->where(function($q) use ($request) {
+                    $q->where('title', 'like', '%' . $request->search . '%')
+                      ->orWhere('description', 'like', '%' . $request->search . '%');
+                });
+            }
+
+            // Sorting
+            switch ($request->sort) {
+                case 'price_low':
+                    $query->orderBy('price', 'asc');
+                    break;
+                case 'price_high':
+                    $query->orderBy('price', 'desc');
+                    break;
+                case 'popular':
+                    $query->orderBy('likes_count', 'desc')
+                          ->orderBy('views_count', 'desc');
+                    break;
+                case 'recent':
+                    $query->latest();
+                    break;
+                default:
+                    $query->orderBy('is_featured', 'desc')
+                          ->orderBy('is_boosted', 'desc')
+                          ->latest();
+            }
+
+            return $query->paginate($request->limit ?? $request->per_page ?? 20);
+        });
 
         return response()->json([
             'success' => true,
-            'data' => ProductResource::collection($products)
+            'data' => ProductResource::collection($products),
+            'meta' => [
+                'cached' => cache()->has($cacheKey),
+                'cache_key' => config('app.debug') ? $cacheKey : null,
+            ]
         ]);
     }
 

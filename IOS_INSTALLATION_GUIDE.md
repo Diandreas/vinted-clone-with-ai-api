@@ -152,3 +152,4 @@
 **Version** : 1.0  
 **Dernière mise à jour** : Décembre 2024  
 **Compatibilité iOS** : 11.0 et versions ultérieures
+
