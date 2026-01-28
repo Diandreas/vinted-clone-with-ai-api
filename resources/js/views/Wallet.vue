@@ -296,7 +296,7 @@ const getTransactionTitle = (transaction) => {
 const getTransactionBgColor = (transaction) => {
   if (transaction.status === 'failed') return 'bg-gray-100'
   if (transaction.status === 'pending') return 'bg-gray-100'
-  
+
   switch (transaction.purpose) {
     case 'topup':
     case 'refund':
@@ -311,7 +311,7 @@ const getTransactionBgColor = (transaction) => {
 const getTransactionIconColor = (transaction) => {
   if (transaction.status === 'failed') return 'text-gray-700'
   if (transaction.status === 'pending') return 'text-gray-600'
-  
+
   switch (transaction.purpose) {
     case 'topup':
     case 'refund':
@@ -326,7 +326,7 @@ const getTransactionIconColor = (transaction) => {
 const getAmountColor = (transaction) => {
   if (transaction.status === 'failed') return 'text-gray-500'
   if (transaction.status === 'pending') return 'text-gray-500'
-  
+
   switch (transaction.purpose) {
     case 'topup':
     case 'refund':
@@ -386,7 +386,7 @@ const refreshTransactions = async () => {
 
 const loadMoreTransactions = async () => {
   // Implement pagination logic here
-  console.log('Load more transactions')
+
 }
 
 const handleTopUpSuccess = (data) => {

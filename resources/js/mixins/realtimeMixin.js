@@ -10,7 +10,7 @@ export default {
       realtimeSubscriptions: []
     }
   },
-  
+
   methods: {
     /**
      * S'abonner aux mises à jour temps réel
@@ -21,12 +21,12 @@ export default {
     subscribeToRealtime(type, callback, customFrequency = null) {
       const subscription = { type, callback }
       this.realtimeSubscriptions.push(subscription)
-      
+
       realtimeService.subscribe(type, callback, customFrequency)
-      
-      console.log(`📡 Composant ${this.$options.name || 'Unknown'} abonné à ${type}`)
+
+
     },
-    
+
     /**
      * Se désabonner des mises à jour temps réel
      * @param {string} type - Type de données
@@ -47,10 +47,10 @@ export default {
           sub => sub.type !== type
         )
       }
-      
+
       realtimeService.unsubscribe(type, callback)
     },
-    
+
     /**
      * Se désabonner de toutes les mises à jour
      */
@@ -60,7 +60,7 @@ export default {
       })
       this.realtimeSubscriptions = []
     },
-    
+
     /**
      * Forcer une mise à jour immédiate
      * @param {string} type - Type de données
@@ -68,7 +68,7 @@ export default {
     forceRealtimeUpdate(type) {
       realtimeService.forceUpdate(type)
     },
-    
+
     /**
      * Obtenir le statut du service temps réel
      */
@@ -76,7 +76,7 @@ export default {
       return realtimeService.getStatus()
     }
   },
-  
+
   beforeUnmount() {
     // Se désabonner automatiquement à la destruction du composant
     this.unsubscribeFromAllRealtime()

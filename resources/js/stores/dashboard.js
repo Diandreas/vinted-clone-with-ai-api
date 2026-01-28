@@ -32,12 +32,12 @@ export const useDashboardStore = defineStore('dashboard', () => {
   const fetchStats = async () => {
     try {
       const response = await api.get('/analytics/dashboard')
-      
+
       // L'API retourne response.data.data.overview
       if (response.data.success && response.data.data && response.data.data.overview) {
         const overview = response.data.data.overview
         const thisMonth = response.data.data.this_month || {}
-        
+
         // Mapper les données de l'API vers le format attendu par le store
         stats.value = {
           products_count: overview.total_products || 0,
@@ -51,10 +51,10 @@ export const useDashboardStore = defineStore('dashboard', () => {
           views_trend: 0 // À calculer si nécessaire
         }
       }
-      
+
       return response.data
     } catch (error) {
-      console.error('Failed to fetch dashboard stats:', error)
+
       throw error
     }
   }
@@ -67,7 +67,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
       recentProducts.value = response.data.data || []
       return response.data
     } catch (error) {
-      console.error('Failed to fetch recent products:', error)
+
       throw error
     }
   }
@@ -80,7 +80,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
       recentActivity.value = response.data.data || []
       return response.data
     } catch (error) {
-      console.error('Failed to fetch recent activity:', error)
+
       throw error
     }
   }
@@ -93,7 +93,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
       trendingProducts.value = response.data.data || []
       return response.data
     } catch (error) {
-      console.error('Failed to fetch trending products:', error)
+
       throw error
     }
   }
@@ -105,11 +105,11 @@ export const useDashboardStore = defineStore('dashboard', () => {
       })
 
       const salesByDay = response.data.data?.sales_by_day || {}
-      
+
       // Convertir l'objet sales_by_day en tableaux pour le graphique
       const dates = Object.keys(salesByDay)
       const salesData = Object.values(salesByDay)
-      
+
       // Pour l'instant, on utilise les mêmes données pour les ventes et commandes
       // car l'API ne retourne qu'un seul type de données par jour
       salesChartData.value = {
@@ -137,7 +137,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
 
       return response.data
     } catch (error) {
-      console.error('Failed to fetch sales chart:', error)
+
       // Return empty data on error
       salesChartData.value = {
         labels: [],
@@ -161,7 +161,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
 
       return true
     } catch (error) {
-      console.error('Failed to delete product:', error)
+
       throw error
     }
   }
@@ -185,7 +185,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
 
       return response.data
     } catch (error) {
-      console.error('Failed to boost product:', error)
+
       throw error
     }
   }
@@ -196,7 +196,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
       unreadNotifications.value = 0
       return true
     } catch (error) {
-      console.error('Failed to mark notifications as read:', error)
+
       throw error
     }
   }
@@ -211,7 +211,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
         fetchSalesChart()
       ])
     } catch (error) {
-      console.error('Failed to refresh dashboard data:', error)
+
       throw error
     }
   }

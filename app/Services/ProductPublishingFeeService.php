@@ -8,12 +8,12 @@ use Illuminate\Support\Facades\Log;
 
 class ProductPublishingFeeService
 {
-    const BASE_FEE = 100; // 100 FCFA base fee
-    const PERCENTAGE_FEE = 0.10; // 10% of product price
+    const BASE_FEE = 500; // 500 FCFA per listing
+    const PERCENTAGE_FEE = 0.0; // No percentage fee
     
     /**
      * Calculate the publishing fee for a single product
-     * Fee = 100 FCFA + 10% of product price
+     * Fee = 500 FCFA per product
      */
     public function calculateSingleProductFee(float $productPrice): float
     {
@@ -81,7 +81,7 @@ class ProductPublishingFeeService
             'explanation' => [
                 'base_fee' => self::BASE_FEE . ' FCFA × ' . $productCount . ' produits = ' . number_format(self::BASE_FEE * $productCount, 0, ',', ' ') . ' FCFA',
                 'percentage_fee' => number_format(self::PERCENTAGE_FEE * 100, 0) . '% × ' . number_format($estimatedTotalValue, 0, ',', ' ') . ' FCFA = ' . number_format($estimatedTotalValue * self::PERCENTAGE_FEE, 0, ',', ' ') . ' FCFA',
-                'total' => 'Frais de base + Frais en pourcentage = ' . number_format($calculation['total_fee'], 0, ',', ' ') . ' FCFA'
+                'total' => 'Frais de publication = ' . number_format($calculation['total_fee'], 0, ',', ' ') . ' FCFA'
             ]
         ];
     }
@@ -115,7 +115,7 @@ class ProductPublishingFeeService
             'formatted_base_fee' => number_format(self::BASE_FEE, 0, ',', ' ') . ' FCFA',
             'percentage_rate' => self::PERCENTAGE_FEE * 100,
             'formatted_percentage_rate' => number_format(self::PERCENTAGE_FEE * 100, 1) . '%',
-            'description' => 'Frais de publication = ' . self::BASE_FEE . ' FCFA + ' . (self::PERCENTAGE_FEE * 100) . '% du prix du produit',
+            'description' => 'Frais de publication = ' . self::BASE_FEE . ' FCFA par produit',
             'examples' => [
                 [
                     'product_price' => 1000,

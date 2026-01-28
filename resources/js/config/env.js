@@ -6,7 +6,7 @@ export const config = {
     production: '/api/v1', // URL relative pour le VPS
     staging: '/api/v1'
   },
-  
+
   // Détection automatique de l'environnement
   get current() {
     if (window.location.hostname === 'localhost') {
@@ -14,18 +14,17 @@ export const config = {
     }
     return 'production';
   },
-  
+
   // URL de base de l'API
   get baseURL() {
     return this.api[this.current];
   },
-  
+
   // Debug
   debug: window.location.hostname === 'localhost'
 };
 
 // Log de la configuration (uniquement en développement)
 if (config.debug) {
-  console.log('Environment:', config.current);
-  console.log('API Base URL:', config.baseURL);
+
 }

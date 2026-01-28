@@ -161,7 +161,7 @@ export default {
           to: response.data.to
         }
       } catch (error) {
-        console.error('Erreur lors du chargement des produits:', error)
+
         notificationStore.error('Erreur lors du chargement des produits')
       } finally {
         loadingProducts.value = false
@@ -198,7 +198,7 @@ export default {
           product.likes_count = response.data.likes_count
         }
       } catch (error) {
-        console.error('Erreur lors du like:', error)
+
         notificationStore.error('Erreur lors du like du produit')
       } finally {
         const index = likingProducts.value.indexOf(product.id)
@@ -234,7 +234,7 @@ export default {
           await copyLink(productUrl)
         }
       } catch (error) {
-        console.error('Erreur lors du partage:', error)
+
         // Fallback : copier le lien
         await copyLink(productUrl)
       }
@@ -245,7 +245,7 @@ export default {
         await navigator.clipboard.writeText(url)
         showNotification('Lien copié dans le presse-papiers !', 'success')
       } catch (error) {
-        console.error('Erreur lors de la copie:', error)
+
         // Fallback pour les navigateurs plus anciens
         const textArea = document.createElement('textarea')
         textArea.value = url

@@ -27,7 +27,6 @@ class NotchPayController extends Controller
             // 1. Validate request
             $validated = $request->validate([
                 'product_id' => 'required|integer|exists:products,id',
-                'amount' => 'required|numeric|min:100',
                 'email' => 'required|email',
             ]);
 
@@ -46,10 +45,33 @@ class NotchPayController extends Controller
                 throw new Exception('Product is not pending payment');
             }
 
-            // 3. Initialize payment with NotchPay API
+            // 3. Determine listing fee amount (do not trust client-provided amount)
+            $listingFee = \App\Models\PlatformFee::where('code', 'listing_fee')
+                ->where('active', true)
+                ->first();
+
+            if (!$listingFee) {
+                throw new Exception('Listing fee is not configured');
+            }
+
+            $feeCharge = \App\Models\ProductFeeCharge::where('product_id', $product->id)
+                ->where('fee_id', $listingFee->id)
+                ->first();
+
+            $amount = $feeCharge
+                ? (float) $feeCharge->amount
+                : ($listingFee->type === 'percentage'
+                    ? round(($listingFee->percentage / 100) * (float) $product->price, 2)
+                    : (float) $listingFee->amount);
+
+            if ($amount < 100) {
+                throw new Exception('Listing fee amount is invalid');
+            }
+
+            // 4. Initialize payment with NotchPay API
             $fields = [
                 'email' => $validated['email'],
-                'amount' => (string)$validated['amount'],
+                'amount' => (string) $amount,
                 'currency' => 'XAF',
                 'description' => 'Frais de publication - ' . $product->name,
                 'reference' => 'prod_' . $product->id . '_' . uniqid(),
@@ -71,7 +93,7 @@ class NotchPayController extends Controller
             Log::info('Creating payment record', [
                 'user_id' => $user->id,
                 'product_id' => $product->id,
-                'amount' => $validated['amount'],
+                'amount' => $amount,
                 'response' => $response
             ]);
 

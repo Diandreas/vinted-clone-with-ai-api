@@ -40,8 +40,8 @@
 
     <!-- Products with Conversations -->
     <div v-else class="products-list">
-      <div 
-        v-for="productData in productsWithConversations" 
+      <div
+        v-for="productData in productsWithConversations"
         :key="productData.product.id"
         class="product-conversations-card"
         :class="{
@@ -61,10 +61,10 @@
                 image-classes="product-image"
                 :class="{ 'grayscale': isProductUnavailable(productData.product) }"
               />
-              
+
               <!-- Unavailable Overlay -->
-              <div 
-                v-if="isProductUnavailable(productData.product)" 
+              <div
+                v-if="isProductUnavailable(productData.product)"
                 class="product-unavailable-overlay"
               >
                 <div class="unavailable-content">
@@ -73,7 +73,7 @@
                 </div>
               </div>
             </div>
-            
+
             <div class="product-details">
               <h3 class="product-title">{{ productData.product.title }}</h3>
               <div class="product-meta">
@@ -82,7 +82,7 @@
                   {{ getProductStatusText(productData.product) }}
                 </span>
               </div>
-              
+
               <!-- Product Status Badge -->
               <div v-if="isProductUnavailable(productData.product)" class="mt-2">
                 <span :class="['inline-block px-2 py-1 text-xs font-medium rounded-full', getProductStatusClass(productData.product)]">
@@ -101,7 +101,7 @@
               <span class="stat-number unread">{{ productData.unread_count }}</span>
               <span class="stat-text">non lu(s)</span>
             </div>
-            <button 
+            <button
               class="expand-btn"
               :class="{ expanded: expandedProducts.includes(productData.product.id) }"
             >
@@ -113,13 +113,13 @@
         </div>
 
         <!-- Conversations for this Product -->
-        <div 
+        <div
           v-if="expandedProducts.includes(productData.product.id)"
           class="conversations-section"
         >
           <div class="conversations-header">
             <h4>Acheteurs intéressés</h4>
-            <button 
+            <button
               class="btn btn-secondary btn-small"
               @click="markAllAsRead(productData.product.id)"
               v-if="productData.unread_count > 0"
@@ -129,8 +129,8 @@
           </div>
 
           <div class="buyers-list">
-            <div 
-              v-for="conversation in productData.conversations" 
+            <div
+              v-for="conversation in productData.conversations"
               :key="conversation.id"
               class="buyer-conversation"
               :class="{ 'has-unread': getConversationUnreadCount(conversation) > 0 }"
@@ -139,8 +139,8 @@
               <div class="buyer-header" @click="toggleConversationDetails(conversation.id)">
                 <!-- Buyer Info -->
                 <div class="buyer-info">
-                  <img 
-                    :src="conversation.buyer.avatar || generateDefaultAvatar(conversation.buyer.name, conversation.buyer.id)" 
+                  <img
+                    :src="conversation.buyer.avatar || generateDefaultAvatar(conversation.buyer.name, conversation.buyer.id)"
                     :alt="conversation.buyer.name"
                     class="buyer-avatar"
                     @error="handleBuyerAvatarError($event, conversation.buyer)"
@@ -159,7 +159,7 @@
                 </div>
 
                 <!-- Expand/Collapse Button -->
-                <button 
+                <button
                   class="expand-conversation-btn"
                   :class="{ expanded: expandedConversations.includes(conversation.id) }"
                   @click.stop="toggleConversationDetails(conversation.id)"
@@ -184,7 +184,7 @@
               </div>
 
               <!-- Expanded Conversation Details (Dropdown) -->
-              <div 
+              <div
                 v-if="expandedConversations.includes(conversation.id)"
                 class="conversation-details-expanded"
               >
@@ -208,7 +208,7 @@
 
                 <!-- Quick Actions -->
                 <div class="quick-actions-expanded">
-                  <button 
+                  <button
                     class="btn btn-primary btn-small"
                     @click="openConversation(conversation)"
                   >
@@ -217,8 +217,8 @@
                     </svg>
                     Répondre
                   </button>
-                  
-                  <button 
+
+                  <button
                     class="btn btn-secondary btn-small"
                     @click="viewBuyerProfile(conversation.buyer)"
                   >
@@ -228,7 +228,7 @@
                     Profil
                   </button>
 
-                  <button 
+                  <button
                     class="btn btn-outline btn-small"
                     @click="showQuickActions(conversation)"
                   >
@@ -244,7 +244,7 @@
                   <div class="unread-badge">
                     {{ getConversationUnreadCount(conversation) }} message(s) non lu(s)
                   </div>
-                  <button 
+                  <button
                     class="btn btn-text btn-small"
                     @click="markConversationAsRead(conversation.id)"
                   >
@@ -256,7 +256,7 @@
               <!-- Conversation Actions (Compact - Always visible) -->
               <div class="conversation-actions">
                 <div class="status-info">
-                  <span 
+                  <span
                     :class="['conversation-status', getConversationStatusClass(conversation)]"
                   >
                     {{ getConversationStatusText(conversation) }}
@@ -267,7 +267,7 @@
                 </div>
 
                 <div class="quick-actions">
-                  <button 
+                  <button
                     class="btn-icon"
                     @click.stop="openConversation(conversation)"
                     title="Répondre"
@@ -276,8 +276,8 @@
                       <path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/>
                     </svg>
                   </button>
-                  
-                  <button 
+
+                  <button
                     class="btn-icon"
                     @click.stop="viewBuyerProfile(conversation.buyer)"
                     title="Voir profil"
@@ -287,7 +287,7 @@
                     </svg>
                   </button>
 
-                  <button 
+                  <button
                     class="btn-icon"
                     @click.stop="showQuickActions(conversation)"
                     title="Plus d'actions"
@@ -344,7 +344,7 @@ import ProductImage from '@/components/ui/ProductImage.vue'
 const generateDefaultAvatar = (name, id) => {
   const initials = getUserInitials(name)
   const color = generateUserColor(name || id?.toString() || 'User')
-  
+
   const svg = `
     <svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
       <rect width="40" height="40" fill="${color}"/>
@@ -353,7 +353,7 @@ const generateDefaultAvatar = (name, id) => {
       </text>
     </svg>
   `
-  
+
   return 'data:image/svg+xml;base64,' + btoa(svg)
 }
 
@@ -385,7 +385,7 @@ export default {
   },
   setup() {
     const router = useRouter()
-    
+
     const loading = ref(true)
     const productsWithConversations = ref([])
     const expandedProducts = ref([])
@@ -414,13 +414,13 @@ export default {
         loading.value = true
         const response = await api.get('/conversations/my-products-with-buyers')
         productsWithConversations.value = response.data.data || []
-        
+
         // Auto-expand first product if only one
         if (productsWithConversations.value.length === 1) {
           expandedProducts.value = [productsWithConversations.value[0].product.id]
         }
       } catch (error) {
-        console.error('Erreur lors du chargement:', error)
+
       } finally {
         loading.value = false
       }
@@ -497,7 +497,7 @@ export default {
       const date = new Date(timestamp)
       const now = new Date()
       const diffInHours = (now - date) / (1000 * 60 * 60)
-      
+
       if (diffInHours < 1) {
         return 'À l\'instant'
       } else if (diffInHours < 24) {
@@ -518,9 +518,9 @@ export default {
     const markAllAsRead = async (productId) => {
       try {
         // Implementation to mark all messages as read for this product
-        console.log('Marking all as read for product:', productId)
+
       } catch (error) {
-        console.error('Erreur:', error)
+
       }
     }
 
@@ -547,22 +547,22 @@ export default {
 
     // Quick actions
     const markAsSold = () => {
-      console.log('Mark as sold')
+
       closeQuickActions()
     }
 
     const updatePrice = () => {
-      console.log('Update price')
+
       closeQuickActions()
     }
 
     const sendOffer = () => {
-      console.log('Send offer')
+
       closeQuickActions()
     }
 
     const blockBuyer = () => {
-      console.log('Block buyer')
+
       closeQuickActions()
     }
 
@@ -1277,17 +1277,17 @@ export default {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .product-stats {
     margin-top: 16px;
     justify-content: space-between;
   }
-  
+
   .buyer-conversation {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .conversation-actions {
     margin-top: 12px;
     justify-content: space-between;
@@ -1297,28 +1297,28 @@ export default {
     grid-template-columns: 1fr;
     gap: 12px;
   }
-  
+
   .quick-actions-expanded {
     flex-direction: column;
   }
-  
+
   .btn {
     width: 100%;
     justify-content: center;
   }
-  
+
   .unread-info {
     flex-direction: column;
     gap: 12px;
     text-align: center;
   }
-  
+
   .buyer-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
   }
-  
+
   .expand-conversation-btn {
     align-self: flex-end;
   }

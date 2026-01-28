@@ -430,9 +430,9 @@ const loadProducts = async (page = 1) => {
 
     // 1) Tentative admin (nécessite authentification + droits admin)
     try {
-      console.log('Tentative d\'appel API admin...')
+
       const adminResp = await window.axios.get(`/admin/products?${adminParams}`)
-      console.log('Réponse API admin:', adminResp.data)
+
       products.value = adminResp.data.data || []
       if (adminResp.data.meta) {
         Object.assign(pagination, adminResp.data.meta)
@@ -445,7 +445,7 @@ const loadProducts = async (page = 1) => {
       }
     } catch (adminErr) {
       // 2) Fallback public si 401/403 ou autre erreur
-      console.log('API admin échouée, fallback vers API publique:', adminErr.message)
+
       const publicParams = new URLSearchParams({
         page: page.toString(),
         per_page: pagination.per_page.toString(),
@@ -461,13 +461,13 @@ const loadProducts = async (page = 1) => {
         category_id: baseParams.category || '',
         status: '' // pas géré publiquement dans l'index
       })
-      console.log('Appel API publique avec params:', publicParams.toString())
+
       const pubResp = await window.axios.get(`/products?${publicParams}`)
-      console.log('Réponse API publique:', pubResp.data)
+
       // Réponse publique: { success, data: paginator }
       const paginator = pubResp.data.data || {}
       const items = Array.isArray(paginator.data) ? paginator.data : []
-      console.log('Produits récupérés:', items.length)
+
       products.value = items
       // Mettre à jour la pagination depuis le paginator
       const { current_page, last_page, per_page, total, from, to } = paginator

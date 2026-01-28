@@ -10,9 +10,9 @@
         >
             <ArrowLeftIcon class="w-3.5 h-3.5 sm:w-5 sm:h-5" />
         </button>
-        
+
           <h1 class="text-sm sm:text-lg font-semibold text-green-800">Profil</h1>
-          
+
         <RouterLink
           to="/profile/edit"
             class="p-1 sm:p-2 rounded-lg bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
@@ -25,7 +25,7 @@
 
     <!-- Contenu principal - Ultra Compact mobile -->
     <div class="max-w-4xl mx-auto px-2 py-2 sm:px-4 sm:py-6">
-      
+
       <!-- Section Profil - Ultra Compact mobile -->
       <div class="bg-white/90 backdrop-blur-md rounded-xl sm:rounded-2xl shadow-xl sm:shadow-2xl border border-slate-200/60 p-3 sm:p-6 mb-3 sm:mb-6">
         <!-- Avatar et infos principales - Ultra Compact mobile -->
@@ -38,12 +38,12 @@
               <div class="w-1 h-1 sm:w-2 sm:h-2 lg:w-2.5 lg:h-2.5 bg-white rounded-full"></div>
                 </div>
               </div>
-              
+
           <h2 class="text-lg sm:text-2xl lg:text-3xl font-bold text-green-800 mb-1 sm:mb-2">{{ user?.name || 'Utilisateur' }}</h2>
           <p v-if="user?.username" class="text-green-600 text-sm sm:text-lg mb-1.5 sm:mb-3 font-medium">@{{ user.username }}</p>
           <p v-if="user?.bio" class="text-green-700 text-xs sm:text-sm max-w-md mx-auto leading-relaxed">{{ user.bio }}</p>
                 </div>
-        
+
         <!-- Infos supplémentaires - Ultra Compact mobile -->
         <div v-if="user?.location || user?.website" class="flex flex-col sm:flex-row justify-center items-center space-y-1 sm:space-y-0 sm:space-x-6 text-xs sm:text-sm text-green-700 mb-3 sm:mb-6">
           <span v-if="user?.location" class="flex items-center">
@@ -57,7 +57,7 @@
                     </a>
                   </span>
                 </div>
-        
+
         <!-- Actions rapides - Ultra Compact mobile -->
         <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 justify-center">
           <RouterLink
@@ -67,7 +67,7 @@
             <PlusIcon class="w-3.5 h-3.5 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
             Vendre un article
           </RouterLink>
-          
+
               <RouterLink
                 to="/profile/edit"
             class="inline-flex items-center justify-center px-3 py-2 sm:px-6 sm:py-3 bg-white text-green-700 border-2 border-green-300 font-semibold rounded-xl sm:rounded-2xl hover:bg-green-50 hover:border-green-400 transition-all duration-300 shadow-md hover:shadow-lg text-xs sm:text-base"
@@ -75,7 +75,7 @@
             <EditIcon class="w-3.5 h-3.5 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
             Modifier profil
               </RouterLink>
-          
+
           <!-- Bouton activer tous les produits en attente -->
           <button
             v-if="stats?.pending_payment_products > 0"
@@ -118,7 +118,7 @@
           <div class="text-base sm:text-xl lg:text-2xl font-bold text-green-600 mb-0.5 sm:mb-1 group-hover:text-green-700">{{ stats?.total_sales || 0 }}</div>
           <div class="text-xs sm:text-sm text-green-700">Ventes</div>
         </div>
-        <div 
+        <div
           v-if="stats?.pending_payment_products > 0"
           @click="activeTab = 'pending'"
           class="bg-white/90 backdrop-blur-md rounded-xl sm:rounded-2xl shadow-lg border border-amber-200/60 p-2 sm:p-4 text-center hover:shadow-xl transition-all duration-300 cursor-pointer hover:bg-amber-50/50 group"
@@ -137,25 +137,25 @@
       <span class="text-lg sm:text-xl font-bold text-gray-900">26</span>
       <span class="text-xs sm:text-sm text-gray-600 whitespace-nowrap">Produits</span>
     </div>
-    
+
     <!-- Followers -->
     <div class="flex flex-col items-center min-w-0">
       <span class="text-lg sm:text-xl font-bold text-gray-900">3</span>
       <span class="text-xs sm:text-sm text-gray-600 whitespace-nowrap">Followers</span>
     </div>
-    
+
     <!-- Following -->
     <div class="flex flex-col items-center min-w-0">
       <span class="text-lg sm:text-xl font-bold text-gray-900">2</span>
       <span class="text-xs sm:text-sm text-gray-600 whitespace-nowrap">Following</span>
     </div>
-    
+
     <!-- Ventes -->
     <div class="flex flex-col items-center min-w-0">
       <span class="text-lg sm:text-xl font-bold text-gray-900">62.00</span>
       <span class="text-xs sm:text-sm text-gray-600 whitespace-nowrap">Ventes</span>
     </div>
-    
+
     <!-- En attente -->
     <div class="flex flex-col items-center min-w-0">
       <span class="text-lg sm:text-xl font-bold text-gray-900">1</span>
@@ -201,11 +201,11 @@
                 Ajouter
               </RouterLink>
             </div>
-            
+
             <div v-if="loadingProducts" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-4">
               <ProductSkeleton v-for="i in 4" :key="i" />
             </div>
-            
+
             <div v-else-if="products.length > 0" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-4">
               <ProductCard
                 v-for="product in products"
@@ -218,12 +218,12 @@
                 @view="viewProduct"
               />
             </div>
-            
+
             <div v-else class="text-center py-5 sm:py-8">
               <PackageIcon class="mx-auto h-8 w-8 sm:h-12 sm:w-12 text-slate-400 mb-2.5 sm:mb-4" />
               <h3 class="text-sm sm:text-lg font-medium text-green-800 mb-1.5 sm:mb-2">Aucun produit</h3>
               <p class="text-slate-600 mb-2.5 sm:mb-4 text-xs sm:text-base">Commencez par créer votre premier produit</p>
-              <RouterLink 
+              <RouterLink
                 to="/products/create"
                 class="inline-flex items-center px-3 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all duration-200 shadow-lg hover:shadow-xl text-xs sm:text-base"
               >
@@ -236,7 +236,7 @@
           <!-- Followers -->
           <div v-if="activeTab === 'followers'" class="space-y-1.5 sm:space-y-4">
             <h3 class="text-sm sm:text-lg font-semibold text-green-800 mb-2.5 sm:mb-4">Mes Followers</h3>
-            
+
             <div v-if="loadingFollowers" class="space-y-1.5 sm:space-y-4">
               <div v-for="i in 3" :key="i" class="flex items-center space-x-2.5 sm:space-x-3 p-2.5 sm:p-4 bg-slate-50 rounded-lg animate-pulse">
                 <div class="w-7 h-7 sm:w-10 sm:h-10 bg-slate-300 rounded-full"></div>
@@ -246,7 +246,7 @@
                 </div>
               </div>
             </div>
-            
+
             <div v-else-if="followers.length > 0" class="space-y-1.5 sm:space-y-3">
               <div
                 v-for="follower in followers"
@@ -270,7 +270,7 @@
                 </RouterLink>
               </div>
             </div>
-            
+
             <div v-else class="text-center py-5 sm:py-8">
               <UsersIcon class="mx-auto h-8 w-8 sm:h-12 sm:w-12 text-slate-400 mb-2.5 sm:mb-4" />
               <h3 class="text-sm sm:text-lg font-medium text-green-800 mb-1.5 sm:mb-2">Aucun follower</h3>
@@ -281,7 +281,7 @@
           <!-- Following -->
           <div v-if="activeTab === 'following'" class="space-y-1.5 sm:space-y-4">
             <h3 class="text-sm sm:text-lg font-semibold text-green-800 mb-2.5 sm:mb-4">Mes Abonnements</h3>
-            
+
             <div v-if="loadingFollowing" class="space-y-1.5 sm:space-y-4">
               <div v-for="i in 3" :key="i" class="flex items-center space-x-2.5 sm:space-x-3 p-2.5 sm:p-4 bg-slate-50 rounded-lg animate-pulse">
                 <div class="w-7 h-7 sm:w-10 sm:h-10 bg-slate-300 rounded-full"></div>
@@ -291,7 +291,7 @@
                 </div>
               </div>
             </div>
-            
+
             <div v-else-if="following.length > 0" class="space-y-1.5 sm:space-y-3">
               <div
                 v-for="followed in following"
@@ -307,7 +307,7 @@
                     <div class="text-xs sm:text-sm text-slate-600">@{{ followed.username }}</div>
                   </div>
                 </div>
-                <button 
+                <button
                   @click="unfollowUser(followed.id)"
                   class="px-2.5 py-1 sm:px-4 sm:py-2 bg-slate-600 text-white text-xs sm:text-sm rounded-lg hover:bg-slate-700 transition-all duration-200 shadow-md hover:shadow-lg"
                 >
@@ -315,7 +315,7 @@
                 </button>
               </div>
             </div>
-            
+
             <div v-else class="text-center py-5 sm:py-8">
               <UsersIcon class="mx-auto h-8 w-8 sm:h-12 sm:w-12 text-slate-400 mb-2.5 sm:mb-4" />
               <h3 class="text-sm sm:text-lg font-medium text-green-800 mb-1.5 sm:mb-2">Aucun abonnement</h3>
@@ -326,14 +326,14 @@
           <!-- Activité -->
           <div v-if="activeTab === 'activity'" class="space-y-1.5 sm:space-y-4">
             <h3 class="text-sm sm:text-lg font-semibold text-green-800 mb-2.5 sm:mb-4">Mon Activité</h3>
-            
+
             <div v-if="loadingActivity" class="space-y-1.5 sm:space-y-4">
               <div v-for="i in 3" :key="i" class="p-2.5 sm:p-4 bg-slate-50 rounded-lg animate-pulse">
                 <div class="h-2.5 sm:h-4 bg-slate-300 rounded w-3/4 mb-1 sm:mb-2"></div>
                 <div class="h-2 sm:h-3 bg-slate-300 rounded w-1/2"></div>
               </div>
             </div>
-            
+
             <div v-else-if="recentActivity.length > 0" class="space-y-1.5 sm:space-y-3">
               <div
                 v-for="activity in recentActivity"
@@ -351,7 +351,7 @@
                 </div>
               </div>
             </div>
-            
+
             <div v-else class="text-center py-5 sm:py-8">
               <ActivityIcon class="mx-auto h-8 w-8 sm:h-12 sm:w-12 text-slate-400 mb-2.5 sm:mb-4" />
               <h3 class="text-sm sm:text-lg font-medium text-green-800 mb-1.5 sm:mb-2">Aucune activité</h3>
@@ -427,10 +427,10 @@ const loadProducts = async () => {
     const response = await api.get('/products/my-products', {
       params: { per_page: 20 }
     })
-    
+
     products.value = response.data.data || []
   } catch (error) {
-    console.error('Error loading products:', error)
+
     products.value = []
   } finally {
     loadingProducts.value = false
@@ -441,7 +441,7 @@ const loadFollowers = async () => {
   loadingFollowers.value = true
   try {
     const response = await api.get('/users/my-followers')
-    
+
     if (response.data.success && response.data.data) {
       followers.value = response.data.data.data || response.data.data || []
     } else {
@@ -458,7 +458,7 @@ const loadFollowing = async () => {
   loadingFollowing.value = true
   try {
     const response = await api.get('/users/my-following')
-    
+
     if (response.data.success && response.data.data) {
       following.value = response.data.data.data || response.data.data || []
     } else {
@@ -477,10 +477,10 @@ const loadActivity = async () => {
     const response = await api.get('/me/activity', {
       params: { limit: 10 }
     })
-    
+
     if (response.data.success && response.data.data) {
-      recentActivity.value = response.data.data.recent_actions || 
-                           response.data.data.activities || 
+      recentActivity.value = response.data.data.recent_actions ||
+                           response.data.data.activities ||
                            (Array.isArray(response.data.data) ? response.data.data : [])
     } else {
       recentActivity.value = []
@@ -515,7 +515,7 @@ const deleteProduct = async (product) => {
 const shareProduct = async (product) => {
   try {
     const productUrl = `${window.location.origin}/products/${product.id}`
-    
+
     if (navigator.share) {
       await navigator.share({
         title: product.title,
@@ -524,12 +524,12 @@ const shareProduct = async (product) => {
       })
     } else {
       await navigator.clipboard.writeText(productUrl)
-      
+
       const notification = document.createElement('div')
       notification.textContent = 'Lien copié dans le presse-papiers !'
       notification.className = 'fixed bottom-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg z-50'
       document.body.appendChild(notification)
-      
+
       setTimeout(() => {
         document.body.removeChild(notification)
       }, 3000)
@@ -583,30 +583,30 @@ const formatDate = (date) => {
 // Payer et activer tous les produits en attente via Lygos
 const activateAllPendingProducts = async () => {
   if (isActivatingAll.value) return
-  
+
   isActivatingAll.value = true
-  
+
   try {
     const response = await api.post('/products/create-bulk-payment')
-    
+
     if (response.data.success) {
       const paymentData = response.data.data
-      
+
       if (paymentData.payment_required && paymentData.notchpay_payment_link) {
         localStorage.setItem('bulk_payment_info', JSON.stringify({
             reference: paymentData.notchpay_reference,
             total_amount: paymentData.total_amount,
             product_count: paymentData.product_count
         }))
-        
+
         window.location.href = paymentData.notchpay_payment_link
       } else {
         const activateResponse = await api.post('/products/activate-all-pending')
-        
+
         if (activateResponse.data.success) {
           const result = activateResponse.data
           alert(`🎉 ${result.summary.activated} produit(s) activé(s) avec succès !`)
-          
+
           await Promise.all([
             loadProducts(),
             loadUserStats()
@@ -616,7 +616,7 @@ const activateAllPendingProducts = async () => {
     } else {
       alert('❌ Erreur lors de la création du paiement')
     }
-    
+
   } catch (error) {
     if (error.response?.status === 404) {
       alert('ℹ️ Aucun produit en attente de paiement trouvé')
@@ -654,10 +654,10 @@ watch(activeTab, (newTab) => {
 const loadUserStats = async () => {
   try {
     const response = await api.get('/me/stats')
-    
+
     if (response.data.success) {
       const userStats = response.data.data
-      
+
       if (!dashboardStore.stats.value) {
         dashboardStore.stats.value = {
           products_count: 0,
@@ -672,19 +672,19 @@ const loadUserStats = async () => {
           pending_payment_products: 0
         }
       }
-      
+
       dashboardStore.stats.value.products_count = userStats.products?.total || 0
       dashboardStore.stats.value.followers_count = userStats.social?.followers_count || 0
       dashboardStore.stats.value.following_count = userStats.social?.following_count || 0
       dashboardStore.stats.value.total_sales = userStats.sales?.total_earnings || 0
     }
-    
+
     const statsResponse = await api.get('/products/stats')
     if (statsResponse.data.success) {
       const productStats = statsResponse.data.data
       dashboardStore.stats.value.pending_payment_products = productStats.pending_payment_products || 0
     }
-    
+
   } catch (error) {
     // Gestion silencieuse des erreurs de stats
   }

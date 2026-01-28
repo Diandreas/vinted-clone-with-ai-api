@@ -21,10 +21,10 @@
                 image-classes="w-full h-full object-cover rounded-lg"
                 :class="{ 'grayscale': isProductUnavailable }"
               />
-              
+
               <!-- Unavailable Overlay -->
-              <div 
-                v-if="isProductUnavailable" 
+              <div
+                v-if="isProductUnavailable"
                 class="absolute inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center rounded-lg"
               >
                 <div class="text-center text-white">
@@ -32,7 +32,7 @@
                 </div>
               </div>
             </div>
-            
+
             <!-- Product & Participant Info - Compact -->
             <div>
               <h1 class="text-lg sm:text-xl font-semibold text-gray-900 truncate max-w-48 sm:max-w-none">
@@ -42,7 +42,7 @@
                 Conversation avec {{ otherParticipant?.name }}
               </p>
               <p class="text-xs text-gray-400">{{ formatPrice(conversation.product?.price) }}</p>
-              
+
               <!-- Product Status Badge -->
               <div v-if="isProductUnavailable" class="mt-1">
                 <span :class="['inline-block px-2 py-1 text-xs font-medium rounded-full', getProductStatusClass()]">
@@ -51,7 +51,7 @@
               </div>
             </div>
           </div>
-          
+
           <!-- Back Button - Compact -->
           <button
             @click="goBack"
@@ -157,8 +157,8 @@ const messagesContainer = ref(null)
 const currentUserId = computed(() => authStore.user?.id)
 const otherParticipant = computed(() => {
   if (!conversation.value) return null
-  return conversation.value.buyer_id === currentUserId.value 
-    ? conversation.value.seller 
+  return conversation.value.buyer_id === currentUserId.value
+    ? conversation.value.seller
     : conversation.value.buyer
 })
 
@@ -166,27 +166,23 @@ const otherParticipant = computed(() => {
 const loadConversation = async () => {
   loading.value = true
   try {
-    console.log('🔵 Loading conversation:', route.params.id)
+
     const response = await api.get(`/conversations/${route.params.id}`)
-    
+
     if (response.data.success) {
       conversation.value = response.data.data
       messages.value = response.data.data.messages?.reverse() || []
-      
-      console.log('✅ Conversation loaded:', {
-        id: conversation.value.id,
-        product: conversation.value.product?.title,
-        messages_count: messages.value.length
-      })
-      
+
+
+
       // Scroll to bottom after loading
       await nextTick()
       scrollToBottom()
     }
   } catch (error) {
-    console.error('❌ Error loading conversation:', error)
+
     conversation.value = null
-    
+
     // Si l'erreur est 403 ou 404, rediriger automatiquement après 3 secondes
     if (error.response?.status === 403 || error.response?.status === 404) {
       setTimeout(() => {
@@ -200,27 +196,27 @@ const loadConversation = async () => {
 
 const sendMessage = async () => {
   if (!newMessage.value.trim() || sendingMessage.value) return
-  
+
   sendingMessage.value = true
   const messageContent = newMessage.value.trim()
   newMessage.value = ''
-  
+
   try {
-    console.log('🔵 Sending message:', messageContent)
+
     const response = await api.post(`/conversations/${conversation.value.id}/messages`, {
       content: messageContent
     })
-    
+
     if (response.data.success) {
       messages.value.push(response.data.data)
-      console.log('✅ Message sent successfully')
-      
+
+
       // Scroll to bottom
       await nextTick()
       scrollToBottom()
     }
   } catch (error) {
-    console.error('❌ Error sending message:', error)
+
     // Restore message if failed
     newMessage.value = messageContent
   } finally {
@@ -249,22 +245,22 @@ const formatPrice = (price) => {
 
 const getProductImageUrl = (product) => {
   if (!product) return '/images/placeholder-product.png'
-  
+
   // If main_image_url is a string, use it
   if (typeof product.main_image_url === 'string') {
     return product.main_image_url
   }
-  
+
   // If main_image is an object with filename, construct URL
   if (product.main_image && typeof product.main_image === 'object' && product.main_image.filename) {
     return `http://localhost:8000/storage/products/${product.main_image.filename}`
   }
-  
+
   // If main_image is a string (filename), construct URL
   if (typeof product.main_image === 'string') {
     return `http://localhost:8000/storage/products/${product.main_image}`
   }
-  
+
   // Fallback to placeholder
   return '/images/placeholder-product.png'
 }
@@ -324,7 +320,7 @@ const getProductStatusText = computed(() => {
 
 // Lifecycle
 onMounted(() => {
-  console.log('🔵 ConversationDetail mounted for ID:', route.params.id)
+
   loadConversation()
 })
 </script>

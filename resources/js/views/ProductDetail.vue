@@ -538,9 +538,9 @@
           <div class="mb-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
             <div class="flex justify-between items-center">
               <span class="text-sm font-medium text-orange-800">Frais de publication</span>
-              <span class="text-lg font-bold text-orange-600">{{ formatPrice(Math.round(product?.price * 0.05)) }}</span>
+              <span class="text-lg font-bold text-orange-600">{{ formatPrice(LISTING_FEE_AMOUNT) }}</span>
             </div>
-            <p class="text-xs text-orange-600 mt-1">5% du prix de vente</p>
+            <p class="text-xs text-orange-600 mt-1">Frais fixe par publication</p>
           </div>
 
           <!-- Erreur de paiement -->
@@ -594,6 +594,7 @@ import {
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
+const LISTING_FEE_AMOUNT = 500
 
 // State
 const loading = ref(true)
@@ -1111,8 +1112,8 @@ const handleProductPayment = async () => {
       throw new Error('Vous devez être connecté pour effectuer un paiement')
     }
 
-    // Calculer les frais de publication (exemple : 5% du prix)
-    const listingFee = Math.round(product.value.price * 0.05)
+    // Frais de publication fixes par produit
+    const listingFee = LISTING_FEE_AMOUNT
 
     console.log('💳 Tentative de paiement:', {
       product_id: product.value.id,
@@ -1180,6 +1181,4 @@ onMounted(async () => {
   overflow: hidden;
 }
 </style>
-
-
 

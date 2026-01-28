@@ -13,8 +13,8 @@
           <button
             @click="activeTab = 'buyer'"
             class="flex-1 px-2 py-2 text-xs font-medium transition-colors"
-            :class="activeTab === 'buyer' 
-              ? 'text-primary-600 border-b-2 border-primary-600 bg-primary-50' 
+            :class="activeTab === 'buyer'
+              ? 'text-primary-600 border-b-2 border-primary-600 bg-primary-50'
               : 'text-gray-500 hover:text-gray-700'"
           >
             <div class="flex items-center justify-center space-x-1">
@@ -27,12 +27,12 @@
               </span>
             </div>
           </button>
-          
+
           <button
             @click="activeTab = 'seller'"
             class="flex-1 px-2 py-2 text-xs font-medium transition-colors"
-            :class="activeTab === 'seller' 
-              ? 'text-primary-600 border-b-2 border-primary-600 bg-primary-50' 
+            :class="activeTab === 'seller'
+              ? 'text-primary-600 border-b-2 border-primary-600 bg-primary-50'
               : 'text-gray-500 hover:text-gray-700'"
           >
             <div class="flex items-center justify-center space-x-1">
@@ -56,7 +56,7 @@
             <div class="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-primary-600 mx-auto"></div>
             <p class="text-gray-500 mt-2 text-xs sm:text-sm">Chargement...</p>
           </div>
-          
+
           <div v-else-if="buyerConversations.length === 0" class="text-center py-4 sm:py-6">
             <svg class="mx-auto h-6 w-6 sm:h-8 sm:w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-1l-4 4z"/>
@@ -72,7 +72,7 @@
               </RouterLink>
             </div>
           </div>
-          
+
           <div v-else class="grid gap-2 sm:gap-3">
             <div
               v-for="conversation in buyerConversations"
@@ -87,9 +87,9 @@
               <div class="flex items-center space-x-2 sm:space-x-3">
                 <!-- Product Image - Ultra Compact -->
                 <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gray-100 rounded-md overflow-hidden flex-shrink-0 relative">
-                  <img 
+                  <img
                     v-if="conversation.product?.main_image_url"
-                    :src="conversation.product.main_image_url" 
+                    :src="conversation.product.main_image_url"
                     :alt="conversation.product.title"
                     class="w-full h-full object-cover"
                     :class="{ 'grayscale': isProductUnavailable(conversation.product) }"
@@ -99,10 +99,10 @@
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                     </svg>
                   </div>
-                  
+
                   <!-- Unavailable Overlay -->
-                  <div 
-                    v-if="isProductUnavailable(conversation.product)" 
+                  <div
+                    v-if="isProductUnavailable(conversation.product)"
                     class="absolute inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center rounded-md"
                   >
                     <div class="text-center text-white">
@@ -110,12 +110,12 @@
                     </div>
                   </div>
                 </div>
-                
+
                 <!-- Product Info - Ultra Compact -->
                 <div class="flex-1 min-w-0">
                   <h3 class="text-sm font-semibold text-gray-900 truncate">{{ conversation.product?.title }}</h3>
                   <p class="text-xs text-gray-500">{{ formatPrice(conversation.product?.price) }}</p>
-                  
+
                   <!-- Product Status Badge -->
                   <div v-if="isProductUnavailable(conversation.product)" class="mt-1">
                     <span :class="['inline-block px-1.5 py-0.5 text-xs font-medium rounded-full', getProductStatusClass(conversation.product)]">
@@ -123,7 +123,7 @@
                     </span>
                   </div>
                 </div>
-                
+
                 <!-- Unread indicator - Ultra Compact -->
                 <div v-if="getUnreadCount(conversation) > 0" class="flex-shrink-0">
                   <span class="bg-gray-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold min-w-[20px] h-5 flex items-center justify-center">
@@ -141,7 +141,7 @@
             <div class="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-primary-600 mx-auto"></div>
             <p class="text-gray-500 mt-2 text-xs sm:text-sm">Chargement...</p>
           </div>
-          
+
           <div v-else-if="sellerProducts.length === 0" class="text-center py-4 sm:py-6">
             <svg class="mx-auto h-6 w-6 sm:h-8 sm:w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
@@ -157,7 +157,7 @@
               </RouterLink>
             </div>
           </div>
-          
+
           <div v-else class="space-y-2 sm:space-y-3">
             <div
               v-for="productData in sellerProducts"
@@ -169,9 +169,9 @@
                 <div class="flex items-center space-x-2">
                   <!-- Product Image - Ultra Compact -->
                   <div class="w-8 h-8 sm:w-10 sm:h-10 bg-gray-100 rounded-md overflow-hidden flex-shrink-0">
-                    <img 
+                    <img
                       v-if="productData.product.main_image_url"
-                      :src="productData.product.main_image_url" 
+                      :src="productData.product.main_image_url"
                       :alt="productData.product.title"
                       class="w-full h-full object-cover"
                     />
@@ -181,12 +181,12 @@
                     <p class="text-xs text-gray-500">{{ formatPrice(productData.product.price) }}</p>
                   </div>
                 </div>
-                
+
                 <div class="flex items-center space-x-2">
                   <span class="text-xs text-gray-500">{{ productData.conversations.length }} intéressé(s)</span>
-                  
+
                   <!-- Expand/Collapse Button for Product -->
-                  <button 
+                  <button
                     class="product-expand-btn"
                     :class="{ expanded: expandedProducts.includes(productData.product.id) }"
                     @click.stop="toggleProductDropdown(productData.product.id)"
@@ -197,9 +197,9 @@
                   </button>
                 </div>
               </div>
-              
+
               <!-- Expanded Product Conversations (Dropdown) -->
-              <div 
+              <div
                 v-if="expandedProducts.includes(productData.product.id)"
                 class="product-conversations-expanded"
               >
@@ -225,7 +225,7 @@
                           </div>
                         </div>
                       </div>
-                      
+
                       <!-- Unread indicator -->
                       <div v-if="getUnreadCount(conversation) > 0" class="bg-gray-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold min-w-[20px] h-5 flex items-center justify-center">
                         {{ getUnreadCount(conversation) }}
@@ -233,14 +233,14 @@
                     </div>
                   </div>
                 </div>
-                
+
                 <!-- Product Summary Actions -->
                 <div class="product-actions mt-3 pt-3 border-t border-gray-200">
                   <div class="flex justify-between items-center">
                     <span class="text-xs text-gray-600">
                       {{ productData.conversations.length }} conversation(s) active(s)
                     </span>
-                    <button 
+                    <button
                       class="btn btn-primary btn-small"
                       @click="viewProductDetails(productData.product)"
                     >
@@ -300,7 +300,7 @@ const loadBuyerConversations = async () => {
     const response = await api.get('/conversations/my-product-discussions')
     if (response.data.success) {
       const newData = response.data.data
-      
+
       // Utiliser le service de mise à jour intelligente
       smartUpdateService.smartUpdate(
         'buyer-conversations',
@@ -311,7 +311,7 @@ const loadBuyerConversations = async () => {
             // Ajouter les nouvelles conversations
             buyerConversations.value.unshift(...newItems)
           }
-          
+
           if (updatedItems.length > 0) {
             // Mettre à jour les conversations modifiées
             updatedItems.forEach(({ old, new: updated }) => {
@@ -321,7 +321,7 @@ const loadBuyerConversations = async () => {
               }
             })
           }
-          
+
           if (removedItems.length > 0) {
             // Supprimer les conversations supprimées
             removedItems.forEach(removed => {
@@ -331,23 +331,18 @@ const loadBuyerConversations = async () => {
               }
             })
           }
-          
+
           // Les éléments inchangés restent en place
         },
         (changeType, items) => {
           // Callback pour les animations
           if (changeType === 'new') {
-            console.log('🆕 Nouvelles conversations:', items.length)
-          } else if (changeType === 'updated') {
-            console.log('🔄 Conversations mises à jour:', items.length)
-          } else if (changeType === 'removed') {
-            console.log('🗑️ Conversations supprimées:', items.length)
-          }
+
         }
       )
     }
   } catch (error) {
-    console.error('Error loading buyer conversations:', error)
+
   }
 }
 
@@ -356,7 +351,7 @@ const loadSellerProducts = async () => {
     const response = await api.get('/conversations/my-products-with-buyers')
     if (response.data.success) {
       const newData = response.data.data
-      
+
       // Utiliser le service de mise à jour intelligente
       smartUpdateService.smartUpdate(
         'seller-products',
@@ -367,7 +362,7 @@ const loadSellerProducts = async () => {
             // Ajouter les nouveaux produits
             sellerProducts.value.unshift(...newItems)
           }
-          
+
           if (updatedItems.length > 0) {
             // Mettre à jour les produits modifiés
             updatedItems.forEach(({ old, new: updated }) => {
@@ -377,7 +372,7 @@ const loadSellerProducts = async () => {
               }
             })
           }
-          
+
           if (removedItems.length > 0) {
             // Supprimer les produits supprimés
             removedItems.forEach(removed => {
@@ -387,18 +382,13 @@ const loadSellerProducts = async () => {
               }
             })
           }
-          
+
           // Les éléments inchangés restent en place
         },
         (changeType, items) => {
           // Callback pour les animations
           if (changeType === 'new') {
-            console.log('🆕 Nouveaux produits:', items.length)
-          } else if (changeType === 'updated') {
-            console.log('🔄 Produits mis à jour:', items.length)
-          } else if (changeType === 'removed') {
-            console.log('🗑️ Produits supprimés:', items.length)
-          }
+
         }
       )
     }
@@ -504,14 +494,14 @@ const markConversationAsRead = async (conversationId) => {
 // Lifecycle
 onMounted(() => {
   loadData()
-  
+
   // S'abonner aux mises à jour temps réel
   subscribeToRealtime('messages', async () => {
     // Utiliser le service intelligent au lieu de recharger tout
     await loadBuyerConversations()
     await loadSellerProducts()
   })
-  
+
   // S'abonner aux mises à jour des likes/vues (moins fréquent)
   subscribeToRealtime('likes', async () => {
     // Utiliser le service intelligent au lieu de recharger tout
@@ -662,12 +652,12 @@ onMounted(() => {
     grid-template-columns: 1fr;
     gap: 8px;
   }
-  
+
   .quick-actions-expanded {
     flex-direction: column;
     gap: 8px;
   }
-  
+
   .product-conversations-expanded {
     margin: 4px;
     padding: 8px;
