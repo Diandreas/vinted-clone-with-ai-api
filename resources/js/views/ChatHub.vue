@@ -337,7 +337,8 @@ const loadBuyerConversations = async () => {
         (changeType, items) => {
           // Callback pour les animations
           if (changeType === 'new') {
-
+            // Animation placeholder for new items
+          }
         }
       )
     }
@@ -388,7 +389,8 @@ const loadSellerProducts = async () => {
         (changeType, items) => {
           // Callback pour les animations
           if (changeType === 'new') {
-
+            // Animation placeholder for new items
+          }
         }
       )
     }
