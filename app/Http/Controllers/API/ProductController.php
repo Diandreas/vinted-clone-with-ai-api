@@ -340,9 +340,19 @@ class ProductController extends Controller
             'comments.user'
         ]);
 
+        // Hide unpublished products from non-owners
+        $viewer = Auth::user();
+        if (in_array($product->status, [Product::STATUS_DRAFT, Product::STATUS_PENDING_PAYMENT, Product::STATUS_REMOVED], true)) {
+            if (!$viewer || $viewer->id !== $product->user_id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Product is not available'
+                ], 404);
+            }
+        }
+
         // Visibility gate for followers-only show
         if ($product->followers_only) {
-            $viewer = Auth::user();
             if (!$viewer || ($viewer->id !== $product->user_id && !$viewer->isFollowing($product->user))) {
                 return response()->json([
                     'success' => false,

@@ -100,7 +100,7 @@ class NotchPayController extends Controller
             // 4. Create pending payment record
             $payment = Payment::create([
                 'user_id' => $user->id,
-                'amount' => $validated['amount'],
+                'amount' => $amount,
                 'currency' => 'XAF',
                 'transaction_id' => $response['transaction']['reference'],
                 'status' => 'pending',
