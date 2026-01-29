@@ -4,7 +4,7 @@
       <h1 class="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Dashboard Admin</h1>
 
       <!-- KPI Cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 sm:gap-4 mb-4 sm:mb-6">
         <div class="bg-white rounded-xl border border-gray-200 p-3 sm:p-4">
           <div class="text-xs sm:text-sm text-gray-500">Utilisateurs</div>
           <div class="text-xl sm:text-2xl font-semibold text-gray-900">{{ kpis.users_total }}</div>
@@ -19,6 +19,21 @@
         <div class="bg-white rounded-xl border border-gray-200 p-3 sm:p-4">
           <div class="text-xs sm:text-sm text-gray-500">Commandes</div>
           <div class="text-xl sm:text-2xl font-semibold text-gray-900">{{ kpis.orders_total }}</div>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-200 p-3 sm:p-4">
+          <div class="text-xs sm:text-sm text-gray-500">Frais publication</div>
+          <div class="text-xl sm:text-2xl font-semibold text-gray-900">{{ formatCurrency(kpis.publishing_fee_revenue) }}</div>
+          <div class="text-xs text-green-600">Payés: {{ kpis.publishing_fee_paid_count }}</div>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-200 p-3 sm:p-4">
+          <div class="text-xs sm:text-sm text-gray-500">Paiements réussis</div>
+          <div class="text-xl sm:text-2xl font-semibold text-gray-900">{{ kpis.payments_completed }}</div>
+          <div class="text-xs text-gray-500">En attente: {{ kpis.payments_pending }}</div>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-200 p-3 sm:p-4">
+          <div class="text-xs sm:text-sm text-gray-500">Paiements échoués</div>
+          <div class="text-xl sm:text-2xl font-semibold text-gray-900">{{ kpis.payments_failed }}</div>
+          <div class="text-xs text-gray-500">Produits en attente: {{ kpis.products_pending_payment }}</div>
         </div>
       </div>
 
@@ -40,6 +55,14 @@
           <div class="text-xs sm:text-sm font-medium text-gray-900 mb-2">Produits par statut</div>
           <canvas ref="productsByStatusChart" height="160"></canvas>
         </div>
+        <div class="bg-white rounded-xl border border-gray-200 p-3 sm:p-4">
+          <div class="text-xs sm:text-sm font-medium text-gray-900 mb-2">Paiements (statuts)</div>
+          <canvas ref="paymentsByStatusChart" height="160"></canvas>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-200 p-3 sm:p-4">
+          <div class="text-xs sm:text-sm font-medium text-gray-900 mb-2">Revenus frais de publication</div>
+          <canvas ref="feeRevenueByDayChart" height="160"></canvas>
+        </div>
       </div>
     </div>
   </div>
@@ -54,13 +77,23 @@ const kpis = ref({
   users_verified: 0,
   products_total: 0,
   products_active: 0,
-  orders_total: 0
+  orders_total: 0,
+  products_pending_payment: 0,
+  publishing_fee_revenue: 0,
+  publishing_fee_paid_count: 0,
+  publishing_fee_pending_count: 0,
+  publishing_fee_failed_count: 0,
+  payments_completed: 0,
+  payments_pending: 0,
+  payments_failed: 0
 })
 
 const usersByDayChart = ref(null)
 const productsByDayChart = ref(null)
 const ordersByDayChart = ref(null)
 const productsByStatusChart = ref(null)
+const paymentsByStatusChart = ref(null)
+const feeRevenueByDayChart = ref(null)
 
 const buildLineChart = (el, labels, data, label) => new Chart(el, {
   type: 'line',
@@ -73,6 +106,11 @@ const buildPieChart = (el, labels, data) => new Chart(el, {
   data: { labels, datasets: [{ data, backgroundColor: ['#22c55e','#525252','#737373','#3da066','#3da066'] }] },
   options: { responsive: true }
 })
+
+const formatCurrency = (value) => {
+  const amount = Number(value || 0)
+  return new Intl.NumberFormat('fr-FR').format(amount) + ' FCFA'
+}
 
 onMounted(async () => {
   // KPIs
@@ -101,12 +139,21 @@ onMounted(async () => {
   const oLabels = (s.orders_by_day || []).map(x => x.d)
   const oData = (s.orders_by_day || []).map(x => x.c)
   buildLineChart(ordersByDayChart.value, oLabels, oData, 'Orders')
+
+  // Payments charts
+  const payments = await window.axios.get('/admin/analytics/payments')
+  const pay = payments.data.data || {}
+  const ps = pay.payments_by_status || {}
+  buildPieChart(paymentsByStatusChart.value, Object.keys(ps), Object.values(ps))
+  const feeByDay = pay.fee_revenue_by_day || []
+  const fLabels = feeByDay.map(x => x.d)
+  const fData = feeByDay.map(x => Number(x.s))
+  buildLineChart(feeRevenueByDayChart.value, fLabels, fData, 'Frais publication')
 })
 </script>
 
 <style scoped>
 </style>
-
 
 
 

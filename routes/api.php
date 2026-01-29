@@ -421,6 +421,7 @@ Route::prefix('v1')->group(function () {
             Route::get('users', [AdminAnalyticsController::class, 'users']);
             Route::get('products', [AdminAnalyticsController::class, 'products']);
             Route::get('sales', [AdminAnalyticsController::class, 'sales']);
+            Route::get('payments', [AdminAnalyticsController::class, 'payments']);
             Route::get('reports', [AdminAnalyticsController::class, 'reports']);
         });
 
