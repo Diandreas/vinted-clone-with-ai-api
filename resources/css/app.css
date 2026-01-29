@@ -1,5 +1,6 @@
 /* Import des styles RIKEAA */
 @import './rikeaa.css';
+@import './ios-specific.css';
 
 @tailwind base;
 @tailwind components;
@@ -100,4 +101,3 @@
 }
 
 /* iOS Specific Styles */
-@import './ios-specific.css';
