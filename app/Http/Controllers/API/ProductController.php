@@ -341,7 +341,7 @@ class ProductController extends Controller
         ]);
 
         // Hide unpublished products from non-owners
-        $viewer = Auth::user();
+        $viewer = Auth::guard('sanctum')->user() ?? Auth::user();
         if (in_array($product->status, [Product::STATUS_DRAFT, Product::STATUS_PENDING_PAYMENT, Product::STATUS_REMOVED], true)) {
             if (!$viewer || $viewer->id !== $product->user_id) {
                 return response()->json([
