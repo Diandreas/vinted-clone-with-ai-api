@@ -95,17 +95,30 @@ const productsByStatusChart = ref(null)
 const paymentsByStatusChart = ref(null)
 const feeRevenueByDayChart = ref(null)
 
-const buildLineChart = (el, labels, data, label) => new Chart(el, {
-  type: 'line',
-  data: { labels, datasets: [{ label, data, borderColor: '#2f7f52', tension: 0.3 }] },
-  options: { responsive: true, plugins: { legend: { display: false } } }
-})
+const getCanvasContext = (el) => {
+  if (!el || typeof el.getContext !== 'function') return null
+  return el.getContext('2d')
+}
 
-const buildPieChart = (el, labels, data) => new Chart(el, {
-  type: 'doughnut',
-  data: { labels, datasets: [{ data, backgroundColor: ['#22c55e','#525252','#737373','#3da066','#3da066'] }] },
-  options: { responsive: true }
-})
+const buildLineChart = (el, labels, data, label) => {
+  const ctx = getCanvasContext(el)
+  if (!ctx) return null
+  return new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets: [{ label, data, borderColor: '#2f7f52', tension: 0.3 }] },
+    options: { responsive: true, plugins: { legend: { display: false } } }
+  })
+}
+
+const buildPieChart = (el, labels, data) => {
+  const ctx = getCanvasContext(el)
+  if (!ctx) return null
+  return new Chart(ctx, {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data, backgroundColor: ['#22c55e','#525252','#737373','#3da066','#3da066'] }] },
+    options: { responsive: true }
+  })
+}
 
 const formatCurrency = (value) => {
   const amount = Number(value || 0)
@@ -113,47 +126,50 @@ const formatCurrency = (value) => {
 }
 
 onMounted(async () => {
-  // KPIs
-  const ov = await window.axios.get('/admin/analytics/overview')
-  Object.assign(kpis.value, ov.data.data || {})
+  try {
+    // KPIs
+    const ov = await window.axios.get('/admin/analytics/overview')
+    Object.assign(kpis.value, ov.data.data || {})
 
-  // Users chart
-  const users = await window.axios.get('/admin/analytics/users')
-  const u = users.data.data || {}
-  const uLabels = (u.by_day || []).map(x => x.d)
-  const uData = (u.by_day || []).map(x => x.c)
-  buildLineChart(usersByDayChart.value, uLabels, uData, 'Users')
+    // Users chart
+    const users = await window.axios.get('/admin/analytics/users')
+    const u = users.data.data || {}
+    const uLabels = (u.by_day || []).map(x => x.d)
+    const uData = (u.by_day || []).map(x => x.c)
+    buildLineChart(usersByDayChart.value, uLabels, uData, 'Users')
 
-  // Products charts
-  const prods = await window.axios.get('/admin/analytics/products')
-  const p = prods.data.data || {}
-  const pLabels = (p.by_day || []).map(x => x.d)
-  const pData = (p.by_day || []).map(x => x.c)
-  buildLineChart(productsByDayChart.value, pLabels, pData, 'Products')
-  const byStatus = p.by_status || {}
-  buildPieChart(productsByStatusChart.value, Object.keys(byStatus), Object.values(byStatus))
+    // Products charts
+    const prods = await window.axios.get('/admin/analytics/products')
+    const p = prods.data.data || {}
+    const pLabels = (p.by_day || []).map(x => x.d)
+    const pData = (p.by_day || []).map(x => x.c)
+    buildLineChart(productsByDayChart.value, pLabels, pData, 'Products')
+    const byStatus = p.by_status || {}
+    buildPieChart(productsByStatusChart.value, Object.keys(byStatus), Object.values(byStatus))
 
-  // Orders chart
-  const sales = await window.axios.get('/admin/analytics/sales')
-  const s = sales.data.data || {}
-  const oLabels = (s.orders_by_day || []).map(x => x.d)
-  const oData = (s.orders_by_day || []).map(x => x.c)
-  buildLineChart(ordersByDayChart.value, oLabels, oData, 'Orders')
+    // Orders chart
+    const sales = await window.axios.get('/admin/analytics/sales')
+    const s = sales.data.data || {}
+    const oLabels = (s.orders_by_day || []).map(x => x.d)
+    const oData = (s.orders_by_day || []).map(x => x.c)
+    buildLineChart(ordersByDayChart.value, oLabels, oData, 'Orders')
 
-  // Payments charts
-  const payments = await window.axios.get('/admin/analytics/payments')
-  const pay = payments.data.data || {}
-  const ps = pay.payments_by_status || {}
-  buildPieChart(paymentsByStatusChart.value, Object.keys(ps), Object.values(ps))
-  const feeByDay = pay.fee_revenue_by_day || []
-  const fLabels = feeByDay.map(x => x.d)
-  const fData = feeByDay.map(x => Number(x.s))
-  buildLineChart(feeRevenueByDayChart.value, fLabels, fData, 'Frais publication')
+    // Payments charts
+    const payments = await window.axios.get('/admin/analytics/payments')
+    const pay = payments.data.data || {}
+    const ps = pay.payments_by_status || {}
+    buildPieChart(paymentsByStatusChart.value, Object.keys(ps), Object.values(ps))
+    const feeByDay = pay.fee_revenue_by_day || []
+    const fLabels = feeByDay.map(x => x.d)
+    const fData = feeByDay.map(x => Number(x.s))
+    buildLineChart(feeRevenueByDayChart.value, fLabels, fData, 'Frais publication')
+  } catch (error) {
+    console.error('Failed to load admin analytics:', error)
+  }
 })
 </script>
 
 <style scoped>
 </style>
-
 
 
