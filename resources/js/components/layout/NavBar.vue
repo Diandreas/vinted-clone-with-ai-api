@@ -117,7 +117,7 @@
                 <div
                   v-show="showAdminMenu"
                   @click="showAdminMenu = false"
-                  class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                  class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none hidden md:block"
                 >
                   <RouterLink
                     to="/admin/dashboard"
@@ -249,6 +249,54 @@
               <XIcon class="w-4 h-4" />
             </button>
           </div>
+        </div>
+      </div>
+
+      <!-- Mobile Admin Menu -->
+      <div
+        v-if="showAdminMenu && (authStore.isAdmin || authStore.hasPermission('dashboard:view'))"
+        class="md:hidden py-3 border-t border-gray-200"
+      >
+        <div class="text-xs font-semibold text-gray-500 mb-2">Administration</div>
+        <div class="grid gap-1">
+          <RouterLink
+            to="/admin/dashboard"
+            class="flex items-center px-3 py-2 text-sm text-gray-700 rounded-lg hover:bg-gray-100"
+            :class="{ 'bg-gray-100': $route.name === 'admin-dashboard' }"
+            @click="showAdminMenu = false"
+          >
+            <BarChart3Icon class="w-4 h-4 mr-3" />
+            Dashboard
+          </RouterLink>
+          <RouterLink
+            v-if="authStore.isAdmin || authStore.hasPermission('users:manage')"
+            to="/admin/users"
+            class="flex items-center px-3 py-2 text-sm text-gray-700 rounded-lg hover:bg-gray-100"
+            :class="{ 'bg-gray-100': $route.name === 'admin-users' }"
+            @click="showAdminMenu = false"
+          >
+            <UsersIcon class="w-4 h-4 mr-3" />
+            Gestion Utilisateurs
+          </RouterLink>
+          <RouterLink
+            v-if="authStore.isAdmin || authStore.hasPermission('products:moderate')"
+            to="/admin/products"
+            class="flex items-center px-3 py-2 text-sm text-gray-700 rounded-lg hover:bg-gray-100"
+            :class="{ 'bg-gray-100': $route.name === 'admin-dashboard' }"
+            @click="showAdminMenu = false"
+          >
+            <PackageIcon class="w-4 h-4 mr-3" />
+            Gestion Produits
+          </RouterLink>
+          <RouterLink
+            to="/admin/categories"
+            class="flex items-center px-3 py-2 text-sm text-gray-700 rounded-lg hover:bg-gray-100"
+            :class="{ 'bg-gray-100': $route.name === 'admin-categories' }"
+            @click="showAdminMenu = false"
+          >
+            <TagIcon class="w-4 h-4 mr-3" />
+            Gestion Catégories
+          </RouterLink>
         </div>
       </div>
     </div>
