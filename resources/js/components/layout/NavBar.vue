@@ -57,7 +57,7 @@
         </div>
 
         <!-- Right Side Actions -->
-        <div class="flex items-center space-x-2 sm:space-x-3 lg:space-x-4">
+        <div class="flex items-center space-x-1 sm:space-x-3 lg:space-x-4">
           <!-- Bouton Vendre - Visible sur desktop -->
           <RouterLink
             v-if="isAuthenticated"
@@ -94,16 +94,16 @@
           <!-- Authenticated User Actions -->
           <template v-if="isAuthenticated">
 
-            <!-- Admin Dropdown - Visible sur desktop seulement -->
-            <div v-if="authStore.isAdmin || authStore.hasPermission('dashboard:view')" class="relative hidden md:block">
+            <!-- Admin Dropdown -->
+            <div v-if="authStore.isAdmin || authStore.hasPermission('dashboard:view')" class="relative">
               <button
                 @click="showAdminMenu = !showAdminMenu"
-                class="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-all duration-200 rounded-xl hover:bg-gray-50"
+                class="flex items-center space-x-1 px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium text-gray-600 hover:text-gray-900 transition-all duration-200 rounded-xl hover:bg-gray-50"
                 :class="{ 'text-primary-600 bg-primary-50': $route.name?.includes('admin') }"
               >
                 <PackageIcon class="w-4 h-4" />
-                <span>Admin</span>
-                <ChevronDownIcon class="w-3 h-3" />
+                <span class="hidden sm:inline">Admin</span>
+                <ChevronDownIcon class="hidden sm:inline w-3 h-3" />
               </button>
 
               <Transition
