@@ -35,7 +35,7 @@ const route = useRoute()
 
 // Hide navbar on auth pages
 const isAuthPage = computed(() => {
-  return ['login', 'register', 'forgot-password'].includes(route.name)
+  return ['login', 'register', 'forgot-password', 'reset-password'].includes(route.name)
 })
 </script>
 
@@ -63,4 +63,3 @@ const isAuthPage = computed(() => {
   transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
 }
 </style>
-

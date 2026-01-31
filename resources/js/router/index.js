@@ -7,6 +7,7 @@ const Home = () => import('@/views/Home.vue')
 const Login = () => import('@/views/auth/Login.vue')
 const Register = () => import('@/views/auth/Register.vue')
 const ForgotPassword = () => import('@/views/auth/ForgotPassword.vue')
+const ResetPassword = () => import('@/views/auth/ResetPassword.vue')
 const Profile = () => import('@/views/Profile.vue')
 const EditProfile = () => import('@/views/EditProfile.vue')
 const Products = () => import('@/views/Products.vue')
@@ -76,6 +77,12 @@ const routes = [
     path: '/forgot-password',
     name: 'forgot-password',
     component: ForgotPassword,
+    meta: { requiresAuth: false, guestOnly: true }
+  },
+  {
+    path: '/reset-password',
+    name: 'reset-password',
+    component: ResetPassword,
     meta: { requiresAuth: false, guestOnly: true }
   },
   {
