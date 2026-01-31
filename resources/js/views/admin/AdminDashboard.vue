@@ -4,36 +4,36 @@
       <h1 class="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Dashboard Admin</h1>
 
       <!-- KPI Cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 sm:gap-4 mb-4 sm:mb-6">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-4 mb-4 sm:mb-6">
         <div class="bg-white rounded-xl border border-gray-200 p-3 sm:p-4">
-          <div class="text-xs sm:text-sm text-gray-500">Utilisateurs</div>
-          <div class="text-xl sm:text-2xl font-semibold text-gray-900">{{ kpis.users_total }}</div>
-          <div class="text-xs text-green-600">Vérifiés: {{ kpis.users_verified }}</div>
+          <div class="text-[10px] sm:text-sm text-gray-500 uppercase tracking-wide">Utilisateurs</div>
+          <div class="text-lg sm:text-2xl font-semibold text-gray-900">{{ kpis.users_total }}</div>
+          <div class="text-[11px] text-green-600">Vérifiés: {{ kpis.users_verified }}</div>
         </div>
         <div class="bg-white rounded-xl border border-gray-200 p-3 sm:p-4">
-          <div class="text-xs sm:text-sm text-gray-500">Produits</div>
-          <div class="text-xl sm:text-2xl font-semibold text-gray-900">{{ kpis.products_total }}</div>
-          <div class="text-xs text-green-600">Actifs: {{ kpis.products_active }}</div>
+          <div class="text-[10px] sm:text-sm text-gray-500 uppercase tracking-wide">Produits</div>
+          <div class="text-lg sm:text-2xl font-semibold text-gray-900">{{ kpis.products_total }}</div>
+          <div class="text-[11px] text-green-600">Actifs: {{ kpis.products_active }}</div>
         </div>
 
         <div class="bg-white rounded-xl border border-gray-200 p-3 sm:p-4">
-          <div class="text-xs sm:text-sm text-gray-500">Commandes</div>
-          <div class="text-xl sm:text-2xl font-semibold text-gray-900">{{ kpis.orders_total }}</div>
+          <div class="text-[10px] sm:text-sm text-gray-500 uppercase tracking-wide">Commandes</div>
+          <div class="text-lg sm:text-2xl font-semibold text-gray-900">{{ kpis.orders_total }}</div>
         </div>
         <div class="bg-white rounded-xl border border-gray-200 p-3 sm:p-4">
-          <div class="text-xs sm:text-sm text-gray-500">Frais publication</div>
-          <div class="text-xl sm:text-2xl font-semibold text-gray-900">{{ formatCurrency(kpis.publishing_fee_revenue) }}</div>
-          <div class="text-xs text-green-600">Payés: {{ kpis.publishing_fee_paid_count }}</div>
+          <div class="text-[10px] sm:text-sm text-gray-500 uppercase tracking-wide">Frais pub.</div>
+          <div class="text-lg sm:text-2xl font-semibold text-gray-900">{{ formatCurrency(kpis.publishing_fee_revenue) }}</div>
+          <div class="text-[11px] text-green-600">Payés: {{ kpis.publishing_fee_paid_count }}</div>
         </div>
         <div class="bg-white rounded-xl border border-gray-200 p-3 sm:p-4">
-          <div class="text-xs sm:text-sm text-gray-500">Paiements réussis</div>
-          <div class="text-xl sm:text-2xl font-semibold text-gray-900">{{ kpis.payments_completed }}</div>
-          <div class="text-xs text-gray-500">En attente: {{ kpis.payments_pending }}</div>
+          <div class="text-[10px] sm:text-sm text-gray-500 uppercase tracking-wide">Paiements OK</div>
+          <div class="text-lg sm:text-2xl font-semibold text-gray-900">{{ kpis.payments_completed }}</div>
+          <div class="text-[11px] text-gray-500">Attente: {{ kpis.payments_pending }}</div>
         </div>
         <div class="bg-white rounded-xl border border-gray-200 p-3 sm:p-4">
-          <div class="text-xs sm:text-sm text-gray-500">Paiements échoués</div>
-          <div class="text-xl sm:text-2xl font-semibold text-gray-900">{{ kpis.payments_failed }}</div>
-          <div class="text-xs text-gray-500">Produits en attente: {{ kpis.products_pending_payment }}</div>
+          <div class="text-[10px] sm:text-sm text-gray-500 uppercase tracking-wide">Paiements KO</div>
+          <div class="text-lg sm:text-2xl font-semibold text-gray-900">{{ kpis.payments_failed }}</div>
+          <div class="text-[11px] text-gray-500">Produits: {{ kpis.products_pending_payment }}</div>
         </div>
       </div>
 
@@ -171,5 +171,4 @@ onMounted(async () => {
 
 <style scoped>
 </style>
-
 
