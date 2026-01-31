@@ -37,6 +37,10 @@ class  User extends Authenticatable implements MustVerifyEmail
         'notification_settings',
         'privacy_settings',
         'wallet_balance_xaf',
+        'role',
+        'permissions',
+        'is_admin',
+        'status',
     ];
 
     /**
@@ -66,6 +70,8 @@ class  User extends Authenticatable implements MustVerifyEmail
             'notification_settings' => 'array',
             'privacy_settings' => 'array',
             'wallet_balance_xaf' => 'integer',
+            'permissions' => 'array',
+            'is_admin' => 'boolean',
         ];
     }
 

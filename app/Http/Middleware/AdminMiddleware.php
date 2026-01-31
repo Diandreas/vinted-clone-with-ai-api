@@ -23,10 +23,21 @@ class AdminMiddleware
             ], 401);
         }
 
-        // Check if user is admin by flag or role string
+        // Check if user is admin by flag, role, or explicit permissions
         $user = $request->user();
         $isAdmin = ($user->is_admin ?? false) || (($user->role ?? null) === 'admin');
-        if (!$isAdmin) {
+        $permissions = $user->permissions ?? [];
+        if (is_string($permissions)) {
+            $decoded = json_decode($permissions, true);
+            $permissions = is_array($decoded) ? $decoded : [];
+        }
+
+        $hasAdminPermission = in_array('dashboard:view', $permissions, true)
+            || in_array('users:manage', $permissions, true)
+            || in_array('products:moderate', $permissions, true)
+            || in_array('analytics:view', $permissions, true);
+
+        if (!$isAdmin && !$hasAdminPermission) {
             return response()->json([
                 'success' => false,
                 'message' => 'Admin access required'
