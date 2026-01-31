@@ -185,6 +185,7 @@
         :category="selectedCategory"
         @close="closeModal"
         @saved="onCategorySaved"
+        @cancel="closeModal"
       />
 
       <!-- Delete Confirmation Modal -->
@@ -350,6 +351,5 @@ onMounted(() => {
   loadAllCategories()
 })
 </script>
-
 
 

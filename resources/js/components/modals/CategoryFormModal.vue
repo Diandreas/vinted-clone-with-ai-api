@@ -24,7 +24,7 @@
             v-model="form.name"
             type="text"
             required
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             :class="{ 'border-gray-300': errors.name }"
             placeholder="Ex: Électronique, Vêtements..."
           />
@@ -40,7 +40,7 @@
             id="description"
             v-model="form.description"
             rows="3"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             :class="{ 'border-gray-300': errors.description }"
             placeholder="Description de la catégorie..."
           ></textarea>
@@ -55,7 +55,7 @@
           <select
             id="parent_id"
             v-model="form.parent_id"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             :class="{ 'border-gray-300': errors.parent_id }"
           >
             <option value="">Aucune (catégorie racine)</option>
@@ -79,7 +79,7 @@
             id="icon"
             v-model="form.icon"
             type="text"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             :class="{ 'border-gray-300': errors.icon }"
             placeholder="Ex: <svg>...</svg> ou classe d'icône"
           />
@@ -102,7 +102,7 @@
             <input
               v-model="form.color"
               type="text"
-              class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              class="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               :class="{ 'border-gray-300': errors.color }"
               placeholder="#000000"
             />
@@ -120,7 +120,7 @@
             v-model="form.sort_order"
             type="number"
             min="0"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             :class="{ 'border-gray-300': errors.sort_order }"
             placeholder="0"
           />
@@ -280,6 +280,5 @@ watch(() => props.show, (newShow) => {
   }
 })
 </script>
-
 
 
