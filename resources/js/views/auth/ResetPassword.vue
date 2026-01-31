@@ -100,6 +100,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import api from '@/services/api'
 
 const route = useRoute()
 const router = useRouter()
@@ -134,7 +135,7 @@ const submitForm = async () => {
   message.value = ''
 
   try {
-    await window.axios.post('/auth/reset-password', form.value)
+    await api.post('/auth/reset-password', form.value)
     message.value = 'Mot de passe mis à jour. Vous pouvez vous connecter.'
     form.value.password = ''
     form.value.password_confirmation = ''

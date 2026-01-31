@@ -73,9 +73,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-
-const router = useRouter()
+import api from '@/services/api'
 
 const form = ref({
   email: ''
@@ -91,7 +89,7 @@ const submitForm = async () => {
   message.value = ''
 
   try {
-    const response = await window.axios.post('/auth/forgot-password', form.value)
+    await api.post('/auth/forgot-password', form.value)
     message.value = 'Un email de réinitialisation a été envoyé à votre adresse.'
     form.value.email = ''
   } catch (err) {
