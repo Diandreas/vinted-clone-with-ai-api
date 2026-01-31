@@ -183,6 +183,7 @@
       <CategoryFormModal
         :show="showCreateModal || showEditModal"
         :category="selectedCategory"
+        :categories="allCategories"
         @close="closeModal"
         @saved="onCategorySaved"
         @cancel="closeModal"
@@ -351,5 +352,4 @@ onMounted(() => {
   loadAllCategories()
 })
 </script>
-
 

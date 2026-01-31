@@ -175,7 +175,7 @@ const props = defineProps({
   categories: Array
 })
 
-const emit = defineEmits(['save', 'cancel'])
+const emit = defineEmits(['saved', 'cancel'])
 
 // State
 const loading = ref(false)
@@ -248,7 +248,13 @@ const handleSubmit = async () => {
     if (!formData.icon) formData.icon = null
     if (!formData.color) formData.color = null
     
-    await emit('save', formData)
+    if (isEditing.value) {
+      await window.axios.put(`/admin/categories/${props.category.id}`, formData)
+    } else {
+      await window.axios.post('/admin/categories', formData)
+    }
+
+    emit('saved')
     resetForm()
     
   } catch (error) {
@@ -280,5 +286,4 @@ watch(() => props.show, (newShow) => {
   }
 })
 </script>
-
 
