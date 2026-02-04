@@ -301,6 +301,12 @@ const loadBuyerConversations = async () => {
     if (response.data.success) {
       const newData = response.data.data
 
+      if (buyerConversations.value.length === 0) {
+        buyerConversations.value = Array.isArray(newData) ? [...newData] : []
+        smartUpdateService.registerData('buyer-conversations', newData)
+        return
+      }
+
       // Utiliser le service de mise à jour intelligente
       smartUpdateService.smartUpdate(
         'buyer-conversations',
@@ -352,6 +358,12 @@ const loadSellerProducts = async () => {
     const response = await api.get('/conversations/my-products-with-buyers')
     if (response.data.success) {
       const newData = response.data.data
+
+      if (sellerProducts.value.length === 0) {
+        sellerProducts.value = Array.isArray(newData) ? [...newData] : []
+        smartUpdateService.registerData('seller-products', newData)
+        return
+      }
 
       // Utiliser le service de mise à jour intelligente
       smartUpdateService.smartUpdate(
