@@ -19,7 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
         
         // Ensure web middleware only applies to web routes
         $middleware->web(append: [
-            // Add any web-specific middleware here if needed
+            \App\Http\Middleware\TrackSiteVisit::class,
         ]);
         
         // Register custom middleware aliases

@@ -11,6 +11,7 @@ use App\Models\Story;
 use App\Models\Payment;
 use App\Models\PlatformFee;
 use App\Models\ProductFeeCharge;
+use Illuminate\Support\Facades\DB;
 
 class AnalyticsController extends Controller
 {
@@ -24,6 +25,10 @@ class AnalyticsController extends Controller
         $notchpayListingPayments = Payment::where('payment_method', 'notchpay')
             ->whereNotNull('metadata->product_id');
 
+        $today = now()->toDateString();
+        $visitorsTotal = (int) DB::table('site_visits')->count();
+        $visitorsToday = (int) DB::table('site_visits')->where('visited_on', $today)->count();
+
         $data = [
             'users_total' => User::count(),
             'users_verified' => User::where('is_verified', true)->count(),
@@ -34,6 +39,8 @@ class AnalyticsController extends Controller
             'lives_active' => Live::where('status', 'live')->count(),
             'orders_total' => Order::count(),
             'stories_total' => Story::count(),
+            'visitors_total' => $visitorsTotal,
+            'visitors_today' => $visitorsToday,
             'publishing_fee_revenue' => (float) (clone $listingFees)->where('status', 'paid')->sum('amount'),
             'publishing_fee_paid_count' => (clone $listingFees)->where('status', 'paid')->count(),
             'publishing_fee_pending_count' => (clone $listingFees)->where('status', 'pending')->count(),
@@ -106,6 +113,21 @@ class AnalyticsController extends Controller
                 ->selectRaw('status, COUNT(*) as c')
                 ->groupBy('status')
                 ->pluck('c', 'status'),
+        ];
+
+        return response()->json(['success' => true, 'data' => $data]);
+    }
+
+    public function visitors()
+    {
+        $data = [
+            'by_day' => DB::table('site_visits')
+                ->selectRaw('visited_on as d, COUNT(*) as c')
+                ->groupBy('visited_on')
+                ->orderBy('visited_on')
+                ->get(),
+            'total' => (int) DB::table('site_visits')->count(),
+            'today' => (int) DB::table('site_visits')->where('visited_on', now()->toDateString())->count(),
         ];
 
         return response()->json(['success' => true, 'data' => $data]);

@@ -4,7 +4,7 @@
       <h1 class="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Dashboard Admin</h1>
 
       <!-- KPI Cards -->
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-4 mb-4 sm:mb-6">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-2 sm:gap-4 mb-4 sm:mb-6">
         <div class="bg-white rounded-xl border border-gray-200 p-3 sm:p-4">
           <div class="text-[10px] sm:text-sm text-gray-500 uppercase tracking-wide">Utilisateurs</div>
           <div class="text-lg sm:text-2xl font-semibold text-gray-900">{{ kpis.users_total }}</div>
@@ -14,6 +14,11 @@
           <div class="text-[10px] sm:text-sm text-gray-500 uppercase tracking-wide">Produits</div>
           <div class="text-lg sm:text-2xl font-semibold text-gray-900">{{ kpis.products_total }}</div>
           <div class="text-[11px] text-green-600">Actifs: {{ kpis.products_active }}</div>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-200 p-3 sm:p-4">
+          <div class="text-[10px] sm:text-sm text-gray-500 uppercase tracking-wide">Visiteurs</div>
+          <div class="text-lg sm:text-2xl font-semibold text-gray-900">{{ kpis.visitors_total }}</div>
+          <div class="text-[11px] text-gray-500">Aujourd'hui: {{ kpis.visitors_today }}</div>
         </div>
 
         <div class="bg-white rounded-xl border border-gray-200 p-3 sm:p-4">
@@ -48,6 +53,10 @@
           <canvas ref="productsByDayChart" height="160"></canvas>
         </div>
         <div class="bg-white rounded-xl border border-gray-200 p-3 sm:p-4">
+          <div class="text-xs sm:text-sm font-medium text-gray-900 mb-2">Visiteurs par jour</div>
+          <canvas ref="visitorsByDayChart" height="160"></canvas>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-200 p-3 sm:p-4">
           <div class="text-xs sm:text-sm font-medium text-gray-900 mb-2">Commandes par jour</div>
           <canvas ref="ordersByDayChart" height="160"></canvas>
         </div>
@@ -78,6 +87,8 @@ const kpis = ref({
   products_total: 0,
   products_active: 0,
   orders_total: 0,
+  visitors_total: 0,
+  visitors_today: 0,
   products_pending_payment: 0,
   publishing_fee_revenue: 0,
   publishing_fee_paid_count: 0,
@@ -90,6 +101,7 @@ const kpis = ref({
 
 const usersByDayChart = ref(null)
 const productsByDayChart = ref(null)
+const visitorsByDayChart = ref(null)
 const ordersByDayChart = ref(null)
 const productsByStatusChart = ref(null)
 const paymentsByStatusChart = ref(null)
@@ -147,6 +159,13 @@ onMounted(async () => {
     const byStatus = p.by_status || {}
     buildPieChart(productsByStatusChart.value, Object.keys(byStatus), Object.values(byStatus))
 
+    // Visitors chart
+    const visitors = await window.axios.get('/admin/analytics/visitors')
+    const v = visitors.data.data || {}
+    const vLabels = (v.by_day || []).map(x => x.d)
+    const vData = (v.by_day || []).map(x => x.c)
+    buildLineChart(visitorsByDayChart.value, vLabels, vData, 'Visiteurs')
+
     // Orders chart
     const sales = await window.axios.get('/admin/analytics/sales')
     const s = sales.data.data || {}
@@ -171,4 +190,3 @@ onMounted(async () => {
 
 <style scoped>
 </style>
-
