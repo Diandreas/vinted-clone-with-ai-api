@@ -1,5 +1,5 @@
 <template>
-  <div class="user-dropdown absolute right-0 top-full mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+  <div class="user-dropdown absolute right-0 top-full mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50" @click.stop>
     <div class="px-4 py-3 border-b border-gray-100">
       <div class="flex items-center space-x-3">
         <img
@@ -171,4 +171,3 @@ const logout = async () => {
   await authStore.logout()
 }
 </script>
-

@@ -182,7 +182,7 @@
             <!-- User Menu - Visible sur desktop seulement -->
             <div class="relative hidden md:block">
               <button
-                @click="showUserMenu = !showUserMenu"
+                @click.stop="showUserMenu = !showUserMenu"
                 class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 <img
