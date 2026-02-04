@@ -90,6 +90,7 @@
 
           <!-- Bouton de déconnexion -->
           <button
+            type="button"
             @click="logout"
             class="inline-flex items-center justify-center px-3 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white font-semibold rounded-xl sm:rounded-2xl transition-all duration-300 shadow-md hover:shadow-lg text-xs sm:text-base transform hover:-translate-y-0.5"
           >
@@ -545,9 +546,8 @@ const shareProduct = async (product) => {
   }
 }
 
-const logout = () => {
-  authStore.logout()
-  router.push('/login')
+const logout = async () => {
+  await authStore.logout()
 }
 
 const getActivityIcon = (type) => {
@@ -820,6 +820,5 @@ button:focus, a:focus {
   background-clip: text;
 }
 </style>
-
 
 
