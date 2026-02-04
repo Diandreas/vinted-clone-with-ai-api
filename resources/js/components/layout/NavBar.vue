@@ -158,7 +158,7 @@
             </div>
 
             <!-- Notifications - Visible sur desktop seulement -->
-            <div class="relative hidden md:block">
+            <div class="relative hidden md:block user-menu">
               <button
                 @click="showNotifications = !showNotifications"
                 class="relative p-2 text-gray-400 hover:text-gray-600 transition-colors"
@@ -410,7 +410,7 @@ const handleClickOutside = (event) => {
   if (!event.target.closest('.notification-dropdown')) {
     showNotifications.value = false
   }
-  if (!event.target.closest('.user-dropdown')) {
+  if (!event.target.closest('.user-menu')) {
     showUserMenu.value = false
   }
 }
