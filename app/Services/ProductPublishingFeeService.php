@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Log;
 
 class ProductPublishingFeeService
 {
-    const BASE_FEE = 500; // 500 FCFA per listing
+    const BASE_FEE = 100; // 100 FCFA per listing
     const PERCENTAGE_FEE = 0.0; // No percentage fee
     
     /**

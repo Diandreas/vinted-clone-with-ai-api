@@ -594,7 +594,7 @@ import {
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
-const LISTING_FEE_AMOUNT = 500
+const LISTING_FEE_AMOUNT = 100
 
 // State
 const loading = ref(true)
@@ -1181,4 +1181,3 @@ onMounted(async () => {
   overflow: hidden;
 }
 </style>
-

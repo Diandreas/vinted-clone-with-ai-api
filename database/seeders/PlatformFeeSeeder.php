@@ -14,7 +14,7 @@ class PlatformFeeSeeder extends Seeder
                 'code' => 'listing_fee',
                 'name' => 'Listing Fee',
                 'type' => 'fixed',
-                'amount' => 500.00,
+                'amount' => 100.00,
                 'percentage' => 0,
                 'active' => true,
             ],
@@ -52,5 +52,3 @@ class PlatformFeeSeeder extends Seeder
         }
     }
 }
-
-

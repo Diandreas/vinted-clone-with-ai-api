@@ -12,7 +12,7 @@ return new class extends Migration
             [
                 'name' => 'Listing Fee',
                 'type' => 'fixed',
-                'amount' => 500.00,
+                'amount' => 100.00,
                 'percentage' => 0,
                 'active' => true,
                 'updated_at' => now(),
@@ -27,7 +27,7 @@ return new class extends Migration
             ->where('code', 'listing_fee')
             ->update([
                 'type' => 'fixed',
-                'amount' => 0.50,
+                'amount' => 500.00,
                 'percentage' => 0,
                 'updated_at' => now(),
             ]);
