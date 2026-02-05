@@ -328,14 +328,26 @@ class NotchPayController extends Controller
                 'activated_at' => now(),
             ]);
 
-            // Create or update ProductFeeCharge record
+            // Create or update ProductFeeCharge record with correct amount
+            $listingFee = \App\Models\PlatformFee::where('code', 'listing_fee')->first();
+            $feeCharge = \App\Models\ProductFeeCharge::where('product_id', $product->id)
+                ->where('fee_id', $listingFee?->id)
+                ->first();
+
+            $amount = $feeCharge?->amount;
+            if ($amount === null && $listingFee) {
+                $amount = $listingFee->type === 'percentage'
+                    ? round(($listingFee->percentage / 100) * (float) $product->price, 2)
+                    : (float) $listingFee->amount;
+            }
+
             $feeCharge = \App\Models\ProductFeeCharge::updateOrCreate(
                 [
                     'product_id' => $product->id,
-                    'fee_id' => \App\Models\PlatformFee::where('code', 'listing_fee')->first()->id ?? 1
+                    'fee_id' => $listingFee?->id ?? 1
                 ],
                 [
-                    'amount' => $product->listing_fee ?? 0,
+                    'amount' => $amount ?? 0,
                     'status' => 'paid',
                     'paid_at' => now(),
                     'payment_method' => 'notchpay'
