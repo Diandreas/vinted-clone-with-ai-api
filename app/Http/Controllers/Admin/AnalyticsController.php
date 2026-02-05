@@ -24,6 +24,14 @@ class AnalyticsController extends Controller
 
         $notchpayListingPayments = Payment::where('payment_method', 'notchpay')
             ->whereNotNull('metadata->product_id');
+        $paymentsCompleted = (clone $notchpayListingPayments)->where('status', 'completed');
+        $paymentsCompletedCount = (clone $paymentsCompleted)->count();
+        $paymentsRevenue = (float) (clone $paymentsCompleted)->sum('amount');
+        $feesRevenue = (float) (clone $listingFees)->where('status', 'paid')->sum('amount');
+        $publishingRevenue = $paymentsRevenue > 0 ? $paymentsRevenue : $feesRevenue;
+        $publishingPaidCount = $paymentsCompletedCount > 0
+            ? $paymentsCompletedCount
+            : (clone $listingFees)->where('status', 'paid')->count();
 
         $today = now()->toDateString();
         $visitorsTotal = (int) DB::table('site_visits')->count();
@@ -41,8 +49,8 @@ class AnalyticsController extends Controller
             'stories_total' => Story::count(),
             'visitors_total' => $visitorsTotal,
             'visitors_today' => $visitorsToday,
-            'publishing_fee_revenue' => (float) (clone $listingFees)->where('status', 'paid')->sum('amount'),
-            'publishing_fee_paid_count' => (clone $listingFees)->where('status', 'paid')->count(),
+            'publishing_fee_revenue' => $publishingRevenue,
+            'publishing_fee_paid_count' => $publishingPaidCount,
             'publishing_fee_pending_count' => (clone $listingFees)->where('status', 'pending')->count(),
             'publishing_fee_failed_count' => (clone $listingFees)->where('status', 'failed')->count(),
             'payments_completed' => (clone $notchpayListingPayments)->where('status', 'completed')->count(),
