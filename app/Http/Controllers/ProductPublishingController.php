@@ -38,6 +38,7 @@ class ProductPublishingController extends Controller
     {
         try {
             $structure = $this->feeService->getFeeStructure();
+            $structure['enabled'] = env('PUBLISHING_FEE_ENABLED', true);
 
             return response()->json([
                 'success' => true,

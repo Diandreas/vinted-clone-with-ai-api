@@ -208,7 +208,8 @@ class ProductController extends Controller
         ]);
 
         // Check if listing fee is required
-        $listingFee = PlatformFee::where('code', 'listing_fee')->where('active', true)->first();
+        $feeEnabled = env('PUBLISHING_FEE_ENABLED', true);
+        $listingFee = $feeEnabled ? PlatformFee::where('code', 'listing_fee')->where('active', true)->first() : null;
         $initialStatus = $listingFee ? Product::STATUS_PENDING_PAYMENT : Product::STATUS_ACTIVE;
         
         $product = Product::create([
@@ -907,11 +908,12 @@ class ProductController extends Controller
         // Business rules for status changes
         if ($newStatus === Product::STATUS_ACTIVE && $product->isPendingPayment()) {
             // Check if listing fee is paid before allowing activation
-            $feeCharge = ProductFeeCharge::where('product_id', $product->id)
+            $feeEnabled = env('PUBLISHING_FEE_ENABLED', true);
+            $feeCharge = $feeEnabled ? ProductFeeCharge::where('product_id', $product->id)
                 ->whereHas('fee', function($query) {
                     $query->where('code', 'listing_fee');
                 })
-                ->first();
+                ->first() : null;
 
             if ($feeCharge && $feeCharge->status !== 'paid') {
                 return response()->json([
