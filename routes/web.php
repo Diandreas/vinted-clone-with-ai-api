@@ -35,6 +35,11 @@ Route::get('delete-account', function () {
     return view('delete-account');
 })->name('delete.account');
 
+// Child safety standards page (required by Google Play Store)
+Route::get('child-safety', function () {
+    return view('child-safety');
+})->name('child.safety');
+
 // All other GET routes are handled by Vue Router (EXCEPT API routes)
 Route::get('{any}', function () {
     // Skip API routes - more comprehensive check
