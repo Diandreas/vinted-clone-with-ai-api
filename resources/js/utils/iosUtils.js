@@ -2,6 +2,7 @@
  * iOS Utilities for RIKEAA PWA
  * Handles iOS-specific functionality and optimizations
  */
+import { isNative } from '@/utils/platform';
 
 // Detect iOS device
 export const isIOS = () => {
@@ -197,7 +198,11 @@ export const initIOSUtils = () => {
     setupIOSTouchHandling();
     setupIOSScrollHandling();
     setupIOSKeyboardHandling();
-    setupIOSPWA();
+
+    // Skip PWA install prompt when running inside Capacitor
+    if (!isNative()) {
+        setupIOSPWA();
+    }
 };
 
 // Export default function

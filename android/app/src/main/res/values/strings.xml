@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">RIKEAA</string>
+    <string name="title_activity_main">RIKEAA</string>
+    <string name="package_name">com.rikeaa.app</string>
+    <string name="custom_url_scheme">com.rikeaa.app</string>
+</resources>

@@ -5,17 +5,26 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:mobile": "vite build --config vite.config.mobile.js",
+    "cap:sync": "npx cap sync",
+    "cap:ios": "npm run build:mobile && npx cap sync ios && npx cap open ios",
+    "cap:android": "npm run build:mobile && npx cap sync android && npx cap open android"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.0",
     "autoprefixer": "^10.4.21",
     "axios": "^1.6.4",
     "laravel-vite-plugin": "^1.0.0",
+    "typescript": "^5.9.3",
     "vite": "^5.0.0",
     "vue": "^3.4.0"
   },
   "dependencies": {
+    "@capacitor/android": "^8.1.0",
+    "@capacitor/cli": "^7.5.0",
+    "@capacitor/core": "^8.1.0",
+    "@capacitor/ios": "^8.1.0",
     "@headlessui/vue": "^1.7.16",
     "@heroicons/vue": "^2.0.18",
     "@tailwindcss/forms": "^0.5.7",

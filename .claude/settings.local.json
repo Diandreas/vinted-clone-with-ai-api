@@ -13,7 +13,11 @@
       "Bash(php:*)",
       "Bash(del storageappgoogleservice-account.json)",
       "Bash(npm run build:*)",
-      "Bash(npm install)"
+      "Bash(npm install)",
+      "Bash(npm install:*)",
+      "Bash(npx cap add ios)",
+      "Bash(npx cap:*)",
+      "Bash(npm run build:mobile:*)"
     ],
     "deny": [],
     "ask": [],

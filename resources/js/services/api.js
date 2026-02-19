@@ -1,8 +1,9 @@
 import axios from 'axios'
+import { isNative } from '@/utils/platform'
 
 // Create axios instance
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api/v1',
+  baseURL: isNative() ? 'https://rikeaa.com/api/v1' : (import.meta.env.VITE_API_URL || '/api/v1'),
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',

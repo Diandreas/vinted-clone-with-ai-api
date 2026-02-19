@@ -23,6 +23,21 @@
     }
 }
 
+/* Android Safe Area Support */
+@supports (padding: env(safe-area-inset-top)) {
+    .android-device nav {
+        padding-top: env(safe-area-inset-top);
+    }
+
+    .android-device .fixed.top-0 {
+        top: env(safe-area-inset-top);
+    }
+
+    .android-device .fixed.bottom-0 {
+        bottom: env(safe-area-inset-bottom);
+    }
+}
+
 /* iOS Touch Optimizations */
 .ios-device * {
     -webkit-tap-highlight-color: transparent;
