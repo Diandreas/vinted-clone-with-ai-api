@@ -30,6 +30,11 @@ Route::get('privacy-policy', function () {
     return view('privacy-policy');
 })->name('privacy.policy');
 
+// Account deletion page (required by Google Play Store)
+Route::get('delete-account', function () {
+    return view('delete-account');
+})->name('delete.account');
+
 // All other GET routes are handled by Vue Router (EXCEPT API routes)
 Route::get('{any}', function () {
     // Skip API routes - more comprehensive check

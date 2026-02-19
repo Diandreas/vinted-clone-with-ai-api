@@ -438,7 +438,7 @@
         <p>Pour toute question, demande d'exercice de droits ou signalement concernant vos données personnelles :</p>
         <p style="margin-top:14px;">
             <strong style="color:#fff;">E-mail :</strong>
-            <a href="mailto:privacy@rikeaa.com">privacy@rikeaa.com</a>
+            <a href="mailto:privacy@rikeaa.com">hello@rikeaa.com</a>
         </p>
         <p style="margin-top:6px;">
             <strong style="color:#fff;">Application :</strong>
