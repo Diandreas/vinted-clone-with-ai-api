@@ -5,10 +5,10 @@ namespace App\Notifications;
 use App\Jobs\SendPushNotification;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
+
 use Illuminate\Notifications\Notification;
 
-class NewFollower extends Notification implements ShouldQueue
+class NewFollower extends Notification
 {
     use Queueable;
 

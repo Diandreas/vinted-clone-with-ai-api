@@ -7,10 +7,10 @@ use App\Models\Product;
 use App\Models\ProductComment;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
+
 use Illuminate\Notifications\Notification;
 
-class ProductCommented extends Notification implements ShouldQueue
+class ProductCommented extends Notification
 {
     use Queueable;
 

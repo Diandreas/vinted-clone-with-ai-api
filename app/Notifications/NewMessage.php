@@ -7,10 +7,10 @@ use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
+
 use Illuminate\Notifications\Notification;
 
-class NewMessage extends Notification implements ShouldQueue
+class NewMessage extends Notification
 {
     use Queueable;
 
