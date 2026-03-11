@@ -35,11 +35,23 @@ if (FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey !== 'VOTRE_API_KEY') {
       url = `/profile/${data.follower_id}`;
     }
 
+    // Tag stable : une nouvelle notif du même type remplace l'ancienne
+    // au lieu de s'empiler → évite le "Spam potentiel" Chrome
+    let tag = 'rikeaa-notification';
+    if (data.type === 'product_liked' || data.type === 'product_commented') {
+      tag = `rikeaa-product-${data.product_id}`;
+    } else if (data.type === 'new_message') {
+      tag = `rikeaa-conv-${data.conversation_id}`;
+    } else if (data.type === 'new_follower') {
+      tag = `rikeaa-follower-${data.follower_id}`;
+    }
+
     self.registration.showNotification(title || 'RIKEAA', {
       body: body || '',
       icon: '/logo.png',
       badge: '/logo.png',
-      tag: `rikeaa-${data.type || 'notification'}-${Date.now()}`,
+      tag,
+      renotify: true,
       vibrate: [100, 50, 100],
       data: { url, ...data },
       actions: [
