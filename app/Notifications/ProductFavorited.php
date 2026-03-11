@@ -9,45 +9,43 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class ProductLiked extends Notification implements ShouldQueue
+class ProductFavorited extends Notification implements ShouldQueue
 {
     use Queueable;
 
     public function __construct(
         public readonly Product $product,
-        public readonly User $liker,
+        public readonly User $fan,
     ) {}
 
     public function via(object $notifiable): array
     {
-        $channels = ['database'];
-
         if (!empty($notifiable->fcm_token)) {
             SendPushNotification::dispatch(
                 $notifiable->fcm_token,
-                '❤️ Nouveau like !',
-                "{$this->liker->name} a aimé votre produit « {$this->product->title} »",
+                '⭐ Nouveau favori !',
+                "{$this->fan->name} a ajouté « {$this->product->title} » à ses favoris",
                 [
                     'type'       => 'product_liked',
                     'product_id' => (string) $this->product->id,
-                    'liker_id'   => (string) $this->liker->id,
+                    'liker_id'   => (string) $this->fan->id,
                 ]
             );
         }
 
-        return $channels;
+        return ['database'];
     }
 
     public function toArray(object $notifiable): array
     {
         return [
-            'type'         => 'product_liked',
-            'product_id'   => $this->product->id,
+            'type'          => 'product_favorited',
+            'product_id'    => $this->product->id,
             'product_title' => $this->product->title,
-            'liker_id'     => $this->liker->id,
-            'liker_name'   => $this->liker->name,
-            'liker_avatar' => $this->liker->avatar_url,
-            'message'      => "{$this->liker->name} a aimé votre produit « {$this->product->title} »",
+            'fan_id'        => $this->fan->id,
+            'fan_name'      => $this->fan->name,
+            'fan_avatar'    => $this->fan->avatar_url,
+            'message'       => "{$this->fan->name} a ajouté « {$this->product->title} » à ses favoris",
         ];
     }
 }

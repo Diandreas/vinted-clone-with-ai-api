@@ -5,6 +5,7 @@ import router from './router';
 import App from './App.vue';
 import { initIOSUtils } from './utils/iosUtils';
 import { isAndroid } from './utils/platform';
+import { initFirebase } from './services/firebaseService';
 
 // Initialize iOS utilities
 initIOSUtils();
@@ -13,6 +14,9 @@ initIOSUtils();
 if (isAndroid()) {
     document.body.classList.add('android-device');
 }
+
+// Initialize Firebase (web push notifications)
+initFirebase();
 
 // Create Vue app
 const app = createApp(App);

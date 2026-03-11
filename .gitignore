@@ -27,3 +27,6 @@ Thumbs.db
 /dist
 /ios/App/App/public
 /android/app/src/main/assets/public
+
+# Firebase service account credentials (never commit)
+storage/credentials/

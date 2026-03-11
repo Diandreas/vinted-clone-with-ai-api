@@ -7,6 +7,8 @@ use App\Models\Message;
 use App\Models\Conversation;
 use App\Services\MessageCacheService;
 use App\Events\MessageSent;
+use App\Models\User;
+use App\Notifications\NewMessage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -93,6 +95,16 @@ class MessageController extends Controller
 
         // Broadcast message via Pusher for real-time delivery
         broadcast(new MessageSent($message))->toOthers();
+
+        // Send FCM push notification to the recipient (if they are not online)
+        $recipientId = $conversation->buyer_id === Auth::id()
+            ? $conversation->seller_id
+            : $conversation->buyer_id;
+
+        $recipient = User::find($recipientId);
+        if ($recipient) {
+            $recipient->notify(new NewMessage($message, Auth::user(), $conversation));
+        }
 
         return response()->json([
             'success' => true,

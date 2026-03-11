@@ -41,6 +41,7 @@ class  User extends Authenticatable implements MustVerifyEmail
         'permissions',
         'is_admin',
         'status',
+        'fcm_token',
     ];
 
     /**

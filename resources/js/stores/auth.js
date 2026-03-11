@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import api from '@/services/api'
 import router from '@/router'
+import { registerFcmToken, removeFcmToken } from '@/services/firebaseService'
 
 export const useAuthStore = defineStore('auth', () => {
   // State
@@ -29,6 +30,8 @@ export const useAuthStore = defineStore('auth', () => {
       try {
         setAuthToken(token.value)
         await fetchUser()
+        // Re-enregistrer le token FCM au rechargement (il peut avoir changé)
+        registerFcmToken()
       } catch (error) {
         console.error('Failed to initialize auth:', error)
         logout()
@@ -75,11 +78,14 @@ export const useAuthStore = defineStore('auth', () => {
       
       setAuthToken(response.data.token)
       user.value = response.data.user
-      
+
+      // Enregistrer le token FCM pour les notifications push
+      registerFcmToken()
+
       // Redirect to intended page or dashboard
       const redirect = router.currentRoute.value.query.redirect || '/dashboard'
       router.push(redirect)
-      
+
       return response.data
     } catch (error) {
       console.error('Login failed:', error)
@@ -96,9 +102,12 @@ export const useAuthStore = defineStore('auth', () => {
       
       setAuthToken(response.data.token)
       user.value = response.data.user
-      
+
+      // Enregistrer le token FCM pour les notifications push
+      registerFcmToken()
+
       router.push('/dashboard')
-      
+
       return response.data
     } catch (error) {
       console.error('Registration failed:', error)
@@ -112,6 +121,8 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = true
     try {
       if (token.value) {
+        // Supprimer le token FCM avant de se déconnecter
+        await removeFcmToken()
         await api.post('/auth/logout')
       }
     } catch (error) {

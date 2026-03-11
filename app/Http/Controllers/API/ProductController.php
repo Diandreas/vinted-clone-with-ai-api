@@ -16,6 +16,9 @@ use App\Jobs\ProcessProductImages;
 use App\Jobs\IndexProductForSearch;
 use App\Models\ProductAppointment;
 use App\Notifications\FollowerOnlyProductPosted;
+use App\Notifications\ProductLiked as ProductLikedNotification;
+use App\Notifications\ProductCommented as ProductCommentedNotification;
+use App\Notifications\ProductFavorited as ProductFavoritedNotification;
 use App\Models\PlatformFee;
 use App\Models\ProductFeeCharge;
 use App\Http\Resources\ProductResource;
@@ -257,15 +260,16 @@ class ProductController extends Controller
             ]);
         }
 
-        // Notify followers if followers-only
-        if ($product->followers_only) {
-            $seller = $product->user()->first();
-            if ($seller) {
-                $followers = $seller->followers()->get();
-                foreach ($followers as $follower) {
-                    $follower->notify(new FollowerOnlyProductPosted($product));
-                }
-            }
+        // Notify ALL followers when a product is published (active status only)
+        if ($product->status === Product::STATUS_ACTIVE) {
+            $seller = Auth::user();
+            $seller->followers()->each(function ($follower) use ($product, $seller) {
+                $follower->notify(new FollowerOnlyProductPosted(
+                    $product,
+                    $seller,
+                    $product->followers_only
+                ));
+            });
         }
 
         // Index for search
@@ -502,14 +506,19 @@ class ProductController extends Controller
         ]);
         
         $liked = $product->toggleLike($user);
-        
+
         $product->refresh(); // Rafraîchir le modèle
-        
+
         \Log::info('✅ toggleLike terminé', [
             'product_id' => $product->id,
             'liked' => $liked,
             'likes_count_after' => $product->likes_count
         ]);
+
+        // Notify the product owner (not if liking own product)
+        if ($liked && $product->user_id !== $user->id) {
+            $product->user->notify(new ProductLikedNotification($product, $user));
+        }
 
         return response()->json([
             'success' => true,
@@ -533,14 +542,18 @@ class ProductController extends Controller
         ]);
         
         $favorited = $product->toggleFavorite($user);
-        
+
         $product->refresh(); // Rafraîchir le modèle
-        
+
         \Log::info('✅ toggleFavorite terminé', [
             'product_id' => $product->id,
             'favorited' => $favorited,
             'favorites_count_after' => $product->favorites_count
         ]);
+
+        if ($favorited && $product->user_id !== $user->id) {
+            $product->user->notify(new ProductFavoritedNotification($product, $user));
+        }
 
         return response()->json([
             'success' => true,
@@ -593,6 +606,11 @@ class ProductController extends Controller
         ]);
 
         $product->increment('comments_count');
+
+        // Notify the product owner (not if commenting on own product)
+        if ($product->user_id !== Auth::id()) {
+            $product->user->notify(new ProductCommentedNotification($product, $comment, Auth::user()));
+        }
 
         return response()->json([
             'success' => true,

@@ -41,6 +41,13 @@ return [
         'storage_bucket' => env('GOOGLE_CLOUD_STORAGE_BUCKET'),
     ],
 
+    'firebase' => [
+        // Firebase project ID (généralement identique à GOOGLE_CLOUD_PROJECT_ID)
+        'project_id' => env('FIREBASE_PROJECT_ID', env('GOOGLE_CLOUD_PROJECT_ID')),
+        // Chemin résolu automatiquement depuis storage/ — fonctionne en local ET sur le serveur
+        'credentials_file' => storage_path('credentials/' . env('FIREBASE_CREDENTIALS_FILENAME', 'rikeaa-firebase-adminsdk.json')),
+    ],
+
     'stripe' => [
         'model' => App\Models\User::class,
         'key' => env('STRIPE_KEY'),

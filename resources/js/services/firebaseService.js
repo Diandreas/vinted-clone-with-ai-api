@@ -1,0 +1,132 @@
+import { initializeApp } from 'firebase/app'
+import { getMessaging, getToken, onMessage } from 'firebase/messaging'
+import { isNative } from '@/utils/platform'
+import api from '@/services/api'
+
+// ─── Firebase Web Config ────────────────────────────────────────────────────
+const firebaseConfig = {
+  apiKey:            import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain:        import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId:         import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket:     import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId:             import.meta.env.VITE_FIREBASE_APP_ID,
+}
+
+const VAPID_KEY = import.meta.env.VITE_FIREBASE_VAPID_KEY
+
+let messaging = null
+
+/**
+ * Initialise Firebase (Web seulement).
+ * Sur Android natif, c'est le plugin Capacitor qui gère nativement.
+ */
+export function initFirebase() {
+  if (isNative()) return null // Géré par @capacitor-firebase/messaging
+
+  if (!firebaseConfig.apiKey) {
+    console.warn('[FCM] Config Firebase manquante.')
+    return null
+  }
+
+  try {
+    const app = initializeApp(firebaseConfig)
+    messaging = getMessaging(app)
+    return messaging
+  } catch (err) {
+    console.error('[FCM] Erreur initialisation Firebase:', err)
+    return null
+  }
+}
+
+/**
+ * Demande la permission et enregistre le token FCM.
+ * - Sur Android natif  → utilise @capacitor-firebase/messaging
+ * - Sur le Web         → utilise le SDK Firebase Web
+ */
+export async function registerFcmToken() {
+  try {
+    let token = null
+
+    if (isNative()) {
+      // ── Android (Capacitor) ───────────────────────────────────────────────
+      const { FirebaseMessaging } = await import('@capacitor-firebase/messaging')
+
+      // Demande la permission de notifications
+      const { receive } = await FirebaseMessaging.requestPermissions()
+      if (receive !== 'granted') {
+        console.warn('[FCM] Permission refusée sur Android')
+        return
+      }
+
+      // Récupère le token FCM natif Android
+      const result = await FirebaseMessaging.getToken()
+      token = result.token
+
+    } else {
+      // ── Web (navigateur) ─────────────────────────────────────────────────
+      if (!messaging) return
+      if (Notification.permission === 'denied') return
+
+      const permission = await Notification.requestPermission()
+      if (permission !== 'granted') return
+
+      const swRegistration = await navigator.serviceWorker.ready
+      token = await getToken(messaging, {
+        vapidKey: VAPID_KEY,
+        serviceWorkerRegistration: swRegistration,
+      })
+    }
+
+    if (token) {
+      await api.post('/notifications/fcm-token', { fcm_token: token })
+      console.log('[FCM] Token enregistré ✓')
+    }
+
+  } catch (err) {
+    console.error('[FCM] Erreur lors de la récupération du token:', err)
+  }
+}
+
+/**
+ * Supprime le token FCM du serveur au logout.
+ */
+export async function removeFcmToken() {
+  try {
+    await api.delete('/notifications/fcm-token')
+  } catch (err) {
+    // Silencieux au logout
+  }
+}
+
+/**
+ * Écoute les notifications quand l'app est ouverte (foreground).
+ * - Sur Android natif  → utilise @capacitor-firebase/messaging
+ * - Sur le Web         → utilise le SDK Firebase Web
+ * @param {Function} callback — reçoit { title, body, data }
+ * @returns {Function} unsubscribe
+ */
+export async function onForegroundMessage(callback) {
+  if (isNative()) {
+    const { FirebaseMessaging } = await import('@capacitor-firebase/messaging')
+
+    // Sur Android, les notifications foreground ne s'affichent pas automatiquement
+    // Il faut les afficher manuellement via le callback
+    await FirebaseMessaging.addListener('notificationReceived', (event) => {
+      callback({
+        notification: {
+          title: event.notification.title,
+          body:  event.notification.body,
+        },
+        data: event.notification.data || {},
+      })
+    })
+
+    // Retourne une fonction de nettoyage
+    return () => FirebaseMessaging.removeAllListeners()
+  }
+
+  // Web
+  if (!messaging) return () => {}
+  return onMessage(messaging, callback)
+}

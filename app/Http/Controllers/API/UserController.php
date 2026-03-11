@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Follow;
+use App\Notifications\NewFollower;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -89,11 +90,15 @@ class UserController extends Controller
         }
 
         $result = $currentUser->follow($user);
-        
+
         // Si le follow a réussi, l'utilisateur suit maintenant l'autre
         // Si le follow a échoué (déjà abonné), on vérifie l'état actuel
         $isFollowing = $result ? true : $currentUser->isFollowing($user);
-        
+
+        if ($result) {
+            $user->notify(new NewFollower($currentUser));
+        }
+
         return response()->json([
             'success' => true,
             'data' => [

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class NotificationController extends Controller
 {
@@ -77,6 +78,37 @@ class NotificationController extends Controller
         return response()->json([
             'success' => true,
             'data' => ['count' => $count]
+        ]);
+    }
+
+    /**
+     * Register or update the FCM token for the current user.
+     * Called by the app/web after obtaining a Firebase token.
+     */
+    public function updateFcmToken(Request $request)
+    {
+        $request->validate([
+            'fcm_token' => 'required|string|max:500',
+        ]);
+
+        Auth::user()->update(['fcm_token' => $request->fcm_token]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'FCM token enregistré',
+        ]);
+    }
+
+    /**
+     * Remove the FCM token (e.g. on logout).
+     */
+    public function removeFcmToken()
+    {
+        Auth::user()->update(['fcm_token' => null]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'FCM token supprimé',
         ]);
     }
 

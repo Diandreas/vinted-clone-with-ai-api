@@ -30,8 +30,12 @@ import MobileTabBar from '@/components/layout/MobileTabBar.vue'
 import NotificationToast from '@/components/ui/NotificationToast.vue'
 import PWAInstallPrompt from '@/components/ui/PWAInstallPrompt.vue'
 import PWANotification from '@/components/ui/PWANotification.vue'
+import { useFcmNotifications } from '@/composables/useFcmNotifications'
 
 const route = useRoute()
+
+// Gestion des notifications push Firebase (foreground + clics background)
+useFcmNotifications()
 
 // Hide navbar on auth pages
 const isAuthPage = computed(() => {

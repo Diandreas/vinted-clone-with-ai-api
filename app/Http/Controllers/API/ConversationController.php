@@ -7,6 +7,7 @@ use App\Models\Conversation;
 use App\Models\Product;
 use App\Models\ProductInterest;
 use App\Models\User;
+use App\Notifications\NewMessage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -297,6 +298,9 @@ class ConversationController extends Controller
         ]);
 
         $conversation->load(['product', 'seller', 'lastMessage']);
+
+        // Notifie le vendeur du premier message
+        $seller->notify(new NewMessage($message, $buyer, $conversation));
 
         \Log::info('🎉 Conversation démarrée avec succès', [
             'conversation_id' => $conversation->id,

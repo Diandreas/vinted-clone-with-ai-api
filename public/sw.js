@@ -1,3 +1,56 @@
+// ─── Firebase Messaging (notifications en arrière-plan) ─────────────────────
+// Le SDK Firebase compat est chargé via CDN pour fonctionner dans le Service Worker.
+// Ces valeurs sont publiques — elles identifient le projet Firebase côté client.
+// Remplissez-les avec vos vraies valeurs depuis la console Firebase.
+importScripts('https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.11.0/firebase-messaging-compat.js');
+
+// ⚠️  Remplacez ces valeurs par celles de votre projet Firebase
+//    Console Firebase → Paramètres du projet → Vos applications → Web
+const FIREBASE_CONFIG = {
+  apiKey:            'AIzaSyDohobRkc4XT_TNOC4UtYv-N107GDXp-jg',
+  authDomain:        'rikeaa-a166c.firebaseapp.com',
+  projectId:         'rikeaa-a166c',
+  storageBucket:     'rikeaa-a166c.firebasestorage.app',
+  messagingSenderId: '970678640320',
+  appId:             '1:970678640320:web:c0c660a2d2bd597f7f5725',
+};
+
+if (FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey !== 'VOTRE_API_KEY') {
+  firebase.initializeApp(FIREBASE_CONFIG);
+  const messaging = firebase.messaging();
+
+  // Notifications reçues quand l'app est en arrière-plan / fermée
+  messaging.onBackgroundMessage((payload) => {
+    const { title, body } = payload.notification || {};
+    const data = payload.data || {};
+
+    // Détermine l'URL de redirection selon le type de notification
+    let url = '/';
+    if (data.type === 'product_liked' || data.type === 'product_commented' || data.type === 'product_published') {
+      url = `/products/${data.product_id}`;
+    } else if (data.type === 'new_message') {
+      url = `/conversations/${data.conversation_id}`;
+    } else if (data.type === 'new_follower') {
+      url = `/profile/${data.follower_id}`;
+    }
+
+    self.registration.showNotification(title || 'RIKEAA', {
+      body: body || '',
+      icon: '/logo.png',
+      badge: '/logo.png',
+      tag: `rikeaa-${data.type || 'notification'}-${Date.now()}`,
+      vibrate: [100, 50, 100],
+      data: { url, ...data },
+      actions: [
+        { action: 'open', title: 'Voir' },
+        { action: 'close', title: 'Ignorer' },
+      ],
+    });
+  });
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 const CACHE_NAME = 'rikeaa-v2';
 const STATIC_CACHE = 'rikeaa-static-v2';
 const DYNAMIC_CACHE = 'rikeaa-dynamic-v2';
@@ -55,6 +108,12 @@ self.addEventListener('fetch', (event) => {
 
   // Skip chrome-extension and other non-http requests
   if (!url.protocol.startsWith('http')) {
+    return;
+  }
+
+  // Skip cross-origin requests (CDN fonts, external scripts, etc.)
+  // These can fail due to CORS when intercepted by the SW
+  if (url.origin !== self.location.origin) {
     return;
   }
 
@@ -144,45 +203,29 @@ self.addEventListener('sync', (event) => {
   }
 });
 
-// Push notifications
-self.addEventListener('push', (event) => {
-  const options = {
-    body: event.data ? event.data.text() : 'Nouvelle notification RIKEAA',
-    icon: '/logo.png',
-    badge: '/logo.png',
-    vibrate: [100, 50, 100],
-    data: {
-      dateOfArrival: Date.now(),
-      primaryKey: 1
-    },
-    actions: [
-      {
-        action: 'explore',
-        title: 'Voir',
-        icon: '/logo.png'
-      },
-      {
-        action: 'close',
-        title: 'Fermer',
-        icon: '/logo.png'
-      }
-    ]
-  };
-
-  event.waitUntil(
-    self.registration.showNotification('RIKEAA', options)
-  );
-});
-
-// Notification click
+// Notification click — ouvre la bonne page selon le type
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
 
-  if (event.action === 'explore') {
-    event.waitUntil(
-      clients.openWindow('/')
-    );
-  }
+  if (event.action === 'close') return;
+
+  const data = event.notification.data || {};
+  const url = data.url || '/';
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      // Si l'app est déjà ouverte, focus + navigation
+      for (const client of clientList) {
+        if ('focus' in client) {
+          client.focus();
+          client.postMessage({ type: 'NOTIFICATION_CLICK', url, data });
+          return;
+        }
+      }
+      // Sinon ouvre une nouvelle fenêtre
+      return clients.openWindow(url);
+    })
+  );
 });
 
 // Background sync function

@@ -2,53 +2,57 @@
 
 namespace App\Notifications;
 
+use App\Jobs\SendPushNotification;
+use App\Models\Product;
+use App\Models\ProductComment;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class ProductCommented extends Notification
+class ProductCommented extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    /**
-     * Create a new notification instance.
-     */
-    public function __construct()
-    {
-        //
-    }
+    public function __construct(
+        public readonly Product $product,
+        public readonly ProductComment $comment,
+        public readonly User $commenter,
+    ) {}
 
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @return array<int, string>
-     */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        $channels = ['database'];
+
+        if (!empty($notifiable->fcm_token)) {
+            SendPushNotification::dispatch(
+                $notifiable->fcm_token,
+                '💬 Nouveau commentaire sur votre produit',
+                "{$this->commenter->name} : {$this->comment->content}",
+                [
+                    'type'       => 'product_commented',
+                    'product_id' => (string) $this->product->id,
+                    'comment_id' => (string) $this->comment->id,
+                    'user_id'    => (string) $this->commenter->id,
+                ]
+            );
+        }
+
+        return $channels;
     }
 
-    /**
-     * Get the mail representation of the notification.
-     */
-    public function toMail(object $notifiable): MailMessage
-    {
-        return (new MailMessage)
-            ->line('The introduction to the notification.')
-            ->action('Notification Action', url('/'))
-            ->line('Thank you for using our application!');
-    }
-
-    /**
-     * Get the array representation of the notification.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(object $notifiable): array
     {
         return [
-            //
+            'type'           => 'product_commented',
+            'product_id'     => $this->product->id,
+            'product_title'  => $this->product->title,
+            'comment_id'     => $this->comment->id,
+            'comment'        => $this->comment->content,
+            'commenter_id'   => $this->commenter->id,
+            'commenter_name' => $this->commenter->name,
+            'commenter_avatar' => $this->commenter->avatar_url,
+            'message'        => "{$this->commenter->name} a commenté votre produit « {$this->product->title} »",
         ];
     }
 }
