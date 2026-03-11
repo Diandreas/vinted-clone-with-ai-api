@@ -35,8 +35,8 @@ export function useFcmNotifications() {
     const url = getUrlFromData(data)
     notificationStore.addNotification({
       type: 'info',
-      title: notification?.title || 'RIKEAA',
-      message: notification?.body || '',
+      title: notification?.title || data?.title || 'RIKEAA',
+      message: notification?.body  || data?.body  || '',
       duration: 6000,
       action: url ? () => router.push(url) : null,
     })

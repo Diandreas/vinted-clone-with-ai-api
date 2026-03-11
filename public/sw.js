@@ -22,8 +22,9 @@ if (FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey !== 'VOTRE_API_KEY') {
 
   // Notifications reçues quand l'app est en arrière-plan / fermée
   messaging.onBackgroundMessage((payload) => {
-    const { title, body } = payload.notification || {};
     const data = payload.data || {};
+    const title = data.title || 'RIKEAA';
+    const body  = data.body  || '';
 
     // Détermine l'URL de redirection selon le type de notification
     let url = '/';

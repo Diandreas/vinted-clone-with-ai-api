@@ -34,11 +34,7 @@ class FcmService
                 ->post("https://fcm.googleapis.com/v1/projects/{$this->projectId}/messages:send", [
                     'message' => [
                         'token' => $token,
-                        'notification' => [
-                            'title' => $title,
-                            'body'  => $body,
-                        ],
-                        'data' => array_map('strval', $data),
+                        'data' => array_map('strval', array_merge(['title' => $title, 'body' => $body], $data)),
                         'android' => [
                             'priority' => 'high',
                             'notification' => [

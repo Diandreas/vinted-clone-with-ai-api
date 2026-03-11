@@ -87,23 +87,12 @@ export const setupIOSViewport = () => {
 // iOS-specific touch handling
 export const setupIOSTouchHandling = () => {
     if (isIOS()) {
-        // Prevent double-tap zoom
-        let lastTouchEnd = 0;
-        document.addEventListener('touchend', (event) => {
-            const now = (new Date()).getTime();
-            if (now - lastTouchEnd <= 300) {
-                event.preventDefault();
-            }
-            lastTouchEnd = now;
-        }, false);
+        // Double-tap zoom is already disabled via user-scalable=no in the viewport meta tag.
+        // The old touchend + touchmove preventDefault approach was blocking ALL scrolling
+        // and tap navigation on iOS — so both handlers are intentionally removed.
 
-        // Prevent pull-to-refresh on body
-        document.body.addEventListener('touchmove', (event) => {
-            if (event.target.closest('.scrollable-content')) {
-                return;
-            }
-            event.preventDefault();
-        }, { passive: false });
+        // Prevent pull-to-refresh using CSS only (overscroll-behavior) — no JS needed.
+        document.body.style.overscrollBehaviorY = 'none';
     }
 };
 
