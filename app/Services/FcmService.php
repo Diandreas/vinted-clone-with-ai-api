@@ -48,10 +48,6 @@ class FcmService
                             ],
                         ],
                         'webpush' => [
-                            'notification' => [
-                                'icon' => '/icons/icon-192x192.png',
-                                'badge' => '/icons/badge-72x72.png',
-                            ],
                             'fcm_options' => [
                                 'link' => config('app.url'),
                             ],
