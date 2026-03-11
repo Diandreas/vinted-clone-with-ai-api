@@ -6,6 +6,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Forcer le mode clair — l'app n'a pas de dark mode.
+   Sans cela, les navigateurs en mode sombre appliquent automatiquement
+   un fond sombre sur les inputs, rendant le texte invisible. */
+:root {
+    color-scheme: light;
+}
+
 /* Custom CSS Variables */
 :root {
     --primary-50: #f0f9ff;
