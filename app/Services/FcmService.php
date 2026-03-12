@@ -60,10 +60,12 @@ class FcmService
                     'token'  => substr($token, 0, 20) . '...',
                     'status' => $response->status(),
                     'error'  => $response->json('error.message'),
+                    'body'   => $response->json(),
                 ]);
                 return false;
             }
 
+            Log::info('FCM: envoi OK', ['token' => substr($token, 0, 20) . '...', 'data_keys' => array_keys($data)]);
             return true;
         } catch (\Exception $e) {
             Log::error('FCM: exception', ['message' => $e->getMessage()]);
