@@ -28,9 +28,9 @@
         </div>
       </div>
       
-      <div v-else-if="notifications.length > 0" class="divide-y divide-gray-100">
+      <div v-else-if="unreadNotifications.length > 0" class="divide-y divide-gray-100">
         <div
-          v-for="notification in notifications"
+          v-for="notification in unreadNotifications"
           :key="notification.id"
           :class="[
             'p-4 hover:bg-gray-50 cursor-pointer transition-colors',
@@ -83,7 +83,7 @@
     </div>
 
     <!-- Footer -->
-    <div v-if="notifications.length > 0" class="border-t border-gray-100 p-3">
+    <div v-if="unreadNotifications.length > 0" class="border-t border-gray-100 p-3">
       <RouterLink
         to="/notifications"
         class="block text-center text-sm text-indigo-600 hover:text-indigo-700"
@@ -124,9 +124,10 @@ const loading = ref(true)
 const notifications = ref([])
 
 // Computed
-const unreadCount = computed(() => 
-  notifications.value.filter(n => !n.read_at).length
+const unreadNotifications = computed(() =>
+  notifications.value.filter(n => !n.read_at)
 )
+const unreadCount = computed(() => unreadNotifications.value.length)
 
 // Methods
 const normalizeNotification = (raw) => {
@@ -189,6 +190,7 @@ const handleNotificationClick = async (notification) => {
     try {
               await window.axios.put(`/notifications/${notification.id}/read`)
       notification.read_at = new Date().toISOString()
+      dashboardStore.unreadNotifications = Math.max(0, dashboardStore.unreadNotifications - 1)
     } catch (error) {
       console.error('Error marking notification as read:', error)
     }
