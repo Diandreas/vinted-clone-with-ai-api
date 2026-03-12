@@ -416,17 +416,27 @@ const handleClickOutside = (event) => {
 }
 
 // Lifecycle
+let unreadIntervalId = null
+
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
 
   // Load notification counts and wallet balance if authenticated
   if (isAuthenticated.value) {
     dashboardStore.fetchStats()
+    dashboardStore.fetchUnreadNotifications()
+    unreadIntervalId = setInterval(() => {
+      dashboardStore.fetchUnreadNotifications()
+    }, 30000)
   }
 })
 
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
+  if (unreadIntervalId) {
+    clearInterval(unreadIntervalId)
+    unreadIntervalId = null
+  }
 })
 </script>
 

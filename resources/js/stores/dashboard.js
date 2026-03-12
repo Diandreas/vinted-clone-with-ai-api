@@ -201,6 +201,17 @@ export const useDashboardStore = defineStore('dashboard', () => {
     }
   }
 
+  const fetchUnreadNotifications = async () => {
+    try {
+      const response = await api.get('/notifications/unread-count')
+      const count = response.data?.data?.count
+      unreadNotifications.value = typeof count === 'number' ? count : 0
+      return unreadNotifications.value
+    } catch (error) {
+      throw error
+    }
+  }
+
   const refreshData = async () => {
     try {
       await Promise.all([
@@ -236,7 +247,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
     deleteProduct,
     boostProduct,
     markNotificationsAsRead,
+    fetchUnreadNotifications,
     refreshData
   }
 })
-

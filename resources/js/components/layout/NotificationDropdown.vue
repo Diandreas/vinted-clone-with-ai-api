@@ -129,13 +129,41 @@ const unreadCount = computed(() =>
 )
 
 // Methods
+const normalizeNotification = (raw) => {
+  const data = raw?.data || {}
+  const type = data.type || raw?.type || 'notification'
+
+  const titleByType = {
+    product_liked: 'Nouveau like',
+    product_favorited: 'Nouveau favori',
+    product_commented: 'Nouveau commentaire',
+    new_message: 'Nouveau message',
+    new_follower: 'Nouveau follower',
+    order_status_changed: 'Commande mise à jour',
+  }
+
+  return {
+    id: raw.id,
+    type,
+    title: data.title || titleByType[type] || 'Notification',
+    message: data.message || raw.message || '',
+    data,
+    read_at: raw.read_at,
+    created_at: raw.created_at,
+  }
+}
+
 const fetchNotifications = async () => {
   loading.value = true
   try {
             const response = await window.axios.get('/notifications', {
       params: { limit: 10 }
     })
-    notifications.value = response.data.data || []
+    const payload = response.data?.data || {}
+    const items = payload.data || payload || []
+    const normalized = (items || []).map(normalizeNotification)
+    notifications.value = normalized
+    dashboardStore.unreadNotifications = normalized.filter(n => !n.read_at).length
   } catch (error) {
     console.error('Error fetching notifications:', error)
   } finally {
@@ -178,12 +206,16 @@ const handleNotificationClick = async (notification) => {
 
 const getNotificationUrl = (notification) => {
   switch (notification.type) {
-    case 'like':
+    case 'product_liked':
+    case 'product_favorited':
+    case 'product_commented':
       return `/products/${notification.data?.product_id}`
-    case 'order':
+    case 'new_message':
+      return `/conversations/${notification.data?.conversation_id}`
+    case 'new_follower':
+      return `/profile/${notification.data?.follower_id || notification.data?.user_id}`
+    case 'order_status_changed':
       return `/orders/${notification.data?.order_id}`
-    case 'follow':
-      return `/users/${notification.data?.user_id}`
     default:
       return null
   }
@@ -191,9 +223,12 @@ const getNotificationUrl = (notification) => {
 
 const getNotificationIcon = (type) => {
   const iconMap = {
-    like: HeartIcon,
-    order: ShoppingBagIcon,
-    follow: UserPlusIcon,
+    product_liked: HeartIcon,
+    product_favorited: StarIcon,
+    product_commented: ShoppingBagIcon,
+    new_message: ShoppingBagIcon,
+    new_follower: UserPlusIcon,
+    order_status_changed: ShoppingBagIcon,
     review: StarIcon,
     product: PackageIcon
   }
@@ -202,9 +237,12 @@ const getNotificationIcon = (type) => {
 
 const getNotificationIconClass = (type) => {
   const classMap = {
-    like: 'bg-red-100 text-red-600',
-    order: 'bg-green-100 text-green-600',
-    follow: 'bg-purple-100 text-purple-600',
+    product_liked: 'bg-red-100 text-red-600',
+    product_favorited: 'bg-yellow-100 text-yellow-600',
+    product_commented: 'bg-blue-100 text-blue-600',
+    new_message: 'bg-green-100 text-green-600',
+    new_follower: 'bg-purple-100 text-purple-600',
+    order_status_changed: 'bg-green-100 text-green-600',
     review: 'bg-yellow-100 text-yellow-600',
     product: 'bg-gray-100 text-gray-600'
   }
@@ -223,4 +261,3 @@ onMounted(() => {
   fetchNotifications()
 })
 </script>
-
