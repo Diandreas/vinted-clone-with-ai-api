@@ -28,6 +28,24 @@ class ProductController extends Controller
 {
     use AuthorizesRequests;
     /**
+     * Resolve brand_id from request: use brand_id if given, otherwise find-or-create by brand_name.
+     */
+    private function resolveBrandId(Request $request): ?int
+    {
+        if ($request->brand_id) {
+            return (int) $request->brand_id;
+        }
+        if ($request->brand_name && trim($request->brand_name) !== '') {
+            $brand = Brand::firstOrCreate(
+                ['name' => trim($request->brand_name)],
+                ['slug' => \Illuminate\Support\Str::slug($request->brand_name)]
+            );
+            return $brand->id;
+        }
+        return null;
+    }
+
+    /**
      * Display a listing of products.
      */
     public function index(Request $request)
@@ -198,6 +216,7 @@ class ProductController extends Controller
             'original_price' => 'nullable|numeric|min:0.01',
             'category_id' => 'required|exists:categories,id',
             'brand_id' => 'nullable|exists:brands,id',
+            'brand_name' => 'nullable|string|max:100',
             'condition_id' => 'required|exists:conditions,id',
             'size' => 'nullable|string|max:50',
             'color' => 'nullable|string|max:50',
@@ -229,7 +248,7 @@ class ProductController extends Controller
             'price' => $request->price,
             'original_price' => $request->original_price,
             'category_id' => $request->category_id,
-            'brand_id' => $request->brand_id,
+            'brand_id' => $this->resolveBrandId($request),
             'condition_id' => $request->condition_id,
             'size' => $request->size,
             'color' => $request->color,
@@ -426,6 +445,7 @@ class ProductController extends Controller
             'original_price' => 'nullable|numeric|min:0.01',
             'category_id' => 'sometimes|exists:categories,id',
             'brand_id' => 'nullable|exists:brands,id',
+            'brand_name' => 'nullable|string|max:100',
             'condition_id' => 'sometimes|exists:conditions,id',
             'size' => 'nullable|string|max:50',
             'color' => 'nullable|string|max:50',
@@ -445,14 +465,14 @@ class ProductController extends Controller
             'new_images.*' => 'file|mimetypes:image/jpeg,image/png,image/gif,video/mp4,video/quicktime,video/webm|max:51200',
         ]);
 
-        $product->update($request->only([
+        $product->update(array_merge($request->only([
             'title', 'description', 'price', 'original_price',
-            'category_id', 'brand_id', 'condition_id',
+            'category_id', 'condition_id',
             'size', 'color', 'material', 'shipping_cost',
             'location', 'is_negotiable', 'minimum_offer',
             'tags', 'measurements', 'status',
             'followers_only', 'is_spot', 'spot_starts_at', 'spot_ends_at'
-        ]));
+        ]), ['brand_id' => $this->resolveBrandId($request)]));
 
         // Process new images if provided
         if ($request->hasFile('new_images')) {

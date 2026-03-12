@@ -193,25 +193,36 @@
               </select>
             </div>
 
-            <!-- Brand - Ultra Compact -->
-            <div>
+            <!-- Brand - Autocomplete -->
+            <div class="relative">
               <label for="brand" class="block text-xs font-medium text-gray-700 mb-1">
                 Marque
               </label>
-              <select
+              <input
                 id="brand"
-                v-model="form.brand_id"
+                v-model="brandSearch"
+                type="text"
+                placeholder="Ex: Nike, Zara, Samsung…"
+                autocomplete="off"
                 class="w-full px-2 py-1.5 border border-gray-300 rounded-md focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 bg-white/80 backdrop-blur-sm text-xs"
+                @input="onBrandInput"
+                @focus="showBrandDropdown = true"
+                @blur="hideBrandDropdown"
+              />
+              <!-- Dropdown suggestions -->
+              <ul
+                v-if="showBrandDropdown && filteredBrands.length > 0"
+                class="absolute z-20 w-full bg-white border border-gray-200 rounded-md shadow-lg mt-1 max-h-40 overflow-y-auto"
               >
-                <option value="">Marque</option>
-                <option
-                  v-for="brand in brands"
+                <li
+                  v-for="brand in filteredBrands"
                   :key="brand.id"
-                  :value="brand.id"
+                  @mousedown.prevent="selectBrand(brand)"
+                  class="px-3 py-2 text-xs cursor-pointer hover:bg-primary-50 hover:text-primary-700"
                 >
                   {{ brand.name }}
-                </option>
-              </select>
+                </li>
+              </ul>
             </div>
 
             <!-- Condition - Ultra Compact -->
@@ -325,7 +336,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useNotificationStore } from '@/stores/notification'
@@ -394,6 +405,15 @@ export default {
     const brands = ref([])
     const conditions = ref([])
 
+    // Brand autocomplete
+    const brandSearch = ref('')
+    const showBrandDropdown = ref(false)
+    const filteredBrands = computed(() => {
+      const q = brandSearch.value.trim().toLowerCase()
+      if (!q) return brands.value.slice(0, 8)
+      return brands.value.filter(b => b.name.toLowerCase().includes(q)).slice(0, 8)
+    })
+
     // Refs
     const multipleImageInput = ref(null)
 
@@ -414,6 +434,22 @@ export default {
       } catch (error) {
         console.error('Error loading brands:', error)
       }
+    }
+
+    const onBrandInput = () => {
+      // Reset brand_id si l'utilisateur retape
+      form.value.brand_id = ''
+      showBrandDropdown.value = true
+    }
+
+    const selectBrand = (brand) => {
+      form.value.brand_id = brand.id
+      brandSearch.value = brand.name
+      showBrandDropdown.value = false
+    }
+
+    const hideBrandDropdown = () => {
+      setTimeout(() => { showBrandDropdown.value = false }, 150)
     }
 
     const loadConditions = async () => {
@@ -514,6 +550,8 @@ export default {
         formData.append('category_id', form.value.category_id)
         if (form.value.brand_id) {
           formData.append('brand_id', form.value.brand_id)
+        } else if (brandSearch.value.trim()) {
+          formData.append('brand_name', brandSearch.value.trim())
         }
         formData.append('condition_id', form.value.condition_id)
         if (form.value.size) {
@@ -579,6 +617,12 @@ export default {
       categories,
       brands,
       conditions,
+      brandSearch,
+      showBrandDropdown,
+      filteredBrands,
+      onBrandInput,
+      selectBrand,
+      hideBrandDropdown,
       multipleImageInput,
       handleMultipleImageUpload,
       removeImage,
