@@ -1,5 +1,5 @@
 <template>
-  <div class="notification-dropdown absolute right-0 top-full mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+  <div class="notification-dropdown absolute right-0 top-full mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50" @click.stop>
     <!-- Header -->
     <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
       <h3 class="text-lg font-semibold text-gray-900">Notifications</h3>

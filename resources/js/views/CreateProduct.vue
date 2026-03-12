@@ -250,6 +250,7 @@
                   step="0.01"
                   min="0"
                   required
+                  @keydown="(e) => { if (e.key === '-' || e.key === 'e' || e.key === 'E') e.preventDefault() }"
                   class="w-full pl-6 pr-2 py-1.5 border border-gray-300 rounded-md focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 bg-white/80 backdrop-blur-sm text-xs"
                   placeholder="0"
                 />

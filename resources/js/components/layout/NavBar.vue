@@ -158,9 +158,9 @@
             </div>
 
           <!-- Notifications -->
-          <div class="relative user-menu">
+          <div class="relative user-menu notification-menu">
               <button
-                @click="showNotifications = !showNotifications"
+                @click.stop="showNotifications = !showNotifications"
                 class="relative p-2 text-gray-400 hover:text-gray-600 transition-colors"
               >
                 <BellIcon class="w-6 h-6" />
@@ -407,7 +407,7 @@ const logout = async () => {
 
 // Close dropdowns when clicking outside
 const handleClickOutside = (event) => {
-  if (!event.target.closest('.notification-dropdown')) {
+  if (!event.target.closest('.notification-dropdown') && !event.target.closest('.notification-menu')) {
     showNotifications.value = false
   }
   if (!event.target.closest('.user-menu')) {

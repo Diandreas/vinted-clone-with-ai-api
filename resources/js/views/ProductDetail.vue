@@ -628,18 +628,7 @@ const isProductOwner = computed(() => {
 })
 
 const canEditProduct = computed(() => {
-  if (!isProductOwner.value) return false
-
-  // Vérifier si le produit a été créé il y a moins de 30 minutes
-  if (product.value?.created_at) {
-    const createdAt = new Date(product.value.created_at)
-    const now = new Date()
-    const diffInMinutes = (now - createdAt) / (1000 * 60) // différence en minutes
-
-    return diffInMinutes <= 30
-  }
-
-  return false
+  return isProductOwner.value
 })
 
 // Methods

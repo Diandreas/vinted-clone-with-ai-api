@@ -90,7 +90,8 @@
                   step="0.01"
                   min="0.01"
                   required
-                  class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  @keydown="blockNegative"
+                  class="w-full pl-14 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   placeholder="0.00"
                 />
               </div>
@@ -108,7 +109,8 @@
                   type="number"
                   step="0.01"
                   min="0.01"
-                  class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  @keydown="blockNegative"
+                  class="w-full pl-14 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   placeholder="0.00"
                 />
               </div>
@@ -237,7 +239,8 @@
                   type="number"
                   step="0.01"
                   min="0"
-                  class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  @keydown="blockNegative"
+                  class="w-full pl-14 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   placeholder="0.00"
                 />
               </div>
@@ -281,7 +284,8 @@
                   type="number"
                   step="0.01"
                   min="0.01"
-                  class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  @keydown="blockNegative"
+                  class="w-full pl-14 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   placeholder="0.00"
                 />
               </div>
@@ -531,6 +535,11 @@ const handleImageUpload = (event) => {
   event.target.value = ''
 }
 
+// Block negative values on price inputs
+const blockNegative = (e) => {
+  if (e.key === '-' || e.key === 'e' || e.key === 'E') e.preventDefault()
+}
+
 // Remove new image
 const removeNewImage = (index) => {
   newImages.value.splice(index, 1)
@@ -558,21 +567,26 @@ const updateProduct = async () => {
   
   try {
     const formData = new FormData()
-    
+
+    // Laravel method spoofing : PHP ne parse le multipart/form-data que pour POST
+    formData.append('_method', 'PUT')
+
     // Add form fields
     Object.keys(form).forEach(key => {
-      if (form[key] !== '' && form[key] !== null && form[key] !== undefined) {
-        formData.append(key, form[key])
+      const value = form[key]
+      if (value !== '' && value !== null && value !== undefined) {
+        // FormData convertit les booléens en "true"/"false" que Laravel refuse — on utilise 1/0
+        formData.append(key, typeof value === 'boolean' ? (value ? '1' : '0') : value)
       }
     })
-    
+
     // Add new images
     newImages.value.forEach(image => {
       formData.append('new_images[]', image.file)
     })
-    
-    // Update product
-    await window.axios.put(`/products/${route.params.id}`, formData, {
+
+    // Update product via POST (method spoofing)
+    await window.axios.post(`/products/${route.params.id}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }

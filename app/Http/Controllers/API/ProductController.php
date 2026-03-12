@@ -392,21 +392,6 @@ class ProductController extends Controller
             ], 403);
         }
 
-        // Vérifier si le produit peut encore être modifié (30 minutes après création)
-        $createdAt = $product->created_at;
-        $now = now();
-        $diffInMinutes = $createdAt->diffInMinutes($now);
-        
-        if ($diffInMinutes > 30) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Product can only be edited within 30 minutes of creation',
-                'created_at' => $createdAt,
-                'current_time' => $now,
-                'minutes_elapsed' => $diffInMinutes
-            ], 422);
-        }
-
         $request->validate([
             'title' => 'sometimes|string|max:255',
             'description' => 'sometimes|string',
@@ -429,6 +414,8 @@ class ProductController extends Controller
             'is_spot' => 'nullable|boolean',
             'spot_starts_at' => 'nullable|date',
             'spot_ends_at' => 'nullable|date|after:spot_starts_at',
+            'new_images' => 'nullable|array|max:10',
+            'new_images.*' => 'file|mimetypes:image/jpeg,image/png,image/gif,video/mp4,video/quicktime,video/webm|max:51200',
         ]);
 
         $product->update($request->only([
@@ -440,10 +427,18 @@ class ProductController extends Controller
             'followers_only', 'is_spot', 'spot_starts_at', 'spot_ends_at'
         ]));
 
+        // Process new images if provided
+        if ($request->hasFile('new_images')) {
+            $job = new ProcessProductImages($product, $request->file('new_images'));
+            $job->handle();
+        }
+
         // Re-index for search if needed
         if ($product->wasChanged(['title', 'description', 'price', 'category_id', 'brand_id'])) {
             IndexProductForSearch::dispatch($product);
         }
+
+        $product->load(['images']);
 
         return response()->json([
             'success' => true,

@@ -179,7 +179,7 @@ Route::prefix('v1')->group(function () {
             Route::get('sold', [ProductController::class, 'sold']);
             Route::get('stats', [ProductController::class, 'stats']);
             // Parameterized routes come after
-            Route::put('{product}', [ProductController::class, 'update']);
+            Route::match(['PUT', 'POST'], '{product}', [ProductController::class, 'update']);
             Route::put('{product}/status', [ProductController::class, 'updateStatus']);
             Route::delete('{product}', [ProductController::class, 'destroy']);
             Route::get('{product}/payment-details', [ProductController::class, 'getPaymentDetails']);

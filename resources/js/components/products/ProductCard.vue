@@ -39,7 +39,7 @@
           v-if="canEditProduct"
           @click.stop="$emit('edit', product)"
           class="bg-white bg-opacity-90 hover:bg-opacity-100 p-0.5 sm:p-1 rounded-full shadow-sm transition-all"
-          title="Modifier (disponible 30 min après création)"
+          title="Modifier"
         >
           <EditIcon class="w-3 h-3 sm:w-4 sm:h-4 text-gray-600" />
         </button>
@@ -233,16 +233,7 @@ const favoritingProduct = ref(false)
 const isLiked = computed(() => props.product.is_liked_by_user)
 const isFavorite = computed(() => props.product.is_favorited_by_user)
 
-// Check if product can be edited (only within 30 minutes of creation)
-const canEditProduct = computed(() => {
-  if (!props.product.created_at) return false
-  
-  const createdAt = new Date(props.product.created_at)
-  const now = new Date()
-  const diffInMinutes = (now - createdAt) / (1000 * 60)
-  
-  return diffInMinutes <= 30
-})
+const canEditProduct = computed(() => true)
 
 // Methods
 
