@@ -395,9 +395,14 @@ const sendMessage = async () => {
 }
 
 const scrollToBottom = () => {
-  if (messagesContainer.value) {
-    messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
-  }
+  // Double rAF : garantit que le scroll se fait après le rendu complet du DOM
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      if (messagesContainer.value) {
+        messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
+      }
+    })
+  })
 }
 
 const markAllRead = () => {
