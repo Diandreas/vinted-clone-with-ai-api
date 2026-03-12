@@ -164,20 +164,31 @@ const formattedViews = computed(() => {
   return num.toString()
 })
 
-const formattedDate = computed(() => {
-  if (!props.product.created_at) return ''
-  const date = new Date(props.product.created_at)
-  const now = new Date()
-  const diffTime = Math.abs(now - date)
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-  
-  if (diffDays === 1) return 'Aujourd\'hui'
-  if (diffDays === 2) return 'Hier'
-  if (diffDays <= 7) return `Il y a ${diffDays - 1} jours`
-  if (diffDays <= 30) return `Il y a ${Math.floor(diffDays / 7)} semaines`
-  if (diffDays <= 365) return `Il y a ${Math.floor(diffDays / 30)} mois`
-  return `Il y a ${Math.floor(diffDays / 365)} ans`
-})
+const formattedDate = computed(() => timeAgo(props.product.created_at))
+
+function timeAgo(dateString) {
+  if (!dateString) return ''
+  // Si pas de timezone info, on interprète comme UTC (Laravel stocke en UTC par défaut)
+  let raw = dateString
+  if (!raw.includes('Z') && !raw.includes('+') && !/[+-]\d{2}:\d{2}/.test(raw)) {
+    raw = raw.replace(' ', 'T') + 'Z'
+  }
+  const date = new Date(raw)
+  const diffMs = Math.max(0, Date.now() - date.getTime())
+  const diffSecs  = Math.floor(diffMs / 1000)
+  const diffMins  = Math.floor(diffMs / 60000)
+  const diffHours = Math.floor(diffMs / 3600000)
+  const diffDays  = Math.floor(diffMs / 86400000)
+  if (diffSecs  <  60)  return 'À l\'instant'
+  if (diffMins  <  60)  return `Il y a ${diffMins} min`
+  if (diffHours <  24)  return `Il y a ${diffHours}h`
+  if (diffDays  === 1)  return 'Hier'
+  if (diffDays  <   7)  return `Il y a ${diffDays} jours`
+  if (diffDays  <  30)  return `Il y a ${Math.floor(diffDays / 7)} sem.`
+  if (diffDays  < 365)  return `Il y a ${Math.floor(diffDays / 30)} mois`
+  const years = Math.floor(diffDays / 365)
+  return `Il y a ${years} an${years > 1 ? 's' : ''}`
+}
 
 const isLiked = computed(() => props.product.is_liked || false)
 const isFavorite = computed(() => props.product.is_favorited || false)

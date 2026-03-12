@@ -241,14 +241,22 @@ export default {
     formatPrice,
     formatDate(dateString) {
       if (!dateString) return ''
-      const date = new Date(dateString)
-      const now = new Date()
-      const diffTime = Math.abs(now - date)
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-
-      if (diffDays === 1) return 'Hier'
-      if (diffDays < 7) return `Il y a ${diffDays} jours`
-      if (diffDays < 30) return `Il y a ${Math.floor(diffDays / 7)} semaines`
+      let raw = dateString
+      if (!raw.includes('Z') && !raw.includes('+') && !/[+-]\d{2}:\d{2}/.test(raw)) {
+        raw = raw.replace(' ', 'T') + 'Z'
+      }
+      const date = new Date(raw)
+      const diffMs = Math.max(0, Date.now() - date.getTime())
+      const diffSecs  = Math.floor(diffMs / 1000)
+      const diffMins  = Math.floor(diffMs / 60000)
+      const diffHours = Math.floor(diffMs / 3600000)
+      const diffDays  = Math.floor(diffMs / 86400000)
+      if (diffSecs  <  60)  return 'À l\'instant'
+      if (diffMins  <  60)  return `Il y a ${diffMins} min`
+      if (diffHours <  24)  return `Il y a ${diffHours}h`
+      if (diffDays  === 1)  return 'Hier'
+      if (diffDays  <   7)  return `Il y a ${diffDays} jours`
+      if (diffDays  <  30)  return `Il y a ${Math.floor(diffDays / 7)} sem.`
       return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
     },
     toggleLike() {

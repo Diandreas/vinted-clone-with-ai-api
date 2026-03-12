@@ -71,7 +71,7 @@ class ProductController extends Controller
                 'likes_count', 'views_count', 'status',
                 'created_at', 'followers_only', 'is_spot'
             ])
-            ->active();
+            ->where('status', '!=', Product::STATUS_DRAFT);
 
             // Filters
             if ($request->category_id) {
@@ -112,29 +112,6 @@ class ProductController extends Controller
                 if (!is_null($isSpot)) {
                     $query->where('is_spot', $isSpot);
                 }
-            }
-
-            // Followers only filter (explicit)
-            if ($request->has('followers_only')) {
-                $followersOnly = filter_var($request->get('followers_only'), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-                if (!is_null($followersOnly)) {
-                    $query->where('followers_only', $followersOnly);
-                }
-            }
-
-            // Followers-only filtering for non-followers
-            if (Auth::check()) {
-                $followingIds = Auth::user()->following()->pluck('following_id');
-                $query->where(function($q) use ($followingIds) {
-                    $q->where('followers_only', false)
-                      ->orWhere(function($q2) use ($followingIds) {
-                          $q2->where('followers_only', true)
-                             ->whereIn('user_id', $followingIds);
-                      })
-                      ->orWhere('user_id', Auth::id());
-                });
-            } else {
-                $query->where('followers_only', false);
             }
 
             // Search
