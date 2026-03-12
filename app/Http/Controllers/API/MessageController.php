@@ -31,6 +31,21 @@ class MessageController extends Controller
             ], 403);
         }
 
+        // Polling : retourner uniquement les messages après un ID donné
+        if ($request->has('after_id')) {
+            $afterId = (int) $request->get('after_id');
+            $newMessages = $conversation->messages()
+                ->with('sender:id,name,avatar')
+                ->where('id', '>', $afterId)
+                ->orderBy('id', 'asc')
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => $newMessages,
+            ]);
+        }
+
         $page = $request->get('page', 1);
         $perPage = $request->get('per_page', 50);
 
@@ -145,6 +160,28 @@ class MessageController extends Controller
             'success' => true,
             'message' => 'Message marked as read'
         ]);
+    }
+
+    /**
+     * Marquer tous les messages d'une conversation comme lus.
+     * Appelé quand l'utilisateur est déjà dans la conversation.
+     */
+    public function markAllRead(Conversation $conversation)
+    {
+        if (!($conversation->buyer_id === Auth::id() || $conversation->seller_id === Auth::id())) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        // Marquer en DB tous les messages de l'autre participant comme lus
+        $conversation->messages()
+            ->where('sender_id', '!=', Auth::id())
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
+
+        // Remettre le compteur Redis à 0 pour cet utilisateur
+        $this->cacheService->updateUnreadCount($conversation->id, Auth::id(), 0);
+
+        return response()->json(['success' => true]);
     }
 
     /**

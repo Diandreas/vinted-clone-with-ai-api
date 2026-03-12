@@ -272,6 +272,7 @@ Route::prefix('v1')->group(function () {
             Route::delete('{conversation}', [ConversationController::class, 'destroy']);
             Route::post('{conversation}/messages', [MessageController::class, 'store']);
             Route::get('{conversation}/messages', [MessageController::class, 'index']);
+            Route::post('{conversation}/mark-read', [MessageController::class, 'markAllRead']);
             Route::put('{conversation}/status', [ConversationController::class, 'updateStatus']);
             Route::put('messages/{message}/read', [MessageController::class, 'markAsRead']);
             Route::delete('messages/{message}', [MessageController::class, 'destroy']);

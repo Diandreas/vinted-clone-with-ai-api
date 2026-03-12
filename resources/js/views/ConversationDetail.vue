@@ -145,16 +145,58 @@
 
       </div>
 
+      <!-- ── Picker emoji ── -->
+      <div
+        v-if="showEmojiPicker"
+        class="bg-white border-t border-gray-100 flex-shrink-0 shadow-[0_-2px_12px_rgba(0,0,0,0.05)]"
+      >
+        <!-- Onglets catégories -->
+        <div class="flex border-b border-gray-100 px-2 pt-1.5">
+          <button
+            v-for="cat in emojiCategories"
+            :key="cat.label"
+            @click="activeEmojiCat = cat.label"
+            class="flex-1 py-1.5 text-lg transition-all"
+            :class="activeEmojiCat === cat.label ? 'border-b-2 border-emerald-500' : 'opacity-50'"
+          >
+            {{ cat.icon }}
+          </button>
+        </div>
+        <!-- Grille emojis -->
+        <div class="grid grid-cols-8 gap-0.5 p-2 h-36 overflow-y-auto">
+          <button
+            v-for="emoji in currentEmojis"
+            :key="emoji"
+            @click="insertEmoji(emoji)"
+            class="text-xl h-9 flex items-center justify-center rounded-lg hover:bg-gray-100 active:bg-gray-200 transition-colors"
+          >
+            {{ emoji }}
+          </button>
+        </div>
+      </div>
+
       <!-- ── Barre de saisie ── -->
       <div class="bg-white border-t border-gray-100 px-3 py-2.5 flex-shrink-0 shadow-[0_-2px_12px_rgba(0,0,0,0.05)]">
         <form @submit.prevent="sendMessage" class="flex items-center gap-2">
+          <!-- Bouton emoji -->
+          <button
+            type="button"
+            @click="showEmojiPicker = !showEmojiPicker"
+            class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 active:bg-gray-200 transition-colors flex-shrink-0 text-xl"
+            :class="showEmojiPicker ? 'bg-emerald-50' : ''"
+          >
+            😊
+          </button>
+
           <input
             v-model="newMessage"
+            ref="messageInput"
             type="text"
             placeholder="Message..."
             class="flex-1 bg-gray-100 rounded-full px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:bg-gray-50 focus:ring-2 focus:ring-emerald-300 transition-all"
             :disabled="sendingMessage"
             @keydown.enter.exact.prevent="sendMessage"
+            @focus="showEmojiPicker = false"
           />
           <button
             type="submit"
@@ -190,7 +232,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRoute, useRouter, RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import api from '@/services/api'
@@ -212,6 +254,43 @@ const messages = ref([])
 const newMessage = ref('')
 const sendingMessage = ref(false)
 const messagesContainer = ref(null)
+const messageInput = ref(null)
+
+// Emoji picker
+const showEmojiPicker = ref(false)
+const activeEmojiCat = ref('Smileys')
+
+const emojiCategories = [
+  {
+    label: 'Smileys', icon: '😊',
+    emojis: ['😀','😃','😄','😁','😆','😅','🤣','😂','🙂','🙃','😉','😊','😇','🥰','😍','🤩','😘','😗','😚','😙','🥲','😋','😛','😜','🤪','😝','🤑','🤗','🤭','🤫','🤔','🤐','🤨','😐','😑','😶','😏','😒','🙄','😬','🤥','😌','😔','😪','🤤','😴','😷','🤒','🤕','🤢','🤮','🤧','🥵','🥶','🥴','😵','🤯','🤠','🥳','🥸','😎','🤓','🧐','😕','😟','🙁','☹️','😮','😯','😲','😳','🥺','😦','😧','😨','😰','😥','😢','😭','😱','😖','😣','😞','😓','😩','😫','🥱','😤','😡','😠','🤬','😈','👿','💀','☠️','💩','🤡','👹','👺','👻','👽','👾','🤖']
+  },
+  {
+    label: 'Gestes', icon: '👋',
+    emojis: ['👋','🤚','🖐','✋','🖖','👌','🤌','🤏','✌️','🤞','🤟','🤘','🤙','👈','👉','👆','🖕','👇','☝️','👍','👎','✊','👊','🤛','🤜','👏','🙌','👐','🤲','🤝','🙏','✍️','💅','🤳','💪','🦾','🦵','🦶','👂','🦻','👃','🫀','🫁','🧠','🦷','🦴','👀','👁','👅','👄','💋','🫦']
+  },
+  {
+    label: 'Coeurs', icon: '❤️',
+    emojis: ['❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','❤️‍🔥','❤️‍🩹','💔','💕','💞','💓','💗','💖','💘','💝','💟','☮️','✝️','☯️','🕉','🔯','💯','♾','‼️','⁉️','❓','❔','❕','❗','🔅','🔆','⚜️','🔱','📛','🔰','✅','❎','🆗','🆙','🆒','🆕','🆓','🔝','🛑','⛔','🚫','💢','♨️','🌀','✨','🎊','🎉','🎈']
+  },
+  {
+    label: 'Nature', icon: '🌿',
+    emojis: ['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐸','🐵','🙈','🙉','🙊','🐔','🐧','🐦','🐤','🦆','🦅','🦉','🦇','🐺','🐗','🦋','🐛','🐌','🐞','🐜','🪲','🦟','🦗','🌸','🌺','🌻','🌹','🌷','🌱','🌿','☘️','🍀','🎍','🎋','🍃','🍂','🍁','🌾','🌵','🦀','🐠','🐟','🐡','🦈','🐳','🦋']
+  },
+  {
+    label: 'Objets', icon: '🎁',
+    emojis: ['⚽','🏀','🏈','⚾','🎾','🏐','🏉','🥏','🎱','🏓','🏸','🥅','⛳','🏹','🎣','🤿','🎽','🎿','🛷','🥌','🎯','🎮','🎲','🎭','🎨','🎬','🎤','🎧','🎼','🎵','🎶','🎸','🎹','🎺','🎻','🥁','📱','💻','⌨️','🖥','🖨','🖱','🖲','💽','💾','💿','📀','📷','📸','📹','🎥','📽','🎞','📞','☎️','📟','📠','📺','📻','🧭','⏱','⌚','⏰','🎁','🎀','🎊','🎉','🎈','🛍','🛒','💎','💰','💳','💵','📈','📉','📊','📋','📌','📍','🗓','📅','📆']
+  },
+]
+
+const currentEmojis = computed(() => {
+  return emojiCategories.find(c => c.label === activeEmojiCat.value)?.emojis || []
+})
+
+const insertEmoji = (emoji) => {
+  newMessage.value += emoji
+  messageInput.value?.focus()
+}
 
 // Computed
 const currentUserId = computed(() => authStore.user?.id)
@@ -281,6 +360,8 @@ const loadConversation = async () => {
       messages.value = response.data.data.messages?.reverse() || []
       await nextTick()
       scrollToBottom()
+      // L'utilisateur est dans la conversation → tout marquer lu
+      markAllRead()
     }
   } catch (error) {
     conversation.value = null
@@ -319,9 +400,53 @@ const scrollToBottom = () => {
   }
 }
 
+const markAllRead = () => {
+  if (!conversation.value) return
+  api.post(`/conversations/${conversation.value.id}/mark-read`).catch(() => {})
+}
+
 const goBack = () => router.push('/discussions')
 
-onMounted(() => loadConversation())
+// ── Polling temps réel ──────────────────────────────────────────────────────
+let pollingInterval = null
+
+const pollNewMessages = async () => {
+  if (!conversation.value) return
+  const lastId = messages.value.length > 0
+    ? messages.value[messages.value.length - 1].id
+    : 0
+  try {
+    const response = await api.get(
+      `/conversations/${conversation.value.id}/messages`,
+      { params: { after_id: lastId } }
+    )
+    if (response.data.success) {
+      const fetched = Array.isArray(response.data.data) ? response.data.data : []
+      // Dédoublonnage par ID : évite les doublons dus à la race condition
+      // entre sendMessage() qui ajoute localement et le poll qui récupère le même message
+      const existingIds = new Set(messages.value.map(m => m.id))
+      const uniqueNew = fetched.filter(m => !existingIds.has(m.id))
+      if (uniqueNew.length > 0) {
+        messages.value.push(...uniqueNew)
+        await nextTick()
+        scrollToBottom()
+        // Nouveaux messages reçus pendant qu'on est dans la conv → marquer lus
+        markAllRead()
+      }
+    }
+  } catch {
+    // silencieux — ne pas perturber l'UI
+  }
+}
+
+onMounted(() => {
+  loadConversation()
+  pollingInterval = setInterval(pollNewMessages, 3000)
+})
+
+onUnmounted(() => {
+  if (pollingInterval) clearInterval(pollingInterval)
+})
 </script>
 
 <style scoped>

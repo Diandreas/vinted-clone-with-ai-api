@@ -117,7 +117,7 @@ import NotificationSkeleton from '@/components/skeletons/NotificationSkeleton.vu
 const dashboardStore = useDashboardStore()
 const router = useRouter()
 
-defineEmits(['close'])
+const emit = defineEmits(['close'])
 
 // State
 const loading = ref(true)
@@ -203,7 +203,7 @@ const handleNotificationClick = async (notification) => {
   }
   
   // Close dropdown
-  $emit('close')
+  emit('close')
 }
 
 const getNotificationUrl = (notification) => {
