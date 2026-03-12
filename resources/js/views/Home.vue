@@ -127,6 +127,7 @@ export default {
       from: 0,
       to: 0
     })
+    const hasMore = ref(true)
 
     const notification = ref({
       show: false,
@@ -162,14 +163,22 @@ export default {
         }
 
         const meta = wrapped.meta || payload.meta || {}
+        const links = wrapped.links || payload.links || {}
+        const currentPage = meta.current_page || wrapped.current_page || payload.current_page || page
+        const lastPage = meta.last_page || wrapped.last_page || payload.last_page || currentPage
+        const total = meta.total || wrapped.total || payload.total || 0
+        const from = meta.from || wrapped.from || payload.from || 0
+        const to = meta.to || wrapped.to || payload.to || 0
+        const perPage = meta.per_page || wrapped.per_page || payload.per_page || params.per_page
         pagination.value = {
-          current_page: meta.current_page || 1,
-          last_page: meta.last_page || 1,
-          per_page: meta.per_page || params.per_page,
-          total: meta.total || 0,
-          from: meta.from || 0,
-          to: meta.to || 0
+          current_page: currentPage,
+          last_page: lastPage,
+          per_page: perPage,
+          total,
+          from,
+          to
         }
+        hasMore.value = Boolean(links.next) || currentPage < lastPage
       } catch (error) {
 
         notificationStore.error('Erreur lors du chargement des produits')
@@ -180,7 +189,7 @@ export default {
 
     const loadMoreProducts = async () => {
       if (loadingMore.value || loadingProducts.value) return
-      if (pagination.value.current_page < pagination.value.last_page) {
+      if (hasMore.value) {
         loadingMore.value = true
         await loadProducts(pagination.value.current_page + 1)
         loadingMore.value = false
@@ -321,6 +330,7 @@ export default {
       loadingMore,
       likingProducts,
       pagination,
+      hasMore,
       filters,
       notification,
       isAuthenticated,
