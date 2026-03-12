@@ -24,38 +24,6 @@
           </div>
         </div>
 
-        <!-- Search Bar -->
-        <div class="hidden md:flex flex-1 max-w-md lg:max-w-lg mx-4 sm:mx-6 lg:mx-8">
-          <div class="relative w-full">
-            <SearchIcon class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
-            <input
-              v-model="searchQuery"
-              type="text"
-              placeholder="Rechercher des produits..."
-              class="w-full pl-9 sm:pl-10 pr-12 py-2 sm:py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 text-sm bg-gray-50/50 hover:bg-white focus:bg-white"
-              @keydown.enter="performSearch"
-            />
-            <div class="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
-              <RouterLink
-                to="/search/image"
-                class="p-1.5 text-gray-400 hover:text-primary-600 transition-colors rounded-lg hover:bg-primary-50"
-                title="Recherche par image"
-              >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                </svg>
-              </RouterLink>
-              <button
-                v-if="searchQuery"
-                @click="clearSearch"
-                class="p-1.5 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
-              >
-                <XIcon class="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-
         <!-- Right Side Actions -->
         <div class="flex items-center space-x-1 sm:space-x-3 lg:space-x-4">
           <!-- Bouton Vendre - Visible sur desktop -->
@@ -82,14 +50,6 @@
 
           <!-- PWA Install Button -->
           <InstallPWAButton />
-
-          <!-- Mobile Search Toggle -->
-          <button
-            @click="showMobileSearch = !showMobileSearch"
-            class="md:hidden p-2 text-gray-400 hover:text-primary-600 transition-colors rounded-lg hover:bg-primary-50"
-          >
-            <SearchIcon class="w-5 h-5" />
-          </button>
 
           <!-- Authenticated User Actions -->
           <template v-if="isAuthenticated">
@@ -217,38 +177,6 @@
               S'inscrire
             </RouterLink>
           </template>
-        </div>
-      </div>
-
-      <!-- Mobile Search -->
-      <div v-if="showMobileSearch" class="md:hidden py-4 border-t border-gray-200">
-        <div class="relative">
-          <SearchIcon class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-          <input
-            v-model="searchQuery"
-            type="text"
-            placeholder="Rechercher des produits..."
-            class="w-full pl-10 pr-16 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            @keydown.enter="performSearch"
-          />
-          <div class="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
-            <RouterLink
-              to="/search/image"
-              class="p-1.5 text-gray-400 hover:text-primary-600 transition-colors rounded-lg hover:bg-primary-50"
-              title="Recherche par image"
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-              </svg>
-            </RouterLink>
-            <button
-              v-if="searchQuery"
-              @click="clearSearch"
-              class="p-1.5 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
-            >
-              <XIcon class="w-4 h-4" />
-            </button>
-          </div>
         </div>
       </div>
 
