@@ -604,10 +604,15 @@ class Product extends Model
      */
     public function getIsLikedByUserAttribute()
     {
+        // Use pre-injected value if set by controller (batch-loaded for performance)
+        if (array_key_exists('is_liked_by_user', $this->attributes)) {
+            return (bool) $this->attributes['is_liked_by_user'];
+        }
+
         if (!auth()->check()) {
             return false;
         }
-        
+
         return $this->likes()->where('user_id', auth()->id())->exists();
     }
 
@@ -616,10 +621,15 @@ class Product extends Model
      */
     public function getIsFavoritedByUserAttribute()
     {
+        // Use pre-injected value if set by controller (batch-loaded for performance)
+        if (array_key_exists('is_favorited_by_user', $this->attributes)) {
+            return (bool) $this->attributes['is_favorited_by_user'];
+        }
+
         if (!auth()->check()) {
             return false;
         }
-        
+
         return $this->favorites()->where('user_id', auth()->id())->exists();
     }
 

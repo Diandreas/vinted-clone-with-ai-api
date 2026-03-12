@@ -108,33 +108,55 @@
             </div>
           </div>
 
-          <!-- Action Buttons - Ultra Compact mobile -->
-          <div class="flex space-x-0.5 sm:space-x-2">
+          <!-- Action Buttons -->
+          <div class="flex items-center gap-3">
+
+            <!-- Like TikTok style -->
             <button
               @click="toggleLike"
-              :class="isLiked ? 'bg-gray-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
-              class="flex-1 flex items-center justify-center px-1.5 sm:px-3 py-1 sm:py-2.5 rounded sm:rounded-lg font-medium transition-colors text-xs sm:text-sm"
+              :disabled="likingProduct"
+              class="flex flex-col items-center gap-0.5 px-4 py-2 rounded-2xl transition-all duration-200 active:scale-90 disabled:opacity-50"
+              :class="isLiked ? 'bg-red-50' : 'bg-gray-100 hover:bg-red-50'"
             >
-              <HeartIcon class="w-3 h-3 sm:w-4 sm:h-4 mr-0.5 sm:mr-2" />
-              {{ isLiked ? 'Aimé' : 'J\'aime' }}
+              <HeartIcon
+                class="w-7 h-7 transition-all duration-200"
+                :class="isLiked ? 'text-red-500 fill-red-500 scale-110' : 'text-gray-400'"
+              />
+              <span
+                class="text-xs font-bold leading-none transition-colors duration-200"
+                :class="isLiked ? 'text-red-500' : 'text-gray-500'"
+              >
+                {{ product.likes_count ?? 0 }}
+              </span>
             </button>
 
+            <!-- Favori -->
             <button
               @click="toggleFavorite"
-              :class="isFavorited ? 'bg-gray-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
-              class="flex-1 flex items-center justify-center px-1.5 sm:px-3 py-1 sm:py-2.5 rounded sm:rounded-lg font-medium transition-colors text-xs sm:text-sm"
+              :class="isFavorited ? 'bg-yellow-50' : 'bg-gray-100 hover:bg-yellow-50'"
+              class="flex flex-col items-center gap-0.5 px-4 py-2 rounded-2xl transition-all duration-200 active:scale-90"
             >
-              <StarIcon class="w-3 h-3 sm:w-5 sm:h-5 mr-0.5 sm:mr-2" />
-              Favori
+              <StarIcon
+                class="w-7 h-7 transition-all duration-200"
+                :class="isFavorited ? 'text-yellow-500 fill-yellow-500 scale-110' : 'text-gray-400'"
+              />
+              <span
+                class="text-xs font-bold leading-none transition-colors duration-200"
+                :class="isFavorited ? 'text-yellow-500' : 'text-gray-500'"
+              >
+                {{ product.favorites_count ?? 0 }}
+              </span>
             </button>
 
+            <!-- Partager -->
             <button
               @click="shareProduct"
-              class="flex-1 bg-gray-100 text-gray-700 hover:bg-gray-200 flex items-center justify-center px-1.5 sm:px-3 py-1 sm:py-2.5 rounded sm:rounded-lg font-medium transition-colors text-xs sm:text-sm"
+              class="flex flex-col items-center gap-0.5 px-4 py-2 rounded-2xl bg-gray-100 hover:bg-gray-200 transition-all duration-200 active:scale-90"
             >
-              <ShareIcon class="w-3 h-3 sm:w-4 sm:h-4 mr-0.5 sm:mr-2" />
-              Partager
+              <ShareIcon class="w-7 h-7 text-gray-400" />
+              <span class="text-xs font-bold text-gray-500 leading-none">Partager</span>
             </button>
+
           </div>
 
           <!-- Contact Seller / Product Owner Actions - Ultra Compact mobile -->
@@ -238,13 +260,6 @@
                 >
                   Modifier
                 </button>
-                <div
-                  v-else-if="isProductOwner"
-                  class="bg-gray-100 text-gray-500 px-3 py-2 rounded-lg text-sm text-center border border-gray-200 mb-2"
-                  title="La modification n'est plus possible après 30 minutes"
-                >
-                  ⏰ Modification expirée (30min dépassées)
-                </div>
                 <button
                   v-if="product?.status === 'pending_payment'"
                   @click="showPaymentModal = true"
@@ -342,24 +357,6 @@
             </dl>
           </div>
 
-          <!-- Stats -->
-          <div class="bg-white rounded-xl border border-gray-200 p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Statistiques</h3>
-            <div class="grid grid-cols-3 gap-4">
-              <div class="text-center">
-                <div class="text-2xl font-bold text-primary-600">{{ product.views_count }}</div>
-                <div class="text-sm text-gray-500">Vues</div>
-              </div>
-              <div class="text-center">
-                <div class="text-2xl font-bold text-gray-500">{{ product.likes_count }}</div>
-                <div class="text-sm text-gray-500">J'aime</div>
-              </div>
-              <div class="text-center">
-                <div class="text-2xl font-bold text-gray-500">{{ product.favorites_count }}</div>
-                <div class="text-sm text-gray-500">Favoris</div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -576,6 +573,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useRealtime } from '@/composables/useRealtime'
 import api from '@/services/api'
 import { extractMessageContent } from '@/utils/messageUtils'
 import VerifiedSellerName from '@/components/ui/VerifiedSellerName.vue'
@@ -594,6 +592,7 @@ import {
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
+const { subscribeToRealtime } = useRealtime()
 const LISTING_FEE_AMOUNT = 100
 
 // State
@@ -667,6 +666,22 @@ const loadProduct = async () => {
     product.value = null
   } finally {
     loading.value = false
+  }
+}
+
+const refreshProductStats = async () => {
+  if (!product.value) return
+  try {
+    const response = await api.get(`/products/${route.params.id}`)
+    if (response.data.success) {
+      const fresh = response.data.data
+      product.value.likes_count = fresh.likes_count
+      product.value.favorites_count = fresh.favorites_count
+      product.value.comments_count = fresh.comments_count
+      product.value.views_count = fresh.views_count
+    }
+  } catch (error) {
+    // Silencieux: pas d'impact UI
   }
 }
 
@@ -1153,6 +1168,9 @@ onMounted(async () => {
   })
 
   await loadProduct()
+
+  // Auto-refresh likes stats without reload (faster poll)
+  subscribeToRealtime('likes', refreshProductStats, 5000)
 
   // Charger automatiquement les conversations si l'utilisateur est le propriétaire
   if (isProductOwner.value && product.value) {

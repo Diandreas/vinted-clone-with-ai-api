@@ -249,52 +249,53 @@ const handleAvatarError = (event) => {
 }
 
 const toggleLike = async () => {
-  if (!authStore.isAuthenticated) {
-    // Redirect to login or show modal
-    return
-  }
+  if (!authStore.isAuthenticated || likingProduct.value) return
+
+  // Mise à jour optimiste — UI instantanée
+  const wasLiked = props.product.is_liked_by_user
+  const prevCount = props.product.likes_count ?? 0
+  props.product.is_liked_by_user = !wasLiked
+  props.product.likes_count = wasLiked ? Math.max(0, prevCount - 1) : prevCount + 1
 
   likingProduct.value = true
   try {
     const response = await window.axios.post(`/products/${props.product.id}/like`)
-
     if (response.data.success) {
-      // Mettre à jour l'état local du produit
+      // Confirmer avec les valeurs serveur
       props.product.is_liked_by_user = response.data.liked
       props.product.likes_count = response.data.likes_count
-
-      // Émettre l'événement pour notifier le parent
       emit('like', props.product)
     }
-  } catch (error) {
-    console.error('Erreur lors du like/unlike:', error)
-    // Optionnel : afficher un message d'erreur
+  } catch {
+    // Annuler en cas d'erreur
+    props.product.is_liked_by_user = wasLiked
+    props.product.likes_count = prevCount
   } finally {
     likingProduct.value = false
   }
 }
 
 const toggleFavorite = async () => {
-  if (!authStore.isAuthenticated) {
-    // Redirect to login or show modal
-    return
-  }
+  if (!authStore.isAuthenticated || favoritingProduct.value) return
+
+  // Mise à jour optimiste — UI instantanée
+  const wasFavorited = props.product.is_favorited_by_user
+  const prevCount = props.product.favorites_count ?? 0
+  props.product.is_favorited_by_user = !wasFavorited
+  props.product.favorites_count = wasFavorited ? Math.max(0, prevCount - 1) : prevCount + 1
 
   favoritingProduct.value = true
   try {
     const response = await window.axios.post(`/products/${props.product.id}/favorite`)
-
     if (response.data.success) {
-      // Mettre à jour l'état local du produit
       props.product.is_favorited_by_user = response.data.favorited
       props.product.favorites_count = response.data.favorites_count
-
-      // Émettre l'événement pour notifier le parent
       emit('favorite', props.product)
     }
-  } catch (error) {
-    console.error('Erreur lors du favorite/unfavorite:', error)
-    // Optionnel : afficher un message d'erreur
+  } catch {
+    // Annuler en cas d'erreur
+    props.product.is_favorited_by_user = wasFavorited
+    props.product.favorites_count = prevCount
   } finally {
     favoritingProduct.value = false
   }

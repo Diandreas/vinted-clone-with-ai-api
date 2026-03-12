@@ -107,7 +107,7 @@
         v-for="product in products"
         :key="product.id"
         :product="product"
-        :is-liked="product.is_liked"
+        :is-liked="product.is_liked_by_user || product.is_liked"
         :liking-product="likingProducts.includes(product.id)"
         @like="$emit('like', product)"
         @view="$emit('view', product)"

@@ -276,8 +276,10 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { debounce } from 'lodash'
+import { useRealtime } from '@/composables/useRealtime'
 
 const router = useRouter()
+const { subscribeToRealtime } = useRealtime()
 
 // State
 const loading = ref(false)
@@ -448,6 +450,11 @@ const getStatusText = (status) => {
 onMounted(() => {
   loadProducts()
   loadCategories()
+
+  // Auto-refresh likes stats for owner list (faster poll)
+  subscribeToRealtime('likes', async () => {
+    await loadProducts()
+  }, 5000)
 })
 </script>
 

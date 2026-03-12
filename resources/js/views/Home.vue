@@ -96,6 +96,7 @@ import FacebookProductSkeleton from '../components/skeletons/FacebookProductSkel
 
 import { useAuthStore } from '../stores/auth.js'
 import { useNotificationStore } from '../stores/notification.js'
+import { useRealtime } from '../composables/useRealtime.js'
 import api from '../services/api.js'
 
 export default {
@@ -109,6 +110,7 @@ export default {
     const router = useRouter()
     const authStore = useAuthStore()
     const notificationStore = useNotificationStore()
+    const { subscribeToRealtime } = useRealtime()
 
     const products = ref([])
     const categories = ref([])
@@ -196,6 +198,39 @@ export default {
       }
     }
 
+    const refreshVisibleProductStats = async () => {
+      if (loadingProducts.value || loadingMore.value || products.value.length === 0) return
+      try {
+        const params = {
+          page: 1,
+          per_page: 20,
+          sort: 'recent',
+          include: 'user,category,brand,images',
+          no_cache: 1
+        }
+        const response = await api.get('/products', { params })
+        const payload = response.data || {}
+        const wrapped = payload.data || {}
+        const data = Array.isArray(wrapped.data) ? wrapped.data : []
+        if (!data.length) return
+
+        const byId = new Map(data.map(p => [p.id, p]))
+        products.value = products.value.map(p => {
+          const fresh = byId.get(p.id)
+          if (!fresh) return p
+          return {
+            ...p,
+            likes_count: fresh.likes_count,
+            favorites_count: fresh.favorites_count,
+            comments_count: fresh.comments_count,
+            views_count: fresh.views_count
+          }
+        })
+      } catch (error) {
+        // Silencieux: pas d'impact UI
+      }
+    }
+
 
 
 
@@ -215,6 +250,7 @@ export default {
         if (response.data.success) {
           // Mettre à jour l'état du produit selon la réponse de l'API
           product.is_liked = response.data.liked
+          product.is_liked_by_user = response.data.liked
           product.likes_count = response.data.likes_count
         }
       } catch (error) {
@@ -314,6 +350,9 @@ export default {
           infiniteObserver.observe(infiniteScrollTrigger.value)
         }
       }
+
+      // Auto-refresh likes stats without reload (faster poll)
+      subscribeToRealtime('likes', refreshVisibleProductStats, 5000)
     })
 
     onUnmounted(() => {

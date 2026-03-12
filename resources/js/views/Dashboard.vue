@@ -297,10 +297,11 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useDashboardStore } from '@/stores/dashboard'
+import { useRealtime } from '@/composables/useRealtime'
 import StatsCard from '@/components/dashboard/StatsCard.vue'
 import SalesChart from '@/components/dashboard/SalesChart.vue'
 import ProductCard from '@/components/products/ProductCard.vue'
@@ -323,6 +324,7 @@ import {
 const router = useRouter()
 const authStore = useAuthStore()
 const dashboardStore = useDashboardStore()
+const { subscribeToRealtime } = useRealtime()
 
 // Reactive data
 const chartPeriod = ref('30')
@@ -404,6 +406,11 @@ onMounted(async () => {
     loadRecentActivity(),
     dashboardStore.fetchSalesChart(chartPeriod.value)
   ])
+
+  // Refresh stats/activity when likes change (polling via realtime service)
+  subscribeToRealtime('likes', async () => {
+    await Promise.all([loadStats(), loadRecentActivity()])
+  })
 })
 </script>
 

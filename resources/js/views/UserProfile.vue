@@ -272,6 +272,7 @@
 import { ref, computed, onMounted, watch, defineComponent, h } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useRealtime } from '@/composables/useRealtime'
 import TikTokProductCard from '@/components/products/TikTokProductCard.vue'
 import api from '@/services/api'
 
@@ -326,6 +327,7 @@ const UserRow = defineComponent({
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
+const { subscribeToRealtime } = useRealtime()
 
 const loading     = ref(true)
 const followBusy  = ref(false)
@@ -462,5 +464,14 @@ watch(isAuthenticated, async (isAuthed) => {
     isFollowing.value = false
   }
 })
-onMounted(() => loadInitialData())
+onMounted(() => {
+  loadInitialData()
+
+  // Auto-refresh likes stats for owner profile products (faster poll)
+  subscribeToRealtime('likes', async () => {
+    if (activeTab.value === 'products') {
+      await fetchProducts()
+    }
+  }, 5000)
+})
 </script>

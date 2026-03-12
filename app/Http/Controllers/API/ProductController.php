@@ -32,7 +32,11 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        // Generate cache key based on request parameters
+        // Try to get from cache (5 minutes for homepage, 2 minutes for filtered results)
+        $isHomepage = !$request->has('category_id') && !$request->has('search') && !$request->has('brand_id');
+        $cacheDuration = $isHomepage ? 300 : 120;
+
+        // Cache key without user_id — shared public data, like/favorite injected fresh below
         $cacheKey = 'products_list_' . md5(json_encode([
             'page' => $request->page ?? 1,
             'category_id' => $request->category_id,
@@ -48,14 +52,9 @@ class ProductController extends Controller
             'search' => $request->search,
             'sort' => $request->sort,
             'per_page' => $request->limit ?? $request->per_page ?? 20,
-            'user_id' => Auth::id(),
         ]));
 
-        // Try to get from cache (5 minutes for homepage, 2 minutes for filtered results)
-        $isHomepage = !$request->has('category_id') && !$request->has('search') && !$request->has('brand_id');
-        $cacheDuration = $isHomepage ? 300 : 120; // 5 min for homepage, 2 min for filtered
-
-        $products = cache()->remember($cacheKey, $cacheDuration, function () use ($request) {
+        $buildQuery = function () use ($request) {
             // Optimized eager loading with select() to load only needed columns
             $query = Product::with([
                 'user:id,name,avatar,username',
@@ -147,7 +146,35 @@ class ProductController extends Controller
             }
 
             return $query->paginate($request->limit ?? $request->per_page ?? 20);
-        });
+        };
+
+        if ($request->boolean('no_cache')) {
+            $products = $buildQuery();
+        } else {
+            $products = cache()->remember($cacheKey, $cacheDuration, function () use ($buildQuery) {
+                return $buildQuery();
+            });
+        }
+
+        // Inject fresh like/favorite status for authenticated user (not stored in shared cache)
+        // Use guard('sanctum')->user() because this route has no auth middleware
+        $authUser = Auth::guard('sanctum')->user();
+        if ($authUser) {
+            $userId = $authUser->id;
+            $productIds = $products->getCollection()->pluck('id');
+            $likedIds = \DB::table('product_likes')
+                ->where('user_id', $userId)
+                ->whereIn('product_id', $productIds)
+                ->pluck('product_id')->flip();
+            $favoritedIds = \DB::table('favorites')
+                ->where('user_id', $userId)
+                ->whereIn('product_id', $productIds)
+                ->pluck('product_id')->flip();
+            $products->getCollection()->each(function ($product) use ($likedIds, $favoritedIds) {
+                $product->is_liked_by_user = isset($likedIds[$product->id]);
+                $product->is_favorited_by_user = isset($favoritedIds[$product->id]);
+            });
+        }
 
         return response()->json([
             'success' => true,
