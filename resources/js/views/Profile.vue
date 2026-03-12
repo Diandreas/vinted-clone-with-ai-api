@@ -1,19 +1,6 @@
 <template>
   <div class="min-h-screen bg-gray-100">
 
-    <!-- Header -->
-    <div class="bg-white border-b border-gray-100 sticky top-0 z-10">
-      <div class="flex items-center justify-between px-4 py-3">
-        <button @click="router.back()" class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
-          <ArrowLeftIcon class="w-5 h-5 text-gray-700" />
-        </button>
-        <h1 class="text-base font-bold text-gray-900">Profil</h1>
-        <RouterLink to="/profile/edit" class="w-9 h-9 flex items-center justify-center rounded-full bg-green-50 hover:bg-green-100 transition-colors">
-          <EditIcon class="w-4 h-4 text-green-600" />
-        </RouterLink>
-      </div>
-    </div>
-
     <div class="max-w-2xl mx-auto px-4 py-5 space-y-4">
 
       <!-- Carte profil -->
@@ -44,11 +31,6 @@
 
         <!-- Boutons action -->
         <div class="flex flex-col gap-2.5">
-          <RouterLink to="/products/create"
-            class="flex items-center justify-center gap-2 py-3 bg-green-500 text-white font-bold rounded-2xl shadow-md shadow-green-200/50 hover:bg-green-600 transition-colors active:scale-95">
-            <PlusIcon class="w-5 h-5" /> Vendre un article
-          </RouterLink>
-
           <div class="flex gap-2.5">
             <RouterLink to="/profile/edit"
               class="flex-1 flex items-center justify-center gap-2 py-2.5 border-2 border-gray-200 text-gray-700 font-semibold rounded-2xl hover:bg-gray-50 transition-colors text-sm">
@@ -264,7 +246,7 @@ import { useDashboardStore } from '@/stores/dashboard'
 import ProductCard from '@/components/products/ProductCard.vue'
 import api from '@/services/api'
 import {
-  ArrowLeftIcon, EditIcon, PlusIcon, PackageIcon, UsersIcon,
+  EditIcon, PackageIcon, UsersIcon,
   ActivityIcon, MapPinIcon, LinkIcon, HeartIcon, ShoppingCartIcon,
   StarIcon, EyeIcon, LogOutIcon, PlayIcon
 } from 'lucide-vue-next'

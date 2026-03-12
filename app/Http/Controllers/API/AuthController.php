@@ -142,9 +142,13 @@ class AuthController extends Controller
 
     public function user(Request $request)
     {
+        $user = $request->user()
+            ->makeVisible(['email', 'phone'])
+            ->load(['followers', 'following']);
+
         return response()->json([
             'success' => true,
-            'user' => $request->user()->load(['followers', 'following'])
+            'user' => $user
         ]);
     }
 
