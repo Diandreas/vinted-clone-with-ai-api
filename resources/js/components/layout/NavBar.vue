@@ -304,7 +304,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useDashboardStore } from '@/stores/dashboard'
@@ -418,6 +418,21 @@ const handleClickOutside = (event) => {
 // Lifecycle
 let unreadIntervalId = null
 
+const startUnreadPolling = () => {
+  if (!unreadIntervalId) {
+    unreadIntervalId = setInterval(() => {
+      dashboardStore.fetchUnreadNotifications()
+    }, 30000)
+  }
+}
+
+const stopUnreadPolling = () => {
+  if (unreadIntervalId) {
+    clearInterval(unreadIntervalId)
+    unreadIntervalId = null
+  }
+}
+
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
 
@@ -425,18 +440,23 @@ onMounted(() => {
   if (isAuthenticated.value) {
     dashboardStore.fetchStats()
     dashboardStore.fetchUnreadNotifications()
-    unreadIntervalId = setInterval(() => {
-      dashboardStore.fetchUnreadNotifications()
-    }, 30000)
+    startUnreadPolling()
+  }
+})
+
+watch(isAuthenticated, (isAuthed) => {
+  if (isAuthed) {
+    dashboardStore.fetchStats()
+    dashboardStore.fetchUnreadNotifications()
+    startUnreadPolling()
+  } else {
+    stopUnreadPolling()
   }
 })
 
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
-  if (unreadIntervalId) {
-    clearInterval(unreadIntervalId)
-    unreadIntervalId = null
-  }
+  stopUnreadPolling()
 })
 </script>
 

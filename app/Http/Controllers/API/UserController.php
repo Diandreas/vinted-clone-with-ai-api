@@ -50,7 +50,8 @@ class UserController extends Controller
                     'following_count' => $user->following_count,
                     'average_rating' => $user->average_rating,
                 ],
-                'is_following' => Auth::check() ? Auth::user()->isFollowing($user) : false,
+                // Route publique : on tente une auth optionnelle via le guard Sanctum
+                'is_following' => ($authUser = Auth::guard('sanctum')->user()) ? $authUser->isFollowing($user) : false,
             ]
         ]);
     }

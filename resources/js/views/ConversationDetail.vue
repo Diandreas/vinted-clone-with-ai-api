@@ -1,142 +1,202 @@
 <template>
-  <div class="min-h-screen bg-gray-50 pb-16 sm:pb-0">
-    <!-- Loading -->
-    <div v-if="loading" class="min-h-screen flex items-center justify-center">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+  <div class="fixed inset-x-0 top-14 sm:top-16 bottom-20 flex flex-col bg-[#f0f2f5] overflow-hidden z-10">
+
+    <!-- ── Loading ── -->
+    <div v-if="loading" class="flex-1 flex items-center justify-center">
+      <div class="flex flex-col items-center gap-3">
+        <div class="relative w-12 h-12">
+          <div class="absolute inset-0 rounded-full border-4 border-gray-200"></div>
+          <div class="absolute inset-0 rounded-full border-4 border-transparent border-t-emerald-500 animate-spin"></div>
+        </div>
+        <p class="text-sm text-gray-400 font-medium">Chargement...</p>
+      </div>
     </div>
 
-    <!-- Conversation Detail -->
-    <div v-else-if="conversation" class="max-w-4xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-6">
-      <!-- Header - Compact -->
-      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4 mb-3 sm:mb-4">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-3">
-            <!-- Product Image - Compact -->
-            <div class="w-12 h-12 sm:w-14 sm:h-14 bg-gray-100 rounded-lg overflow-hidden relative">
-              <ProductImage
-                :src="getProductImageUrl(conversation.product)"
-                :alt="conversation.product?.title || 'Produit'"
-                :product-id="conversation.product?.id"
-                fallback="/images/placeholder-product.png"
-                image-classes="w-full h-full object-cover rounded-lg"
-                :class="{ 'grayscale': isProductUnavailable }"
-              />
+    <template v-else-if="conversation">
 
-              <!-- Unavailable Overlay -->
-              <div
-                v-if="isProductUnavailable"
-                class="absolute inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center rounded-lg"
-              >
-                <div class="text-center text-white">
-                  <div class="text-xs font-semibold">{{ getUnavailableText() }}</div>
-                </div>
-              </div>
-            </div>
+      <!-- ── Header ── -->
+      <div class="bg-white shadow-sm flex-shrink-0">
 
-            <!-- Product & Participant Info - Compact -->
-            <div>
-              <h1 class="text-lg sm:text-xl font-semibold text-gray-900 truncate max-w-48 sm:max-w-none">
-                {{ conversation.product?.title }}
-              </h1>
-              <p class="text-sm text-gray-500">
-                Conversation avec {{ otherParticipant?.name }}
-              </p>
-              <p class="text-xs text-gray-400">{{ formatPrice(conversation.product?.price) }}</p>
+        <!-- Ligne principale -->
+        <div class="flex items-center gap-3 px-3 py-2.5">
 
-              <!-- Product Status Badge -->
-              <div v-if="isProductUnavailable" class="mt-1">
-                <span :class="['inline-block px-2 py-1 text-xs font-medium rounded-full', getProductStatusClass()]">
-                  {{ getProductStatusText() }}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Back Button - Compact -->
+          <!-- Retour -->
           <button
             @click="goBack"
-            class="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm"
+            class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 active:bg-gray-200 transition-colors flex-shrink-0"
           >
-            ← Retour
+            <ArrowLeftIcon class="w-5 h-5 text-gray-600" />
           </button>
+
+          <!-- Avatar interlocuteur -->
+          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center flex-shrink-0 shadow-md overflow-hidden">
+            <img
+              v-if="otherParticipant?.avatar"
+              :src="otherParticipant.avatar"
+              class="w-full h-full object-cover"
+            />
+            <span v-else class="text-white font-bold text-sm select-none">
+              {{ getInitials(otherParticipant?.name) }}
+            </span>
+          </div>
+
+          <!-- Nom + produit -->
+          <div class="flex-1 min-w-0">
+            <p class="font-bold text-gray-900 text-sm leading-tight truncate">
+              {{ otherParticipant?.name || 'Utilisateur' }}
+            </p>
+            <p class="text-xs text-gray-400 truncate leading-tight mt-0.5">
+              {{ conversation.product?.title }}
+            </p>
+          </div>
+
+          <!-- Vignette produit cliquable -->
+          <RouterLink
+            :to="`/products/${conversation.product?.id}`"
+            class="flex-shrink-0 group"
+          >
+            <div class="w-11 h-11 rounded-xl overflow-hidden bg-gray-100 border-2 border-gray-200 group-hover:border-emerald-300 transition-colors shadow-sm">
+              <ProductImage
+                :src="getProductImageUrl(conversation.product)"
+                :alt="conversation.product?.title"
+                :product-id="conversation.product?.id"
+                fallback="/images/placeholder-product.png"
+                image-classes="w-full h-full object-cover"
+                :class="{ 'grayscale opacity-60': isProductUnavailable }"
+              />
+            </div>
+          </RouterLink>
+        </div>
+
+        <!-- Bande prix / statut produit -->
+        <div class="px-4 pb-2 flex items-center gap-2 border-t border-gray-50">
+          <span class="text-xs font-semibold text-emerald-600">
+            {{ formatPrice(conversation.product?.price) }}
+          </span>
+          <span v-if="isProductUnavailable"
+            :class="['text-xs font-semibold px-2 py-0.5 rounded-full', getProductStatusClass()]"
+          >
+            {{ getProductStatusText() }}
+          </span>
         </div>
       </div>
 
-      <!-- Messages - Compact -->
-      <div class="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col h-80 sm:h-96">
-        <!-- Messages List - Compact -->
-        <div class="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3" ref="messagesContainer">
+      <!-- ── Zone messages ── -->
+      <div
+        class="flex-1 overflow-y-auto px-3 py-3 space-y-1"
+        ref="messagesContainer"
+      >
+
+        <!-- Vide -->
+        <div v-if="messages.length === 0" class="flex flex-col items-center justify-center h-full text-center py-10">
+          <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-gray-100 mb-4">
+            <MessageCircleIcon class="w-7 h-7 text-gray-300" />
+          </div>
+          <p class="text-sm font-semibold text-gray-600">Démarrez la conversation</p>
+          <p class="text-xs text-gray-400 mt-1">Envoyez votre premier message ci-dessous</p>
+        </div>
+
+        <!-- Messages -->
+        <div
+          v-for="(message, index) in messages"
+          :key="message.id"
+          class="flex items-end gap-2"
+          :class="message.sender_id === currentUserId ? 'justify-end' : 'justify-start'"
+        >
+          <!-- Avatar reçu (affiché seulement sur le dernier message du groupe) -->
           <div
-            v-for="message in messages"
-            :key="message.id"
-            :class="[
-              'flex',
-              message.sender_id === currentUserId ? 'justify-end' : 'justify-start'
-            ]"
+            v-if="message.sender_id !== currentUserId"
+            class="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center flex-shrink-0 overflow-hidden shadow-sm"
+            :class="isLastInGroup(index) ? 'opacity-100' : 'opacity-0'"
+          >
+            <img
+              v-if="otherParticipant?.avatar"
+              :src="otherParticipant.avatar"
+              class="w-full h-full object-cover"
+            />
+            <span v-else class="text-white text-xs font-bold select-none">
+              {{ getInitials(otherParticipant?.name) }}
+            </span>
+          </div>
+
+          <!-- Bulle -->
+          <div class="max-w-[72%] flex flex-col"
+            :class="message.sender_id === currentUserId ? 'items-end' : 'items-start'"
           >
             <div
               :class="[
-                'max-w-xs lg:max-w-md px-3 py-2 rounded-lg',
+                'px-3.5 py-2 shadow-sm text-sm leading-relaxed',
                 message.sender_id === currentUserId
-                  ? 'bg-primary-600 text-white'
-                  : 'bg-gray-100 text-gray-900'
+                  ? 'bg-emerald-500 text-white rounded-2xl rounded-br-md'
+                  : 'bg-white text-gray-900 rounded-2xl rounded-bl-md border border-gray-100'
               ]"
             >
-              <p class="text-sm">{{ extractMessageContent(message.content) }}</p>
-              <p class="text-xs opacity-75 mt-1">
-                {{ formatMessageTime(message.created_at) }}
-              </p>
+              {{ extractMessageContent(message.content) }}
             </div>
+            <!-- Horodatage (seulement sur le dernier du groupe) -->
+            <p
+              v-if="isLastInGroup(index)"
+              class="text-[11px] text-gray-400 mt-1 px-1"
+            >
+              {{ formatMessageTime(message.created_at) }}
+            </p>
           </div>
         </div>
 
-        <!-- Message Input - Compact -->
-        <div class="p-3 sm:p-4 border-t border-gray-200">
-          <form @submit.prevent="sendMessage" class="flex space-x-2 sm:space-x-3">
-            <input
-              v-model="newMessage"
-              type="text"
-              placeholder="Tapez votre message..."
-              class="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-              :disabled="sendingMessage"
-            />
-            <button
-              type="submit"
-              :disabled="!newMessage.trim() || sendingMessage"
-              class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {{ sendingMessage ? 'Envoi...' : 'Envoyer' }}
-            </button>
-          </form>
+      </div>
+
+      <!-- ── Barre de saisie ── -->
+      <div class="bg-white border-t border-gray-100 px-3 py-2.5 flex-shrink-0 shadow-[0_-2px_12px_rgba(0,0,0,0.05)]">
+        <form @submit.prevent="sendMessage" class="flex items-center gap-2">
+          <input
+            v-model="newMessage"
+            type="text"
+            placeholder="Message..."
+            class="flex-1 bg-gray-100 rounded-full px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:bg-gray-50 focus:ring-2 focus:ring-emerald-300 transition-all"
+            :disabled="sendingMessage"
+            @keydown.enter.exact.prevent="sendMessage"
+          />
+          <button
+            type="submit"
+            :disabled="!newMessage.trim() || sendingMessage"
+            class="w-10 h-10 bg-emerald-500 text-white rounded-full flex items-center justify-center flex-shrink-0 shadow-md shadow-emerald-200/50 hover:bg-emerald-600 active:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none transition-all active:scale-95"
+          >
+            <SendIcon v-if="!sendingMessage" class="w-4 h-4 translate-x-px" />
+            <LoaderIcon v-else class="w-4 h-4 animate-spin" />
+          </button>
+        </form>
+      </div>
+
+    </template>
+
+    <!-- ── Erreur ── -->
+    <div v-else class="flex-1 flex items-center justify-center px-6">
+      <div class="text-center">
+        <div class="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
+          <AlertTriangleIcon class="w-8 h-8 text-red-400" />
         </div>
+        <p class="font-bold text-gray-800 text-lg mb-1">Conversation introuvable</p>
+        <p class="text-sm text-gray-500 mb-6">Cette conversation n'existe pas ou vous n'y avez pas accès.</p>
+        <button
+          @click="goBack"
+          class="px-6 py-2.5 bg-emerald-500 text-white rounded-full text-sm font-bold shadow-lg shadow-emerald-200 hover:bg-emerald-600 transition-colors"
+        >
+          Retour aux discussions
+        </button>
       </div>
     </div>
 
-    <!-- Error State -->
-    <div v-else class="min-h-screen flex items-center justify-center">
-      <div class="text-center">
-        <AlertTriangleIcon class="mx-auto h-12 w-12 text-gray-400" />
-        <h3 class="mt-2 text-sm font-medium text-gray-900">Conversation non trouvée</h3>
-        <p class="mt-1 text-sm text-gray-500">Cette conversation n'existe pas ou vous n'y avez pas accès.</p>
-        <div class="mt-6">
-          <button
-            @click="goBack"
-            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700"
-          >
-            Retour aux discussions
-          </button>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, nextTick } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute, useRouter, RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import api from '@/services/api'
-import { ImageIcon, AlertTriangleIcon } from 'lucide-vue-next'
+import {
+  ArrowLeftIcon, AlertTriangleIcon, SendIcon, LoaderIcon, MessageCircleIcon
+} from 'lucide-vue-next'
 import { extractMessageContent } from '@/utils/messageUtils'
 import { formatMessageTime } from '@/utils/timeUtils'
 import ProductImage from '@/components/ui/ProductImage.vue'
@@ -162,32 +222,70 @@ const otherParticipant = computed(() => {
     : conversation.value.buyer
 })
 
-// Methods
+const isProductUnavailable = computed(() => {
+  if (!conversation.value?.product) return false
+  return conversation.value.product.is_sold
+    || conversation.value.product.is_deleted
+    || conversation.value.product.is_inactive
+})
+
+// Helpers
+const getInitials = (name) => {
+  if (!name) return '?'
+  return name.trim().split(' ').slice(0, 2).map(w => w[0]?.toUpperCase()).join('')
+}
+
+const isLastInGroup = (index) => {
+  const next = messages.value[index + 1]
+  const current = messages.value[index]
+  if (!next) return true
+  return next.sender_id !== current.sender_id
+}
+
+const getProductStatusClass = () => {
+  if (!conversation.value?.product) return ''
+  if (conversation.value.product.is_sold)    return 'bg-green-100 text-green-700'
+  if (conversation.value.product.is_deleted) return 'bg-red-100 text-red-700'
+  if (conversation.value.product.is_inactive) return 'bg-yellow-100 text-yellow-700'
+  return ''
+}
+
+const getProductStatusText = () => {
+  if (!conversation.value?.product) return ''
+  if (conversation.value.product.is_sold)    return 'Vendu'
+  if (conversation.value.product.is_deleted) return 'Supprimé'
+  if (conversation.value.product.is_inactive) return 'Désactivé'
+  return ''
+}
+
+const formatPrice = (price) => {
+  if (!price) return ''
+  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XAF' }).format(price)
+}
+
+const getProductImageUrl = (product) => {
+  if (!product) return '/images/placeholder-product.png'
+  if (typeof product.main_image_url === 'string') return product.main_image_url
+  if (product.main_image?.filename) return `http://localhost:8000/storage/products/${product.main_image.filename}`
+  if (typeof product.main_image === 'string') return `http://localhost:8000/storage/products/${product.main_image}`
+  return '/images/placeholder-product.png'
+}
+
+// API
 const loadConversation = async () => {
   loading.value = true
   try {
-
     const response = await api.get(`/conversations/${route.params.id}`)
-
     if (response.data.success) {
       conversation.value = response.data.data
       messages.value = response.data.data.messages?.reverse() || []
-
-
-
-      // Scroll to bottom after loading
       await nextTick()
       scrollToBottom()
     }
   } catch (error) {
-
     conversation.value = null
-
-    // Si l'erreur est 403 ou 404, rediriger automatiquement après 3 secondes
     if (error.response?.status === 403 || error.response?.status === 404) {
-      setTimeout(() => {
-        router.push('/discussions')
-      }, 3000)
+      setTimeout(() => router.push('/discussions'), 3000)
     }
   } finally {
     loading.value = false
@@ -196,28 +294,19 @@ const loadConversation = async () => {
 
 const sendMessage = async () => {
   if (!newMessage.value.trim() || sendingMessage.value) return
-
   sendingMessage.value = true
   const messageContent = newMessage.value.trim()
   newMessage.value = ''
-
   try {
-
     const response = await api.post(`/conversations/${conversation.value.id}/messages`, {
       content: messageContent
     })
-
     if (response.data.success) {
       messages.value.push(response.data.data)
-
-
-      // Scroll to bottom
       await nextTick()
       scrollToBottom()
     }
-  } catch (error) {
-
-    // Restore message if failed
+  } catch {
     newMessage.value = messageContent
   } finally {
     sendingMessage.value = false
@@ -230,117 +319,14 @@ const scrollToBottom = () => {
   }
 }
 
-const goBack = () => {
-  // Rediriger vers les discussions produits plutôt que juste router.back()
-  router.push('/discussions')
-}
+const goBack = () => router.push('/discussions')
 
-const formatPrice = (price) => {
-  if (!price) return ''
-  return new Intl.NumberFormat('fr-FR', {
-    style: 'currency',
-    currency: 'XAF'
-  }).format(price)
-}
-
-const getProductImageUrl = (product) => {
-  if (!product) return '/images/placeholder-product.png'
-
-  // If main_image_url is a string, use it
-  if (typeof product.main_image_url === 'string') {
-    return product.main_image_url
-  }
-
-  // If main_image is an object with filename, construct URL
-  if (product.main_image && typeof product.main_image === 'object' && product.main_image.filename) {
-    return `http://localhost:8000/storage/products/${product.main_image.filename}`
-  }
-
-  // If main_image is a string (filename), construct URL
-  if (typeof product.main_image === 'string') {
-    return `http://localhost:8000/storage/products/${product.main_image}`
-  }
-
-  // Fallback to placeholder
-  return '/images/placeholder-product.png'
-}
-
-// Computed property for product unavailability
-const isProductUnavailable = computed(() => {
-  if (!conversation.value || !conversation.value.product) {
-    return false
-  }
-  return conversation.value.product.is_sold || conversation.value.product.is_deleted || conversation.value.product.is_inactive
-})
-
-// Computed property for product status text
-const getUnavailableText = computed(() => {
-  if (!conversation.value || !conversation.value.product) {
-    return ''
-  }
-  if (conversation.value.product.is_sold) {
-    return 'Vendu'
-  } else if (conversation.value.product.is_deleted) {
-    return 'Supprimé'
-  } else if (conversation.value.product.is_inactive) {
-    return 'Désactivé'
-  }
-  return ''
-})
-
-// Computed property for product status class
-const getProductStatusClass = computed(() => {
-  if (!conversation.value || !conversation.value.product) {
-    return ''
-  }
-  if (conversation.value.product.is_sold) {
-    return 'bg-green-100 text-green-800'
-  } else if (conversation.value.product.is_deleted) {
-    return 'bg-red-100 text-red-800'
-  } else if (conversation.value.product.is_inactive) {
-    return 'bg-yellow-100 text-yellow-800'
-  }
-  return ''
-})
-
-// Computed property for product status text
-const getProductStatusText = computed(() => {
-  if (!conversation.value || !conversation.value.product) {
-    return ''
-  }
-  if (conversation.value.product.is_sold) {
-    return 'Vendu'
-  } else if (conversation.value.product.is_deleted) {
-    return 'Supprimé'
-  } else if (conversation.value.product.is_inactive) {
-    return 'Désactivé'
-  }
-  return ''
-})
-
-// Lifecycle
-onMounted(() => {
-
-  loadConversation()
-})
+onMounted(() => loadConversation())
 </script>
 
 <style scoped>
-/* Custom scrollbar for messages */
-.overflow-y-auto::-webkit-scrollbar {
-  width: 4px;
-}
-
-.overflow-y-auto::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-.overflow-y-auto::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 2px;
-}
-
-.overflow-y-auto::-webkit-scrollbar-thumb:hover {
-  background: #a1a1a1;
-}
+.overflow-y-auto::-webkit-scrollbar { width: 3px; }
+.overflow-y-auto::-webkit-scrollbar-track { background: transparent; }
+.overflow-y-auto::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+.overflow-y-auto::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
 </style>

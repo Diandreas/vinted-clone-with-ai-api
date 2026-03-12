@@ -455,5 +455,12 @@ async function loadInitialData() {
 
 watch(activeTab, () => loadTabContent())
 watch(() => route.params.id, async () => { loading.value = true; await loadInitialData() })
+watch(isAuthenticated, async (isAuthed) => {
+  if (isAuthed) {
+    await fetchUser()
+  } else {
+    isFollowing.value = false
+  }
+})
 onMounted(() => loadInitialData())
 </script>
