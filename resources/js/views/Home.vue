@@ -30,6 +30,7 @@
           @load-more="loadMoreProducts"
           @notification="handleNotification"
         />
+        <div ref="infiniteScrollTrigger" class="h-1"></div>
 
         <!-- Notification Toast -->
         <div
@@ -87,7 +88,7 @@
 </template>
 
 <script>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 
 import FacebookProductGridLayout from '../components/products/FacebookProductGridLayout.vue'
@@ -132,33 +133,42 @@ export default {
       type: 'success',
       message: ''
     })
+    const infiniteScrollTrigger = ref(null)
+    let infiniteObserver = null
 
     const isAuthenticated = computed(() => authStore.isAuthenticated)
 
     const loadProducts = async (page = 1) => {
       try {
-        loadingProducts.value = true
+        if (page === 1) {
+          loadingProducts.value = true
+        }
         const params = {
           page,
-          per_page: 10,
+          per_page: 20,
+          sort: 'recent',
           include: 'user,category,brand,images'
         }
 
         const response = await api.get('/products', { params })
+        const payload = response.data || {}
+        const wrapped = payload.data || {}
+        const data = Array.isArray(wrapped.data) ? wrapped.data : (Array.isArray(wrapped) ? wrapped : [])
 
         if (page === 1) {
-          products.value = response.data.data
+          products.value = data
         } else {
-          products.value = [...products.value, ...response.data.data]
+          products.value = [...products.value, ...data]
         }
 
+        const meta = wrapped.meta || payload.meta || {}
         pagination.value = {
-          current_page: response.data.current_page,
-          last_page: response.data.last_page,
-          per_page: response.data.per_page,
-          total: response.data.total,
-          from: response.data.from,
-          to: response.data.to
+          current_page: meta.current_page || 1,
+          last_page: meta.last_page || 1,
+          per_page: meta.per_page || params.per_page,
+          total: meta.total || 0,
+          from: meta.from || 0,
+          to: meta.to || 0
         }
       } catch (error) {
 
@@ -169,6 +179,7 @@ export default {
     }
 
     const loadMoreProducts = async () => {
+      if (loadingMore.value || loadingProducts.value) return
       if (pagination.value.current_page < pagination.value.last_page) {
         loadingMore.value = true
         await loadProducts(pagination.value.current_page + 1)
@@ -279,8 +290,28 @@ export default {
       showNotification(event.message, event.type)
     }
 
-    onMounted(() => {
-      loadProducts()
+    onMounted(async () => {
+      await loadProducts()
+      if ('IntersectionObserver' in window) {
+        infiniteObserver = new IntersectionObserver(
+          (entries) => {
+            if (entries[0]?.isIntersecting) {
+              loadMoreProducts()
+            }
+          },
+          { rootMargin: '200px 0px' }
+        )
+        if (infiniteScrollTrigger.value) {
+          infiniteObserver.observe(infiniteScrollTrigger.value)
+        }
+      }
+    })
+
+    onUnmounted(() => {
+      if (infiniteObserver) {
+        infiniteObserver.disconnect()
+        infiniteObserver = null
+      }
     })
 
     return {
@@ -300,7 +331,8 @@ export default {
       hideNotification,
       loadMoreProducts,
       handleViewModeChange,
-      handleNotification
+      handleNotification,
+      infiniteScrollTrigger
     }
   }
 }
@@ -314,4 +346,3 @@ export default {
   overflow: hidden;
 }
 </style>
-

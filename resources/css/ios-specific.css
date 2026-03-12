@@ -23,6 +23,17 @@
     }
 }
 
+/* iOS Scroll + Touch Fixes */
+body.ios-device {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+}
+
+body.ios-device #app {
+    min-height: 100%;
+}
+
 /* Android Safe Area Support */
 @supports (padding: env(safe-area-inset-top)) {
     .android-device nav {

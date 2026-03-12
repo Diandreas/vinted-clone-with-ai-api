@@ -1,127 +1,134 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-gray-100">
 
-    <!-- Cover + Header -->
-    <div class="relative bg-white shadow-sm">
+    <!-- ───────────── COVER ───────────── -->
+    <div class="relative h-52 overflow-hidden bg-gradient-to-br from-green-400 via-emerald-500 to-teal-600">
+      <img
+        v-if="user?.cover_image"
+        :src="user.cover_image"
+        class="w-full h-full object-cover"
+      />
+      <!-- Decorative blobs -->
+      <div class="absolute -top-10 -right-10 w-48 h-48 bg-white/10 rounded-full blur-sm"></div>
+      <div class="absolute top-10 -left-12 w-36 h-36 bg-white/10 rounded-full blur-sm"></div>
+      <div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/25 to-transparent"></div>
 
-      <!-- Cover Image -->
-      <div class="h-36 sm:h-48 md:h-56 bg-gradient-to-br from-green-500 via-emerald-600 to-teal-700 relative overflow-hidden">
-        <img
-          v-if="user?.cover_image"
-          :src="user.cover_image"
-          :alt="`Couverture de ${user?.name}`"
-          class="w-full h-full object-cover"
-        />
-        <div class="absolute inset-0 bg-black/15"></div>
+      <!-- Back -->
+      <button
+        @click="router.back()"
+        class="absolute top-4 left-4 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-colors"
+      >
+        <ArrowLeftIcon class="w-4 h-4 text-gray-800" />
+      </button>
 
-        <!-- Back Button -->
+      <!-- More options -->
+      <div v-if="!isSelf" class="absolute top-4 right-4">
         <button
-          @click="router.back()"
-          class="absolute top-4 left-4 p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-md hover:bg-white transition-colors"
+          @click="showMoreOptions = !showMoreOptions"
+          class="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-colors"
         >
-          <ArrowLeftIcon class="w-4 h-4 text-gray-700" />
+          <MoreVerticalIcon class="w-4 h-4 text-gray-800" />
         </button>
-
-        <!-- More Options -->
-        <div class="absolute top-4 right-4">
-          <button
-            v-if="!isSelf"
-            @click="showMoreOptions = !showMoreOptions"
-            class="p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-md hover:bg-white transition-colors"
-          >
-            <MoreVerticalIcon class="w-4 h-4 text-gray-700" />
+        <div
+          v-if="showMoreOptions"
+          class="absolute top-12 right-0 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50 min-w-[160px]"
+        >
+          <button @click="reportUser" class="w-full px-4 py-3 text-left text-sm text-red-500 hover:bg-red-50 flex items-center gap-3 transition-colors">
+            <FlagIcon class="w-4 h-4" /> Signaler
           </button>
-
-          <!-- Dropdown -->
-          <div
-            v-if="showMoreOptions"
-            class="absolute top-10 right-0 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50 min-w-[150px]"
-          >
-            <button
-              @click="reportUser"
-              class="w-full px-4 py-2.5 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2.5 transition-colors"
-            >
-              <FlagIcon class="w-4 h-4 flex-shrink-0" />
-              Signaler
-            </button>
-            <button
-              @click="blockUser"
-              class="w-full px-4 py-2.5 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2.5 transition-colors"
-            >
-              <BanIcon class="w-4 h-4 flex-shrink-0" />
-              Bloquer
-            </button>
-          </div>
+          <button @click="blockUser" class="w-full px-4 py-3 text-left text-sm text-red-500 hover:bg-red-50 flex items-center gap-3 transition-colors">
+            <BanIcon class="w-4 h-4" /> Bloquer
+          </button>
         </div>
       </div>
+    </div>
 
-      <!-- Profile Info -->
-      <div class="max-w-3xl mx-auto px-4">
+    <!-- ───────────── PROFILE CARD ───────────── -->
+    <div class="bg-white rounded-t-3xl -mt-6 relative z-10 shadow-xl">
+      <div class="px-5 pt-2 pb-1">
+
         <!-- Avatar row -->
-        <div class="flex items-end justify-between -mt-10 sm:-mt-12 mb-3">
-          <div class="relative">
-            <ProfileIcon
-              :src="user?.avatar"
-              :alt="user?.name || 'Utilisateur'"
-              :user-id="user?.id"
-              size="2xl"
-              :verified="user?.is_verified"
-              :fallback-to-initials="true"
-              class="border-4 border-white shadow-lg w-20 h-20 sm:w-24 sm:h-24"
-            />
+        <div class="flex items-start justify-between">
+
+          <!-- Avatar -->
+          <div class="-mt-12 mb-2">
+            <div class="relative inline-block">
+              <div class="w-24 h-24 rounded-full ring-4 ring-white shadow-2xl overflow-hidden">
+                <ProfileIcon
+                  :src="user?.avatar"
+                  :alt="user?.name || 'Utilisateur'"
+                  :user-id="user?.id"
+                  size="2xl"
+                  :verified="false"
+                  :fallback-to-initials="true"
+                  class="w-full h-full"
+                />
+              </div>
+              <div
+                v-if="user?.is_verified"
+                class="absolute bottom-1 right-1 w-7 h-7 bg-green-500 rounded-full flex items-center justify-center ring-2 ring-white shadow-md"
+              >
+                <CheckIcon class="w-4 h-4 text-white" />
+              </div>
+            </div>
           </div>
 
-          <!-- Action Buttons -->
-          <div class="flex items-center gap-2 mb-1">
-            <!-- Bouton Suivre/Abonné -->
+          <!-- Action buttons -->
+          <div class="flex items-center gap-2 mt-3">
+            <!-- Follow / Unfollow -->
             <button
               v-if="!isSelf"
               :disabled="followBusy"
               @click="toggleFollow"
-              class="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold transition-all shadow-sm"
+              class="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-200"
               :class="isFollowing
-                ? 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200'
-                : 'bg-green-500 text-white hover:bg-green-600 shadow-green-200 shadow-md'"
+                ? 'bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200'
+                : 'bg-green-500 text-white shadow-lg shadow-green-200/60 hover:bg-green-600 active:scale-95'"
             >
               <Loader2Icon v-if="followBusy" class="w-4 h-4 animate-spin" />
               <template v-else>
-                <CheckIcon v-if="isFollowing" class="w-4 h-4" />
+                <UserCheckIcon v-if="isFollowing" class="w-4 h-4" />
                 <UserPlusIcon v-else class="w-4 h-4" />
               </template>
-              <span>{{ isFollowing ? 'Abonné' : 'Suivre' }}</span>
+              {{ isFollowing ? 'Abonné' : 'Suivre' }}
             </button>
 
-            <!-- Message (hors son propre profil) -->
+            <!-- Message -->
             <button
               v-if="!isSelf && isAuthenticated"
               @click="goToMessage"
-              class="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200 transition-colors"
+              class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 border border-gray-200 transition-colors active:scale-95"
             >
-              <MessageCircleIcon class="w-4 h-4" />
-              <span class="hidden sm:inline">Message</span>
+              <MessageCircleIcon class="w-5 h-5 text-gray-600" />
             </button>
 
-            <!-- Déconnexion (son propre profil) -->
+            <!-- Logout (own profile) -->
             <button
               v-if="isSelf"
               @click="logout"
-              class="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 transition-colors"
+              class="flex items-center gap-1.5 px-4 py-2.5 rounded-full text-sm font-semibold bg-red-50 text-red-500 border border-red-100 hover:bg-red-100 transition-colors"
             >
               <LogOutIcon class="w-4 h-4" />
-              <span>Déconnexion</span>
+              Déconnexion
             </button>
           </div>
         </div>
 
         <!-- Name & Bio -->
-        <div class="pb-4">
-          <div class="flex flex-wrap items-center gap-2 mb-0.5">
-            <h1 class="text-lg sm:text-xl font-bold text-gray-900">{{ user?.name || 'Utilisateur' }}</h1>
-            <span v-if="user?.username" class="text-sm text-gray-400 font-medium">@{{ user.username }}</span>
+        <div class="mb-5">
+          <div class="flex items-center gap-2 flex-wrap mb-0.5">
+            <h1 class="text-xl font-bold text-gray-900 leading-tight">{{ user?.name || 'Utilisateur' }}</h1>
+            <span
+              v-if="user?.is_verified"
+              class="inline-flex items-center gap-1 text-xs font-semibold text-green-600 bg-green-50 border border-green-100 px-2 py-0.5 rounded-full"
+            >
+              <CheckCircleIcon class="w-3 h-3" /> Vérifié
+            </span>
           </div>
-          <p v-if="user?.bio" class="text-gray-600 text-sm leading-relaxed mt-1 max-w-md">{{ user.bio }}</p>
-          <div class="flex flex-wrap gap-4 mt-2 text-xs text-gray-500">
-            <span v-if="user?.location" class="flex items-center gap-1">
+          <p v-if="user?.username" class="text-sm text-gray-400 font-medium mb-2">@{{ user.username }}</p>
+          <p v-if="user?.bio" class="text-sm text-gray-600 leading-relaxed mb-3">{{ user.bio }}</p>
+          <div class="flex flex-wrap gap-3">
+            <span v-if="user?.location" class="inline-flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 border border-gray-100 px-3 py-1.5 rounded-full font-medium">
               <MapPinIcon class="w-3.5 h-3.5 text-green-500" />
               {{ user.location }}
             </span>
@@ -129,7 +136,7 @@
               v-if="user?.website"
               :href="user.website"
               target="_blank"
-              class="flex items-center gap-1 text-green-600 hover:text-green-700 font-medium transition-colors"
+              class="inline-flex items-center gap-1.5 text-xs text-green-600 bg-green-50 border border-green-100 px-3 py-1.5 rounded-full font-medium hover:bg-green-100 transition-colors"
             >
               <LinkIcon class="w-3.5 h-3.5" />
               Site web
@@ -137,90 +144,114 @@
           </div>
         </div>
 
-        <!-- Stats Bar -->
-        <div class="grid grid-cols-3 divide-x divide-gray-100 border-t border-gray-100">
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-3 gap-2.5 mb-5">
           <button
-            class="flex flex-col items-center py-3 hover:bg-gray-50 transition-colors group"
             @click="activeTab = 'products'"
-            :class="activeTab === 'products' ? 'text-green-600' : 'text-gray-500'"
+            class="flex flex-col items-center py-3.5 rounded-2xl border-2 transition-all duration-200 active:scale-95"
+            :class="activeTab === 'products'
+              ? 'bg-green-500 border-green-500 shadow-lg shadow-green-200/60'
+              : 'bg-gray-50 border-transparent hover:bg-gray-100'"
           >
-            <span class="text-lg font-bold text-gray-900 group-hover:text-green-600 transition-colors">{{ stats?.products_count ?? 0 }}</span>
-            <span class="text-xs font-medium">Produits</span>
+            <span
+              class="text-2xl font-black leading-none mb-1"
+              :class="activeTab === 'products' ? 'text-white' : 'text-gray-900'"
+            >{{ stats?.products_count ?? 0 }}</span>
+            <span
+              class="text-xs font-semibold"
+              :class="activeTab === 'products' ? 'text-green-100' : 'text-gray-500'"
+            >Produits</span>
           </button>
           <button
-            class="flex flex-col items-center py-3 hover:bg-gray-50 transition-colors group"
             @click="activeTab = 'followers'"
-            :class="activeTab === 'followers' ? 'text-green-600' : 'text-gray-500'"
+            class="flex flex-col items-center py-3.5 rounded-2xl border-2 transition-all duration-200 active:scale-95"
+            :class="activeTab === 'followers'
+              ? 'bg-green-500 border-green-500 shadow-lg shadow-green-200/60'
+              : 'bg-gray-50 border-transparent hover:bg-gray-100'"
           >
-            <span class="text-lg font-bold text-gray-900 group-hover:text-green-600 transition-colors">{{ stats?.followers_count ?? 0 }}</span>
-            <span class="text-xs font-medium">Abonnés</span>
+            <span
+              class="text-2xl font-black leading-none mb-1"
+              :class="activeTab === 'followers' ? 'text-white' : 'text-gray-900'"
+            >{{ stats?.followers_count ?? 0 }}</span>
+            <span
+              class="text-xs font-semibold"
+              :class="activeTab === 'followers' ? 'text-green-100' : 'text-gray-500'"
+            >Abonnés</span>
           </button>
           <button
-            class="flex flex-col items-center py-3 hover:bg-gray-50 transition-colors group"
             @click="activeTab = 'following'"
-            :class="activeTab === 'following' ? 'text-green-600' : 'text-gray-500'"
+            class="flex flex-col items-center py-3.5 rounded-2xl border-2 transition-all duration-200 active:scale-95"
+            :class="activeTab === 'following'
+              ? 'bg-green-500 border-green-500 shadow-lg shadow-green-200/60'
+              : 'bg-gray-50 border-transparent hover:bg-gray-100'"
           >
-            <span class="text-lg font-bold text-gray-900 group-hover:text-green-600 transition-colors">{{ stats?.following_count ?? 0 }}</span>
-            <span class="text-xs font-medium">Abonnements</span>
+            <span
+              class="text-2xl font-black leading-none mb-1"
+              :class="activeTab === 'following' ? 'text-white' : 'text-gray-900'"
+            >{{ stats?.following_count ?? 0 }}</span>
+            <span
+              class="text-xs font-semibold"
+              :class="activeTab === 'following' ? 'text-green-100' : 'text-gray-500'"
+            >Abonnements</span>
+          </button>
+        </div>
+
+        <!-- Tab Pills -->
+        <div class="flex gap-1 bg-gray-100 rounded-2xl p-1 mb-5">
+          <button
+            v-for="tab in tabs"
+            :key="tab.id"
+            @click="activeTab = tab.id"
+            class="flex-1 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200"
+            :class="activeTab === tab.id
+              ? 'bg-white text-green-600 shadow-sm'
+              : 'text-gray-500 hover:text-gray-700'"
+          >
+            {{ tab.label }}
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Tabs + Content -->
-    <div class="max-w-3xl mx-auto px-4 pt-4 pb-8">
-
-      <!-- Tab Navigation -->
-      <div class="flex bg-white rounded-xl border border-gray-100 shadow-sm p-1 mb-5 gap-1">
-        <button
-          v-for="tab in tabs"
-          :key="tab.id"
-          @click="activeTab = tab.id"
-          class="flex-1 py-2 px-3 text-sm font-medium rounded-lg transition-all duration-200"
-          :class="activeTab === tab.id
-            ? 'bg-green-500 text-white shadow-sm'
-            : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'"
-        >
-          {{ tab.label }}
-        </button>
-      </div>
+    <!-- ───────────── CONTENT ───────────── -->
+    <div class="px-4 pt-4 pb-28">
 
       <!-- Loading -->
-      <div v-if="loading" class="flex flex-col items-center justify-center py-16 gap-3">
-        <Loader2Icon class="w-8 h-8 animate-spin text-green-500" />
-        <span class="text-sm text-gray-500 font-medium">Chargement...</span>
+      <div v-if="loading" class="flex flex-col items-center py-20 gap-4">
+        <div class="relative w-14 h-14">
+          <div class="absolute inset-0 rounded-full border-4 border-green-100"></div>
+          <div class="absolute inset-0 rounded-full border-4 border-transparent border-t-green-500 animate-spin"></div>
+        </div>
+        <span class="text-sm text-gray-400 font-medium">Chargement du profil...</span>
       </div>
 
       <!-- Error -->
-      <div v-else-if="error" class="text-center py-16">
-        <div class="w-14 h-14 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-          <AlertTriangleIcon class="w-7 h-7 text-red-500" />
+      <div v-else-if="error" class="text-center py-20">
+        <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
+          <AlertTriangleIcon class="w-8 h-8 text-red-400" />
         </div>
-        <p class="text-gray-700 font-medium mb-1">Impossible de charger ce profil</p>
-        <p class="text-gray-500 text-sm mb-4">{{ error }}</p>
+        <p class="font-bold text-gray-800 mb-1 text-lg">Oups !</p>
+        <p class="text-sm text-gray-500 mb-6 max-w-xs mx-auto">{{ error }}</p>
         <button
           @click="retryLoad"
-          class="px-5 py-2 bg-green-500 hover:bg-green-600 text-white rounded-full text-sm font-medium transition-colors shadow-md"
+          class="px-7 py-3 bg-green-500 text-white rounded-full text-sm font-bold shadow-lg shadow-green-200 hover:bg-green-600 transition-colors active:scale-95"
         >
           Réessayer
         </button>
       </div>
 
-      <!-- Content -->
       <div v-else>
-
-        <!-- Products Tab -->
+        <!-- Products -->
         <div v-if="activeTab === 'products'">
-          <div v-if="products.length === 0" class="text-center py-16">
-            <div class="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <PackageIcon class="w-7 h-7 text-gray-400" />
+          <div v-if="products.length === 0" class="text-center py-20">
+            <div class="w-20 h-20 bg-white rounded-3xl flex items-center justify-center mx-auto mb-5 shadow-sm border border-gray-100">
+              <PackageIcon class="w-9 h-9 text-gray-300" />
             </div>
-            <p class="text-gray-700 font-medium mb-1">Aucun produit</p>
-            <p class="text-gray-500 text-sm">Cet utilisateur n'a pas encore mis de produits en vente.</p>
+            <p class="font-bold text-gray-700 text-lg mb-1">Aucun produit</p>
+            <p class="text-sm text-gray-400 max-w-xs mx-auto">Cet utilisateur n'a pas encore mis de produits en vente.</p>
           </div>
-
           <div v-else>
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
               <TikTokProductCard
                 v-for="product in products"
                 :key="product.id"
@@ -228,75 +259,114 @@
                 class="w-full"
               />
             </div>
-
-            <!-- Pagination -->
-            <div v-if="pagination.last > 1" class="flex items-center justify-center gap-2 mt-8">
+            <div v-if="pagination.last > 1" class="flex items-center justify-center gap-3 mt-8">
               <button
                 @click="goToPage(pagination.current - 1)"
                 :disabled="pagination.current <= 1"
-                class="px-4 py-2 text-sm font-medium bg-white border border-gray-200 rounded-full text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-sm"
-              >
-                Précédent
-              </button>
-              <span class="text-sm text-gray-500 font-medium px-2">
+                class="px-5 py-2.5 text-sm font-semibold rounded-full bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm transition-colors"
+              >← Précédent</button>
+              <span class="text-xs text-gray-400 font-medium bg-white border border-gray-100 rounded-full px-3 py-2 shadow-sm">
                 {{ pagination.current }} / {{ pagination.last }}
               </span>
               <button
                 @click="goToPage(pagination.current + 1)"
                 :disabled="pagination.current >= pagination.last"
-                class="px-4 py-2 text-sm font-medium bg-white border border-gray-200 rounded-full text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-sm"
+                class="px-5 py-2.5 text-sm font-semibold rounded-full bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm transition-colors"
+              >Suivant →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Followers -->
+        <div v-if="activeTab === 'followers'">
+          <div v-if="followers.length === 0" class="text-center py-20">
+            <div class="w-20 h-20 bg-white rounded-3xl flex items-center justify-center mx-auto mb-5 shadow-sm border border-gray-100">
+              <UserIcon class="w-9 h-9 text-gray-300" />
+            </div>
+            <p class="font-bold text-gray-700 text-lg mb-1">Aucun abonné</p>
+            <p class="text-sm text-gray-400">Cet utilisateur n'a pas encore d'abonnés.</p>
+          </div>
+          <div v-else class="space-y-2.5">
+            <div
+              v-for="follower in followers"
+              :key="follower.id"
+              class="flex items-center justify-between bg-white rounded-2xl px-4 py-3 shadow-sm border border-gray-100"
+            >
+              <div class="flex items-center gap-3">
+                <ProfileIcon
+                  :src="follower.avatar"
+                  :alt="follower.name || 'Utilisateur'"
+                  :user-id="follower.id"
+                  size="md"
+                  :fallback-to-initials="true"
+                  class="flex-shrink-0"
+                />
+                <div>
+                  <p class="font-semibold text-gray-900 text-sm leading-tight">{{ follower.name || 'Utilisateur' }}</p>
+                  <p class="text-xs text-gray-400 mt-0.5">@{{ follower.username || 'username' }}</p>
+                </div>
+              </div>
+              <button
+                @click="toggleFollowUser(follower.id)"
+                class="px-4 py-1.5 text-xs font-bold rounded-full transition-all active:scale-95"
+                :class="follower.is_following
+                  ? 'bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200'
+                  : 'bg-green-500 text-white shadow-md shadow-green-200/50 hover:bg-green-600'"
               >
-                Suivant
+                {{ follower.is_following ? 'Abonné' : 'Suivre' }}
               </button>
             </div>
           </div>
         </div>
 
-        <!-- Followers Tab -->
-        <div v-if="activeTab === 'followers'">
-          <div v-if="followers.length === 0" class="text-center py-16">
-            <div class="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <UserIcon class="w-7 h-7 text-gray-400" />
-            </div>
-            <p class="text-gray-700 font-medium mb-1">Aucun abonné</p>
-            <p class="text-gray-500 text-sm">Cet utilisateur n'a pas encore d'abonnés.</p>
-          </div>
-          <div v-else class="space-y-2">
-            <UserListCard
-              v-for="follower in followers"
-              :key="follower.id"
-              :user="follower"
-              @toggle-follow="toggleFollowUser(follower.id)"
-            />
-          </div>
-        </div>
-
-        <!-- Following Tab -->
+        <!-- Following -->
         <div v-if="activeTab === 'following'">
-          <div v-if="following.length === 0" class="text-center py-16">
-            <div class="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <UsersIcon class="w-7 h-7 text-gray-400" />
+          <div v-if="following.length === 0" class="text-center py-20">
+            <div class="w-20 h-20 bg-white rounded-3xl flex items-center justify-center mx-auto mb-5 shadow-sm border border-gray-100">
+              <UsersIcon class="w-9 h-9 text-gray-300" />
             </div>
-            <p class="text-gray-700 font-medium mb-1">Aucun abonnement</p>
-            <p class="text-gray-500 text-sm">Découvrez et suivez d'autres vendeurs.</p>
+            <p class="font-bold text-gray-700 text-lg mb-1">Aucun abonnement</p>
+            <p class="text-sm text-gray-400">Découvrez et suivez d'autres vendeurs.</p>
           </div>
-          <div v-else class="space-y-2">
-            <UserListCard
+          <div v-else class="space-y-2.5">
+            <div
               v-for="followed in following"
               :key="followed.id"
-              :user="followed"
-              @toggle-follow="toggleFollowUser(followed.id)"
-            />
+              class="flex items-center justify-between bg-white rounded-2xl px-4 py-3 shadow-sm border border-gray-100"
+            >
+              <div class="flex items-center gap-3">
+                <ProfileIcon
+                  :src="followed.avatar"
+                  :alt="followed.name || 'Utilisateur'"
+                  :user-id="followed.id"
+                  size="md"
+                  :fallback-to-initials="true"
+                  class="flex-shrink-0"
+                />
+                <div>
+                  <p class="font-semibold text-gray-900 text-sm leading-tight">{{ followed.name || 'Utilisateur' }}</p>
+                  <p class="text-xs text-gray-400 mt-0.5">@{{ followed.username || 'username' }}</p>
+                </div>
+              </div>
+              <button
+                @click="toggleFollowUser(followed.id)"
+                class="px-4 py-1.5 text-xs font-bold rounded-full transition-all active:scale-95"
+                :class="followed.is_following
+                  ? 'bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200'
+                  : 'bg-green-500 text-white shadow-md shadow-green-200/50 hover:bg-green-600'"
+              >
+                {{ followed.is_following ? 'Abonné' : 'Suivre' }}
+              </button>
+            </div>
           </div>
         </div>
-
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch, defineComponent, h } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import TikTokProductCard from '@/components/products/TikTokProductCard.vue'
@@ -309,10 +379,12 @@ import {
   FlagIcon,
   BanIcon,
   CheckIcon,
+  CheckCircleIcon,
   PackageIcon,
   UsersIcon,
   UserIcon,
   UserPlusIcon,
+  UserCheckIcon,
   LinkIcon,
   MapPinIcon,
   MessageCircleIcon,
@@ -320,38 +392,6 @@ import {
   Loader2Icon,
   AlertTriangleIcon
 } from 'lucide-vue-next'
-
-// Composant inline pour les cartes utilisateurs (followers/following)
-const UserListCard = defineComponent({
-  props: { user: Object },
-  emits: ['toggle-follow'],
-  setup(props, { emit }) {
-    return () => h('div', {
-      class: 'flex items-center justify-between bg-white rounded-xl px-4 py-3 border border-gray-100 shadow-sm hover:shadow-md transition-shadow'
-    }, [
-      h('div', { class: 'flex items-center gap-3' }, [
-        h(ProfileIcon, {
-          src: props.user.avatar,
-          alt: props.user.name || 'Utilisateur',
-          userId: props.user.id,
-          size: 'md',
-          fallbackToInitials: true,
-          class: 'flex-shrink-0'
-        }),
-        h('div', {}, [
-          h('p', { class: 'font-semibold text-gray-900 text-sm' }, props.user.name || 'Utilisateur'),
-          h('p', { class: 'text-xs text-gray-400' }, `@${props.user.username || 'username'}`)
-        ])
-      ]),
-      h('button', {
-        onClick: () => emit('toggle-follow'),
-        class: props.user.is_following
-          ? 'px-3 py-1.5 text-xs font-semibold rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-200 transition-colors'
-          : 'px-3 py-1.5 text-xs font-semibold rounded-full bg-green-500 text-white hover:bg-green-600 transition-colors shadow-sm'
-      }, props.user.is_following ? 'Abonné' : 'Suivre')
-    ])
-  }
-})
 
 const route = useRoute()
 const router = useRouter()
@@ -372,7 +412,6 @@ const followers = ref([])
 const following = ref([])
 
 const pagination = ref({ current: 1, last: 1, total: 0, perPage: 20 })
-
 const activeTab = ref('products')
 
 const tabs = [
@@ -381,14 +420,12 @@ const tabs = [
   { id: 'following', label: 'Abonnements' }
 ]
 
-// Computed
 const isAuthenticated = computed(() => authStore.isAuthenticated)
 const isSelf = computed(() => {
   const id = Number(route.params.id)
   return authStore.user && authStore.user.id === id
 })
 
-// Methods
 async function fetchUser() {
   try {
     const resp = await api.get(`/users/${route.params.id}`)
@@ -396,7 +433,7 @@ async function fetchUser() {
     user.value = payload?.user || null
     stats.value = payload?.stats || null
     isFollowing.value = Boolean(payload?.is_following)
-  } catch (err) {
+  } catch {
     error.value = 'Impossible de charger ce profil.'
   }
 }
@@ -404,15 +441,15 @@ async function fetchUser() {
 async function fetchProducts(page = 1) {
   try {
     const resp = await api.get(`/users/${route.params.id}/products`, { params: { page } })
-    const pageData = resp.data?.data
-    products.value = Array.isArray(pageData?.data) ? pageData.data : []
+    const d = resp.data?.data
+    products.value = Array.isArray(d?.data) ? d.data : []
     pagination.value = {
-      current: Number(pageData?.current_page || 1),
-      last: Number(pageData?.last_page || 1),
-      total: Number(pageData?.total || 0),
-      perPage: Number(pageData?.per_page || 20)
+      current: Number(d?.current_page || 1),
+      last: Number(d?.last_page || 1),
+      total: Number(d?.total || 0),
+      perPage: Number(d?.per_page || 20)
     }
-  } catch (err) {
+  } catch {
     error.value = 'Impossible de charger les produits.'
   }
 }
@@ -420,14 +457,9 @@ async function fetchProducts(page = 1) {
 async function fetchFollowers() {
   try {
     const resp = await api.get(`/users/${route.params.id}/followers`)
-    if (resp.data?.data?.data) {
-      followers.value = resp.data.data.data
-    } else if (Array.isArray(resp.data?.data)) {
-      followers.value = resp.data.data
-    } else {
-      followers.value = []
-    }
-  } catch (err) {
+    const d = resp.data?.data
+    followers.value = d?.data ?? (Array.isArray(d) ? d : [])
+  } catch {
     error.value = 'Impossible de charger les abonnés.'
   }
 }
@@ -435,14 +467,9 @@ async function fetchFollowers() {
 async function fetchFollowing() {
   try {
     const resp = await api.get(`/users/${route.params.id}/following`)
-    if (resp.data?.data?.data) {
-      following.value = resp.data.data.data
-    } else if (Array.isArray(resp.data?.data)) {
-      following.value = resp.data.data
-    } else {
-      following.value = []
-    }
-  } catch (err) {
+    const d = resp.data?.data
+    following.value = d?.data ?? (Array.isArray(d) ? d : [])
+  } catch {
     error.value = 'Impossible de charger les abonnements.'
   }
 }
@@ -461,7 +488,6 @@ async function toggleFollow() {
     return
   }
   if (isSelf.value || followBusy.value) return
-
   followBusy.value = true
   try {
     if (isFollowing.value) {
@@ -475,7 +501,7 @@ async function toggleFollow() {
       isFollowing.value = data.is_following
       if (stats.value) stats.value.followers_count = data.followers_count
     }
-  } catch (err) {
+  } catch {
     await fetchUser()
   } finally {
     followBusy.value = false
@@ -483,7 +509,7 @@ async function toggleFollow() {
 }
 
 async function toggleFollowUser(userId) {
-  // Implementation for following/unfollowing other users
+  // TODO: implement
 }
 
 function goToMessage() {
@@ -500,13 +526,8 @@ function logout() {
   router.push({ name: 'login' })
 }
 
-function reportUser() {
-  showMoreOptions.value = false
-}
-
-function blockUser() {
-  showMoreOptions.value = false
-}
+function reportUser() { showMoreOptions.value = false }
+function blockUser() { showMoreOptions.value = false }
 
 function retryLoad() {
   error.value = ''
@@ -517,22 +538,22 @@ function retryLoad() {
 async function loadInitialData() {
   try {
     await Promise.all([fetchUser(), fetchProducts()])
-  } catch (err) {
-    // silent
   } finally {
     loading.value = false
   }
 }
 
-// Watchers
 watch(activeTab, () => loadTabContent())
 watch(() => route.params.id, async () => {
   loading.value = true
   await loadInitialData()
 })
 
-// Lifecycle
-onMounted(async () => {
-  await loadInitialData()
-})
+onMounted(() => loadInitialData())
 </script>
+
+<style scoped>
+.active\:scale-95:active {
+  transform: scale(0.95);
+}
+</style>

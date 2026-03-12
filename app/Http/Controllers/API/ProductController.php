@@ -160,6 +160,9 @@ class ProductController extends Controller
                 case 'recent':
                     $query->latest();
                     break;
+                case 'oldest':
+                    $query->orderBy('created_at', 'asc');
+                    break;
                 default:
                     $query->orderBy('is_featured', 'desc')
                           ->orderBy('is_boosted', 'desc')
