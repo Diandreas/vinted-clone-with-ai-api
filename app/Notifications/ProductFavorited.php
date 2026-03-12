@@ -26,9 +26,9 @@ class ProductFavorited extends Notification
                 '⭐ Nouveau favori !',
                 "{$this->fan->name} a ajouté « {$this->product->title} » à ses favoris",
                 [
-                    'type'       => 'product_liked',
+                    'type'       => 'product_favorited',
                     'product_id' => (string) $this->product->id,
-                    'liker_id'   => (string) $this->fan->id,
+                    'fan_id'     => (string) $this->fan->id,
                 ]
             );
         }

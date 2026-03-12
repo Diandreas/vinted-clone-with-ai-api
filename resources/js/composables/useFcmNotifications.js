@@ -18,7 +18,7 @@ export function useFcmNotifications() {
   let cleanupForeground = null
 
   const getUrlFromData = (data = {}) => {
-    if (data.type === 'product_liked' || data.type === 'product_commented' || data.type === 'product_published') {
+    if (data.type === 'product_liked' || data.type === 'product_favorited' || data.type === 'product_commented' || data.type === 'product_published') {
       return `/products/${data.product_id}`
     }
     if (data.type === 'new_message') {

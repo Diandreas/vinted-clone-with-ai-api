@@ -28,7 +28,7 @@ if (FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey !== 'VOTRE_API_KEY') {
 
     // Détermine l'URL de redirection selon le type de notification
     let url = '/';
-    if (data.type === 'product_liked' || data.type === 'product_commented' || data.type === 'product_published') {
+    if (data.type === 'product_liked' || data.type === 'product_favorited' || data.type === 'product_commented' || data.type === 'product_published') {
       url = `/products/${data.product_id}`;
     } else if (data.type === 'new_message') {
       url = `/conversations/${data.conversation_id}`;
@@ -41,6 +41,8 @@ if (FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey !== 'VOTRE_API_KEY') {
     let tag = 'rikeaa-notification';
     if (data.type === 'product_liked' || data.type === 'product_commented') {
       tag = `rikeaa-product-${data.product_id}`;
+    } else if (data.type === 'product_favorited') {
+      tag = `rikeaa-favorite-${data.product_id}`;
     } else if (data.type === 'new_message') {
       tag = `rikeaa-conv-${data.conversation_id}`;
     } else if (data.type === 'new_follower') {
