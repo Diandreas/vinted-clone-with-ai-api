@@ -214,15 +214,15 @@
                       :key="conversation.id"
                       class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
                     >
-                      <div class="flex items-center space-x-3">
+                      <div class="flex items-center space-x-3 min-w-0 flex-1">
                         <!-- Buyer avatar -->
-                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-semibold text-sm">
+                        <div class="w-8 h-8 flex-shrink-0 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-semibold text-sm">
                           {{ getUserInitials(conversation.buyer?.name) }}
                         </div>
 
                         <!-- Buyer info & last message -->
                         <div class="min-w-0 flex-1">
-                          <p class="font-medium text-gray-900 text-sm">{{ conversation.buyer?.name }}</p>
+                          <p class="font-medium text-gray-900 text-sm truncate">{{ conversation.buyer?.name }}</p>
                           <p class="text-xs text-gray-500 truncate" v-if="conversation.last_message">
                             "{{ extractMessageContent(conversation.last_message.content, 40) }}..."
                           </p>
@@ -233,7 +233,7 @@
                       </div>
 
                       <!-- Actions -->
-                      <div class="flex items-center space-x-2">
+                      <div class="flex items-center space-x-2 flex-shrink-0 ml-2">
                         <span
                           v-if="conversation.unread_count > 0"
                           class="bg-red-500 text-white text-xs px-2 py-1 rounded-full"
