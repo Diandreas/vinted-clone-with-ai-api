@@ -241,17 +241,17 @@ Route::prefix('v1')->group(function () {
             Route::get('following-stories', [StoryController::class, 'followingStories']);
         });
 
-        // Order Routes
+        // Order Routes — routes statiques AVANT les routes avec paramètres
         Route::prefix('orders')->group(function () {
             Route::get('/', [OrderController::class, 'index']);
             Route::post('/', [OrderController::class, 'store']);
+            Route::get('purchases', [OrderController::class, 'purchases']);
+            Route::get('sales', [OrderController::class, 'sales']);
+            Route::get('pending', [OrderController::class, 'pending']);
             Route::get('{order}', [OrderController::class, 'show']);
             Route::put('{order}/status', [OrderController::class, 'updateStatus']);
             Route::post('{order}/cancel', [OrderController::class, 'cancel']);
             Route::post('{order}/dispute', [OrderController::class, 'dispute']);
-            Route::get('purchases', [OrderController::class, 'purchases']);
-            Route::get('sales', [OrderController::class, 'sales']);
-            Route::get('pending', [OrderController::class, 'pending']);
         });
 
                 // Conversation & Messages Routes

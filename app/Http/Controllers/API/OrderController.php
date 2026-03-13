@@ -11,8 +11,8 @@ class OrderController extends Controller
 {
     public function index()
     {
-        $orders = auth()->user()->orders_as_buyer()
-            ->with(['product', 'seller'])
+        $orders = auth()->user()->orders()
+            ->with(['product.images', 'seller'])
             ->latest()
             ->paginate(20);
 
@@ -81,10 +81,22 @@ class OrderController extends Controller
         }
 
         $request->validate([
-            'status' => 'required|in:confirmed,shipped,delivered,cancelled',
+            'status'          => 'required|in:confirmed,shipped,delivered,cancelled',
+            'tracking_number' => 'nullable|string|max:100',
         ]);
 
-        $order->update(['status' => $request->status]);
+        $data = ['status' => $request->status];
+        if ($request->status === 'shipped') {
+            $data['shipped_at'] = now();
+            if ($request->tracking_number) {
+                $data['tracking_number'] = $request->tracking_number;
+            }
+        }
+        if ($request->status === 'delivered') {
+            $data['delivered_at'] = now();
+        }
+
+        $order->update($data);
 
         return response()->json([
             'success' => true,
@@ -129,8 +141,8 @@ class OrderController extends Controller
 
     public function purchases()
     {
-        $orders = auth()->user()->orders_as_buyer()
-            ->with(['product', 'seller'])
+        $orders = auth()->user()->orders()
+            ->with(['product.images', 'seller'])
             ->latest()
             ->paginate(20);
 
@@ -142,8 +154,8 @@ class OrderController extends Controller
 
     public function sales()
     {
-        $orders = auth()->user()->orders_as_seller()
-            ->with(['product', 'buyer'])
+        $orders = auth()->user()->sales()
+            ->with(['product.images', 'buyer'])
             ->latest()
             ->paginate(20);
 
