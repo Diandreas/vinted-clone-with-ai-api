@@ -64,12 +64,41 @@
           <canvas ref="feeRevenueByDayChart" height="160"></canvas>
         </div>
       </div>
+
+      <!-- Accès rapide -->
+      <div class="mt-6">
+        <h2 class="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-3">Accès rapide</h2>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          <RouterLink to="/admin/users" class="bg-white border border-gray-200 rounded-xl p-4 flex flex-col items-center hover:shadow-md transition-shadow text-center">
+            <span class="text-2xl mb-1">👥</span>
+            <span class="text-xs font-medium text-gray-700">Utilisateurs</span>
+          </RouterLink>
+          <RouterLink to="/admin/products" class="bg-white border border-gray-200 rounded-xl p-4 flex flex-col items-center hover:shadow-md transition-shadow text-center">
+            <span class="text-2xl mb-1">📦</span>
+            <span class="text-xs font-medium text-gray-700">Produits</span>
+          </RouterLink>
+          <RouterLink to="/admin/categories" class="bg-white border border-gray-200 rounded-xl p-4 flex flex-col items-center hover:shadow-md transition-shadow text-center">
+            <span class="text-2xl mb-1">🏷️</span>
+            <span class="text-xs font-medium text-gray-700">Catégories</span>
+          </RouterLink>
+          <RouterLink to="/admin/brands" class="bg-white border border-gray-200 rounded-xl p-4 flex flex-col items-center hover:shadow-md transition-shadow text-center">
+            <span class="text-2xl mb-1">⭐</span>
+            <span class="text-xs font-medium text-gray-700">Marques</span>
+          </RouterLink>
+          <RouterLink to="/admin/reports" class="bg-white border border-gray-200 rounded-xl p-4 flex flex-col items-center hover:shadow-md transition-shadow text-center">
+            <span class="text-2xl mb-1">🚩</span>
+            <span class="text-xs font-medium text-gray-700">Signalements</span>
+          </RouterLink>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
+
 <script setup>
 import { ref, onMounted } from 'vue'
+import { RouterLink } from 'vue-router'
 import Chart from 'chart.js/auto'
 
 const kpis = ref({

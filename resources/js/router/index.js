@@ -165,6 +165,12 @@ const routes = [
     component: CategoryManagement,
     meta: { requiresAuth: true }
   },
+  {
+    path: '/admin/brands',
+    name: 'brand-management',
+    component: () => import('@/views/admin/BrandManagement.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
 
   {
     path: '/messages',
