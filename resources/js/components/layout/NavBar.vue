@@ -110,8 +110,16 @@
                     class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     :class="{ 'bg-gray-100': $route.name === 'admin-categories' }"
                   >
-                    <TagIcon class="w-4 h-2 mr-3" />
+                    <TagIcon class="w-4 h-4 mr-3" />
                     Gestion Catégories
+                  </RouterLink>
+                  <RouterLink
+                    to="/admin/brands"
+                    class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    :class="{ 'bg-gray-100': $route.name === 'brand-management' }"
+                  >
+                    <StarIcon class="w-4 h-4 mr-3" />
+                    Gestion Marques
                   </RouterLink>
                 </div>
               </Transition>
@@ -225,6 +233,15 @@
             <TagIcon class="w-4 h-4 mr-3" />
             Gestion Catégories
           </RouterLink>
+          <RouterLink
+            to="/admin/brands"
+            class="flex items-center px-3 py-2 text-sm text-gray-700 rounded-lg hover:bg-gray-100"
+            :class="{ 'bg-gray-100': $route.name === 'brand-management' }"
+            @click="showAdminMenu = false"
+          >
+            <StarIcon class="w-4 h-4 mr-3" />
+            Gestion Marques
+          </RouterLink>
         </div>
       </div>
     </div>
@@ -244,6 +261,7 @@ import {
   PackageIcon,
   UsersIcon,
   TagIcon,
+  StarIcon,
   BarChart3Icon,
 } from 'lucide-vue-next'
 
