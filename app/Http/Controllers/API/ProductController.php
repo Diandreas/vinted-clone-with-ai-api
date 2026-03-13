@@ -45,6 +45,21 @@ class ProductController extends Controller
         return null;
     }
 
+    private function resolveCategoryId(Request $request): ?int
+    {
+        if ($request->category_id) {
+            return (int) $request->category_id;
+        }
+        if ($request->category_name && trim($request->category_name) !== '') {
+            $category = Category::firstOrCreate(
+                ['name' => trim($request->category_name)],
+                ['slug' => \Illuminate\Support\Str::slug($request->category_name)]
+            );
+            return $category->id;
+        }
+        return null;
+    }
+
     /**
      * Display a listing of products.
      */
@@ -214,7 +229,8 @@ class ProductController extends Controller
             'description' => 'required|string',
             'price' => 'required|numeric|min:0.01',
             'original_price' => 'nullable|numeric|min:0.01',
-            'category_id' => 'required|exists:categories,id',
+            'category_id' => 'nullable|exists:categories,id',
+            'category_name' => 'nullable|string|max:100',
             'brand_id' => 'nullable|exists:brands,id',
             'brand_name' => 'nullable|string|max:100',
             'condition_id' => 'required|exists:conditions,id',
@@ -247,7 +263,7 @@ class ProductController extends Controller
             'description' => $request->description,
             'price' => $request->price,
             'original_price' => $request->original_price,
-            'category_id' => $request->category_id,
+            'category_id' => $this->resolveCategoryId($request),
             'brand_id' => $this->resolveBrandId($request),
             'condition_id' => $request->condition_id,
             'size' => $request->size,
@@ -443,7 +459,8 @@ class ProductController extends Controller
             'description' => 'sometimes|string',
             'price' => 'sometimes|numeric|min:0.01',
             'original_price' => 'nullable|numeric|min:0.01',
-            'category_id' => 'sometimes|exists:categories,id',
+            'category_id' => 'nullable|exists:categories,id',
+            'category_name' => 'nullable|string|max:100',
             'brand_id' => 'nullable|exists:brands,id',
             'brand_name' => 'nullable|string|max:100',
             'condition_id' => 'sometimes|exists:conditions,id',
@@ -467,12 +484,15 @@ class ProductController extends Controller
 
         $product->update(array_merge($request->only([
             'title', 'description', 'price', 'original_price',
-            'category_id', 'condition_id',
+            'condition_id',
             'size', 'color', 'material', 'shipping_cost',
             'location', 'is_negotiable', 'minimum_offer',
             'tags', 'measurements', 'status',
             'followers_only', 'is_spot', 'spot_starts_at', 'spot_ends_at'
-        ]), ['brand_id' => $this->resolveBrandId($request)]));
+        ]), [
+            'category_id' => $this->resolveCategoryId($request),
+            'brand_id' => $this->resolveBrandId($request),
+        ]));
 
         // Process new images if provided
         if ($request->hasFile('new_images')) {

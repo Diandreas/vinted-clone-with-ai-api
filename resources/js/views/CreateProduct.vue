@@ -171,56 +171,95 @@
               ></textarea>
             </div>
 
-            <!-- Category - Ultra Compact -->
-            <div>
-              <label for="category" class="block text-xs font-medium text-gray-700 mb-1">
-                Catégorie *
-              </label>
-              <select
-                id="category"
-                v-model="form.category_id"
-                required
-                class="w-full px-2 py-1.5 border border-gray-300 rounded-md focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 bg-white/80 backdrop-blur-sm text-xs"
+            <!-- Category - Combobox -->
+            <div class="relative">
+              <label class="block text-xs font-medium text-gray-700 mb-1">Catégorie *</label>
+              <div class="relative">
+                <input
+                  v-model="categorySearch"
+                  type="text"
+                  placeholder="Catégorie"
+                  autocomplete="off"
+                  class="w-full px-2 py-1.5 pr-7 border border-gray-300 rounded-md focus:ring-1 focus:ring-primary-500 focus:border-primary-500 bg-white/80 backdrop-blur-sm text-xs"
+                  @focus="showCategoryDropdown = true"
+                  @blur="hideCategoryDropdown"
+                  @input="onCategoryInput"
+                />
+                <span class="pointer-events-none absolute inset-y-0 right-2 flex items-center text-gray-400">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                  </svg>
+                </span>
+              </div>
+              <ul
+                v-if="showCategoryDropdown"
+                class="absolute z-30 w-full bg-white border border-gray-200 rounded-md shadow-lg mt-0.5 max-h-44 overflow-y-auto"
               >
-                <option value="">Catégorie</option>
-                <option
-                  v-for="category in categories"
+                <li
+                  v-for="category in filteredCategories"
                   :key="category.id"
-                  :value="category.id"
+                  @mousedown.prevent="selectCategory(category)"
+                  class="px-3 py-1.5 text-xs cursor-pointer hover:bg-primary-50 hover:text-primary-700"
                 >
                   {{ category.name }}
-                </option>
-              </select>
+                </li>
+                <li
+                  v-if="categorySearch.trim() && !exactCategoryMatch"
+                  @mousedown.prevent="confirmNewCategory"
+                  class="px-3 py-1.5 text-xs cursor-pointer bg-gray-50 hover:bg-primary-50 text-gray-500 hover:text-primary-700 border-t border-gray-100"
+                >
+                  Ajouter "{{ categorySearch.trim() }}"
+                </li>
+                <li v-if="filteredCategories.length === 0 && !categorySearch.trim()" class="px-3 py-2 text-xs text-gray-400">
+                  Tapez pour rechercher…
+                </li>
+              </ul>
             </div>
 
-            <!-- Brand - Autocomplete -->
+            <!-- Brand - Combobox (select + saisie libre) -->
             <div class="relative">
-              <label for="brand" class="block text-xs font-medium text-gray-700 mb-1">
-                Marque
-              </label>
-              <input
-                id="brand"
-                v-model="brandSearch"
-                type="text"
-                placeholder="Ex: Nike, Zara, Samsung…"
-                autocomplete="off"
-                class="w-full px-2 py-1.5 border border-gray-300 rounded-md focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 bg-white/80 backdrop-blur-sm text-xs"
-                @input="onBrandInput"
-                @focus="showBrandDropdown = true"
-                @blur="hideBrandDropdown"
-              />
-              <!-- Dropdown suggestions -->
+              <label class="block text-xs font-medium text-gray-700 mb-1">Marque</label>
+              <div class="relative">
+                <input
+                  v-model="brandSearch"
+                  type="text"
+                  placeholder="Marque"
+                  autocomplete="off"
+                  class="w-full px-2 py-1.5 pr-7 border border-gray-300 rounded-md focus:ring-1 focus:ring-primary-500 focus:border-primary-500 bg-white/80 backdrop-blur-sm text-xs appearance-none"
+                  @focus="showBrandDropdown = true"
+                  @blur="hideBrandDropdown"
+                  @input="onBrandInput"
+                />
+                <!-- Flèche style select -->
+                <span class="pointer-events-none absolute inset-y-0 right-2 flex items-center text-gray-400">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                  </svg>
+                </span>
+              </div>
+              <!-- Dropdown -->
               <ul
-                v-if="showBrandDropdown && filteredBrands.length > 0"
-                class="absolute z-20 w-full bg-white border border-gray-200 rounded-md shadow-lg mt-1 max-h-40 overflow-y-auto"
+                v-if="showBrandDropdown"
+                class="absolute z-30 w-full bg-white border border-gray-200 rounded-md shadow-lg mt-0.5 max-h-44 overflow-y-auto"
               >
                 <li
                   v-for="brand in filteredBrands"
                   :key="brand.id"
                   @mousedown.prevent="selectBrand(brand)"
-                  class="px-3 py-2 text-xs cursor-pointer hover:bg-primary-50 hover:text-primary-700"
+                  class="px-3 py-1.5 text-xs cursor-pointer hover:bg-primary-50 hover:text-primary-700"
                 >
                   {{ brand.name }}
+                </li>
+                <!-- Option saisie libre si pas de correspondance exacte -->
+                <li
+                  v-if="brandSearch.trim() && !exactBrandMatch"
+                  @mousedown.prevent="confirmNewBrand"
+                  class="px-3 py-1.5 text-xs cursor-pointer bg-gray-50 hover:bg-primary-50 text-gray-500 hover:text-primary-700 border-t border-gray-100"
+                >
+                  Ajouter "{{ brandSearch.trim() }}"
+                </li>
+                <li v-if="filteredBrands.length === 0 && !brandSearch.trim()" class="px-3 py-2 text-xs text-gray-400">
+                  Tapez pour rechercher…
                 </li>
               </ul>
             </div>
@@ -405,14 +444,75 @@ export default {
     const brands = ref([])
     const conditions = ref([])
 
-    // Brand autocomplete
+    // Brand combobox
     const brandSearch = ref('')
     const showBrandDropdown = ref(false)
+    const selectedBrandId = ref('')
+
     const filteredBrands = computed(() => {
       const q = brandSearch.value.trim().toLowerCase()
-      if (!q) return brands.value.slice(0, 8)
-      return brands.value.filter(b => b.name.toLowerCase().includes(q)).slice(0, 8)
+      if (!q) return brands.value.slice(0, 10)
+      return brands.value.filter(b => b.name.toLowerCase().includes(q)).slice(0, 10)
     })
+
+    const exactBrandMatch = computed(() =>
+      brands.value.some(b => b.name.toLowerCase() === brandSearch.value.trim().toLowerCase())
+    )
+
+    const onBrandInput = () => {
+      selectedBrandId.value = ''
+      form.value.brand_id = ''
+    }
+
+    const selectBrand = (brand) => {
+      brandSearch.value = brand.name
+      selectedBrandId.value = brand.id
+      form.value.brand_id = brand.id
+      showBrandDropdown.value = false
+    }
+
+    const confirmNewBrand = () => {
+      form.value.brand_id = ''
+      selectedBrandId.value = ''
+      showBrandDropdown.value = false
+    }
+
+    const hideBrandDropdown = () => {
+      setTimeout(() => { showBrandDropdown.value = false }, 150)
+    }
+
+    // Category combobox
+    const categorySearch = ref('')
+    const showCategoryDropdown = ref(false)
+
+    const filteredCategories = computed(() => {
+      const q = categorySearch.value.trim().toLowerCase()
+      if (!q) return categories.value.slice(0, 10)
+      return categories.value.filter(c => c.name.toLowerCase().includes(q)).slice(0, 10)
+    })
+
+    const exactCategoryMatch = computed(() =>
+      categories.value.some(c => c.name.toLowerCase() === categorySearch.value.trim().toLowerCase())
+    )
+
+    const onCategoryInput = () => {
+      form.value.category_id = ''
+    }
+
+    const selectCategory = (category) => {
+      categorySearch.value = category.name
+      form.value.category_id = category.id
+      showCategoryDropdown.value = false
+    }
+
+    const confirmNewCategory = () => {
+      form.value.category_id = ''
+      showCategoryDropdown.value = false
+    }
+
+    const hideCategoryDropdown = () => {
+      setTimeout(() => { showCategoryDropdown.value = false }, 150)
+    }
 
     // Refs
     const multipleImageInput = ref(null)
@@ -436,21 +536,6 @@ export default {
       }
     }
 
-    const onBrandInput = () => {
-      // Reset brand_id si l'utilisateur retape
-      form.value.brand_id = ''
-      showBrandDropdown.value = true
-    }
-
-    const selectBrand = (brand) => {
-      form.value.brand_id = brand.id
-      brandSearch.value = brand.name
-      showBrandDropdown.value = false
-    }
-
-    const hideBrandDropdown = () => {
-      setTimeout(() => { showBrandDropdown.value = false }, 150)
-    }
 
     const loadConditions = async () => {
       try {
@@ -515,7 +600,7 @@ export default {
         errors.value.price = ['Le prix doit être supérieur à 0']
       }
 
-      if (!form.value.category_id) {
+      if (!form.value.category_id && !categorySearch.value.trim()) {
         errors.value.category_id = ['La catégorie est requise']
       }
 
@@ -547,8 +632,12 @@ export default {
         formData.append('title', form.value.title)
         formData.append('description', form.value.description)
         formData.append('price', form.value.price)
-        formData.append('category_id', form.value.category_id)
-        if (form.value.brand_id) {
+        if (form.value.category_id) {
+          formData.append('category_id', form.value.category_id)
+        } else if (categorySearch.value.trim()) {
+          formData.append('category_name', categorySearch.value.trim())
+        }
+        if (form.value.brand_id && form.value.brand_id !== '__other__') {
           formData.append('brand_id', form.value.brand_id)
         } else if (brandSearch.value.trim()) {
           formData.append('brand_name', brandSearch.value.trim())
@@ -617,11 +706,21 @@ export default {
       categories,
       brands,
       conditions,
+      categorySearch,
+      showCategoryDropdown,
+      filteredCategories,
+      exactCategoryMatch,
+      onCategoryInput,
+      selectCategory,
+      confirmNewCategory,
+      hideCategoryDropdown,
       brandSearch,
       showBrandDropdown,
       filteredBrands,
+      exactBrandMatch,
       onBrandInput,
       selectBrand,
+      confirmNewBrand,
       hideBrandDropdown,
       multipleImageInput,
       handleMultipleImageUpload,
