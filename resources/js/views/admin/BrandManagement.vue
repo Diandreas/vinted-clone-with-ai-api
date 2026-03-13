@@ -4,9 +4,14 @@
 
       <!-- Header -->
       <div class="flex justify-between items-center mb-8">
-        <div>
-          <h1 class="text-3xl font-bold text-gray-900">Gestion des Marques</h1>
-          <p class="text-gray-600 mt-2">Gérez les marques de produits</p>
+        <div class="flex items-center space-x-3">
+          <RouterLink to="/admin/dashboard" class="flex items-center justify-center w-9 h-9 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors text-gray-600">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+          </RouterLink>
+          <div>
+            <h1 class="text-3xl font-bold text-gray-900">Gestion des Marques</h1>
+            <p class="text-gray-600 mt-2">Gérez les marques de produits</p>
+          </div>
         </div>
         <button
           @click="showCreateModal = true"
@@ -149,6 +154,7 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
+import { RouterLink } from 'vue-router'
 import { PlusIcon, SearchIcon, PencilIcon, TrashIcon } from 'lucide-vue-next'
 import { debounce } from 'lodash'
 import BrandFormModal from '@/components/modals/BrandFormModal.vue'

@@ -2,7 +2,12 @@
   <div class="min-h-screen bg-gray-50 p-6">
     <div class="max-w-7xl mx-auto">
       <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold text-gray-900">Gestion des Utilisateurs</h1>
+        <div class="flex items-center space-x-3">
+          <RouterLink to="/admin/dashboard" class="flex items-center justify-center w-9 h-9 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors text-gray-600">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+          </RouterLink>
+          <h1 class="text-2xl font-bold text-gray-900">Gestion des Utilisateurs</h1>
+        </div>
         <button
           @click="showCreateModal = true"
           class="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700"
@@ -336,6 +341,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
+import { RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
 const authStore = useAuthStore()

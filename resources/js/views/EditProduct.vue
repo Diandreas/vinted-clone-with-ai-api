@@ -9,12 +9,13 @@
             <p class="text-gray-600 mt-1">Modifiez les informations de votre article</p>
           </div>
           <div class="flex space-x-3">
-            <RouterLink
-              to="/my-products"
-              class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+            <button
+              @click="router.back()"
+              class="flex items-center space-x-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
             >
-              Retour à mes produits
-            </RouterLink>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+              <span>Retour</span>
+            </button>
           </div>
         </div>
       </div>

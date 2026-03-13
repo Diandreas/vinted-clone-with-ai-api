@@ -414,6 +414,7 @@ Route::prefix('v1')->group(function () {
 
         // Brand Management
         Route::prefix('brands')->group(function () {
+            Route::get('/', [AdminBrandController::class, 'index']);
             Route::post('/', [AdminBrandController::class, 'store']);
             Route::put('{brand}', [AdminBrandController::class, 'update']);
             Route::delete('{brand}', [AdminBrandController::class, 'destroy']);
