@@ -368,7 +368,7 @@ const startUnreadPolling = () => {
   if (!unreadIntervalId) {
     unreadIntervalId = setInterval(() => {
       dashboardStore.fetchUnreadNotifications()
-    }, 30000)
+    }, 15000) // 15s pour une meilleure réactivité
   }
 }
 
@@ -379,10 +379,17 @@ const stopUnreadPolling = () => {
   }
 }
 
+// Rafraîchit le compteur dès que l'utilisateur revient sur l'onglet
+const handleVisibilityChange = () => {
+  if (!document.hidden && isAuthenticated.value) {
+    dashboardStore.fetchUnreadNotifications()
+  }
+}
+
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
+  document.addEventListener('visibilitychange', handleVisibilityChange)
 
-  // Load notification counts and wallet balance if authenticated
   if (isAuthenticated.value) {
     dashboardStore.fetchStats()
     dashboardStore.fetchUnreadNotifications()
@@ -402,6 +409,7 @@ watch(isAuthenticated, (isAuthed) => {
 
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
+  document.removeEventListener('visibilitychange', handleVisibilityChange)
   stopUnreadPolling()
 })
 </script>

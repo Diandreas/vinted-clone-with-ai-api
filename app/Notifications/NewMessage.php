@@ -24,10 +24,11 @@ class NewMessage extends Notification
     {
         $channels = ['database'];
 
+        $preview = $this->getMessagePreview();
         $productTitle = $this->conversation->product?->title;
         $body = $productTitle
-            ? "{$this->sender->name} : {$this->message->content} (à propos de « {$productTitle} »)"
-            : "{$this->sender->name} : {$this->message->content}";
+            ? "{$this->sender->name} : {$preview} (à propos de « {$productTitle} »)"
+            : "{$this->sender->name} : {$preview}";
 
         if (!empty($notifiable->fcm_token)) {
             SendPushNotification::dispatch(
@@ -49,6 +50,8 @@ class NewMessage extends Notification
 
     public function toArray(object $notifiable): array
     {
+        $preview = $this->getMessagePreview();
+
         return [
             'type'            => 'new_message',
             'conversation_id' => $this->conversation->id,
@@ -56,10 +59,35 @@ class NewMessage extends Notification
             'sender_id'       => $this->sender->id,
             'sender_name'     => $this->sender->name,
             'sender_avatar'   => $this->sender->avatar_url,
-            'content'         => $this->message->content,
+            'content'         => $preview,
             'product_id'      => $this->conversation->product_id,
             'product_title'   => $this->conversation->product?->title,
-            'message'         => "{$this->sender->name} vous a envoyé un message",
+            'message'         => "{$this->sender->name} : {$preview}",
         ];
+    }
+
+    private function getMessagePreview(): string
+    {
+        $raw = $this->message->content;
+
+        if (is_array($raw)) {
+            $text = $raw['content'] ?? '';
+        } elseif (is_string($raw)) {
+            $decoded = json_decode($raw, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                $text = $decoded['content'] ?? $raw;
+            } else {
+                $text = $raw;
+            }
+        } else {
+            $text = (string) $raw;
+        }
+
+        $text = preg_replace('/\s+/', ' ', trim($text));
+        if ($text === '') {
+            $text = 'Nouveau message';
+        }
+
+        return mb_strimwidth($text, 0, 120, '...');
     }
 }

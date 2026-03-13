@@ -5,7 +5,11 @@
     
     <!-- Main Content -->
     <main class="flex-1" :class="{ 'pb-20': !isAuthPage }">
-      <RouterView />
+      <RouterView v-slot="{ Component }">
+        <KeepAlive include="Home">
+          <component :is="Component" />
+        </KeepAlive>
+      </RouterView>
     </main>
     
     <!-- Mobile Tab Bar -->
@@ -62,8 +66,5 @@ const isAuthPage = computed(() => {
   background: #4ade80;
 }
 
-/* Smooth transitions globales */
-* {
-  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
-}
+/* Les transitions sont appliquées au cas par cas via Tailwind (transition-colors, transition-all, etc.) */
 </style>

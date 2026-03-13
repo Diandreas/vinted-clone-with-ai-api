@@ -208,7 +208,8 @@ export const useDashboardStore = defineStore('dashboard', () => {
       unreadNotifications.value = typeof count === 'number' ? count : 0
       return unreadNotifications.value
     } catch (error) {
-      throw error
+      // Silencieux : on garde la dernière valeur connue, le polling reprendra au prochain tick
+      return unreadNotifications.value
     }
   }
 

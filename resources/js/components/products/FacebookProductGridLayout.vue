@@ -126,16 +126,9 @@
       <p class="mt-1 text-sm text-gray-500">Aucun produit ne correspond à vos critères de recherche.</p>
     </div>
 
-    <!-- Load More Button -->
-    <div v-if="showLoadMore && products.length > 0" class="text-center">
-      <button
-        @click="$emit('load-more')"
-        :disabled="loadingMore"
-        class="bg-primary-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        <span v-if="loadingMore">Chargement...</span>
-        <span v-else>Charger plus de produits</span>
-      </button>
+    <!-- Skeletons pendant le chargement de la page suivante -->
+    <div v-if="loadingMore" class="space-y-6">
+      <FacebookProductSkeleton v-for="i in 3" :key="`more-${i}`" />
     </div>
 
     <!-- Pagination Info -->

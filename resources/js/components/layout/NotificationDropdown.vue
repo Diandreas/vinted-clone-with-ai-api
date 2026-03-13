@@ -259,7 +259,9 @@ const formatDate = (date) => {
 }
 
 // Lifecycle
-onMounted(() => {
-  fetchNotifications()
+onMounted(async () => {
+  await fetchNotifications()
+  // Synchronise le badge de la navbar avec ce qu'on vient de charger
+  dashboardStore.unreadNotifications = unreadCount.value
 })
 </script>

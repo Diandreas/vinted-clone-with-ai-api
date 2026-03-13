@@ -370,7 +370,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useNotificationStore } from '@/stores/notification'
@@ -563,22 +563,36 @@ export default {
       }
     }
 
+    // Cache des blob URLs pour éviter les fuites mémoire
+    const blobUrlCache = new Map()
+
     const removeImage = (index) => {
+      const img = form.value.images[index]
+      if (img && blobUrlCache.has(img)) {
+        URL.revokeObjectURL(blobUrlCache.get(img))
+        blobUrlCache.delete(img)
+      }
       form.value.images[index] = null
     }
 
-    // Helper function to check if image is a File object
     const isFile = (image) => {
       return image && typeof image === 'object' && image.name && image.type
     }
 
-    // Helper function to get image source
     const getImageSrc = (image) => {
       if (isFile(image)) {
-        return URL.createObjectURL(image)
+        if (!blobUrlCache.has(image)) {
+          blobUrlCache.set(image, URL.createObjectURL(image))
+        }
+        return blobUrlCache.get(image)
       }
       return image
     }
+
+    onUnmounted(() => {
+      blobUrlCache.forEach(url => URL.revokeObjectURL(url))
+      blobUrlCache.clear()
+    })
 
     const validateForm = () => {
       errors.value = {}

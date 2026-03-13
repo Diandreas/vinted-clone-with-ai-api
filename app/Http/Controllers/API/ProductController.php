@@ -306,11 +306,15 @@ class ProductController extends Controller
         if ($product->status === Product::STATUS_ACTIVE) {
             $seller = Auth::user();
             $seller->followers()->each(function ($follower) use ($product, $seller) {
-                $follower->notify(new FollowerOnlyProductPosted(
-                    $product,
-                    $seller,
-                    $product->followers_only
-                ));
+                try {
+                    $follower->notify(new FollowerOnlyProductPosted(
+                        $product,
+                        $seller,
+                        $product->followers_only
+                    ));
+                } catch (\Exception $e) {
+                    \Log::warning('Notification follower failed', ['follower_id' => $follower->id, 'error' => $e->getMessage()]);
+                }
             });
         }
 
@@ -559,7 +563,23 @@ class ProductController extends Controller
 
         // Notify the product owner (not if liking own product)
         if ($liked && $product->user_id !== $user->id) {
-            $product->user->notify(new ProductLikedNotification($product, $user));
+            try {
+                $owner = $product->user;
+                if ($owner) {
+                    $owner->notify(new ProductLikedNotification($product, $user));
+                    \Log::info('✅ ProductLiked notification envoyée', [
+                        'product_id' => $product->id,
+                        'owner_id'   => $owner->id,
+                        'liker_id'   => $user->id,
+                    ]);
+                } else {
+                    \Log::warning('ProductLiked: owner introuvable', ['product_id' => $product->id]);
+                }
+            } catch (\Exception $e) {
+                \Log::error('ProductLiked notification failed', ['product_id' => $product->id, 'error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            }
+        } else {
+            \Log::info('ProductLiked: pas de notif (like=' . ($liked ? 'true' : 'false') . ', own product=' . ($product->user_id === $user->id ? 'true' : 'false') . ')');
         }
 
         return response()->json([
@@ -594,7 +614,11 @@ class ProductController extends Controller
         ]);
 
         if ($favorited && $product->user_id !== $user->id) {
-            $product->user->notify(new ProductFavoritedNotification($product, $user));
+            try {
+                $product->user->notify(new ProductFavoritedNotification($product, $user));
+            } catch (\Exception $e) {
+                \Log::warning('ProductFavorited notification failed', ['product_id' => $product->id, 'error' => $e->getMessage()]);
+            }
         }
 
         return response()->json([
@@ -651,7 +675,11 @@ class ProductController extends Controller
 
         // Notify the product owner (not if commenting on own product)
         if ($product->user_id !== Auth::id()) {
-            $product->user->notify(new ProductCommentedNotification($product, $comment, Auth::user()));
+            try {
+                $product->user->notify(new ProductCommentedNotification($product, $comment, Auth::user()));
+            } catch (\Exception $e) {
+                \Log::warning('ProductCommented notification failed', ['product_id' => $product->id, 'error' => $e->getMessage()]);
+            }
         }
 
         return response()->json([
@@ -1003,7 +1031,11 @@ class ProductController extends Controller
                 if ($seller) {
                     $followers = $seller->followers()->get();
                     foreach ($followers as $follower) {
-                        $follower->notify(new FollowerOnlyProductPosted($product));
+                        try {
+                            $follower->notify(new FollowerOnlyProductPosted($product, $seller, true));
+                        } catch (\Exception $e) {
+                            \Log::warning('Notification follower failed', ['follower_id' => $follower->id, 'error' => $e->getMessage()]);
+                        }
                     }
                 }
             }
@@ -1138,7 +1170,11 @@ class ProductController extends Controller
             if ($seller) {
                 $followers = $seller->followers()->get();
                 foreach ($followers as $follower) {
-                    $follower->notify(new FollowerOnlyProductPosted($product));
+                    try {
+                        $follower->notify(new FollowerOnlyProductPosted($product, $seller, true));
+                    } catch (\Exception $e) {
+                        \Log::warning('Notification follower failed', ['follower_id' => $follower->id, 'error' => $e->getMessage()]);
+                    }
                 }
             }
         }
@@ -1217,7 +1253,11 @@ class ProductController extends Controller
                     if ($seller) {
                         $followers = $seller->followers()->get();
                         foreach ($followers as $follower) {
-                            $follower->notify(new FollowerOnlyProductPosted($product));
+                            try {
+                                $follower->notify(new FollowerOnlyProductPosted($product, $seller, true));
+                            } catch (\Exception $e) {
+                                \Log::warning('Notification follower failed', ['follower_id' => $follower->id, 'error' => $e->getMessage()]);
+                            }
                         }
                     }
                 }

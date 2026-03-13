@@ -241,20 +241,27 @@ export default {
         return
       }
 
+      // Optimistic update — mise à jour immédiate sans attendre le serveur
+      const previousLiked = product.is_liked_by_user || product.is_liked
+      const previousCount = product.likes_count || 0
+      product.is_liked = !previousLiked
+      product.is_liked_by_user = !previousLiked
+      product.likes_count = previousLiked ? Math.max(0, previousCount - 1) : previousCount + 1
+
       try {
         likingProducts.value.push(product.id)
-
-        // Utiliser toujours POST pour toggle like/unlike
         const response = await api.post(`/products/${product.id}/like`)
-
         if (response.data.success) {
-          // Mettre à jour l'état du produit selon la réponse de l'API
+          // Synchronise avec la valeur exacte du serveur
           product.is_liked = response.data.liked
           product.is_liked_by_user = response.data.liked
           product.likes_count = response.data.likes_count
         }
       } catch (error) {
-
+        // Annule l'update optimiste en cas d'erreur
+        product.is_liked = previousLiked
+        product.is_liked_by_user = previousLiked
+        product.likes_count = previousCount
         notificationStore.error('Erreur lors du like du produit')
       } finally {
         const index = likingProducts.value.indexOf(product.id)
@@ -351,8 +358,7 @@ export default {
         }
       }
 
-      // Auto-refresh likes stats without reload (faster poll)
-      subscribeToRealtime('likes', refreshVisibleProductStats, 5000)
+      // Les likes sont mis à jour de façon optimiste côté client — pas besoin de poll
     })
 
     onUnmounted(() => {

@@ -13,7 +13,6 @@ class NotificationController extends Controller
     public function index()
     {
         $notifications = Auth::user()->notifications()
-            ->with(['notifiable'])
             ->latest()
             ->paginate(50);
 
