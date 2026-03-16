@@ -212,6 +212,13 @@ class ProductController extends Controller
         return response()->json([
             'success' => true,
             'data' => ProductResource::collection($products),
+            'current_page' => $products->currentPage(),
+            'last_page' => $products->lastPage(),
+            'per_page' => $products->perPage(),
+            'total' => $products->total(),
+            'from' => $products->firstItem(),
+            'to' => $products->lastItem(),
+            'links' => ['next' => $products->nextPageUrl()],
             'meta' => [
                 'cached' => cache()->has($cacheKey),
                 'cache_key' => config('app.debug') ? $cacheKey : null,
