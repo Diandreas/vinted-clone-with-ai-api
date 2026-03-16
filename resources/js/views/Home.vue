@@ -395,36 +395,26 @@ export default {
       showNotification(event.message, event.type)
     }
 
+    // Scroll listener — plus fiable qu'IntersectionObserver sur WebView/mobile
+    const handleScroll = () => {
+      const distanceFromBottom = document.documentElement.scrollHeight - window.innerHeight - window.scrollY
+      if (distanceFromBottom < 400) {
+        loadMoreProducts()
+      }
+    }
+
     onActivated(async () => {
       await loadProducts()
-      checkAndLoadMore()
+      // Vérifier immédiatement si la page est trop courte pour scroller
+      handleScroll()
     })
 
-    onMounted(async () => {
-      await loadProducts()
-      checkAndLoadMore()
-      if ('IntersectionObserver' in window) {
-        infiniteObserver = new IntersectionObserver(
-          (entries) => {
-            if (entries[0]?.isIntersecting) {
-              loadMoreProducts()
-            }
-          },
-          { rootMargin: '200px 0px' }
-        )
-        if (infiniteScrollTrigger.value) {
-          infiniteObserver.observe(infiniteScrollTrigger.value)
-        }
-      }
-
-      // Les likes sont mis à jour de façon optimiste côté client — pas besoin de poll
+    onMounted(() => {
+      window.addEventListener('scroll', handleScroll, { passive: true })
     })
 
     onUnmounted(() => {
-      if (infiniteObserver) {
-        infiniteObserver.disconnect()
-        infiniteObserver = null
-      }
+      window.removeEventListener('scroll', handleScroll)
     })
 
     return {
@@ -446,8 +436,6 @@ export default {
       loadMoreProducts,
       handleViewModeChange,
       handleNotification,
-      infiniteScrollTrigger,
-      checkAndLoadMore,
       pullIndicatorHeight,
       pullProgress,
       isRefreshing,
