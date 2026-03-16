@@ -119,10 +119,15 @@
                   <EyeIcon class="w-4 h-4 mr-1" />
                   {{ product.views_count }}
                 </span>
-                <span class="flex items-center">
-                  <HeartIcon class="w-4 h-4 mr-1" />
+                <button
+                  @click.stop="toggleLike(product)"
+                  :disabled="likingProducts.includes(product.id)"
+                  class="flex items-center transition-colors disabled:opacity-50"
+                  :class="product.is_liked_by_user ? 'text-red-500' : 'text-gray-500 hover:text-red-400'"
+                >
+                  <HeartIcon class="w-4 h-4 mr-1" :class="product.is_liked_by_user ? 'fill-current' : ''" />
                   {{ product.likes_count }}
-                </span>
+                </button>
               </div>
               <div class="text-sm text-gray-500">
                 Par <VerifiedSellerName 
@@ -196,6 +201,7 @@ const router = useRouter()
 const loading = ref(true)
 const products = ref([])
 const categories = ref([])
+const likingProducts = ref([])
 
 const filters = reactive({
   search: '',
@@ -269,6 +275,27 @@ const resetFilters = () => {
 
 const viewProduct = (product) => {
   router.push(`/products/${product.id}`)
+}
+
+const toggleLike = async (product) => {
+  if (likingProducts.value.includes(product.id)) return
+  const wasLiked = product.is_liked_by_user
+  const prevCount = product.likes_count ?? 0
+  product.is_liked_by_user = !wasLiked
+  product.likes_count = wasLiked ? Math.max(0, prevCount - 1) : prevCount + 1
+  likingProducts.value.push(product.id)
+  try {
+    const response = await window.axios.post(`/products/${product.id}/like`)
+    if (response.data.success) {
+      product.is_liked_by_user = response.data.liked
+      product.likes_count = response.data.likes_count
+    }
+  } catch {
+    product.is_liked_by_user = wasLiked
+    product.likes_count = prevCount
+  } finally {
+    likingProducts.value = likingProducts.value.filter(id => id !== product.id)
+  }
 }
 
 const formatPrice = (price) => {

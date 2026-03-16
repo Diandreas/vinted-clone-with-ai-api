@@ -115,18 +115,19 @@ const requestNotificationPermission = async () => {
     return
   }
 
+  // Sur iOS (Safari/PWA), guider vers les paramètres — pas d'API Notification standard
+  if (isIOS.value) {
+    showIOSNotificationGuide()
+    dismissNotificationPrompt()
+    return
+  }
+
   if (!('Notification' in window)) {
     alert('Ce navigateur ne supporte pas les notifications')
     return
   }
 
-  if (isIOS.value) {
-    // On iOS, guide user to Safari settings
-    if (confirm('Pour activer les notifications sur iOS, vous devez aller dans les paramètres Safari. Voulez-vous être guidé ?')) {
-      // Show iOS specific instructions
-      showIOSNotificationGuide()
-    }
-  } else {
+  {
     // On other platforms, request permission directly
     try {
       const permission = await Notification.requestPermission()
