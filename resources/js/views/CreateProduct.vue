@@ -269,26 +269,21 @@
               <label for="condition_id" class="block text-xs font-medium text-gray-700 mb-1">
                 État *
               </label>
-              <div class="relative">
-                <select
-                  id="condition_id"
-                  v-model="form.condition_id"
-                  required
-                  class="w-full pl-2 pr-6 py-1.5 border border-gray-300 rounded-md focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 bg-white/80 backdrop-blur-sm text-xs appearance-none"
+              <select
+                id="condition_id"
+                v-model="form.condition_id"
+                required
+                class="w-full pl-2 pr-6 py-1.5 border border-gray-300 rounded-md focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 bg-white/80 backdrop-blur-sm text-xs"
+              >
+                <option value="">État</option>
+                <option
+                  v-for="condition in conditions"
+                  :key="condition.id"
+                  :value="condition.id"
                 >
-                  <option value="">État</option>
-                  <option
-                    v-for="condition in conditions"
-                    :key="condition.id"
-                    :value="condition.id"
-                  >
-                    {{ condition.name }}
-                  </option>
-                </select>
-                <svg class="pointer-events-none absolute right-1.5 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
+                  {{ condition.name }}
+                </option>
+              </select>
             </div>
 
             <!-- Price - Ultra Compact -->
