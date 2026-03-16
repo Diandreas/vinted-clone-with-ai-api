@@ -88,7 +88,7 @@
 </template>
 
 <script>
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onActivated, onUnmounted, computed } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 
 import FacebookProductGridLayout from '../components/products/FacebookProductGridLayout.vue'
@@ -341,6 +341,10 @@ export default {
     const handleNotification = (event) => {
       showNotification(event.message, event.type)
     }
+
+    onActivated(async () => {
+      await loadProducts()
+    })
 
     onMounted(async () => {
       await loadProducts()

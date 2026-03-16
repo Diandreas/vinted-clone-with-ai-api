@@ -184,6 +184,7 @@ import { HeartIcon, ShareIcon } from '@heroicons/vue/24/outline'
 import ProductImage from '../ui/ProductImage.vue'
 import VerifiedSellerName from '../ui/VerifiedSellerName.vue'
 import { formatPrice } from '../../utils/currency.js'
+import { useNow } from '../../composables/useNow.js'
 
 export default {
   name: 'FacebookProductCard',
@@ -210,6 +211,7 @@ export default {
   emits: ['like', 'view', 'notification'],
   setup() {
     const showMenu = ref(false)
+    const { now } = useNow()
 
     const toggleMenu = () => {
       showMenu.value = !showMenu.value
@@ -234,19 +236,22 @@ export default {
     return {
       showMenu,
       toggleMenu,
-      closeMenu
+      closeMenu,
+      now,
     }
   },
   methods: {
     formatPrice,
     formatDate(dateString) {
       if (!dateString) return ''
+      // Dépend de this.now pour se mettre à jour automatiquement chaque minute
+      const currentTime = this.now
       let raw = dateString
       if (!raw.includes('Z') && !raw.includes('+') && !/[+-]\d{2}:\d{2}/.test(raw)) {
         raw = raw.replace(' ', 'T') + 'Z'
       }
       const date = new Date(raw)
-      const diffMs = Math.max(0, Date.now() - date.getTime())
+      const diffMs = Math.max(0, currentTime - date.getTime())
       const diffSecs  = Math.floor(diffMs / 1000)
       const diffMins  = Math.floor(diffMs / 60000)
       const diffHours = Math.floor(diffMs / 3600000)
