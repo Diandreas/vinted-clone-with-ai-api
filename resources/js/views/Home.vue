@@ -238,6 +238,16 @@ export default {
         loadingMore.value = true
         await loadProducts(pagination.value.current_page + 1)
         loadingMore.value = false
+        // Si le trigger est toujours visible après le chargement → charger encore
+        checkAndLoadMore()
+      }
+    }
+
+    const checkAndLoadMore = () => {
+      if (!infiniteScrollTrigger.value || !hasMore.value) return
+      const rect = infiniteScrollTrigger.value.getBoundingClientRect()
+      if (rect.top <= window.innerHeight + 200) {
+        loadMoreProducts()
       }
     }
 
@@ -387,10 +397,12 @@ export default {
 
     onActivated(async () => {
       await loadProducts()
+      checkAndLoadMore()
     })
 
     onMounted(async () => {
       await loadProducts()
+      checkAndLoadMore()
       if ('IntersectionObserver' in window) {
         infiniteObserver = new IntersectionObserver(
           (entries) => {
@@ -435,6 +447,7 @@ export default {
       handleViewModeChange,
       handleNotification,
       infiniteScrollTrigger,
+      checkAndLoadMore,
       pullIndicatorHeight,
       pullProgress,
       isRefreshing,

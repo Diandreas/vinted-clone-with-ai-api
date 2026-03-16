@@ -290,7 +290,7 @@
                 class="flex-1 bg-primary-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-primary-700 transition-colors"
               >
                 <MessageCircleIcon class="w-4 h-4 mr-2 inline" />
-                Message
+                Message au vendeur
               </button>
 
               <button
