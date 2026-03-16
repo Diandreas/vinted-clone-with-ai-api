@@ -18,7 +18,10 @@
       "Bash(npx cap add ios)",
       "Bash(npx cap:*)",
       "Bash(npm run build:mobile:*)",
-      "Bash(php artisan tinker --execute=\"\n\\\\$fcm = app\\(App\\\\Services\\\\FcmService::class\\);\n\\\\$user = App\\\\Models\\\\User::find\\(5\\);\n\\\\$result = \\\\$fcm->sendToToken\\(\\\\$user->fcm_token, 'Test', 'Test', ['type' => 'test']\\);\necho \\\\$result ? 'OK' : 'ECHEC';\n\" 2>&1\ngrep \"FCM\\\\|firebase\\\\|401\\\\|403\\\\|credentials\\\\|token\" /home/benoitharck/Documents/ProjetBerto/ai_api/vinted-clone-with-ai-api/storage/logs/laravel.log | tail -10)"
+      "Bash(php artisan tinker --execute=\"\n\\\\$fcm = app\\(App\\\\Services\\\\FcmService::class\\);\n\\\\$user = App\\\\Models\\\\User::find\\(5\\);\n\\\\$result = \\\\$fcm->sendToToken\\(\\\\$user->fcm_token, 'Test', 'Test', ['type' => 'test']\\);\necho \\\\$result ? 'OK' : 'ECHEC';\n\" 2>&1\ngrep \"FCM\\\\|firebase\\\\|401\\\\|403\\\\|credentials\\\\|token\" /home/benoitharck/Documents/ProjetBerto/ai_api/vinted-clone-with-ai-api/storage/logs/laravel.log | tail -10)",
+      "Bash(cd:*)",
+      "Bash(adb devices:*)",
+      "Bash(adb install:*)"
     ],
     "deny": [],
     "ask": [],

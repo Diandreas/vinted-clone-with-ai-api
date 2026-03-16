@@ -1,5 +1,21 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-gray-50" @touchstart="onTouchStart" @touchmove.passive="onTouchMove" @touchend="onTouchEnd">
+
+    <!-- Pull-to-refresh indicator -->
+    <div
+      class="flex items-center justify-center overflow-hidden transition-all duration-200"
+      :style="{ height: pullIndicatorHeight + 'px', opacity: pullProgress }"
+    >
+      <svg
+        class="w-6 h-6 text-primary-500 transition-transform duration-200"
+        :class="isRefreshing ? 'animate-spin' : ''"
+        :style="{ transform: isRefreshing ? '' : `rotate(${pullProgress * 360}deg)` }"
+        fill="none" stroke="currentColor" viewBox="0 0 24 24"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+      </svg>
+    </div>
+
     <!-- Products Section - Main Content -->
     <div class="py-8 sm:py-12 bg-gray-50">
       <div class="max-w-4xl mx-auto px-3 sm:px-6 lg:px-8">
@@ -118,6 +134,33 @@ export default {
     const loadingCategories = ref(true)
     const loadingMore = ref(false)
     const likingProducts = ref([])
+
+    // Pull-to-refresh
+    const PULL_THRESHOLD = 70
+    const pullStartY = ref(0)
+    const pullDistance = ref(0)
+    const isRefreshing = ref(false)
+    const pullIndicatorHeight = computed(() => Math.min(pullDistance.value * 0.5, 56))
+    const pullProgress = computed(() => Math.min(pullDistance.value / PULL_THRESHOLD, 1))
+
+    const onTouchStart = (e) => {
+      if (window.scrollY === 0) pullStartY.value = e.touches[0].clientY
+    }
+    const onTouchMove = (e) => {
+      if (!pullStartY.value) return
+      const delta = e.touches[0].clientY - pullStartY.value
+      if (delta > 0 && window.scrollY === 0) pullDistance.value = delta
+    }
+    const onTouchEnd = async () => {
+      if (pullDistance.value >= PULL_THRESHOLD && !isRefreshing.value) {
+        isRefreshing.value = true
+        pullDistance.value = PULL_THRESHOLD
+        await loadProducts()
+        isRefreshing.value = false
+      }
+      pullDistance.value = 0
+      pullStartY.value = 0
+    }
     const filters = ref({
       viewMode: 'list'
     })
@@ -391,7 +434,13 @@ export default {
       loadMoreProducts,
       handleViewModeChange,
       handleNotification,
-      infiniteScrollTrigger
+      infiniteScrollTrigger,
+      pullIndicatorHeight,
+      pullProgress,
+      isRefreshing,
+      onTouchStart,
+      onTouchMove,
+      onTouchEnd,
     }
   }
 }
