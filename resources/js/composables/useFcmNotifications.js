@@ -44,9 +44,9 @@ export function useFcmNotifications() {
 
   // Clic sur une notification Android en arrière-plan → navigation
   const setupAndroidBackgroundClick = async () => {
-    const { FirebaseMessaging } = await import('@capacitor-firebase/messaging')
+    const { PushNotifications } = await import('@capacitor/push-notifications')
 
-    await FirebaseMessaging.addListener('notificationActionPerformed', (event) => {
+    await PushNotifications.addListener('pushNotificationActionPerformed', (event) => {
       const data = event.notification?.data || {}
       const url = getUrlFromData(data)
       if (url) router.push(url)

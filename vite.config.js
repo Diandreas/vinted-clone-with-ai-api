@@ -21,9 +21,6 @@ export default defineConfig({
     resolve: {
         alias: {
             '@': '/resources/js',
-            // Stub web : @capacitor-firebase/messaging n'existe que sur Android natif.
-            // Le code est toujours protégé par isNative() donc ce stub n'est jamais appelé.
-            '@capacitor-firebase/messaging': path.resolve(__dirname, 'resources/js/stubs/capacitor-firebase-messaging.js'),
         },
     },
 });

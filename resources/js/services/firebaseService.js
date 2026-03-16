@@ -50,18 +50,25 @@ export async function registerFcmToken() {
 
     if (isNative()) {
       // ── Android (Capacitor) ───────────────────────────────────────────────
-      const { FirebaseMessaging } = await import('@capacitor-firebase/messaging')
+      const { PushNotifications } = await import('@capacitor/push-notifications')
 
       // Demande la permission de notifications
-      const { receive } = await FirebaseMessaging.requestPermissions()
+      const { receive } = await PushNotifications.requestPermissions()
       if (receive !== 'granted') {
         console.warn('[FCM] Permission refusée sur Android')
         return
       }
 
-      // Récupère le token FCM natif Android
-      const result = await FirebaseMessaging.getToken()
-      token = result.token
+      // Récupère le token FCM natif Android via l'événement 'registration'
+      token = await new Promise((resolve, reject) => {
+        PushNotifications.addListener('registration', (tokenData) => {
+          resolve(tokenData.value)
+        })
+        PushNotifications.addListener('registrationError', (err) => {
+          reject(new Error(err.error))
+        })
+        PushNotifications.register()
+      })
 
     } else {
       // ── Web (navigateur) ─────────────────────────────────────────────────
@@ -108,22 +115,22 @@ export async function removeFcmToken() {
  */
 export async function onForegroundMessage(callback) {
   if (isNative()) {
-    const { FirebaseMessaging } = await import('@capacitor-firebase/messaging')
+    const { PushNotifications } = await import('@capacitor/push-notifications')
 
     // Sur Android, les notifications foreground ne s'affichent pas automatiquement
     // Il faut les afficher manuellement via le callback
-    await FirebaseMessaging.addListener('notificationReceived', (event) => {
+    await PushNotifications.addListener('pushNotificationReceived', (notification) => {
       callback({
         notification: {
-          title: event.notification.title,
-          body:  event.notification.body,
+          title: notification.title,
+          body:  notification.body,
         },
-        data: event.notification.data || {},
+        data: notification.data || {},
       })
     })
 
     // Retourne une fonction de nettoyage
-    return () => FirebaseMessaging.removeAllListeners()
+    return () => PushNotifications.removeAllListeners()
   }
 
   // Web

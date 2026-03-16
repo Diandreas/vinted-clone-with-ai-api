@@ -33,21 +33,31 @@ class FcmService
             $response = Http::withToken($accessToken)
                 ->post("https://fcm.googleapis.com/v1/projects/{$this->projectId}/messages:send", [
                     'message' => [
-                        'token' => $token,
+                        'token'        => $token,
+                        'notification' => [
+                            'title' => $title,
+                            'body'  => $body,
+                        ],
                         'data' => array_map('strval', array_merge(['title' => $title, 'body' => $body], $data)),
                         'android' => [
-                            'priority' => 'high',
+                            'priority'     => 'high',
                             'notification' => [
-                                'sound'        => 'default',
-                                'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+                                'sound' => 'default',
                             ],
                         ],
                         'apns' => [
                             'payload' => [
-                                'aps' => ['sound' => 'default'],
+                                'aps' => [
+                                    'alert' => ['title' => $title, 'body' => $body],
+                                    'sound' => 'default',
+                                ],
                             ],
                         ],
                         'webpush' => [
+                            'notification' => [
+                                'title' => $title,
+                                'body'  => $body,
+                            ],
                             'fcm_options' => [
                                 'link' => config('app.url'),
                             ],

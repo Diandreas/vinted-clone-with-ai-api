@@ -64,17 +64,21 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { isNative, isIOS as isNativeIOS, isAndroid as isNativeAndroid } from '@/utils/platform'
+import { registerFcmToken } from '@/services/firebaseService'
 
 const showNotificationPrompt = ref(false)
 const notificationPermission = ref('default')
 
 // Detect device type
 const isIOS = computed(() => {
-  return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+  if (isNativeIOS()) return true
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
          (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
 })
 
 const isAndroid = computed(() => {
+  if (isNativeAndroid()) return true
   return /Android/.test(navigator.userAgent)
 })
 
@@ -98,6 +102,19 @@ const checkNotificationPermission = () => {
 
 // Request notification permission
 const requestNotificationPermission = async () => {
+  // Sur Android natif (Capacitor), utiliser le plugin FCM
+  if (isNative()) {
+    try {
+      await registerFcmToken()
+      showNotificationPrompt.value = false
+      showSuccessMessage()
+      localStorage.setItem('notification-permission-granted', 'true')
+    } catch (error) {
+      console.error('Error requesting FCM permission:', error)
+    }
+    return
+  }
+
   if (!('Notification' in window)) {
     alert('Ce navigateur ne supporte pas les notifications')
     return
@@ -114,7 +131,7 @@ const requestNotificationPermission = async () => {
     try {
       const permission = await Notification.requestPermission()
       notificationPermission.value = permission
-      
+
       if (permission === 'granted') {
         showNotificationPrompt.value = false
         showSuccessMessage()
