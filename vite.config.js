@@ -21,6 +21,7 @@ export default defineConfig({
     resolve: {
         alias: {
             '@': '/resources/js',
+            '@capacitor/push-notifications': path.resolve(__dirname, 'resources/js/stubs/capacitor-push-notifications.js'),
         },
     },
 });
