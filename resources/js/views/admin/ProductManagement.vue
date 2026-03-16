@@ -124,26 +124,26 @@
 
         <ul v-else-if="!loading && products && products.length > 0" class="divide-y divide-gray-200">
           <li v-for="product in products" :key="product.id">
-            <div class="px-4 py-4 flex items-center justify-between">
-              <div class="flex items-center">
+            <div class="px-4 py-4 flex items-center justify-between gap-2">
+              <div class="flex items-center min-w-0 flex-1">
                 <div class="flex-shrink-0 h-16 w-16">
                   <img
                     class="h-16 w-16 rounded-lg object-cover"
-                    :src="product.images?.[0]?.url || '/images/placeholder-product.png'"
+                    :src="product.images?.[0]?.url || product.main_image || '/images/placeholder-product.png'"
                     :alt="product.title"
                   />
                 </div>
-                <div class="ml-4">
-                  <div class="flex items-center">
-                    <div class="text-sm font-medium text-gray-900">
+                <div class="ml-4 min-w-0">
+                  <div class="flex items-center min-w-0">
+                    <div class="text-sm font-medium text-gray-900 truncate">
                       {{ product.title }}
                     </div>
-                    <StatusBadge :status="product.status" class="ml-2" />
+                    <StatusBadge :status="product.status" class="ml-2 flex-shrink-0" />
                   </div>
-                  <div class="text-sm text-gray-500">
+                  <div class="text-sm text-gray-500 truncate">
                     {{ product.category?.name }} • {{ formatPrice(product.price) }}
                   </div>
-                  <div class="text-sm text-gray-500">
+                  <div class="text-sm text-gray-500 truncate">
                     Par {{ product.user?.name }} • {{ formatDate(product.created_at) }}
                   </div>
                   <div class="flex items-center space-x-4 text-sm text-gray-500">
@@ -159,24 +159,24 @@
                 </div>
               </div>
 
-              <div class="flex items-center space-x-2">
+              <div class="flex items-center flex-shrink-0">
                 <button
                   @click="viewProduct(product)"
-                  class="text-gray-400 hover:text-gray-500"
+                  class="p-2 text-gray-400 hover:text-gray-500"
                   title="Voir"
                 >
                   <EyeIcon class="h-5 w-5" />
                 </button>
                 <button
                   @click="editProduct(product)"
-                  class="text-primary-600 hover:text-primary-900"
+                  class="p-2 text-primary-600 hover:text-primary-900"
                   title="Modifier"
                 >
                   <PencilIcon class="h-5 w-5" />
                 </button>
                 <button
                   @click="deleteProduct(product)"
-                  class="text-gray-700 hover:text-gray-900"
+                  class="p-2 text-red-600 hover:text-red-800"
                   title="Supprimer"
                 >
                   <TrashIcon class="h-5 w-5" />
