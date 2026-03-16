@@ -104,7 +104,7 @@
 </template>
 
 <script>
-import { ref, onMounted, onActivated, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onActivated, onUnmounted, computed, nextTick } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 
 import FacebookProductGridLayout from '../components/products/FacebookProductGridLayout.vue'
@@ -243,10 +243,11 @@ export default {
       }
     }
 
-    const checkAndLoadMore = () => {
+    const checkAndLoadMore = async () => {
       if (!infiniteScrollTrigger.value || !hasMore.value) return
+      await nextTick()
       const rect = infiniteScrollTrigger.value.getBoundingClientRect()
-      if (rect.top <= window.innerHeight + 200) {
+      if (rect.top <= window.innerHeight + 300) {
         loadMoreProducts()
       }
     }
@@ -395,26 +396,57 @@ export default {
       showNotification(event.message, event.type)
     }
 
-    // Scroll listener — plus fiable qu'IntersectionObserver sur WebView/mobile
+    // Scroll listener — écoute sur window ET document (compatibilité WebView Android)
     const handleScroll = () => {
-      const distanceFromBottom = document.documentElement.scrollHeight - window.innerHeight - window.scrollY
-      if (distanceFromBottom < 400) {
+      const scrollTop = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0
+      const scrollHeight = Math.max(
+        document.body.scrollHeight || 0,
+        document.documentElement.scrollHeight || 0
+      )
+      const clientHeight = window.innerHeight || document.documentElement.clientHeight || 0
+      const distanceFromBottom = scrollHeight - clientHeight - scrollTop
+      if (distanceFromBottom < 500) {
         loadMoreProducts()
       }
     }
 
+    // IntersectionObserver pour détecter le bas de page (plus fiable sur WebView)
+    const setupInfiniteObserver = () => {
+      if (infiniteObserver) {
+        infiniteObserver.disconnect()
+        infiniteObserver = null
+      }
+      if (!infiniteScrollTrigger.value) return
+      infiniteObserver = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting) {
+            loadMoreProducts()
+          }
+        },
+        { rootMargin: '500px', threshold: 0 }
+      )
+      infiniteObserver.observe(infiniteScrollTrigger.value)
+    }
+
     onActivated(async () => {
       await loadProducts()
-      // Vérifier immédiatement si la page est trop courte pour scroller
+      await nextTick()
+      setupInfiniteObserver()
       handleScroll()
     })
 
     onMounted(() => {
       window.addEventListener('scroll', handleScroll, { passive: true })
+      document.addEventListener('scroll', handleScroll, { passive: true })
     })
 
     onUnmounted(() => {
       window.removeEventListener('scroll', handleScroll)
+      document.removeEventListener('scroll', handleScroll)
+      if (infiniteObserver) {
+        infiniteObserver.disconnect()
+        infiniteObserver = null
+      }
     })
 
     return {
