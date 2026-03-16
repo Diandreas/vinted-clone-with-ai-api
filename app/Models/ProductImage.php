@@ -24,6 +24,8 @@ class ProductImage extends Model
         'mime_type',
     ];
 
+    protected $appends = ['url', 'thumbnail_url', 'is_video'];
+
     /**
      * The attributes that should be cast.
      */

@@ -12,7 +12,6 @@
       loading="lazy"
       decoding="async"
       :style="{ opacity: isLoading ? 0 : 1 }"
-      crossorigin="anonymous"
     />
     
     <!-- Loading placeholder -->

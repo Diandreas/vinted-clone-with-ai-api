@@ -548,7 +548,7 @@ const deleteProduct = (product) => {
 
 const confirmDelete = async () => {
   try {
-    await window.axios.delete(`/products/${selectedProduct.value.id}`)
+    await window.axios.delete(`/admin/products/${selectedProduct.value.id}`)
     showDeleteModal.value = false
     selectedProduct.value = null
     loadProducts(pagination.current_page)
