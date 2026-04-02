@@ -113,7 +113,7 @@
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-1 sm:space-x-1.5 lg:space-x-2">
           <img
-            :src="product.user?.avatar || generateDefaultAvatar(product.user?.name, product.user?.id)"
+            :src="product.user?.avatar_url || product.user?.avatar || generateDefaultAvatar(product.user?.name, product.user?.id)"
             :alt="product.user?.name"
             class="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 rounded-full object-cover"
             @error="handleAvatarError"
@@ -310,4 +310,3 @@ const toggleFavorite = async () => {
   overflow: hidden;
 }
 </style>
-

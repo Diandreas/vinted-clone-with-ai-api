@@ -3,7 +3,7 @@
     <div class="px-4 py-3 border-b border-gray-100">
       <div class="flex items-center space-x-3">
         <img
-          :src="user?.avatar || generateDefaultAvatar(user?.name, user?.id)"
+          :src="user?.avatar_url || user?.avatar || generateDefaultAvatar(user?.name, user?.id)"
           :alt="user?.name"
           class="w-10 h-10 rounded-full object-cover"
           @error="handleAvatarError"

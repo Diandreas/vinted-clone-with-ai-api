@@ -165,9 +165,16 @@
               {{ isProductOwner ? 'Gestion' : 'Vendeur' }}
             </h3>
             <div class="flex items-center space-x-2 sm:space-x-4 mb-2 sm:mb-4">
-              <!-- Avatar avec initiales -->
-              <div class="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-semibold text-xs sm:text-lg">
-                {{ getUserInitials(product.user?.name) }}
+              <!-- Avatar vendeur -->
+              <div class="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-semibold text-xs sm:text-lg overflow-hidden">
+                <img
+                  v-if="getUserAvatarUrl(product.user)"
+                  :src="getUserAvatarUrl(product.user)"
+                  :alt="product.user?.name"
+                  class="w-full h-full object-cover"
+                  @error="handleAvatarError($event, product.user)"
+                />
+                <span v-else>{{ getUserInitials(product.user?.name) }}</span>
               </div>
               <div>
                 <VerifiedSellerName
@@ -216,8 +223,15 @@
                     >
                       <div class="flex items-center space-x-3 min-w-0 flex-1">
                         <!-- Buyer avatar -->
-                        <div class="w-8 h-8 flex-shrink-0 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-semibold text-sm">
-                          {{ getUserInitials(conversation.buyer?.name) }}
+                        <div class="w-8 h-8 flex-shrink-0 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-semibold text-sm overflow-hidden">
+                          <img
+                            v-if="getUserAvatarUrl(conversation.buyer)"
+                            :src="getUserAvatarUrl(conversation.buyer)"
+                            :alt="conversation.buyer?.name"
+                            class="w-full h-full object-cover"
+                            @error="handleAvatarError($event, conversation.buyer)"
+                          />
+                          <span v-else>{{ getUserInitials(conversation.buyer?.name) }}</span>
                         </div>
 
                         <!-- Buyer info & last message -->
@@ -444,8 +458,15 @@
 
           <!-- Info vendeur -->
           <div class="flex items-center space-x-3 mb-4">
-            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-semibold text-sm">
-              {{ getUserInitials(product?.user?.name) }}
+            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-semibold text-sm overflow-hidden">
+              <img
+                v-if="getUserAvatarUrl(product?.user)"
+                :src="getUserAvatarUrl(product?.user)"
+                :alt="product?.user?.name"
+                class="w-full h-full object-cover"
+                @error="handleAvatarError($event, product?.user)"
+              />
+              <span v-else>{{ getUserInitials(product?.user?.name) }}</span>
             </div>
             <div>
               <VerifiedSellerName
@@ -1044,6 +1065,35 @@ const getUserInitials = (fullName) => {
   } else {
     // Si plusieurs mots, prendre la première lettre de chaque mot (max 2)
     return names.slice(0, 2).map(name => name.charAt(0).toUpperCase()).join('')
+  }
+}
+
+const getUserAvatarUrl = (u) => u?.avatar_url || u?.avatar || ''
+
+const generateDefaultAvatar = (name, id) => {
+  const initials = getUserInitials(name)
+  const colors = ['#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899', '#06B6D4']
+  const seed = (name || id || 'user').toString()
+  let hash = 0
+  for (let i = 0; i < seed.length; i++) {
+    hash = seed.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  const color = colors[Math.abs(hash) % colors.length]
+  const svg = `
+    <svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+      <rect width="40" height="40" fill="${color}"/>
+      <text x="50%" y="50%" text-anchor="middle" dy="0.35em" fill="white" font-family="Arial, sans-serif" font-size="16" font-weight="bold">
+        ${initials}
+      </text>
+    </svg>
+  `
+  return 'data:image/svg+xml;base64,' + btoa(svg)
+}
+
+const handleAvatarError = (event, user) => {
+  const fallback = generateDefaultAvatar(user?.name, user?.id)
+  if (event?.target?.src !== fallback) {
+    event.target.src = fallback
   }
 }
 

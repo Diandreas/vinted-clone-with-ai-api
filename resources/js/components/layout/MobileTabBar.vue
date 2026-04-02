@@ -83,8 +83,8 @@
           <div class="relative">
             <div class="w-6 h-6 rounded-full overflow-hidden border-2 transition-all duration-150" :class="$route.name === 'profile' || $route.name === 'edit-profile' ? 'border-primary-600 shadow-md' : 'border-gray-300'">
               <img 
-                v-if="user?.avatar" 
-                :src="user.avatar" 
+                v-if="user?.avatar_url || user?.avatar" 
+                :src="user?.avatar_url || user?.avatar" 
                 :alt="user.name"
                 class="w-full h-full object-cover"
               >

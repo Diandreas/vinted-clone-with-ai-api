@@ -7,10 +7,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
@@ -145,6 +146,12 @@ class AuthController extends Controller
         $user = $request->user()
             ->makeVisible(['email', 'phone'])
             ->load(['followers', 'following']);
+
+        Log::info('Auth.user', [
+            'user_id' => $user->id,
+            'avatar' => $user->avatar,
+            'avatar_url' => $user->avatar_url,
+        ]);
 
         return response()->json([
             'success' => true,
@@ -358,6 +365,7 @@ class AuthController extends Controller
                 'phone' => 'sometimes|nullable|string|max:20',
                 'birth_date' => 'sometimes|nullable|date',
                 'gender' => 'sometimes|nullable|in:male,female,other',
+                'avatar' => 'sometimes|nullable|string',
             ]);
         } catch (ValidationException $e) {
             Log::warning('Auth.updateProfile validation_failed', [
@@ -375,12 +383,51 @@ class AuthController extends Controller
         if ($request->has('birth_date')) {
             $updateData['date_of_birth'] = \Carbon\Carbon::parse($request->birth_date)->toDateString();
         }
+
+        // Handle avatar (data URL or clear)
+        if ($request->has('avatar')) {
+            $avatar = $request->input('avatar');
+            if ($avatar === '') {
+                if ($user->avatar && Storage::disk('public')->exists('avatars/' . $user->avatar)) {
+                    Storage::disk('public')->delete('avatars/' . $user->avatar);
+                }
+                $updateData['avatar'] = null;
+            } elseif (is_string($avatar) && str_starts_with($avatar, 'data:image/')) {
+                try {
+                    if (preg_match('/^data:image\\/(png|jpe?g|gif);base64,/', $avatar, $matches)) {
+                        $ext = $matches[1] === 'jpeg' ? 'jpg' : $matches[1];
+                        $base64 = substr($avatar, strpos($avatar, ',') + 1);
+                        $data = base64_decode($base64);
+                        if ($data !== false) {
+                            $filename = time() . '_' . Str::random(8) . '.' . $ext;
+                            Storage::disk('public')->put('avatars/' . $filename, $data);
+                            if ($user->avatar && Storage::disk('public')->exists('avatars/' . $user->avatar)) {
+                                Storage::disk('public')->delete('avatars/' . $user->avatar);
+                            }
+                            $updateData['avatar'] = $filename;
+                        }
+                    }
+                } catch (\Throwable $e) {
+                    Log::warning('Auth.updateProfile avatar_save_failed', [
+                        'user_id' => $user->id,
+                        'message' => $e->getMessage(),
+                    ]);
+                }
+            }
+        }
         
         $user->update($updateData);
 
+        $user = $user->fresh();
+        Log::info('Auth.updateProfile', [
+            'user_id' => $user->id,
+            'avatar' => $user->avatar,
+            'avatar_url' => $user->avatar_url,
+        ]);
+
         return response()->json([
             'success' => true,
-            'user' => $user->fresh(),
+            'user' => $user,
             'message' => 'Profile updated successfully.'
         ]);
     }

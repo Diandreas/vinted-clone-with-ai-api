@@ -52,7 +52,7 @@
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-2">
           <img
-            :src="product.user?.avatar || generateDefaultAvatar(product.user?.name, product.user?.id)"
+            :src="product.user?.avatar_url || product.user?.avatar || generateDefaultAvatar(product.user?.name, product.user?.id)"
             :alt="product.user?.name"
             class="w-5 h-5 rounded-full object-cover"
             @error="handleAvatarError"
@@ -193,6 +193,5 @@ const toggleLike = async () => {
   overflow: hidden;
 }
 </style>
-
 
 

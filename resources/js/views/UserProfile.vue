@@ -53,8 +53,8 @@
             <div class="relative">
               <div class="w-28 h-28 rounded-full ring-[5px] ring-white shadow-2xl overflow-hidden bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center flex-shrink-0">
                 <img
-                  v-if="user?.avatar && !avatarError"
-                  :src="user.avatar"
+                  v-if="(user?.avatar_url || user?.avatar) && !avatarError"
+                  :src="user?.avatar_url || user?.avatar"
                   :alt="user?.name"
                   class="w-full h-full object-cover"
                   @error="avatarError = true"
@@ -301,8 +301,8 @@ const UserRow = defineComponent({
         h('div', {
           class: 'w-12 h-12 rounded-full flex-shrink-0 overflow-hidden bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center shadow-md'
         }, [
-          props.user?.avatar && !avatarErr.value
-            ? h('img', { src: props.user.avatar, class: 'w-full h-full object-cover', onError: () => { avatarErr.value = true } })
+          (props.user?.avatar_url || props.user?.avatar) && !avatarErr.value
+            ? h('img', { src: props.user?.avatar_url || props.user?.avatar, class: 'w-full h-full object-cover', onError: () => { avatarErr.value = true } })
             : h('span', { class: 'text-white font-bold text-sm' }, initials.value)
         ]),
         h('div', { class: 'min-w-0' }, [

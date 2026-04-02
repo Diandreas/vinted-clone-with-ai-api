@@ -30,9 +30,9 @@
 
           <!-- Avatar interlocuteur -->
           <div class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center flex-shrink-0 shadow-md overflow-hidden">
-            <img
-              v-if="otherParticipant?.avatar"
-              :src="otherParticipant.avatar"
+            <img 
+              v-if="otherParticipant?.avatar_url || otherParticipant?.avatar"
+              :src="otherParticipant?.avatar_url || otherParticipant?.avatar"
               class="w-full h-full object-cover"
             />
             <span v-else class="text-white font-bold text-sm select-none">
@@ -109,9 +109,9 @@
             class="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center flex-shrink-0 overflow-hidden shadow-sm"
             :class="isLastInGroup(index) ? 'opacity-100' : 'opacity-0'"
           >
-            <img
-              v-if="otherParticipant?.avatar"
-              :src="otherParticipant.avatar"
+            <img 
+              v-if="otherParticipant?.avatar_url || otherParticipant?.avatar"
+              :src="otherParticipant?.avatar_url || otherParticipant?.avatar"
               class="w-full h-full object-cover"
             />
             <span v-else class="text-white text-xs font-bold select-none">

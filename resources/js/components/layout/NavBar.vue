@@ -154,7 +154,7 @@
                 class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 <img
-                  :src="user?.avatar || generateDefaultAvatar(user?.name, user?.id)"
+                  :src="user?.avatar_url || user?.avatar || generateDefaultAvatar(user?.name, user?.id)"
                   :alt="user?.name"
                   class="w-8 h-8 rounded-full object-cover"
                   @error="handleAvatarError"

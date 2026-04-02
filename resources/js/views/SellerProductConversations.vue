@@ -140,7 +140,7 @@
                 <!-- Buyer Info -->
                 <div class="buyer-info">
                   <img
-                    :src="conversation.buyer.avatar || generateDefaultAvatar(conversation.buyer.name, conversation.buyer.id)"
+                    :src="conversation.buyer.avatar_url || conversation.buyer.avatar || generateDefaultAvatar(conversation.buyer.name, conversation.buyer.id)"
                     :alt="conversation.buyer.name"
                     class="buyer-avatar"
                     @error="handleBuyerAvatarError($event, conversation.buyer)"

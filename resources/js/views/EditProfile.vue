@@ -236,7 +236,7 @@ const form = reactive({
   website: authStore.user?.website || '',
   birth_date: authStore.user?.birth_date || '',
   gender: authStore.user?.gender || '',
-  avatar: authStore.user?.avatar || '',
+  avatar: authStore.user?.avatar_url || authStore.user?.avatar || '',
   cover_image: authStore.user?.cover_image || '',
   instagram: authStore.user?.instagram || '',
   twitter: authStore.user?.twitter || '',
@@ -263,6 +263,9 @@ const loadUserData = async () => {
         form[key] = userData[key]
       }
     })
+    if (userData.avatar_url) {
+      form.avatar = userData.avatar_url
+    }
   } catch (err) {
     error.value = 'Impossible de charger vos données depuis le serveur.'
   }
@@ -397,4 +400,3 @@ onMounted(() => {
   loadUserData()
 })
 </script>
-

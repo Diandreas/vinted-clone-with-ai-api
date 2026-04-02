@@ -2,8 +2,15 @@
   <div class="bg-white rounded-lg border border-gray-200 hover:shadow-lg transition-all duration-200 overflow-hidden">
     <!-- User Header -->
     <div class="flex items-center p-3 border-b border-gray-100">
-      <div class="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center mr-3">
-        <span class="text-white font-bold text-sm">
+      <div class="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center mr-3 overflow-hidden">
+        <img
+          v-if="getUserAvatar(product.user)"
+          :src="getUserAvatar(product.user)"
+          :alt="product.user?.name"
+          class="w-full h-full object-cover"
+          @error="handleAvatarError($event, product.user)"
+        />
+        <span v-else class="text-white font-bold text-sm">
           {{ product.user?.name?.charAt(0)?.toUpperCase() || 'U' }}
         </span>
       </div>
@@ -186,6 +193,26 @@ import VerifiedSellerName from '../ui/VerifiedSellerName.vue'
 import { formatPrice } from '../../utils/currency.js'
 import { useNow } from '../../composables/useNow.js'
 
+const generateDefaultAvatar = (name, id) => {
+  const initials = (name?.trim()?.split(' ') || ['U']).map(n => n.charAt(0).toUpperCase()).slice(0, 2).join('') || 'U'
+  const colors = ['#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899', '#06B6D4']
+  const seed = (name || id || 'user').toString()
+  let hash = 0
+  for (let i = 0; i < seed.length; i++) {
+    hash = seed.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  const color = colors[Math.abs(hash) % colors.length]
+  const svg = `
+    <svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+      <rect width="40" height="40" fill="${color}"/>
+      <text x="50%" y="50%" text-anchor="middle" dy="0.35em" fill="white" font-family="Arial, sans-serif" font-size="16" font-weight="bold">
+        ${initials}
+      </text>
+    </svg>
+  `
+  return 'data:image/svg+xml;base64,' + btoa(svg)
+}
+
 export default {
   name: 'FacebookProductCard',
   components: {
@@ -237,11 +264,17 @@ export default {
       showMenu,
       toggleMenu,
       closeMenu,
-      now,
+      now
     }
   },
   methods: {
     formatPrice,
+    getUserAvatar(u) {
+      return u?.avatar_url || u?.avatar || ''
+    },
+    handleAvatarError(event, u) {
+      event.target.src = generateDefaultAvatar(u?.name, u?.id)
+    },
     formatDate(dateString) {
       if (!dateString) return ''
       // Dépend de this.now pour se mettre à jour automatiquement chaque minute

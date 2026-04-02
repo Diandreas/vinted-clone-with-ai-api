@@ -244,13 +244,13 @@ class UserController extends Controller
         $user = Auth::user();
         
         // Delete old avatar if exists
-        if ($user->avatar && Storage::exists('public/avatars/' . $user->avatar)) {
-            Storage::delete('public/avatars/' . $user->avatar);
+        if ($user->avatar && Storage::disk('public')->exists('avatars/' . $user->avatar)) {
+            Storage::disk('public')->delete('avatars/' . $user->avatar);
         }
 
         // Store new avatar
         $filename = time() . '_' . $request->file('avatar')->getClientOriginalName();
-        $request->file('avatar')->storeAs('public/avatars', $filename);
+        $request->file('avatar')->storeAs('avatars', $filename, 'public');
 
         $user->update(['avatar' => $filename]);
 
@@ -272,13 +272,13 @@ class UserController extends Controller
         $user = Auth::user();
         
         // Delete old cover if exists
-        if ($user->cover_image && Storage::exists('public/covers/' . $user->cover_image)) {
-            Storage::delete('public/covers/' . $user->cover_image);
+        if ($user->cover_image && Storage::disk('public')->exists('covers/' . $user->cover_image)) {
+            Storage::disk('public')->delete('covers/' . $user->cover_image);
         }
 
         // Store new cover
         $filename = time() . '_' . $request->file('cover')->getClientOriginalName();
-        $request->file('cover')->storeAs('public/covers', $filename);
+        $request->file('cover')->storeAs('covers', $filename, 'public');
 
         $user->update(['cover_image' => $filename]);
 

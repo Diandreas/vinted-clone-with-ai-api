@@ -9,8 +9,15 @@
         <!-- Avatar + infos -->
         <div class="flex flex-col items-center text-center mb-5">
           <div class="relative mb-3">
-            <div class="w-24 h-24 rounded-full bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center text-white text-3xl font-black shadow-lg">
-              {{ user?.name?.charAt(0)?.toUpperCase() || 'U' }}
+            <div class="w-24 h-24 rounded-full bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center text-white text-3xl font-black shadow-lg overflow-hidden">
+              <img
+                v-if="avatarSrc && !avatarError"
+                :src="avatarSrc"
+                :alt="user?.name"
+                class="w-full h-full object-cover"
+                @error="avatarError = true"
+              />
+              <span v-else>{{ user?.name?.charAt(0)?.toUpperCase() || 'U' }}</span>
             </div>
             <div class="absolute bottom-1 right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white shadow-md"></div>
           </div>
@@ -140,8 +147,15 @@
               <div v-for="follower in followers" :key="follower.id"
                 class="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
                 <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-                    {{ follower.name?.charAt(0)?.toUpperCase() || 'U' }}
+                  <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0 overflow-hidden">
+                    <img
+                      v-if="getUserAvatar(follower)"
+                      :src="getUserAvatar(follower)"
+                      :alt="follower.name"
+                      class="w-full h-full object-cover"
+                      @error="onFollowerAvatarError($event, follower)"
+                    />
+                    <span v-else>{{ follower.name?.charAt(0)?.toUpperCase() || 'U' }}</span>
                   </div>
                   <div>
                     <p class="font-semibold text-gray-900 text-sm">{{ follower.name }}</p>
@@ -179,8 +193,15 @@
               <div v-for="followed in following" :key="followed.id"
                 class="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
                 <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-                    {{ followed.name?.charAt(0)?.toUpperCase() || 'U' }}
+                  <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0 overflow-hidden">
+                    <img
+                      v-if="getUserAvatar(followed)"
+                      :src="getUserAvatar(followed)"
+                      :alt="followed.name"
+                      class="w-full h-full object-cover"
+                      @error="onFollowerAvatarError($event, followed)"
+                    />
+                    <span v-else>{{ followed.name?.charAt(0)?.toUpperCase() || 'U' }}</span>
                   </div>
                   <div>
                     <p class="font-semibold text-gray-900 text-sm">{{ followed.name }}</p>
@@ -268,6 +289,8 @@ const following      = ref([])
 const recentActivity = ref([])
 
 const user  = computed(() => authStore.user)
+const avatarError = ref(false)
+const avatarSrc = computed(() => user.value?.avatar_url || user.value?.avatar || '')
 const stats = computed(() => dashboardStore.stats.value)
 
 const statCards = computed(() => [
@@ -356,6 +379,32 @@ const unfollowUser = async (userId) => {
 }
 
 const getActivityIcon = (type) => ({ like: HeartIcon, purchase: ShoppingCartIcon, review: StarIcon, view: EyeIcon }[type] ?? ActivityIcon)
+
+const getUserAvatar = (u) => u?.avatar_url || u?.avatar || ''
+
+const generateDefaultAvatar = (name, id) => {
+  const initials = (name?.trim()?.split(' ') || ['U']).map(n => n.charAt(0).toUpperCase()).slice(0, 2).join('') || 'U'
+  const colors = ['#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899', '#06B6D4']
+  const seed = (name || id || 'user').toString()
+  let hash = 0
+  for (let i = 0; i < seed.length; i++) {
+    hash = seed.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  const color = colors[Math.abs(hash) % colors.length]
+  const svg = `
+    <svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+      <rect width="40" height="40" fill="${color}"/>
+      <text x="50%" y="50%" text-anchor="middle" dy="0.35em" fill="white" font-family="Arial, sans-serif" font-size="16" font-weight="bold">
+        ${initials}
+      </text>
+    </svg>
+  `
+  return 'data:image/svg+xml;base64,' + btoa(svg)
+}
+
+const onFollowerAvatarError = (event, u) => {
+  event.target.src = generateDefaultAvatar(u?.name, u?.id)
+}
 
 const formatDate = (date) => date
   ? new Date(date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
