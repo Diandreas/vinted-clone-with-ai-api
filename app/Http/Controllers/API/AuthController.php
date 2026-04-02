@@ -147,12 +147,6 @@ class AuthController extends Controller
             ->makeVisible(['email', 'phone'])
             ->load(['followers', 'following']);
 
-        Log::info('Auth.user', [
-            'user_id' => $user->id,
-            'avatar' => $user->avatar,
-            'avatar_url' => $user->avatar_url,
-        ]);
-
         return response()->json([
             'success' => true,
             'user' => $user
@@ -418,16 +412,9 @@ class AuthController extends Controller
         
         $user->update($updateData);
 
-        $user = $user->fresh();
-        Log::info('Auth.updateProfile', [
-            'user_id' => $user->id,
-            'avatar' => $user->avatar,
-            'avatar_url' => $user->avatar_url,
-        ]);
-
         return response()->json([
             'success' => true,
-            'user' => $user,
+            'user' => $user->fresh(),
             'message' => 'Profile updated successfully.'
         ]);
     }

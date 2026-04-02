@@ -2,7 +2,24 @@
   <div class="bg-white rounded-lg border border-gray-200 hover:shadow-lg transition-all duration-200 overflow-hidden">
     <!-- User Header -->
     <div class="flex items-center p-3 border-b border-gray-100">
-      <div class="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center mr-3 overflow-hidden">
+      <RouterLink
+        v-if="product.user?.id"
+        :to="`/profile/${product.user.id}`"
+        class="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center mr-3 overflow-hidden"
+        title="Voir le profil"
+      >
+        <img
+          v-if="getUserAvatar(product.user)"
+          :src="getUserAvatar(product.user)"
+          :alt="product.user?.name"
+          class="w-full h-full object-cover"
+          @error="handleAvatarError($event, product.user)"
+        />
+        <span v-else class="text-white font-bold text-sm">
+          {{ product.user?.name?.charAt(0)?.toUpperCase() || 'U' }}
+        </span>
+      </RouterLink>
+      <div v-else class="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center mr-3 overflow-hidden">
         <img
           v-if="getUserAvatar(product.user)"
           :src="getUserAvatar(product.user)"
