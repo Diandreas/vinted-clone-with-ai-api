@@ -293,13 +293,13 @@ Route::prefix('v1')->group(function () {
             Route::get('/', [NotificationController::class, 'index']);
             Route::put('{notification}/read', [NotificationController::class, 'markAsRead']);
             Route::post('mark-all-read', [NotificationController::class, 'markAllAsRead']);
-            Route::delete('{notification}', [NotificationController::class, 'destroy']);
             Route::delete('clear-all', [NotificationController::class, 'clearAll']);
             Route::get('unread-count', [NotificationController::class, 'unreadCount']);
             Route::put('settings', [NotificationController::class, 'updateSettings']);
             // Firebase Cloud Messaging token
             Route::post('fcm-token', [NotificationController::class, 'updateFcmToken']);
             Route::delete('fcm-token', [NotificationController::class, 'removeFcmToken']);
+            Route::delete('{notification}', [NotificationController::class, 'destroy']);
         });
 
         // Feed Routes
