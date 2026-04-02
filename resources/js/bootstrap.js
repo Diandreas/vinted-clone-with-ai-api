@@ -22,8 +22,4 @@ if (apiToken) {
 // Configure base URL for API using environment config
 window.axios.defaults.baseURL = config.baseURL;
 
-// Debug: Afficher l'URL de base en console (uniquement en développement)
-if (config.debug) {
-    console.log('API Base URL:', window.axios.defaults.baseURL);
-    console.log('Environment:', config.current);
-}
+// Debug logs removed for production cleanliness

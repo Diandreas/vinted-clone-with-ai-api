@@ -16,14 +16,7 @@ api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('auth_token')
     
-    console.log('📡 API Request:', {
-      method: config.method.toUpperCase(),
-      url: config.url,
-      fullURL: config.baseURL + config.url,
-      hasToken: !!token,
-      tokenPreview: token ? token.substring(0, 20) + '...' : 'None',
-      data: config.data
-    })
+    // Debug logs removed for production cleanliness
     
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
@@ -40,11 +33,7 @@ api.interceptors.request.use(
 // Response interceptor to handle auth errors
 api.interceptors.response.use(
   (response) => {
-    console.log('✅ API Response:', {
-      status: response.status,
-      url: response.config.url,
-      data: response.data
-    })
+    // Debug logs removed for production cleanliness
     return response
   },
   (error) => {
@@ -56,7 +45,7 @@ api.interceptors.response.use(
     })
     
     if (error.response?.status === 401) {
-      console.log('🔓 Authentification expirée, redirection vers login')
+      // Debug logs removed for production cleanliness
       // Note: ne pas importer useAuthStore ici car ça cause des problèmes circulaires
       localStorage.removeItem('auth_token')
       window.location.href = '/login'
