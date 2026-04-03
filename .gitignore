@@ -26,7 +26,6 @@ Thumbs.db
 # Capacitor mobile build output
 /dist
 /ios
-/android
 
 # Firebase service account credentials (never commit)
 storage/credentials/
