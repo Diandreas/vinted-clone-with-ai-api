@@ -13,6 +13,7 @@
 /.zed
 /auth.json
 /node_modules
+/.vite
 /public/build
 /public/hot
 /public/storage
@@ -29,3 +30,6 @@ Thumbs.db
 
 # Firebase service account credentials (never commit)
 storage/credentials/
+
+# Android signing config (never commit)
+/android/key.properties
