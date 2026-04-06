@@ -4,9 +4,10 @@
     <div class="relative aspect-square overflow-hidden rounded-t-lg">
       <ProductImage
         :key="`product-card-${product.id}`"
-        :src="product.main_image_url || product.main_image"
+        :src="product.images?.[0]?.thumbnail_url || product.main_image_url || product.main_image"
         :alt="product.title"
         :product-id="product.id"
+        :eager="true"
         fallback="/placeholder-product.jpg"
         image-classes="w-full h-full object-cover"
       />

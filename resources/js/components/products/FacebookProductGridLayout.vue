@@ -11,9 +11,10 @@
         <div class="relative">
           <ProductImage
             :key="`grid-product-${product.id}`"
-            :src="product.main_image_url || product.main_image"
+            :src="product.images?.[0]?.thumbnail_url || product.main_image_url || product.main_image"
             :alt="product.title"
             :product-id="product.id"
+            :eager="true"
             fallback="/images/placeholder-product.png"
             image-classes="w-full h-48 object-cover"
           />

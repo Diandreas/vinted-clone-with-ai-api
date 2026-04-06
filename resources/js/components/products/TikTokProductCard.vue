@@ -83,7 +83,7 @@ const favoritingProduct = ref(false)
 
 // Computed properties mémorisées
 const imageSrc = computed(() => {
-  return props.product.main_image_url || props.product.main_image || '/images/placeholder-product.png'
+  return props.product.images?.[0]?.thumbnail_url || props.product.main_image_url || props.product.main_image || '/images/placeholder-product.png'
 })
 
 const formattedPrice = computed(() => {

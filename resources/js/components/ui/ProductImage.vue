@@ -7,9 +7,9 @@
       :class="imageClasses"
       @error="handleImageError"
       @load="handleImageLoad"
-      loading="lazy"
+      :loading="eager ? 'eager' : 'lazy'"
       decoding="async"
-      fetchpriority="low"
+      :fetchpriority="eager ? 'high' : 'auto'"
       :style="{ opacity: isLoading ? 0 : 1 }"
     />
 
@@ -38,6 +38,10 @@ const props = defineProps({
   src: {
     type: String,
     default: ''
+  },
+  eager: {
+    type: Boolean,
+    default: false
   },
   fallback: {
     type: String,
@@ -164,4 +168,3 @@ img {
   }
 }
 </style>
-

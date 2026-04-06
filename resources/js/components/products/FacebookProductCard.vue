@@ -91,9 +91,10 @@
     <div class="relative">
       <ProductImage
         :key="`facebook-product-${product.id}`"
-        :src="product.main_image_url || product.main_image"
+        :src="product.images?.[0]?.thumbnail_url || product.main_image_url || product.main_image"
         :alt="product.title"
         :product-id="product.id"
+        :eager="true"
         fallback="/images/placeholder-product.png"
         image-classes="w-full h-64 object-cover"
       />
