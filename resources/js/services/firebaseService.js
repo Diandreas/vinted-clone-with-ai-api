@@ -1,7 +1,7 @@
 import { initializeApp } from 'firebase/app'
 import { getMessaging, getToken, onMessage } from 'firebase/messaging'
-import { isNative } from '@/utils/platform'
-import api from '@/services/api'
+import { isNative } from '../utils/platform'
+import api from './api'
 
 // ─── Firebase Web Config ────────────────────────────────────────────────────
 const firebaseConfig = {

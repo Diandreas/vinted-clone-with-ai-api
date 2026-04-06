@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use App\Models\Follow;
 use App\Notifications\NewFollower;
+use App\Jobs\ProcessKycDocument;
+use App\Models\Follow;
+use App\Models\User;
+use App\Notifications\KycSubmissionReceived;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -288,6 +290,83 @@ class UserController extends Controller
                 'cover_image_url' => $user->fresh()->cover_image_url
             ],
             'message' => 'Cover image updated successfully'
+        ]);
+    }
+
+    public function kycStatus()
+    {
+        $user = Auth::user();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'status' => $user->kyc_status,
+                'document_type' => $user->kyc_document_type,
+                'verified_at' => $user->kyc_verified_at,
+                'rejection_reason' => $user->kyc_rejection_reason,
+            ]
+        ]);
+    }
+
+    public function submitKyc(Request $request)
+    {
+        $request->validate([
+            'document_type' => 'required|in:cni,passport',
+            'document' => 'required|file|mimes:jpeg,png,jpg,pdf|max:5120',
+            'selfie' => 'nullable|file|mimes:jpeg,png,jpg|max:5120',
+        ]);
+
+        $user = Auth::user();
+
+        if ($user->kyc_document_path && Storage::exists($user->kyc_document_path)) {
+            Storage::delete($user->kyc_document_path);
+        }
+        if ($user->kyc_selfie_path && Storage::exists($user->kyc_selfie_path)) {
+            Storage::delete($user->kyc_selfie_path);
+        }
+
+        $documentPath = $request->file('document')->store('kyc/documents');
+        $selfiePath = $request->hasFile('selfie')
+            ? $request->file('selfie')->store('kyc/selfies')
+            : null;
+
+        $user->update([
+            'kyc_status' => 'pending',
+            'kyc_document_type' => $request->document_type,
+            'kyc_document_path' => $documentPath,
+            'kyc_selfie_path' => $selfiePath,
+            'kyc_verified_at' => null,
+            'kyc_rejection_reason' => null,
+        ]);
+
+        User::query()
+            ->get()
+            ->filter(function (User $adminUser) use ($user) {
+                if ($adminUser->id === $user->id) {
+                    return false;
+                }
+
+                $permissions = $adminUser->permissions ?? [];
+                if (!is_array($permissions)) {
+                    $permissions = [];
+                }
+
+                return ($adminUser->is_admin ?? false)
+                    || ($adminUser->role === 'admin')
+                    || in_array('users:manage', $permissions, true);
+            })
+            ->each(function (User $adminUser) use ($user, $request) {
+                $adminUser->notify(new KycSubmissionReceived($user, $request->document_type));
+            });
+
+        ProcessKycDocument::dispatch($user->id, $documentPath, $request->document_type);
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'status' => $user->kyc_status,
+            ],
+            'message' => 'Documents envoyés. Vérification en cours.'
         ]);
     }
 

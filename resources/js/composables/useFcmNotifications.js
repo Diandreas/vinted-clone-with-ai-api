@@ -1,8 +1,8 @@
 import { onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { onForegroundMessage } from '@/services/firebaseService'
+import { onForegroundMessage } from '../services/firebaseService'
 import { useNotificationStore } from '@/stores/notification'
-import { isNative } from '@/utils/platform'
+import { isNative } from '../utils/platform'
 
 /**
  * Composable branché dans App.vue.

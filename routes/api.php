@@ -157,6 +157,8 @@ Route::prefix('v1')->group(function () {
             Route::get('/', [UserController::class, 'index']);
             Route::get('my-followers', [UserController::class, 'myFollowers']);
             Route::get('my-following', [UserController::class, 'myFollowing']);
+            Route::get('kyc', [UserController::class, 'kycStatus']);
+            Route::post('kyc', [UserController::class, 'submitKyc']);
             Route::put('profile', [UserController::class, 'update']);
             Route::post('{user}/follow', [UserController::class, 'follow']);
             Route::delete('{user}/unfollow', [UserController::class, 'unfollow']);
@@ -372,6 +374,11 @@ Route::prefix('v1')->group(function () {
             Route::get('{user}', [AdminUserController::class, 'show']);
             Route::put('{user}', [AdminUserController::class, 'update']);
             Route::put('{user}/verify', [AdminUserController::class, 'verify']);
+            Route::put('{user}/kyc/approve', [AdminUserController::class, 'kycApprove']);
+            Route::put('{user}/kyc/reject', [AdminUserController::class, 'kycReject']);
+            Route::get('{user}/kyc/document', [AdminUserController::class, 'kycDocument']);
+            Route::get('{user}/kyc/selfie', [AdminUserController::class, 'kycSelfie']);
+            Route::post('bulk-update', [AdminUserController::class, 'bulkUpdate']);
             Route::put('{user}/ban', [AdminUserController::class, 'ban']);
             Route::put('{user}/unban', [AdminUserController::class, 'unban']);
             Route::delete('{user}', [AdminUserController::class, 'destroy']);

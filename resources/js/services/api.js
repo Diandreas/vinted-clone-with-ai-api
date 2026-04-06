@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { isNative } from '@/utils/platform'
+import { isNative } from '../utils/platform'
 
 // Create axios instance
 const api = axios.create({

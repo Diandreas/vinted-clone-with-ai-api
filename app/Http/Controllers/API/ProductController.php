@@ -231,6 +231,14 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+        $user = Auth::user();
+        if ($user->kyc_status !== 'verified') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Vérification requise. Veuillez soumettre votre CNI ou passeport avant de vendre.'
+            ], 403);
+        }
+
         $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
@@ -265,7 +273,7 @@ class ProductController extends Controller
         $initialStatus = $listingFee ? Product::STATUS_PENDING_PAYMENT : Product::STATUS_ACTIVE;
         
         $product = Product::create([
-            'user_id' => Auth::id(),
+            'user_id' => $user->id,
             'title' => $request->title,
             'description' => $request->description,
             'price' => $request->price,

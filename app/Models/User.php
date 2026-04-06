@@ -42,6 +42,12 @@ class  User extends Authenticatable implements MustVerifyEmail
         'is_admin',
         'status',
         'fcm_token',
+        'kyc_status',
+        'kyc_document_type',
+        'kyc_document_path',
+        'kyc_selfie_path',
+        'kyc_verified_at',
+        'kyc_rejection_reason',
     ];
 
     /**
@@ -53,6 +59,9 @@ class  User extends Authenticatable implements MustVerifyEmail
         'email',
         'phone',
         'date_of_birth',
+        'kyc_document_path',
+        'kyc_selfie_path',
+        'kyc_rejection_reason',
     ];
 
     /**
@@ -61,6 +70,7 @@ class  User extends Authenticatable implements MustVerifyEmail
     protected $appends = [
         'avatar_url',
         'cover_image_url',
+        'is_kyc_verified',
     ];
 
     /**
@@ -81,6 +91,7 @@ class  User extends Authenticatable implements MustVerifyEmail
             'wallet_balance_xaf' => 'integer',
             'permissions' => 'array',
             'is_admin' => 'boolean',
+            'kyc_verified_at' => 'datetime',
         ];
     }
 
@@ -259,6 +270,16 @@ class  User extends Authenticatable implements MustVerifyEmail
     }
 
     // Accessors & Mutators
+
+    public function getIsKycVerifiedAttribute(): bool
+    {
+        return $this->kyc_status === 'verified';
+    }
+
+    public function getIsVerifiedAttribute($value): bool
+    {
+        return (bool) $value || $this->kyc_status === 'verified';
+    }
 
     /**
      * Get the user's full avatar URL.

@@ -1,4 +1,4 @@
-import { isNative } from '@/utils/platform';
+import { isNative } from '../utils/platform';
 
 // Configuration d'environnement pour le frontend
 export const config = {

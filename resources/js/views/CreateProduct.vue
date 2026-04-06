@@ -64,6 +64,20 @@
         </div>
       </div>
 
+      <!-- KYC Required -->
+      <div v-if="!isKycVerified" class="mb-2">
+        <div class="bg-yellow-50 border border-yellow-200 rounded-md p-2 flex items-start gap-2">
+          <InformationCircleIcon class="w-4 h-4 text-yellow-600 mt-0.5" />
+          <div class="text-xs text-yellow-800">
+            <p class="font-semibold">Vérification requise</p>
+            <p>Vous devez vérifier votre compte (CNI ou passeport) avant de publier un produit.</p>
+            <RouterLink to="/profile/verification" class="inline-block mt-1 text-yellow-700 underline font-semibold">
+              Vérifier maintenant
+            </RouterLink>
+          </div>
+        </div>
+      </div>
+
       <form @submit.prevent="submitProduct" class="space-y-2 sm:space-y-3">
         <!-- Images Section - Ultra Compact -->
         <div class="bg-white/80 backdrop-blur-sm rounded-md shadow-md border border-white/50 p-2 sm:p-3 hover:shadow-lg transition-all duration-300">
@@ -412,6 +426,7 @@ export default {
     const router = useRouter()
     const authStore = useAuthStore()
     const notificationStore = useNotificationStore()
+    const isKycVerified = computed(() => authStore.user?.kyc_status === 'verified')
 
     // Form data
     const form = ref({
@@ -626,6 +641,10 @@ export default {
     }
 
     const submitProduct = async () => {
+      if (!isKycVerified.value) {
+        notificationStore.error('Vérification requise pour vendre.')
+        return
+      }
       if (!validateForm()) {
         showErrors.value = true
         return
@@ -736,7 +755,8 @@ export default {
       removeImage,
       isFile,
       getImageSrc,
-      submitProduct
+      submitProduct,
+      isKycVerified
     }
   }
 }

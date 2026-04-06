@@ -26,6 +26,21 @@
           <p v-if="user?.username" class="text-sm text-gray-400 font-medium mt-0.5">@{{ user.username }}</p>
           <p v-if="user?.bio" class="text-sm text-gray-600 leading-relaxed mt-2 max-w-sm">{{ user.bio }}</p>
 
+          <div class="flex items-center justify-center gap-2 mt-3">
+            <span
+              class="text-xs font-bold px-3 py-1 rounded-full"
+              :class="kycBadgeClass"
+            >
+              {{ kycLabel }}
+            </span>
+            <RouterLink
+              to="/profile/verification"
+              class="text-xs font-bold text-green-600 bg-green-50 px-3 py-1 rounded-full hover:bg-green-100 transition-colors"
+            >
+              Vérifier mon compte
+            </RouterLink>
+          </div>
+
           <div class="flex flex-wrap justify-center gap-2 mt-3">
             <span v-if="user?.location" class="inline-flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 border border-gray-100 px-3 py-1.5 rounded-full">
               <MapPinIcon class="w-3.5 h-3.5 text-green-500" /> {{ user.location }}
@@ -266,6 +281,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useDashboardStore } from '@/stores/dashboard'
 import ProductCard from '@/components/products/ProductCard.vue'
 import api from '@/services/api'
+import { useRealtime } from '@/composables/useRealtime'
 import {
   EditIcon, PackageIcon, UsersIcon,
   ActivityIcon, MapPinIcon, LinkIcon, HeartIcon, ShoppingCartIcon,
@@ -275,6 +291,7 @@ import {
 const router = useRouter()
 const authStore = useAuthStore()
 const dashboardStore = useDashboardStore()
+const { subscribeToRealtime } = useRealtime()
 
 const activeTab      = ref('products')
 const loadingProducts  = ref(false)
@@ -292,6 +309,23 @@ const user  = computed(() => authStore.user)
 const avatarError = ref(false)
 const avatarSrc = computed(() => user.value?.avatar_url || user.value?.avatar || '')
 const stats = computed(() => dashboardStore.stats.value)
+const kycStatus = computed(() => user.value?.kyc_status || 'none')
+const kycLabel = computed(() => {
+  switch (kycStatus.value) {
+    case 'verified': return 'Compte vérifié'
+    case 'pending': return 'Vérification en cours'
+    case 'rejected': return 'Vérification refusée'
+    default: return 'Non vérifié'
+  }
+})
+const kycBadgeClass = computed(() => {
+  switch (kycStatus.value) {
+    case 'verified': return 'bg-green-100 text-green-700'
+    case 'pending': return 'bg-yellow-100 text-yellow-700'
+    case 'rejected': return 'bg-red-100 text-red-600'
+    default: return 'bg-gray-100 text-gray-600'
+  }
+})
 
 const statCards = computed(() => [
   { label: 'Produits',   value: stats.value?.products_count  ?? 0 },
@@ -453,6 +487,17 @@ const loadUserStats = async () => {
   } catch { /* silent */ }
 }
 
+const refreshProfileState = async () => {
+  try {
+    const meRes = await api.get('/auth/user')
+    if (meRes.data?.user && authStore.user) {
+      Object.assign(authStore.user, meRes.data.user)
+    }
+  } catch { /* silent */ }
+
+  await loadUserStats()
+}
+
 watch(activeTab, (tab) => {
   if (tab === 'products'  && products.value.length === 0)  loadProducts()
   if (tab === 'followers')  loadFollowers()
@@ -460,5 +505,8 @@ watch(activeTab, (tab) => {
   if (tab === 'activity')   loadActivity()
 })
 
-onMounted(() => Promise.all([loadProducts(), loadUserStats()]))
+onMounted(() => {
+  Promise.all([loadProducts(), refreshProfileState()])
+  subscribeToRealtime('notifications', refreshProfileState, 3000)
+})
 </script>

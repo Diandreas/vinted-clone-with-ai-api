@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Notifications\KycStatusUpdated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class UserController extends Controller
@@ -43,6 +45,10 @@ class UserController extends Controller
         if ($request->filled('admin')) {
             $query->where('is_admin', $request->admin === 'true');
         }
+
+        if ($request->filled('kyc')) {
+            $query->where('kyc_status', $request->kyc);
+        }
         
         // Sort
         $sortBy = $request->get('sort_by', 'created_at');
@@ -50,6 +56,10 @@ class UserController extends Controller
         $query->orderBy($sortBy, $sortDir);
         
         $users = $query->paginate($request->get('per_page', 15));
+
+        $users->getCollection()->transform(function ($user) {
+            return $user->makeVisible(['kyc_document_path', 'kyc_selfie_path', 'kyc_rejection_reason']);
+        });
         
         return response()->json([
             'success' => true,
@@ -66,6 +76,7 @@ class UserController extends Controller
     public function show(User $user)
     {
         $user->load(['products', 'orders', 'followers', 'following']);
+        $user->makeVisible(['kyc_document_path', 'kyc_selfie_path', 'kyc_rejection_reason']);
         
         $stats = [
             'total_products' => $user->products()->count(),
@@ -186,7 +197,7 @@ class UserController extends Controller
         $validated = $request->validate([
             'user_ids' => 'required|array',
             'user_ids.*' => 'exists:users,id',
-            'action' => 'required|in:verify,unverify,activate,suspend,ban,delete',
+            'action' => 'required|in:verify,unverify,activate,suspend,ban,delete,kyc_approve,kyc_reject',
             'role' => 'nullable|string|in:user,admin,manager,analyst,moderator',
             'permissions' => 'nullable|array',
         ]);
@@ -215,6 +226,22 @@ class UserController extends Controller
                         $user->delete();
                     }
                     break;
+                case 'kyc_approve':
+                    $user->update([
+                        'kyc_status' => 'verified',
+                        'kyc_verified_at' => now(),
+                        'kyc_rejection_reason' => null,
+                        'is_verified' => true,
+                    ]);
+                    $this->notifyKycStatusUpdated($user, 'verified');
+                    break;
+                case 'kyc_reject':
+                    $user->update([
+                        'kyc_status' => 'rejected',
+                        'kyc_verified_at' => null,
+                    ]);
+                    $this->notifyKycStatusUpdated($user, 'rejected');
+                    break;
             }
             
             if (isset($validated['role'])) {
@@ -231,6 +258,67 @@ class UserController extends Controller
             'message' => 'Utilisateurs mis à jour avec succès'
         ]);
     }
+
+    public function kycApprove(User $user)
+    {
+        $user->update([
+            'kyc_status' => 'verified',
+            'kyc_verified_at' => now(),
+            'kyc_rejection_reason' => null,
+            'is_verified' => true,
+        ]);
+
+        $this->notifyKycStatusUpdated($user, 'verified');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'KYC approuvé'
+        ]);
+    }
+
+    public function kycReject(User $user, Request $request)
+    {
+        $validated = $request->validate([
+            'reason' => 'nullable|string|max:255'
+        ]);
+
+        $user->update([
+            'kyc_status' => 'rejected',
+            'kyc_verified_at' => null,
+            'kyc_rejection_reason' => $validated['reason'] ?? null,
+        ]);
+
+        $this->notifyKycStatusUpdated($user, 'rejected', $validated['reason'] ?? null);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'KYC rejeté'
+        ]);
+    }
+
+    public function kycDocument(User $user)
+    {
+        if (!$user->kyc_document_path || !Storage::exists($user->kyc_document_path)) {
+            return response()->json(['success' => false, 'message' => 'Document introuvable'], 404);
+        }
+
+        $mime = Storage::mimeType($user->kyc_document_path) ?? 'application/octet-stream';
+        $file = Storage::get($user->kyc_document_path);
+
+        return response($file, 200)->header('Content-Type', $mime);
+    }
+
+    public function kycSelfie(User $user)
+    {
+        if (!$user->kyc_selfie_path || !Storage::exists($user->kyc_selfie_path)) {
+            return response()->json(['success' => false, 'message' => 'Selfie introuvable'], 404);
+        }
+
+        $mime = Storage::mimeType($user->kyc_selfie_path) ?? 'application/octet-stream';
+        $file = Storage::get($user->kyc_selfie_path);
+
+        return response($file, 200)->header('Content-Type', $mime);
+    }
     
     private function getDefaultPermissions(string $role): array
     {
@@ -241,5 +329,10 @@ class UserController extends Controller
             'moderator' => ['dashboard:view', 'products:moderate', 'lives:moderate'],
             default => []
         };
+    }
+
+    private function notifyKycStatusUpdated(User $user, string $status, ?string $reason = null): void
+    {
+        $user->notify(new KycStatusUpdated($status, $reason));
     }
 }

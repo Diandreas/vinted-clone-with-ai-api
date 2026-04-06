@@ -2,7 +2,7 @@
  * iOS Utilities for RIKEAA PWA
  * Handles iOS-specific functionality and optimizations
  */
-import { isNative } from '@/utils/platform';
+import { isNative } from './platform';
 
 // Detect iOS device
 export const isIOS = () => {
@@ -207,4 +207,3 @@ export default {
     setupIOSPWA,
     initIOSUtils
 };
-

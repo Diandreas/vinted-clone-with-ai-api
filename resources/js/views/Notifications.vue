@@ -161,6 +161,8 @@ const normalizeNotification = (raw) => {
     new_message: 'Nouveau message',
     new_follower: 'Nouveau follower',
     order_status_changed: 'Commande mise à jour',
+    kyc_status_updated: data.status === 'verified' ? 'KYC approuvé' : 'KYC rejeté',
+    kyc_submission_received: 'Nouvelle demande KYC',
   }
 
   return {
@@ -233,6 +235,10 @@ const getUrl = (notification) => {
       return `/profile/${notification.data?.follower_id || notification.data?.user_id}`
     case 'order_status_changed':
       return `/orders/${notification.data?.order_id}`
+    case 'kyc_status_updated':
+      return '/profile/verification'
+    case 'kyc_submission_received':
+      return '/admin/users'
     default:
       return null
   }
@@ -246,6 +252,8 @@ const getIcon = (type) => {
     new_message: MessageCircleIcon,
     new_follower: UserPlusIcon,
     order_status_changed: PackageIcon,
+    kyc_status_updated: BellIcon,
+    kyc_submission_received: BellIcon,
   }
   return map[type] || BellIcon
 }
@@ -258,6 +266,8 @@ const getIconClass = (type) => {
     new_message: 'bg-green-100 text-green-600',
     new_follower: 'bg-purple-100 text-purple-600',
     order_status_changed: 'bg-green-100 text-green-600',
+    kyc_status_updated: 'bg-blue-100 text-blue-600',
+    kyc_submission_received: 'bg-amber-100 text-amber-700',
   }
   return map[type] || 'bg-gray-100 text-gray-600'
 }
